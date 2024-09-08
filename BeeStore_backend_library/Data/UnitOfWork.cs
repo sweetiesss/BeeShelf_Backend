@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BeeStore_backend_repository.Data
+namespace BeeStore_Repository.Data
 {
     internal class UnitOfWork
     {

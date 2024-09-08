@@ -1,6 +1,6 @@
 ﻿using System.Linq.Expressions;
 
-namespace BeeStore_backend_repository.Interfaces
+namespace BeeStore_Repository.Interfaces
 {
     public interface IGenericRepository<T> where T : class
     {

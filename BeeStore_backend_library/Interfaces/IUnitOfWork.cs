@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BeeStore_backend_repository.Interfaces
+namespace BeeStore_Repository.Interfaces
 {
     internal interface IUnitOfWork
     {

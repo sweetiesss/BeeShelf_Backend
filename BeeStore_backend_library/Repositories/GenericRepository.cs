@@ -1,8 +1,8 @@
-﻿using BeeStore_backend_repository.Interfaces;
+﻿using BeeStore_Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
-namespace BeeStore_backend_repository.Repositories
+namespace BeeStore_Repository.Repositories
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {

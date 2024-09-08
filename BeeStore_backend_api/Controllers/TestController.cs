@@ -1,6 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 
-namespace BeeStore_backend_api.Controllers
+namespace BeeStore_Api.Controllers
 {
     [ApiController]
     public class TestController : BaseController

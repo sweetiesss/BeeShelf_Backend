@@ -1,0 +1,36 @@
+{
+  "exclude": [
+    "**/bin",
+    "**/bower_components",
+    "**/jspm_packages",
+    "**/node_modules",
+    "**/obj",
+    "**/platforms"
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl":  "https://localhost:7001"
+  },
+  "Routes": [
+    {
+      "UpstreamPathTemplate": "/gateway/{everything}",
+      "UpstreamHttpMethod": [ "Get" ],
+      "DownstreamPathTemplate": "/api/Test/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7092
+        }
+      ],
+      "LoadBalancerOptions": {
+        "Type": "RoundRobin"
+      },
+      "HealthCheckOptions": {
+        "Timeout": 5000,
+        "Interval": 10000,
+        "Retries": 3,
+        "Path": "/health"
+      }
+    }
+  ]
+}
