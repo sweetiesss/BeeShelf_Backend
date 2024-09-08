@@ -48,6 +48,12 @@ namespace BeeStore_Repository.Repositories
             }
         }
 
+        public virtual async Task<IQueryable<T>> GetQueryable()
+        {
+            IQueryable<T> query = _dbSet;
+            return query;
+        }
+
         public async Task<T> SingleOrDefaultAsync(Expression<Func<T, bool>> predicate)
         {
             return await _dbSet.SingleOrDefaultAsync(predicate);
