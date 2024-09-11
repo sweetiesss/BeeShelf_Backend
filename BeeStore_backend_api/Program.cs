@@ -1,3 +1,4 @@
+using BeeStore_Api.Authentication;
 using BeeStore_Repository.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -20,11 +21,11 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
+app.UseMiddleware<ApiKeyAuthMiddleware>();
+
 app.UseAuthorization();
 
 app.MapControllers();
 
-//app.Urls.Add("http://localhost:5000");
-//app.Urls.Add("http://localhost:5001");
 
 app.Run();

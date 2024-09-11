@@ -8,13 +8,16 @@
     "**/platforms"
   ],
   "GlobalConfiguration": {
-    "BaseUrl":  "https://localhost:7001"
+    "BaseUrl": "https://localhost:7001"
   },
   "Routes": [
     {
       "UpstreamPathTemplate": "/gateway/{everything}",
       "UpstreamHttpMethod": [ "Get" ],
-      "DownstreamPathTemplate": "/api/Test/{everything}",
+      "UpstreamHeaderTransform": {
+        "X-Api-Key": "b3e4f7b76e344c90bc5e1f1d8d6c2f98"
+      },
+      "DownstreamPathTemplate": "/api/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
@@ -30,6 +33,13 @@
         "Interval": 10000,
         "Retries": 3,
         "Path": "/health"
+      },
+      "RateLimitOptions": {
+        "ClientWhitelist": [],
+        "EnableRateLimiting": true,
+        "Period": "5s",
+        "PeriodTimespan": 3,
+        "Limit": 3
       }
     }
   ]
