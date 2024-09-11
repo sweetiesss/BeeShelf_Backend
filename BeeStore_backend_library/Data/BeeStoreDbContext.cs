@@ -47,7 +47,7 @@ public partial class BeeStoreDbContext : DbContext
 
         IConfigurationRoot configuration = builder.Build();
 
-        optionsBuilder.UseMySQL(configuration.GetConnectionString("BeeStoreDB"));
+        optionsBuilder.UseMySQL(configuration.GetConnectionString("DatabaseConnection"));
     }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

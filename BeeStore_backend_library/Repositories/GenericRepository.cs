@@ -1,4 +1,5 @@
-﻿using BeeStore_Repository.Interfaces;
+﻿using BeeStore_Repository.DTO;
+using BeeStore_Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
@@ -20,33 +21,8 @@ namespace BeeStore_Repository.Repositories
             return await _dbSet.FindAsync(id);
         }
 
-        public async Task<IEnumerable<T>> GetAllAsync(
-            Expression<Func<T, bool>> filter = null,
-            Func<IQueryable<T>, IOrderedQueryable<T>> orderBy = null,
-            string includeProperties = "")
-        {
-            IQueryable<T> query = _dbSet;
+        public Task<List<T>> GetAllAsync() => _dbSet.ToListAsync();
 
-            if (filter != null)
-            {
-                query = query.Where(filter);
-            }
-
-            foreach (var includeProperty in includeProperties.Split
-                (new char[] { ',' }, StringSplitOptions.RemoveEmptyEntries))
-            {
-                query = query.Include(includeProperty);
-            }
-
-            if (orderBy != null)
-            {
-                return await orderBy(query).ToListAsync();
-            }
-            else
-            {
-                return await query.ToListAsync();
-            }
-        }
 
         public virtual async Task<IQueryable<T>> GetQueryable()
         {

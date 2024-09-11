@@ -1,4 +1,6 @@
-﻿using System;
+﻿using BeeStore_Repository.DTO;
+using BeeStore_Repository.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -8,5 +10,7 @@ namespace BeeStore_Repository.Services.Interfaces
 {
     public interface IUserService
     {
+        Task<Pagination<UserListDTO>> GetAllUser(int pageIndex, int pageSize);
+
     }
 }
