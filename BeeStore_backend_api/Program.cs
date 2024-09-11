@@ -1,9 +1,11 @@
 using BeeStore_Api.Authentication;
 using BeeStore_Repository.Data;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-var configuration = builder.Configuration.Get<AppConfiguration>();
+
+var configuration = builder.Configuration.GetSection("ConnectionStrings").Get<AppConfiguration>();
 builder.Services.AddInfrastructuresService(configuration.DatabaseConnection);
 builder.Services.AddWebAPIService();
 

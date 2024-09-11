@@ -11,6 +11,6 @@ namespace BeeStore_Repository.Services.Interfaces
     public interface IUserService
     {
         Task<Pagination<UserListDTO>> GetAllUser(int pageIndex, int pageSize);
-
+        Task<UserListDTO> Login(string email, string password);
     }
 }

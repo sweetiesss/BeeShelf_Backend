@@ -8,6 +8,6 @@ namespace BeeStore_Repository.Data
 {
     public class AppConfiguration
     {
-        public string DatabaseConnection { get; set; } = "server=beestoredatabase.cdciasgw89n8.ap-northeast-1.rds.amazonaws.com;port=3306;user=user;password=baijainonsoaunguqnwunqwumdoaj;database=BeestoreDb";
+        public string DatabaseConnection { get; set; } = string.Empty;
     }
 }

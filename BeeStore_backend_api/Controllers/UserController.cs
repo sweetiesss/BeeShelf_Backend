@@ -23,6 +23,13 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Login(string email, string password)
+        {
+            var result = await _userService.Login(email, password);
+            return Ok(result);
+        }
+
                                                     
     }
 }

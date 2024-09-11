@@ -3,6 +3,7 @@ using BeeStore_Repository.Mapper.CustomResolver;
 using BeeStore_Repository.Services;
 using BeeStore_Repository.Services.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System.Diagnostics;
 
@@ -21,6 +22,8 @@ namespace BeeStore_Repository.Data
             //services.AddScoped<CustomEmailResolver>();
             //services.AddScoped<CustomSubscriptionNameResolver>();
             services.AddAutoMapper(typeof(MapperConfigurationsProfile).Assembly);
+            
+
             services.AddDbContext<BeeStoreDbContext>(option => option.UseMySQL(databaseConnection));
 
             return services;

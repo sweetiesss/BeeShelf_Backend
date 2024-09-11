@@ -4,6 +4,7 @@ using BeeStore_Repository.DTO;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
+using Microsoft.EntityFrameworkCore;
 using Mysqlx;
 using MySqlX.XDevAPI.Common;
 using System;
@@ -32,6 +33,26 @@ namespace BeeStore_Repository.Services
             return await ListPagination<UserListDTO>.PaginateList(result, pageIndex, pageSize);
         }
 
-
+        public async Task<UserListDTO> Login(string email, string password)
+        {
+            var user = await _unitOfWork.UserRepo.GetQueryable();
+            var exist = await user.Where(a => a.Email == email).FirstOrDefaultAsync();
+            if (exist != null)
+            {
+                if (exist.Password.Equals(password))
+                {
+                    return _mapper.Map<UserListDTO>(exist);
+                }
+                else
+                {
+                    throw new Exception("Password is incorrect");
+                    ///PLACEHOLDER WILL CHANGE LATER
+                }
+            }
+            else
+            {
+                throw new Exception("Email and password is incorrect");
+            }
+        }
     }
 }
