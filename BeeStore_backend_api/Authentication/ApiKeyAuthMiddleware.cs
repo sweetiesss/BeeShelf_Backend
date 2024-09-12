@@ -1,4 +1,7 @@
-﻿namespace BeeStore_Api.Authentication
+﻿using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
+
+namespace BeeStore_Api.Authentication
 {
     public class ApiKeyAuthMiddleware
     {
@@ -32,8 +35,37 @@
 
         private bool IsValidApiKey(string providedApiKey)
         {
-            var apikey = _configuration.GetValue<string>(AuthConstant.ApiKeySectionName);
-            return providedApiKey == apikey;
+            //var apikey = _configuration.GetValue<string>(AuthConstant.ApiKeySectionName);
+            return providedApiKey.Equals(RetrieveApiKey());
+        }
+
+        private string RetrieveApiKey()
+        {
+            var keyVaultURL = _configuration.GetValue<string>(AuthConstant.KeyVaultUrl);
+            var keyVaultClientId = _configuration.GetValue<string>(AuthConstant.ClientId);
+            var keyVaultClientSecret = _configuration.GetValue<string>(AuthConstant.ClientSecret);
+            var keyVaultDirectoryId = _configuration.GetValue<string>(AuthConstant.DirectoryId);
+
+
+            if (string.IsNullOrEmpty(keyVaultURL) ||
+                string.IsNullOrEmpty(keyVaultClientId) ||
+                string.IsNullOrEmpty(keyVaultClientSecret) ||
+                string.IsNullOrEmpty(keyVaultDirectoryId))
+            {
+                throw new InvalidOperationException("Key Vault configuration values are missing.");
+            }
+
+            var credential = new ClientSecretCredential(
+                keyVaultDirectoryId,
+                keyVaultClientId,
+                keyVaultClientSecret
+            );
+
+            var client = new SecretClient(new Uri(keyVaultURL), credential);
+
+            var secretResponse = client.GetSecret("BeeStore-Apikey");
+
+            return secretResponse.Value.Value;
         }
 
     }

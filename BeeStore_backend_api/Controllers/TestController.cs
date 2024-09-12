@@ -6,6 +6,7 @@ namespace BeeStore_Api.Controllers
     public class TestController : BaseController
     {
         [HttpGet]
+        [ValidateAntiForgeryToken]
         public IActionResult Index()
         {
             return Ok("Hello");

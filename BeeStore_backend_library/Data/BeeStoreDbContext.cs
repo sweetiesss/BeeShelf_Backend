@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using BeeStore_Repository.Models;
+using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
@@ -38,6 +40,47 @@ public partial class BeeStoreDbContext : DbContext
     public virtual DbSet<WarehouseShipper> WarehouseShippers { get; set; }
 
     public virtual DbSet<WarehouseStaff> WarehouseStaffs { get; set; }
+
+
+    //
+    // Pay absolutely no attention here.
+    // Nothing to see here.
+    // Just ignore this part, do NOT modify this.
+    //
+    //private string RetrieveApiKey()
+    //{
+    //    var builder = new ConfigurationBuilder()
+    //    .SetBasePath(Directory.GetCurrentDirectory())
+    //    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+
+    //    IConfigurationRoot _configuration = builder.Build();
+
+    //    var keyVaultURL = _configuration.GetValue<string>(AuthConstant.KeyVaultUrl);
+    //    var keyVaultClientId = _configuration.GetValue<string>(AuthConstant.ClientId);
+    //    var keyVaultClientSecret = _configuration.GetValue<string>(AuthConstant.ClientSecret);
+    //    var keyVaultDirectoryId = _configuration.GetValue<string>(AuthConstant.DirectoryId);
+
+
+    //    if (string.IsNullOrEmpty(keyVaultURL) ||
+    //        string.IsNullOrEmpty(keyVaultClientId) ||
+    //        string.IsNullOrEmpty(keyVaultClientSecret) ||
+    //        string.IsNullOrEmpty(keyVaultDirectoryId))
+    //    {
+    //        throw new InvalidOperationException("Key Vault configuration values are missing.");
+    //    }
+
+    //    var credential = new ClientSecretCredential(
+    //        keyVaultDirectoryId,
+    //        keyVaultClientId,
+    //        keyVaultClientSecret
+    //    );
+
+    //    var client = new SecretClient(new Uri(keyVaultURL), credential);
+
+    //    var secretResponse = client.GetSecret("BeeStore-Apikey");
+
+    //    return secretResponse.Value.Value;
+    //}
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
