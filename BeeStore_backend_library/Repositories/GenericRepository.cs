@@ -1,4 +1,5 @@
-﻿using BeeStore_Repository.DTO;
+﻿using BeeStore_Repository.Data;
+using BeeStore_Repository.DTO;
 using BeeStore_Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
@@ -7,12 +8,12 @@ namespace BeeStore_Repository.Repositories
 {
     public class GenericRepository<T> : IGenericRepository<T> where T : class
     {
-        protected readonly DbContext _context;
+        protected readonly BeeStoreDbContext _context;
         protected readonly DbSet<T> _dbSet;
 
-        public GenericRepository(DbContext context)
+        public GenericRepository(BeeStoreDbContext context)
         {
-            _context = context;
+            this._context = context;
             _dbSet = context.Set<T>();
         }
 
@@ -43,15 +44,11 @@ namespace BeeStore_Repository.Repositories
         public void Update(T entity)
         {
             _dbSet.Attach(entity);
-            _context.Entry(entity).State = EntityState.Modified;
+            
         }
 
         public void Delete(T entity)
         {
-            if (_context.Entry(entity).State == EntityState.Detached)
-            {
-                _dbSet.Attach(entity);
-            }
             _dbSet.Remove(entity);
         }
 

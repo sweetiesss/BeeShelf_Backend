@@ -10,9 +10,6 @@ namespace BeeStore_Repository.Data;
 
 public partial class BeeStoreDbContext : DbContext
 {
-    public BeeStoreDbContext()
-    {
-    }
 
     public BeeStoreDbContext(DbContextOptions<BeeStoreDbContext> options)
         : base(options)
@@ -82,16 +79,7 @@ public partial class BeeStoreDbContext : DbContext
     //    return secretResponse.Value.Value;
     //}
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        var builder = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
 
-        IConfigurationRoot configuration = builder.Build();
-
-        optionsBuilder.UseMySQL(configuration.GetConnectionString("DatabaseConnection"));
-    }
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder

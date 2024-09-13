@@ -2,6 +2,7 @@ using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using BeeStore_Api.Authentication;
 using BeeStore_Repository.Data;
+using BeeStore_Repository.Logger.GlobalExceptionHandler;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -11,9 +12,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 if (builder.Environment.IsProduction())
 {
-    var configuration = builder.Configuration.GetSection("ConnectionStrings").Get<AppConfiguration>();
+    var configuration = builder.Configuration.Get<AppConfiguration>();
     builder.Services.AddInfrastructuresService(configuration.DatabaseConnection);
     builder.Services.AddWebAPIService();
+
 }
 
 if (builder.Environment.IsDevelopment())
@@ -39,7 +41,7 @@ if (builder.Environment.IsDevelopment())
         new Uri(keyVaultURL),
         credential
     );
-
+        
     var client = new SecretClient(new Uri(keyVaultURL), credential);
     var dbConnectionSecret = client.GetSecret("DBConnection");
 
@@ -65,7 +67,7 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 
 app.UseMiddleware<ApiKeyAuthMiddleware>();
-
+app.UseMiddleware<GlobalExceptionMiddleware>();
 app.UseAuthorization();
 
 app.MapControllers();

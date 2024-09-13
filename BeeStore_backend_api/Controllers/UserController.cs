@@ -1,4 +1,5 @@
 ﻿using BeeStore_Repository.Data;
+using BeeStore_Repository.Logger;
 using BeeStore_Repository.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel;

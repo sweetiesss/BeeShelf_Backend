@@ -11,8 +11,13 @@ namespace BeeStore_Repository.Data
 {
     public class UnitOfWork : IDisposable
     {
-        private BeeStoreDbContext context = new BeeStoreDbContext();
+        private BeeStoreDbContext _context;
         private GenericRepository<User> userRepo;
+
+        public UnitOfWork(BeeStoreDbContext context)
+        {
+            _context = context;
+        }
 
         public GenericRepository<User> UserRepo
         {
@@ -20,7 +25,7 @@ namespace BeeStore_Repository.Data
             {
                 if (this.userRepo == null)
                 {
-                    this.userRepo = new GenericRepository<User>(context);
+                    this.userRepo = new GenericRepository<User>(_context);
                 }
                 return userRepo;
             }
@@ -28,7 +33,7 @@ namespace BeeStore_Repository.Data
 
         public async Task SaveAsync()
         {
-            await context.SaveChangesAsync();
+            await _context.SaveChangesAsync();
         }
 
         private bool disposed = false;
@@ -39,7 +44,7 @@ namespace BeeStore_Repository.Data
             {
                 if (disposing)
                 {
-                    context.Dispose();
+                    _context.Dispose();
                 }
             }
             this.disposed = true;

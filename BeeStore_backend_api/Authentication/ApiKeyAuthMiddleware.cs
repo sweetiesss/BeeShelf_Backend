@@ -1,5 +1,6 @@
 ﻿using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
+using BeeStore_Repository.Data;
 
 namespace BeeStore_Api.Authentication
 {
@@ -7,6 +8,7 @@ namespace BeeStore_Api.Authentication
     {
         private readonly RequestDelegate _next;
         private readonly IConfiguration _configuration;
+
 
         public ApiKeyAuthMiddleware(RequestDelegate next, IConfiguration configuration)
         {
@@ -41,6 +43,7 @@ namespace BeeStore_Api.Authentication
 
         private string RetrieveApiKey()
         {
+
             var keyVaultURL = _configuration.GetValue<string>(AuthConstant.KeyVaultUrl);
             var keyVaultClientId = _configuration.GetValue<string>(AuthConstant.ClientId);
             var keyVaultClientSecret = _configuration.GetValue<string>(AuthConstant.ClientSecret);
