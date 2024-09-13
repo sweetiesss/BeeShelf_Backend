@@ -26,6 +26,8 @@ obj/
 
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
+*_logfile.txt
+internal_logs
 
 # Mono auto generated files
 mono_crash.*
