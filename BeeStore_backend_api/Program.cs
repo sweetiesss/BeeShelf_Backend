@@ -4,45 +4,33 @@ using BeeStore_Api.Authentication;
 using BeeStore_Repository.Data;
 using BeeStore_Repository.Logger.GlobalExceptionHandler;
 using Microsoft.AspNetCore.Cors.Infrastructure;
+using Microsoft.Azure.KeyVault;
+using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
 
-if (builder.Environment.IsProduction())
+if (builder.Environment.IsDevelopment())
 {
     var configuration = builder.Configuration.Get<AppConfiguration>();
     builder.Services.AddInfrastructuresService(configuration.DatabaseConnection);
     builder.Services.AddWebAPIService();
-
 }
 
-if (builder.Environment.IsDevelopment())
+if (builder.Environment.IsProduction())
 {
     var keyVaultURL = builder.Configuration.GetSection("KeyVault:KeyVaultURL").Value!.ToString();
-    var keyVaultClientId = builder.Configuration.GetSection("KeyVault:ClientId").Value!.ToString();
-    var keyVaultClientSecret = builder.Configuration.GetSection("KeyVault:ClientSecret").Value!.ToString();
-    var keyVaultDirectoryId = builder.Configuration.GetSection("KeyVault:DirectoryID").Value!.ToString();
 
-    if (string.IsNullOrEmpty(keyVaultURL) || string.IsNullOrEmpty(keyVaultClientId) ||
-        string.IsNullOrEmpty(keyVaultClientSecret) || string.IsNullOrEmpty(keyVaultDirectoryId))
-    {
-        throw new InvalidOperationException("Key Vault configuration values are missing.");
-    }
-
-    var credential = new ClientSecretCredential(
-        keyVaultDirectoryId,
-        keyVaultClientId,
-        keyVaultClientSecret
-    );
+    var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(new AzureServiceTokenProvider().KeyVaultTokenCallback));
 
     builder.Configuration.AddAzureKeyVault(
         new Uri(keyVaultURL),
-        credential
+        new DefaultAzureCredential()
     );
-        
-    var client = new SecretClient(new Uri(keyVaultURL), credential);
+
+    var client = new SecretClient(new Uri(keyVaultURL), new DefaultAzureCredential());
     var dbConnectionSecret = client.GetSecret("DBConnection");
 
     if (dbConnectionSecret.Value != null)
@@ -68,6 +56,7 @@ app.UseHttpsRedirection();
 
 app.UseMiddleware<ApiKeyAuthMiddleware>();
 app.UseMiddleware<GlobalExceptionMiddleware>();
+
 app.UseAuthorization();
 
 app.MapControllers();
