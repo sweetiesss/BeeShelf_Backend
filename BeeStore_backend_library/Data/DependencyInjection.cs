@@ -19,6 +19,8 @@ namespace BeeStore_Repository.Data
         {
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ILoggerManager, LoggerManager>();
+            services.AddScoped<IJWTService, JWTService>();
+
             services.AddScoped<UnitOfWork>();
             services.AddScoped<GlobalExceptionMiddleware>();
             services.AddScoped<CustomRoleNameResolver>();
