@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
+using MySqlX.XDevAPI;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Text;
 
@@ -18,8 +19,27 @@ var builder = WebApplication.CreateBuilder(args);
 
 if (builder.Environment.IsDevelopment())
 {
-    var configuration = builder.Configuration.Get<AppConfiguration>();
+    var configuration = builder.Configuration.Get<AppConfiguration>() ?? throw new ArgumentNullException("Configuration can not be configured.");
     builder.Services.AddInfrastructuresService(configuration.DatabaseConnection);
+
+    builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+.AddJwtBearer(options =>
+{
+    options.TokenValidationParameters = new TokenValidationParameters
+    {
+        ValidateIssuer = true,
+        ValidateAudience = true,
+        ValidateLifetime = true,
+        ValidateIssuerSigningKey = true,
+        ValidIssuer = builder.Configuration["Jwt:Issuer"],
+        ValidAudience = builder.Configuration["Jwt:Audience"],
+        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
+    };
+});
 }
 
 if (builder.Environment.IsProduction())
@@ -44,27 +64,28 @@ if (builder.Environment.IsProduction())
     {
         throw new InvalidOperationException("DBConnection secret is missing in Key Vault.");
     }
+
+    builder.Services.AddAuthentication(options =>
+    {
+        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+    })
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = client.GetSecret("BeeStore-JWT-Issuer").Value.Value ?? throw new ArgumentNullException("JWT-Issuer is not configured on Key Vault."),
+            ValidAudience = client.GetSecret("BeeStore-JWT-Audience").Value.Value ?? throw new ArgumentNullException("JWT-Audience is not configured on Key Vault."),
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(client.GetSecret("BeeStore-JWT-SecretKey").Value.Value
+                                                        ?? throw new ArgumentNullException("BeeStore-JWT-SecretKey is not configured.")))
+        };
+    });
 }
 
-
-builder.Services.AddAuthentication(options =>
-{
-    options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-    options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-})
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-    };
-});
 
 
 builder.Services.AddWebAPIService();
@@ -81,8 +102,11 @@ app.UseSwaggerUI();
 
 app.UseHttpsRedirection();
 
-app.UseMiddleware<ApiKeyAuthMiddleware>();
 app.UseMiddleware<GlobalExceptionMiddleware>();
+if (builder.Environment.IsProduction()) 
+{ 
+    //app.UseMiddleware<ApiKeyAuthMiddleware>();
+}
 
 app.UseAuthentication();
 app.UseAuthorization();

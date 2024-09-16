@@ -25,6 +25,10 @@
           "Port": 7092
         }
       ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer",
+        "AllowedScopes": []
+      },
       "LoadBalancerOptions": {
         "Type": "RoundRobin"
       },
