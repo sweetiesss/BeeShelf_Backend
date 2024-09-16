@@ -16,7 +16,6 @@ namespace BeeStore_Repository.Data
         {
             options.SwaggerDoc("v1", new OpenApiInfo { Title = "BeeStore API", Version = "v1" });
 
-            // Add JWT Bearer scheme
             options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
                 In = ParameterLocation.Header,
