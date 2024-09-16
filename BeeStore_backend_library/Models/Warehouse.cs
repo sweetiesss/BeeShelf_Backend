@@ -15,6 +15,8 @@ public partial class Warehouse
 
     public DateTime? CreateDate { get; set; }
 
+    public ulong? IsDeleted { get; set; }
+
     public virtual ICollection<Inventory> Inventories { get; set; } = new List<Inventory>();
 
     public virtual ICollection<WarehouseShipper> WarehouseShippers { get; set; } = new List<WarehouseShipper>();
