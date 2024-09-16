@@ -7,11 +7,11 @@ public partial class Order
 {
     public int Id { get; set; }
 
-    public string PartnerEmail { get; set; } = null!;
+    public string? PartnerEmail { get; set; }
 
     public DateTime? CreateDate { get; set; }
 
-    public bool? OrderProcessStatus { get; set; }
+    public string? OrderProcessStatus { get; set; }
 
     public string? ReceiverAddress { get; set; }
 
@@ -31,7 +31,9 @@ public partial class Order
 
     public int? ProductId { get; set; }
 
-    public virtual Partner PartnerEmailNavigation { get; set; } = null!;
+    public ulong? IsDeleted { get; set; }
+
+    public virtual Partner? PartnerEmailNavigation { get; set; }
 
     public virtual Product? Product { get; set; }
 }

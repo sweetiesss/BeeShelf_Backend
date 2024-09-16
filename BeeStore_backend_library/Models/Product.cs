@@ -7,27 +7,23 @@ public partial class Product
 {
     public int Id { get; set; }
 
-    public string? Barcode { get; set; }
-
     public string Name { get; set; } = null!;
 
     public int? Amount { get; set; }
 
     public float? Weight { get; set; }
 
-    public float? Volume { get; set; }
-
     public DateTime? CreateDate { get; set; }
-
-    public bool? Status { get; set; }
 
     public int? CategoryId { get; set; }
 
-    public int? InventoryId { get; set; }
+    public ulong? IsDeleted { get; set; }
 
-    public virtual Category? Category { get; set; }
-
-    public virtual Inventory? Inventory { get; set; }
+    public virtual CategoryType? Category { get; set; }
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
+
+    public virtual ICollection<Package> Packages { get; set; } = new List<Package>();
+
+    public virtual ICollection<ProductImage> ProductImages { get; set; } = new List<ProductImage>();
 }

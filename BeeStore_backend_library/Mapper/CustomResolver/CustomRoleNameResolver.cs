@@ -11,7 +11,7 @@ using System.Threading.Tasks;
 namespace BeeStore_Repository.Mapper.CustomResolver
 {
 
-        public class CustomRoleNameResolver : IValueResolver<User, UserListDTO, string>
+    public class CustomRoleNameResolver : IValueResolver<User, UserListDTO, string>
         {
             private readonly BeeStoreDbContext _context;
 

@@ -21,7 +21,7 @@ public partial class User
 
     public string? Picture { get; set; }
 
-    public bool? IsDeleted { get; set; }
+    public ulong? IsDeleted { get; set; }
 
     public int? RoleId { get; set; }
 

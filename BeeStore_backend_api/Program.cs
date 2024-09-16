@@ -19,27 +19,14 @@ var builder = WebApplication.CreateBuilder(args);
 
 if (builder.Environment.IsDevelopment())
 {
-    var configuration = builder.Configuration.Get<AppConfiguration>() ?? throw new ArgumentNullException("Configuration can not be configured.");
+    var configuration = builder.Configuration
+                        .GetSection("ConnectionStrings")
+                        .Get<AppConfiguration>() 
+                        ?? throw new ArgumentNullException("Configuration can not be configured.");
     builder.Services.AddInfrastructuresService(configuration.DatabaseConnection);
 
-    builder.Services.AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-.AddJwtBearer(options =>
-{
-    options.TokenValidationParameters = new TokenValidationParameters
-    {
-        ValidateIssuer = true,
-        ValidateAudience = true,
-        ValidateLifetime = true,
-        ValidateIssuerSigningKey = true,
-        ValidIssuer = builder.Configuration["Jwt:Issuer"],
-        ValidAudience = builder.Configuration["Jwt:Audience"],
-        IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
-    };
-});
+    builder.Services.AddJwtAuthentication(builder.Configuration);
+
 }
 
 if (builder.Environment.IsProduction())
@@ -65,25 +52,9 @@ if (builder.Environment.IsProduction())
         throw new InvalidOperationException("DBConnection secret is missing in Key Vault.");
     }
 
-    builder.Services.AddAuthentication(options =>
-    {
-        options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
-        options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
-    })
-    .AddJwtBearer(options =>
-    {
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
-            ValidateIssuer = true,
-            ValidateAudience = true,
-            ValidateLifetime = true,
-            ValidateIssuerSigningKey = true,
-            ValidIssuer = client.GetSecret("BeeStore-JWT-Issuer").Value.Value ?? throw new ArgumentNullException("JWT-Issuer is not configured on Key Vault."),
-            ValidAudience = client.GetSecret("BeeStore-JWT-Audience").Value.Value ?? throw new ArgumentNullException("JWT-Audience is not configured on Key Vault."),
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(client.GetSecret("BeeStore-JWT-SecretKey").Value.Value
-                                                        ?? throw new ArgumentNullException("BeeStore-JWT-SecretKey is not configured.")))
-        };
-    });
+    builder.Services.AddJwtAuthenticationProduction(client);
+
+   
 }
 
 

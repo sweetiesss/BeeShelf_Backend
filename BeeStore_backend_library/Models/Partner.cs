@@ -19,9 +19,13 @@ public partial class Partner
 
     public string UserEmail { get; set; } = null!;
 
+    public ulong? IsDeleted { get; set; }
+
     public virtual ICollection<Inventory> Inventories { get; set; } = new List<Inventory>();
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
+
+    public virtual ICollection<Package> Packages { get; set; } = new List<Package>();
 
     public virtual User UserEmailNavigation { get; set; } = null!;
 }
