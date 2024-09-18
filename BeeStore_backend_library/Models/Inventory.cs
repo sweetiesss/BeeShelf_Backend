@@ -7,7 +7,7 @@ public partial class Inventory
 {
     public int Id { get; set; }
 
-    public string PartnerEmail { get; set; } = null!;
+    public string? PartnerEmail { get; set; }
 
     public float? Height { get; set; }
 
@@ -27,7 +27,7 @@ public partial class Inventory
 
     public virtual ICollection<Package> Packages { get; set; } = new List<Package>();
 
-    public virtual Partner PartnerEmailNavigation { get; set; } = null!;
+    public virtual Partner? PartnerEmailNavigation { get; set; }
 
     public virtual ICollection<Request> Requests { get; set; } = new List<Request>();
 

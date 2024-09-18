@@ -39,7 +39,6 @@ public partial class BeeStoreDbContext : DbContext
 
     public virtual DbSet<WarehouseStaff> WarehouseStaffs { get; set; }
 
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder
@@ -72,7 +71,7 @@ public partial class BeeStoreDbContext : DbContext
 
             entity.ToTable("Inventory");
 
-            entity.HasIndex(e => e.PartnerEmail, "Inventory_ibfk_1");
+            entity.HasIndex(e => e.PartnerEmail, "partner_email");
 
             entity.HasIndex(e => e.WarehouseId, "warehouse_id");
 
@@ -97,7 +96,6 @@ public partial class BeeStoreDbContext : DbContext
             entity.HasOne(d => d.PartnerEmailNavigation).WithMany(p => p.Inventories)
                 .HasPrincipalKey(p => p.UserEmail)
                 .HasForeignKey(d => d.PartnerEmail)
-                .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("Inventory_ibfk_1");
 
             entity.HasOne(d => d.Warehouse).WithMany(p => p.Inventories)
@@ -136,6 +134,9 @@ public partial class BeeStoreDbContext : DbContext
                 .HasMaxLength(20)
                 .HasColumnName("order_process_status");
             entity.Property(e => e.PartnerEmail).HasColumnName("partner_email");
+            entity.Property(e => e.Picture)
+                .HasMaxLength(255)
+                .HasColumnName("picture");
             entity.Property(e => e.ProductAmount).HasColumnName("product_amount");
             entity.Property(e => e.ProductId).HasColumnName("product_id");
             entity.Property(e => e.ProductPrice)
@@ -422,6 +423,9 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.Name)
                 .HasMaxLength(100)
                 .HasColumnName("name");
+            entity.Property(e => e.Picture)
+                .HasMaxLength(255)
+                .HasColumnName("picture");
             entity.Property(e => e.Size).HasColumnName("size");
         });
 
