@@ -1,4 +1,5 @@
 ﻿using BeeStore_Repository.DTO;
+using BeeStore_Repository.Logger.GlobalExceptionHandler.CustomException;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 
@@ -30,7 +31,9 @@ namespace BeeStore_Repository.Logger.GlobalExceptionHandler
                     {
 
                         case AppException e:
-                            
+                            response.StatusCode = (int)HttpStatusCode.BadRequest;
+                            break;
+                        case DuplicateException e:
                             response.StatusCode = (int)HttpStatusCode.BadRequest;
                             break;
                         case KeyNotFoundException e:

@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using BeeStore_Repository.Data;
-using BeeStore_Repository.DTO;
+using BeeStore_Repository.DTO.UserDTOs;
 using BeeStore_Repository.Models;
 using System;
 using System.Collections.Generic;

@@ -1,6 +1,7 @@
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using BeeStore_Api.Authentication;
+using BeeStore_Repository;
 using BeeStore_Repository.Data;
 using BeeStore_Repository.Logger.GlobalExceptionHandler;
 using Microsoft.AspNetCore.Authentication.JwtBearer;

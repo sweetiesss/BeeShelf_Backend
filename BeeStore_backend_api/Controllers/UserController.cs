@@ -1,4 +1,5 @@
 ﻿using BeeStore_Repository.Data;
+using BeeStore_Repository.DTO.UserDTOs;
 using BeeStore_Repository.Logger;
 using BeeStore_Repository.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
@@ -16,6 +17,13 @@ namespace BeeStore_Api.Controllers
             _userService = userService;
         }
 
+        [HttpPost]
+        public async Task<IActionResult> Login([FromBody]UserLoginRequestDTO request)
+        {
+            var result = await _userService.Login(request.email, request.password);
+            return Ok(result);
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetUsers([FromQuery][DefaultValue(0)] int pageIndex,
                                                                [FromQuery][DefaultValue(10)] int pageSize)
@@ -25,9 +33,23 @@ namespace BeeStore_Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> Login(string email, string password)
+        public async Task<IActionResult> CreateUser([FromBody]UserCreateRequestDTO user)
         {
-            var result = await _userService.Login(email, password);
+            var result = await _userService.CreateUser(user);
+            return Ok(result);
+        }
+
+        [HttpPut]
+        public async Task<IActionResult> UpdateUser([FromBody]UserUpdateRequestDTO user)
+        {
+            var result = await _userService.UpdateUser(user);
+            return Ok(result);
+        }
+
+        [HttpDelete]
+        public async Task<IActionResult> DeleteUser([FromQuery]string email)
+        {
+            var result = await _userService.DeleteUser(email);
             return Ok(result);
         }
 
