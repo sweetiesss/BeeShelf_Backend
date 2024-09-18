@@ -1,4 +1,5 @@
-﻿using BeeStore_Repository.Models;
+﻿using BeeStore_Repository.Data;
+using BeeStore_Repository.Models;
 using BeeStore_Repository.Repositories;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -7,7 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BeeStore_Repository.Data
+namespace BeeStore_Repository
 {
     public class UnitOfWork : IDisposable
     {
@@ -23,9 +24,9 @@ namespace BeeStore_Repository.Data
         {
             get
             {
-                if (this.userRepo == null)
+                if (userRepo == null)
                 {
-                    this.userRepo = new GenericRepository<User>(_context);
+                    userRepo = new GenericRepository<User>(_context);
                 }
                 return userRepo;
             }
@@ -40,14 +41,14 @@ namespace BeeStore_Repository.Data
 
         protected virtual void Dispose(bool disposing)
         {
-            if (!this.disposed)
+            if (!disposed)
             {
                 if (disposing)
                 {
                     _context.Dispose();
                 }
             }
-            this.disposed = true;
+            disposed = true;
         }
 
         public void Dispose()

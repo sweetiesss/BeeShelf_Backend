@@ -1,19 +1,13 @@
 ﻿using AutoMapper;
-using BeeStore_Repository.Data;
 using BeeStore_Repository.DTO;
+using BeeStore_Repository.DTO.UserDTOs;
 using BeeStore_Repository.Logger;
+using BeeStore_Repository.Logger.GlobalExceptionHandler.CustomException;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
-using Mysqlx;
-using MySqlX.XDevAPI.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Linq.Expressions;
 
 namespace BeeStore_Repository.Services
 {
@@ -29,41 +23,111 @@ namespace BeeStore_Repository.Services
             _logger = logger;
         }
 
+        public async Task<UserCreateRequestDTO> CreateUser(UserCreateRequestDTO user)
+        {
+            Expression<Func<User, bool>> keySelector = u => u.Email == user.Email;
+            var exist = await _unitOfWork.UserRepo.GetByKeyAsync(user.Email, keySelector);
+            if (exist != null)
+            {
+                throw new DuplicateException("Email already exist");
+            }
+            var result = _mapper.Map<User>(user);
+            await _unitOfWork.UserRepo.AddAsync(result);
+            await _unitOfWork.SaveAsync();
+            return user;
+        }
+
+        public async Task<string> DeleteUser(string email)
+        {
+            Expression<Func<User, bool>> keySelector = u => u.Email == email;
+            var exist = await _unitOfWork.UserRepo.GetByKeyAsync(email, keySelector);
+            if (exist != null)
+            {
+                exist.IsDeleted = 1;
+                _unitOfWork.UserRepo.Update(exist);
+                await _unitOfWork.SaveAsync();
+            }
+            else
+            {
+                throw new KeyNotFoundException("User not found");
+            }
+            return "Success";
+        }
+
         public async Task<Pagination<UserListDTO>> GetAllUser(int pageIndex, int pageSize)
         {
             var list = await _unitOfWork.UserRepo.GetAllAsync();
-            if(list == null)
+            if (list == null)
             {
                 _logger.LogError("No user found.");
             }
 
             var result = _mapper.Map<List<UserListDTO>>(list);
-            
+
 
             return await ListPagination<UserListDTO>.PaginateList(result, pageIndex, pageSize);
         }
 
-            public async Task<UserListDTO> Login(string email, string password)
+        public async Task<UserListDTO> Login(string email, string password)
+        {
+            var user = await _unitOfWork.UserRepo.GetQueryable();
+            var exist = await user.Where(a => a.Email == email).FirstOrDefaultAsync();
+            if (exist != null)
             {
-                var user = await _unitOfWork.UserRepo.GetQueryable();
-                var exist = await user.Where(a => a.Email == email).FirstOrDefaultAsync();
-                if (exist != null)
+                if (exist.Password.Equals(password))
                 {
-                    if (exist.Password.Equals(password))
-                    {
-                        return _mapper.Map<UserListDTO>(exist);
-                    }
-                    else
-                    {
-                        _logger.LogError("Password is incorrect user id: " + exist.Id);
-                    throw new KeyNotFoundException("Password is incorrect");
-                        ///PLACEHOLDER WILL CHANGE LATER
-                    }
+                    return _mapper.Map<UserListDTO>(exist);
                 }
                 else
                 {
-                throw new KeyNotFoundException("User not found");   
+                    _logger.LogError("Password is incorrect user id: " + exist.Id);
+                    throw new KeyNotFoundException("Password is incorrect");
+                    ///PLACEHOLDER WILL CHANGE LATER
                 }
             }
+            else
+            {
+                throw new KeyNotFoundException("User not found");
+            }
+        }
+
+        public async Task<UserUpdateRequestDTO> UpdateUser(UserUpdateRequestDTO user)
+        {
+            Expression<Func<User, bool>> keySelector = u => u.Email == user.Email;
+            var exist = await _unitOfWork.UserRepo.GetByKeyAsync(user.Email, keySelector);
+            if (exist != null)
+            {
+                if (!String.IsNullOrEmpty(user.Password) || !user.Password.Equals("string"))
+                {
+                    exist.Password = user.Password;
+                }
+                if (!String.IsNullOrEmpty(user.Picture) || !user.Picture.Equals("string"))
+                {
+                    exist.Picture = user.Picture;
+                }
+                if (!String.IsNullOrEmpty(user.Phone) || !user.Phone.Equals("string"))
+                {
+                    exist.Phone = user.Phone;
+                }
+                if (!String.IsNullOrEmpty(user.FirstName) || !user.FirstName.Equals("string"))
+                {
+                    exist.FirstName = user.FirstName;
+                }
+                if (!String.IsNullOrEmpty(user.LastName) || !user.LastName.Equals("string"))
+                {
+                    exist.LastName = user.LastName;
+                }
+
+
+                _unitOfWork.UserRepo.Update(exist);
+                await _unitOfWork.SaveAsync();
+            }
+            else
+            {
+                throw new KeyNotFoundException("User not found.");
+            }
+
+            return user;
+        }
     }
 }

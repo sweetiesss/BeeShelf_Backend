@@ -1,4 +1,5 @@
 ﻿using Azure.Security.KeyVault.Secrets;
+using BeeStore_Repository.Data;
 using BeeStore_Repository.Logger;
 using BeeStore_Repository.Logger.GlobalExceptionHandler;
 using BeeStore_Repository.Mapper;
@@ -15,7 +16,7 @@ using System.Configuration;
 using System.Diagnostics;
 using System.Text;
 
-namespace BeeStore_Repository.Data
+namespace BeeStore_Repository
 {
     public static class DenpendencyInjection
     {
@@ -28,6 +29,7 @@ namespace BeeStore_Repository.Data
             services.AddScoped<UnitOfWork>();
             services.AddScoped<GlobalExceptionMiddleware>();
             services.AddScoped<CustomRoleNameResolver>();
+            services.AddScoped<CustomRoleNameReverseResolver>();
             services.AddAutoMapper(typeof(MapperConfigurationsProfile).Assembly);
             LogManager.LoadConfiguration(string.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
 

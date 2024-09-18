@@ -2,13 +2,13 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
-namespace BeeStore_Repository.DTO
+namespace BeeStore_Repository.DTO.UserDTOs
 {
-    public class UserListDTO
+    public class UserCreateRequestDTO
     {
-        public int Id { get; set; }
 
         public string Email { get; set; } = null!;
 
@@ -24,9 +24,9 @@ namespace BeeStore_Repository.DTO
 
         public string? Picture { get; set; }
 
-        public bool? IsDeleted { get; set; }
+        [JsonIgnore]
+        public bool? IsDeleted { get; set; } = false;
 
         public string RoleName { get; set; }
-
     }
 }

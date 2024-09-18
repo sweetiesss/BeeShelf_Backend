@@ -11,5 +11,6 @@ namespace BeeStore_Repository.Interfaces
         void Update(T entity);
         void Delete(T entity);
         Task<int> CountAsync(Expression<Func<T, bool>> filter = null);
+        Task<T> GetByKeyAsync<TKey>(TKey key, Expression<Func<T, bool>> keySelector);
     }
 }

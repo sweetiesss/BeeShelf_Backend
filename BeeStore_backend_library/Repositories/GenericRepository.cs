@@ -2,6 +2,7 @@
 using BeeStore_Repository.DTO;
 using BeeStore_Repository.Interfaces;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace BeeStore_Repository.Repositories
@@ -43,8 +44,12 @@ namespace BeeStore_Repository.Repositories
 
         public void Update(T entity)
         {
-            _dbSet.Attach(entity);
-            
+            _dbSet.Update(entity);
+        }
+
+        public async Task<T> GetByKeyAsync<TKey>(TKey key, Expression<Func<T, bool>> keySelector)
+        {
+            return await _dbSet.Where(keySelector).FirstOrDefaultAsync();
         }
 
         public void Delete(T entity)

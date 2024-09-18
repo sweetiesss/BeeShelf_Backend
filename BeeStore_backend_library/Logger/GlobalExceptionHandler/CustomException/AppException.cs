@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BeeStore_Repository.Logger.GlobalExceptionHandler
+namespace BeeStore_Repository.Logger.GlobalExceptionHandler.CustomException
 {
     public class AppException : Exception
     {
@@ -14,7 +14,7 @@ namespace BeeStore_Repository.Logger.GlobalExceptionHandler
         public AppException(string message) : base(message) { }
 
         public AppException(string message, params object[] args)
-            : base(String.Format(CultureInfo.CurrentCulture, message, args))
+            : base(string.Format(CultureInfo.CurrentCulture, message, args))
         {
         }
     }
