@@ -31,6 +31,8 @@ public partial class Order
 
     public int? ProductId { get; set; }
 
+    public string? Picture { get; set; }
+
     public ulong? IsDeleted { get; set; }
 
     public virtual Partner? PartnerEmailNavigation { get; set; }
