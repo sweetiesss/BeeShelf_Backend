@@ -1,33 +1,37 @@
-﻿{
-  "$schema": "https://json.schemastore.org/launchsettings.json",
-  "iisSettings": {
-    "windowsAuthentication": false,
-    "anonymousAuthentication": true,
-    "iisExpress": {
-      "applicationUrl": "http://localhost:56129",
-      "sslPort": 44301
-    }
-  },
+{
   "profiles": {
     "http": {
       "commandName": "Project",
-      "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
-      "applicationUrl": "http://localhost:5113",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "http://localhost:5113"
     },
     "https": {
       "commandName": "Project",
-      "dotnetRunMessages": true,
       "launchBrowser": true,
       "launchUrl": "swagger",
-      "applicationUrl": "https://localhost:7092;http://localhost:5113",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
-      }
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "https://localhost:7092;http://localhost:5113"
+    },
+    "https-prod": {
+      "commandName": "Project",
+      "launchBrowser": true,
+      "launchUrl": "swagger",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Production",
+        "AZURE_CLIENT_ID": "b3cf0cb2-f49d-44a5-927b-c0a7e650c654",
+        "AZURE_TENANT_ID": "1591d8e7-5b2b-4f46-96ce-b114a3f08b18",
+        "AZURE_CLIENT_SECRET": "yx88Q~EzcmdzbuWZoOx46AWJXofWMnl_uMnHGb2O"
+      },
+      "dotnetRunMessages": true,
+      "applicationUrl": "https://localhost:7092;http://localhost:5113"
     },
     "IIS Express": {
       "commandName": "IISExpress",
@@ -36,6 +40,28 @@
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker",
+      "launchBrowser": true,
+      "launchUrl": "{Scheme}://{ServiceHost}:{ServicePort}/swagger",
+      "environmentVariables": {
+        "ASPNETCORE_URLS": "https://+:443;http://+:80",
+        "AZURE_CLIENT_ID": "b3cf0cb2-f49d-44a5-927b-c0a7e650c654",
+        "AZURE_TENANT_ID": "1591d8e7-5b2b-4f46-96ce-b114a3f08b18",
+        "AZURE_CLIENT_SECRET": "yx88Q~EzcmdzbuWZoOx46AWJXofWMnl_uMnHGb2O"
+      },
+      "publishAllPorts": true,
+      "useSSL": true
+    }
+  },
+  "$schema": "https://json.schemastore.org/launchsettings.json",
+  "iisSettings": {
+    "windowsAuthentication": false,
+    "anonymousAuthentication": true,
+    "iisExpress": {
+      "applicationUrl": "http://localhost:56129",
+      "sslPort": 44301
     }
   }
 }
