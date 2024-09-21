@@ -18,6 +18,8 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Configuration.AddEnvironmentVariables();
+
 if (builder.Environment.IsDevelopment())
 {
     var configuration = builder.Configuration
@@ -34,14 +36,12 @@ if (builder.Environment.IsProduction())
 {
     var keyVaultURL = builder.Configuration.GetSection("KeyVault:KeyVaultURL").Value!.ToString();
 
-    var keyVaultClient = new KeyVaultClient(new KeyVaultClient.AuthenticationCallback(new AzureServiceTokenProvider().KeyVaultTokenCallback));
-
     builder.Configuration.AddAzureKeyVault(
         new Uri(keyVaultURL),
-        new DefaultAzureCredential()
+        new EnvironmentCredential()
     );
 
-    var client = new SecretClient(new Uri(keyVaultURL), new DefaultAzureCredential());
+    var client = new SecretClient(new Uri(keyVaultURL), new EnvironmentCredential());
     var dbConnectionSecret = client.GetSecret("DBConnection");
 
     if (dbConnectionSecret.Value != null)
