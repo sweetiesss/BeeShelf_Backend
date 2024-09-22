@@ -10,9 +10,16 @@ EXPOSE 443
 # This stage is used to build the service project
 # Add enviroment variable that very much needed
 # Leave this empty before pushing it onto github
-ENV AZURE_CLIENT_ID=""
-ENV AZURE_TENANT_ID=""
-ENV AZURE_CLIENT_SECRET=""
+# Define build arguments
+ARG AZURE_CLIENT_ID
+ARG AZURE_TENANT_ID
+ARG AZURE_CLIENT_SECRET
+
+# Set environment variables from build arguments
+ENV AZURE_CLIENT_ID=${AZURE_CLIENT_ID}
+ENV AZURE_TENANT_ID=${AZURE_TENANT_ID}
+ENV AZURE_CLIENT_SECRET=${AZURE_CLIENT_SECRET}
+
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 ARG BUILD_CONFIGURATION=Release
