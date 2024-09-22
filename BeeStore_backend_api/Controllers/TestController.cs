@@ -24,7 +24,7 @@ namespace BeeStore_Api.Controllers
 
 
         [Authorize]
-        [HttpGet("secure")]
+        [HttpGet("secured")]
         public IActionResult SecureIndex()
         {
             return Ok("Hello, this is a secure endpoint!");
