@@ -19,7 +19,7 @@ namespace BeeStore_Api.Controllers
         [HttpGet]
         public IActionResult Indexx()
         {
-            return Ok("Hello!");
+            return Ok("Hello after CI/CD!");
         }
 
 
