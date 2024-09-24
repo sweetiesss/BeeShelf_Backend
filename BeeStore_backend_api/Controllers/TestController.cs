@@ -17,7 +17,7 @@ namespace BeeStore_Api.Controllers
         }
 
         [HttpGet]
-        public IActionResult Index()
+        public IActionResult Indexx()
         {
             return Ok("Hello!");
         }
