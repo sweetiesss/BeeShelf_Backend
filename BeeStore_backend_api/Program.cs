@@ -1,15 +1,19 @@
+using Amazon;
+using Amazon.S3;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using BeeStore_Api.Authentication;
 using BeeStore_Repository;
 using BeeStore_Repository.Data;
 using BeeStore_Repository.Logger.GlobalExceptionHandler;
+using BeeStore_Repository.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.Azure.KeyVault;
 using Microsoft.Azure.Services.AppAuthentication;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using MySqlX.XDevAPI;
@@ -32,6 +36,7 @@ if (builder.Environment.IsDevelopment())
 
 }
 
+
 if (builder.Environment.IsProduction())
 {
     var keyVaultURL = builder.Configuration.GetSection("KeyVault:KeyVaultURL").Value!.ToString();
@@ -43,6 +48,10 @@ if (builder.Environment.IsProduction())
 
     var client = new SecretClient(new Uri(keyVaultURL), new EnvironmentCredential());
     var dbConnectionSecret = client.GetSecret("DBConnection");
+    var s3AccessKey = client.GetSecret("BeeStore-S3-AccessKey");
+    var s3SecretKey = client.GetSecret("BeeStore-S3-SecretKey");
+    var s3BucketName = client.GetSecret("BeeStore-BucketName");
+    var s3BucketUrl = client.GetSecret("BeeStore-S3-BucketURL");
 
     if (dbConnectionSecret.Value != null)
     {
@@ -55,9 +64,14 @@ if (builder.Environment.IsProduction())
 
     builder.Services.AddJwtAuthenticationProduction(client);
 
-   
-}
+    builder.Services.AddTransient<IPictureService>(_ =>
+    new PictureService(
+        new AmazonS3Client(s3AccessKey.Value.Value, s3SecretKey.Value.Value, RegionEndpoint.APNortheast1),
+        s3BucketName.Value.Value,
+        s3BucketUrl.Value.Value
+    ));
 
+}
 
 
 builder.Services.AddWebAPIService();

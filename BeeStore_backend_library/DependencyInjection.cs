@@ -1,4 +1,5 @@
-﻿using Azure.Security.KeyVault.Secrets;
+﻿using Amazon.S3;
+using Azure.Security.KeyVault.Secrets;
 using BeeStore_Repository.Data;
 using BeeStore_Repository.Logger;
 using BeeStore_Repository.Logger.GlobalExceptionHandler;
@@ -10,8 +11,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using NLog;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using System.Configuration;
 using System.Diagnostics;
 using System.Text;
@@ -22,21 +25,30 @@ namespace BeeStore_Repository
     {
         public static IServiceCollection AddInfrastructuresService(this IServiceCollection services, string databaseConnection)
         {
+            // Scoped
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<ILoggerManager, LoggerManager>();
             services.AddScoped<IJWTService, JWTService>();
-
             services.AddScoped<UnitOfWork>();
             services.AddScoped<GlobalExceptionMiddleware>();
             services.AddScoped<CustomRoleNameResolver>();
             services.AddScoped<CustomRoleNameReverseResolver>();
+
+            // Auto mapper
             services.AddAutoMapper(typeof(MapperConfigurationsProfile).Assembly);
+
+
+            // Logger
             LogManager.LoadConfiguration(string.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
 
 
-
+            // DB context
             services.AddDbContext<BeeStoreDbContext>(option => option.UseMySQL(databaseConnection));
+
+            // Singleton
             services.AddSingleton<AppConfiguration>();
+            services.AddSingleton<IAmazonS3, AmazonS3Client>();
+
             return services;
 
 
