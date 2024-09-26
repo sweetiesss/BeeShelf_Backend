@@ -28,6 +28,7 @@ obj/
 *.userprefs
 *_logfile.txt
 *.yml
+Properties
 internal_logs
 
 # Mono auto generated files

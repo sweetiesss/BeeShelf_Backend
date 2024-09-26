@@ -51,7 +51,7 @@ namespace BeeStore_Api.Authentication
                 throw new InvalidOperationException("Key Vault configuration values are missing.");
             }
 
-            var client = new SecretClient(new Uri(keyVaultURL), new DefaultAzureCredential());
+            var client = new SecretClient(new Uri(keyVaultURL), new EnvironmentCredential());
 
             var secretResponse = client.GetSecret("BeeStore-Apikey");
 
