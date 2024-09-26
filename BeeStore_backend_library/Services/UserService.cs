@@ -101,9 +101,9 @@ namespace BeeStore_Repository.Services
                 {
                     exist.Password = user.Password;
                 }
-                if (!String.IsNullOrEmpty(user.Picture) || !user.Picture.Equals("string"))
+                if (!user.PictureId.Equals(0))
                 {
-                    exist.Picture = user.Picture;
+                    exist.PictureId = user.PictureId;
                 }
                 if (!String.IsNullOrEmpty(user.Phone) || !user.Phone.Equals("string"))
                 {

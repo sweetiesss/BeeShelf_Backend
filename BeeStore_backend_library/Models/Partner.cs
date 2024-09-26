@@ -7,7 +7,7 @@ public partial class Partner
 {
     public int Id { get; set; }
 
-    public string CitizenIdentificationNumber { get; set; } = null!;
+    public string? CitizenIdentificationNumber { get; set; }
 
     public DateTime? CreateDate { get; set; }
 
@@ -17,15 +17,9 @@ public partial class Partner
 
     public string? BankAccountNumber { get; set; }
 
-    public string UserEmail { get; set; } = null!;
+    public string? UserEmail { get; set; }
 
     public ulong? IsDeleted { get; set; }
 
-    public virtual ICollection<Inventory> Inventories { get; set; } = new List<Inventory>();
-
-    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
-
-    public virtual ICollection<Package> Packages { get; set; } = new List<Package>();
-
-    public virtual User UserEmailNavigation { get; set; } = null!;
+    public virtual User? UserEmailNavigation { get; set; }
 }

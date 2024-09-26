@@ -19,17 +19,29 @@ public partial class User
 
     public DateTime? CreateDate { get; set; }
 
-    public string? Picture { get; set; }
+    public int? PictureId { get; set; }
 
     public ulong? IsDeleted { get; set; }
 
+    public string? Setting { get; set; }
+
     public int? RoleId { get; set; }
 
-    public virtual Partner? Partner { get; set; }
+    public virtual ICollection<Inventory> Inventories { get; set; } = new List<Inventory>();
+
+    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
+
+    public virtual ICollection<Partner> Partners { get; set; } = new List<Partner>();
+
+    public virtual Picture? Picture { get; set; }
+
+    public virtual ICollection<Product> Products { get; set; } = new List<Product>();
 
     public virtual Role? Role { get; set; }
 
-    public virtual WarehouseShipper? WarehouseShipper { get; set; }
+    public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
 
-    public virtual WarehouseStaff? WarehouseStaff { get; set; }
+    public virtual ICollection<WarehouseShipper> WarehouseShippers { get; set; } = new List<WarehouseShipper>();
+
+    public virtual ICollection<WarehouseStaff> WarehouseStaffs { get; set; } = new List<WarehouseStaff>();
 }

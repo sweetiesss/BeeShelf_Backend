@@ -26,7 +26,8 @@ namespace BeeStore_Repository.Mapper
             CreateMap<UserCreateRequestDTO, User>()
                  .ForMember(dest => dest.RoleId, opt => opt.MapFrom<CustomRoleNameReverseResolver>());
             CreateMap<User, UserListDTO>()
-                    .ForMember(dest => dest.RoleName, opt => opt.MapFrom<CustomRoleNameResolver>());
+                    .ForMember(dest => dest.RoleName, opt => opt.MapFrom<CustomRoleNameResolver>())
+                    .ForMember(dest => dest.Picture_Link, opt => opt.MapFrom<CustomPictureLinkResolver>());
                 
             }
         }

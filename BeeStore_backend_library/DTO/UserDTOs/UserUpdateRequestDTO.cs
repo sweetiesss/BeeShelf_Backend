@@ -18,7 +18,7 @@ namespace BeeStore_Repository.DTO.UserDTOs
 
         public string? Phone { get; set; }
 
-        public string? Picture { get; set; }
+        public int? PictureId { get; set; }
 
     }
 }

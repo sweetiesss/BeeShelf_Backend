@@ -7,19 +7,11 @@ public partial class Package
 {
     public int Id { get; set; }
 
-    public string? PartnerEmail { get; set; }
-
-    public string Name { get; set; } = null!;
-
     public DateTime? CreateDate { get; set; }
 
-    public float? Height { get; set; }
+    public decimal? Weight { get; set; }
 
-    public float? Length { get; set; }
-
-    public float? Width { get; set; }
-
-    public float? Weight { get; set; }
+    public int? Amount { get; set; }
 
     public int? ProductId { get; set; }
 
@@ -32,8 +24,6 @@ public partial class Package
     public ulong? IsDeleted { get; set; }
 
     public virtual Inventory? Inventory { get; set; }
-
-    public virtual Partner? PartnerEmailNavigation { get; set; }
 
     public virtual Product? Product { get; set; }
 

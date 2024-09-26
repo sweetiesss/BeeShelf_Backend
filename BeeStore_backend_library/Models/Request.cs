@@ -7,13 +7,13 @@ public partial class Request
 {
     public int Id { get; set; }
 
-    public string Name { get; set; } = null!;
+    public string? Name { get; set; }
 
     public string? Description { get; set; }
 
     public int? PackageId { get; set; }
 
-    public int? SendToInventoryId { get; set; }
+    public int? SendToInventory { get; set; }
 
     public DateTime? CreateDate { get; set; }
 
@@ -23,5 +23,5 @@ public partial class Request
 
     public virtual Package? Package { get; set; }
 
-    public virtual Inventory? SendToInventory { get; set; }
+    public virtual Inventory? SendToInventoryNavigation { get; set; }
 }
