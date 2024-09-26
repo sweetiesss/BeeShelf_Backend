@@ -22,7 +22,7 @@ namespace BeeStore_Repository.DTO.UserDTOs
 
         public DateTime? CreateDate { get; set; }
 
-        public string? Picture { get; set; }
+        public int? PictureId { get; set; }
 
         [JsonIgnore]
         public bool? IsDeleted { get; set; } = false;

@@ -11,31 +11,31 @@ public partial class Order
 
     public DateTime? CreateDate { get; set; }
 
-    public string? OrderProcessStatus { get; set; }
+    public string? OrderStatus { get; set; }
 
-    public string? ReceiverAddress { get; set; }
+    public string? CancellationReason { get; set; }
 
     public string? ReceiverPhone { get; set; }
 
-    public decimal? ProductPrice { get; set; }
+    public string? ReceiverAddress { get; set; }
 
     public int? ProductAmount { get; set; }
 
     public decimal? TotalPrice { get; set; }
 
-    public bool? IsCod { get; set; }
+    public string? CodStatus { get; set; }
 
-    public string? OrderDeliveryStatus { get; set; }
+    public DateTime? DeliverBy { get; set; }
 
-    public string? DeliverBy { get; set; }
+    public int? PictureId { get; set; }
 
     public int? ProductId { get; set; }
 
-    public string? Picture { get; set; }
-
     public ulong? IsDeleted { get; set; }
 
-    public virtual Partner? PartnerEmailNavigation { get; set; }
+    public virtual User? PartnerEmailNavigation { get; set; }
+
+    public virtual Picture? Picture { get; set; }
 
     public virtual Product? Product { get; set; }
 }

@@ -7,19 +7,19 @@ public partial class Warehouse
 {
     public int Id { get; set; }
 
-    public string Name { get; set; } = null!;
+    public string? Name { get; set; }
 
-    public float? Size { get; set; }
+    public decimal? Size { get; set; }
 
     public string? Location { get; set; }
 
     public DateTime? CreateDate { get; set; }
 
-    public string? Picture { get; set; }
-
     public ulong? IsDeleted { get; set; }
 
     public virtual ICollection<Inventory> Inventories { get; set; } = new List<Inventory>();
+
+    public virtual ICollection<WarehouseCategory> WarehouseCategories { get; set; } = new List<WarehouseCategory>();
 
     public virtual ICollection<WarehouseShipper> WarehouseShippers { get; set; } = new List<WarehouseShipper>();
 

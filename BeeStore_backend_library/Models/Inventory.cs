@@ -9,15 +9,11 @@ public partial class Inventory
 
     public string? PartnerEmail { get; set; }
 
-    public float? Height { get; set; }
+    public decimal? MaxWeight { get; set; }
 
-    public float? Width { get; set; }
+    public decimal? Weight { get; set; }
 
-    public float? Length { get; set; }
-
-    public float? MaxWeight { get; set; }
-
-    public DateTime? CreateDate { get; set; }
+    public DateTime? BoughtDate { get; set; }
 
     public DateTime? ExpirationDate { get; set; }
 
@@ -27,9 +23,11 @@ public partial class Inventory
 
     public virtual ICollection<Package> Packages { get; set; } = new List<Package>();
 
-    public virtual Partner? PartnerEmailNavigation { get; set; }
+    public virtual User? PartnerEmailNavigation { get; set; }
 
     public virtual ICollection<Request> Requests { get; set; } = new List<Request>();
+
+    public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
 
     public virtual Warehouse? Warehouse { get; set; }
 }

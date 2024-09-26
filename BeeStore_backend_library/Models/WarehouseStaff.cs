@@ -7,13 +7,13 @@ public partial class WarehouseStaff
 {
     public int Id { get; set; }
 
-    public string UserEmail { get; set; } = null!;
+    public string? UserEmail { get; set; }
 
     public int? WarehouseId { get; set; }
 
     public ulong? IsDeleted { get; set; }
 
-    public virtual User UserEmailNavigation { get; set; } = null!;
+    public virtual User? UserEmailNavigation { get; set; }
 
     public virtual Warehouse? Warehouse { get; set; }
 }

@@ -19,11 +19,6 @@ namespace BeeStore_Repository.Mapper.CustomResolver
             _context = context;
         }
 
-        //public int Resolve(UserListDTO source, User destination, int? destMember, ResolutionContext context)
-        //{
-        //    var role = _context.Roles.FirstOrDefault(r => r.RoleName == source.RoleName);
-        //    return role != null ? role.Id : default;
-        //}
 
         int? IValueResolver<UserCreateRequestDTO, User, int?>.Resolve(UserCreateRequestDTO source, User destination, int? destMember, ResolutionContext context)
         {
