@@ -29,7 +29,7 @@ namespace BeeStore_Repository.Services
             _issuer = configuration["Jwt:Issuer"] ?? throw new ArgumentNullException("Jwt:Issuer is not configured.");
             _audience = configuration["Jwt:Audience"] ?? throw new ArgumentNullException("Jwt:Audience is not configured.");
             _keyVaultURL = configuration["KeyVault:KeyVaultURL"] ?? throw new ArgumentNullException("Key Vault URL configuration values are missing.");
-            _client = new SecretClient(new Uri(_keyVaultURL), new DefaultAzureCredential());
+            _client = new SecretClient(new Uri(_keyVaultURL), new EnvironmentCredential());
         }
 
         public string GenerateJwtToken(string userEmail)
