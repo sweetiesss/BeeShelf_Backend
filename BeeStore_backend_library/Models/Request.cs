@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace BeeStore_Repository.Models;
 
-public partial class Request
+public partial class Request : BaseEntity
 {
-    public int Id { get; set; }
+    //public int Id { get; set; }
 
     public string? Name { get; set; }
 
@@ -19,7 +19,7 @@ public partial class Request
 
     public string? Status { get; set; }
 
-    public ulong? IsDeleted { get; set; }
+    //public ulong? IsDeleted { get; set; }
 
     public virtual Package? Package { get; set; }
 

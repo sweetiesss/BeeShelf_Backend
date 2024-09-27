@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace BeeStore_Repository.Models;
 
-public partial class Transaction
+public partial class Transaction : BaseEntity
 {
-    public int Id { get; set; }
+    //public int Id { get; set; }
 
     public string? TransactionCode { get; set; }
 
@@ -23,7 +23,7 @@ public partial class Transaction
 
     public string? CancellationReason { get; set; }
 
-    public ulong? IsDeleted { get; set; }
+    //public ulong? IsDeleted { get; set; }
 
     public virtual User? BuyerEmailNavigation { get; set; }
 

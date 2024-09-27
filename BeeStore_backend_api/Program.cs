@@ -7,6 +7,7 @@ using BeeStore_Repository;
 using BeeStore_Repository.Data;
 using BeeStore_Repository.Logger.GlobalExceptionHandler;
 using BeeStore_Repository.Services;
+using BeeStore_Repository.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Cors.Infrastructure;
 using Microsoft.Azure.KeyVault;
