@@ -14,6 +14,8 @@ namespace BeeStore_Repository
     {
         private BeeStoreDbContext _context;
         private GenericRepository<User> userRepo;
+        private GenericRepository<Picture> pictureRepo;
+        private GenericRepository<Partner> partnerRepo;
 
         public UnitOfWork(BeeStoreDbContext context)
         {
@@ -29,6 +31,30 @@ namespace BeeStore_Repository
                     userRepo = new GenericRepository<User>(_context);
                 }
                 return userRepo;
+            }
+        }
+
+        public GenericRepository<Picture> PictureRepo
+        {
+            get
+            {
+                if (pictureRepo == null)
+                {
+                    pictureRepo = new GenericRepository<Picture>(_context);
+                }
+                return pictureRepo;
+            }
+        }
+
+        public GenericRepository<Partner> PartnerRepo
+        {
+            get
+            {
+                if (partnerRepo == null)
+                {
+                    partnerRepo = new GenericRepository<Partner>(_context);
+                }
+                return partnerRepo;
             }
         }
 

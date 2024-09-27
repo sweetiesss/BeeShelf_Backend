@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace BeeStore_Repository.Models;
 
-public partial class Partner
+public partial class Partner : BaseEntity
 {
-    public int Id { get; set; }
+    //public int Id { get; set; }
 
     public string? CitizenIdentificationNumber { get; set; }
 
@@ -19,7 +19,7 @@ public partial class Partner
 
     public string? UserEmail { get; set; }
 
-    public ulong? IsDeleted { get; set; }
+    //public ulong? IsDeleted { get; set; }
 
     public virtual User? UserEmailNavigation { get; set; }
 }

@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace BeeStore_Repository.Models;
 
-public partial class Inventory
+public partial class Inventory : BaseEntity
 {
-    public int Id { get; set; }
+    //public int Id { get; set; }
 
     public string? PartnerEmail { get; set; }
 
@@ -19,7 +19,7 @@ public partial class Inventory
 
     public int? WarehouseId { get; set; }
 
-    public ulong? IsDeleted { get; set; }
+    //public ulong? IsDeleted { get; set; }
 
     public virtual ICollection<Package> Packages { get; set; } = new List<Package>();
 

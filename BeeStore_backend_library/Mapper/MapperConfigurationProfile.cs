@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BeeStore_Repository.DTO;
+using BeeStore_Repository.DTO.PartnerDTOs;
 using BeeStore_Repository.DTO.UserDTOs;
 using BeeStore_Repository.Mapper.CustomResolver;
 using BeeStore_Repository.Models;
@@ -17,18 +18,19 @@ namespace BeeStore_Repository.Mapper
         {
             public MapperConfigurationsProfile()
             {
-            //CreateMap<UserListDTO, User>();
+            
             CreateMap(typeof(Pagination<>), typeof(Pagination<>));
             CreateMap(typeof(Task<>), typeof(Pagination<>));
             CreateMap(typeof(InternalDbSet<>), typeof(IQueryable<>));
             CreateMap(typeof(UserCreateRequestDTO), typeof(User));
-            //CreateMap<User, UserListDTO>();
+            
             CreateMap<UserCreateRequestDTO, User>()
                  .ForMember(dest => dest.RoleId, opt => opt.MapFrom<CustomRoleNameReverseResolver>());
             CreateMap<User, UserListDTO>()
                     .ForMember(dest => dest.RoleName, opt => opt.MapFrom<CustomRoleNameResolver>())
                     .ForMember(dest => dest.Picture_Link, opt => opt.MapFrom<CustomPictureLinkResolver>());
-                
+            CreateMap<Partner, PartnerListDTO>();
+            CreateMap<UpgradeToPartnerRequest, Partner>();
             }
         }
     }

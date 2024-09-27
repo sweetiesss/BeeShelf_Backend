@@ -43,8 +43,7 @@ namespace BeeStore_Repository.Services
             var exist = await _unitOfWork.UserRepo.GetByKeyAsync(email, keySelector);
             if (exist != null)
             {
-                exist.IsDeleted = 1;
-                _unitOfWork.UserRepo.Update(exist);
+                _unitOfWork.UserRepo.SoftDelete(exist);
                 await _unitOfWork.SaveAsync();
             }
             else
@@ -97,7 +96,7 @@ namespace BeeStore_Repository.Services
             var exist = await _unitOfWork.UserRepo.GetByKeyAsync(user.Email, keySelector);
             if (exist != null)
             {
-                if (!String.IsNullOrEmpty(user.Password) || !user.Password.Equals("string"))
+                if (!String.IsNullOrEmpty(user.Password) && !user.Password.Equals("string"))
                 {
                     exist.Password = user.Password;
                 }
@@ -105,15 +104,15 @@ namespace BeeStore_Repository.Services
                 {
                     exist.PictureId = user.PictureId;
                 }
-                if (!String.IsNullOrEmpty(user.Phone) || !user.Phone.Equals("string"))
+                if (!String.IsNullOrEmpty(user.Phone) && !user.Phone.Equals("string"))
                 {
                     exist.Phone = user.Phone;
                 }
-                if (!String.IsNullOrEmpty(user.FirstName) || !user.FirstName.Equals("string"))
+                if (!String.IsNullOrEmpty(user.FirstName) && !user.FirstName.Equals("string"))
                 {
                     exist.FirstName = user.FirstName;
                 }
-                if (!String.IsNullOrEmpty(user.LastName) || !user.LastName.Equals("string"))
+                if (!String.IsNullOrEmpty(user.LastName) && !user.LastName.Equals("string"))
                 {
                     exist.LastName = user.LastName;
                 }

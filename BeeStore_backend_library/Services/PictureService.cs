@@ -1,6 +1,7 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Model;
 using Amazon.S3.Transfer;
+using BeeStore_Repository.Services.Interfaces;
 using Microsoft.AspNetCore.Http;
 
 namespace BeeStore_Repository.Services
@@ -50,8 +51,5 @@ namespace BeeStore_Repository.Services
         }
     }
 
-    public interface IPictureService
-    {
-        Task<string> UploadImage(IFormFile file);
-    }
+   
 }
