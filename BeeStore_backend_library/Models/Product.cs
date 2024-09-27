@@ -3,9 +3,9 @@ using System.Collections.Generic;
 
 namespace BeeStore_Repository.Models;
 
-public partial class Product
+public partial class Product :BaseEntity
 {
-    public int Id { get; set; }
+    //public int Id { get; set; }
 
     public string? PartnerEmail { get; set; }
 
@@ -27,7 +27,7 @@ public partial class Product
 
     public string? Origin { get; set; }
 
-    public ulong? IsDeleted { get; set; }
+    //public ulong? IsDeleted { get; set; }
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 

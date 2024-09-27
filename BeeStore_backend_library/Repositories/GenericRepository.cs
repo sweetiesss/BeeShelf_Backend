@@ -1,13 +1,16 @@
-﻿using BeeStore_Repository.Data;
+﻿using Amazon.S3.Model;
+using BeeStore_Repository.Data;
 using BeeStore_Repository.DTO;
 using BeeStore_Repository.Interfaces;
+using BeeStore_Repository.Models;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
 using System.Linq.Expressions;
+using static Amazon.S3.Util.S3EventNotification;
 
 namespace BeeStore_Repository.Repositories
 {
-    public class GenericRepository<T> : IGenericRepository<T> where T : class
+    public class GenericRepository<T> : IGenericRepository<T> where T : BaseEntity
     {
         protected readonly BeeStoreDbContext _context;
         protected readonly DbSet<T> _dbSet;
@@ -18,12 +21,12 @@ namespace BeeStore_Repository.Repositories
             _dbSet = context.Set<T>();
         }
 
-        public async Task<T> GetByIdAsync(int id)
-        {
-            return await _dbSet.FindAsync(id);
-        }
+        //public async Task<T> GetByIdAsync(int id)
+        //{
+        //    return await _dbSet.FindAsync(id);
+        //}
 
-        public Task<List<T>> GetAllAsync() => _dbSet.ToListAsync();
+        public Task<List<T>> GetAllAsync() => _dbSet.Where(x => x.IsDeleted.Equals(false)).ToListAsync();
 
 
         public virtual async Task<IQueryable<T>> GetQueryable()
@@ -42,17 +45,48 @@ namespace BeeStore_Repository.Repositories
             await _dbSet.AddAsync(entity);
         }
 
+        public async Task AddRangeAsync(List<T> entities)
+        {
+            
+            await _dbSet.AddRangeAsync(entities);
+        }
+
+
         public void Update(T entity)
         {
             _dbSet.Update(entity);
         }
+
+        public void UpdateRange(List<T> entities)
+        {
+            _dbSet.UpdateRange(entities);
+        }
+
 
         public async Task<T> GetByKeyAsync<TKey>(TKey key, Expression<Func<T, bool>> keySelector)
         {
             return await _dbSet.Where(keySelector).FirstOrDefaultAsync();
         }
 
-        public void Delete(T entity)
+        
+        public void SoftDelete(T entity)
+        {
+            entity.IsDeleted = true;
+            _dbSet.Update(entity);
+        }
+
+        public void SoftDeleteRange(List<T> entities)
+        {
+            foreach (var entity in entities)
+            {
+                entity.IsDeleted = true;
+            }
+            _dbSet.UpdateRange(entities);
+        }
+
+
+
+        public void HardDelete(T entity)
         {
             _dbSet.Remove(entity);
         }
