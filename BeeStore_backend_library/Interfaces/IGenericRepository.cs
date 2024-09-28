@@ -16,6 +16,6 @@ namespace BeeStore_Repository.Interfaces
         void SoftDeleteRange(List<T> entities);
         void HardDelete(T entity);
         Task<int> CountAsync(Expression<Func<T, bool>> filter = null);
-        Task<T> GetByKeyAsync<TKey>(TKey key, Expression<Func<T, bool>> keySelector);
+        Task<T> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate);
     }
 }

@@ -28,28 +28,6 @@ namespace BeeStore_Repository.Services
             _logger = logger;
         }
 
-        public async Task<User> UserExist(string email)
-        {
-            Expression<Func<User, bool>> keySelector = u => u.Email == email;
-            var exist = await _unitOfWork.UserRepo.GetByKeyAsync(email, keySelector);
-            if (exist == null)
-            {
-            return null;
-            }
-            return exist;
-        }
-
-        public async Task<Partner> PartnerExist(string email)
-        {
-            Expression<Func<Partner, bool>> keySelector = u => u.UserEmail == email;
-            var exist = await _unitOfWork.PartnerRepo.GetByKeyAsync(email, keySelector);
-            if (exist == null)
-            {
-                return null;
-            }
-            return exist;
-        }
-
         public async Task<Pagination<PartnerListDTO>> GetPartnerList(int pageIndex, int pageSize)
         {
             var list = await _unitOfWork.PartnerRepo.GetAllAsync();
@@ -60,12 +38,12 @@ namespace BeeStore_Repository.Services
 
         public async Task<UpgradeToPartnerRequest> UpgradeToPartner(UpgradeToPartnerRequest request)
         {
-            if(await UserExist(request.UserEmail) == null)
+            if (await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Email == request.UserEmail) == null)
             {
                 throw new KeyNotFoundException("User not found.");
             }
             
-            if(await PartnerExist(request.UserEmail) != null)
+            if (await _unitOfWork.PartnerRepo.SingleOrDefaultAsync(u => u.UserEmail == request.UserEmail) != null)
             {
                 throw new DuplicateException("User is already a partner");
             }
@@ -79,7 +57,7 @@ namespace BeeStore_Repository.Services
 
         public async Task<PartnerUpdateRequest> UpdatePartner(PartnerUpdateRequest request)
         {
-            var exist = await PartnerExist(request.UserEmail);
+            var exist = await _unitOfWork.PartnerRepo.SingleOrDefaultAsync(u => u.UserEmail == request.UserEmail);
             if(exist == null)
             {
                 throw new KeyNotFoundException("Partner does not exist");
@@ -105,8 +83,8 @@ namespace BeeStore_Repository.Services
 
         public async Task<string> DeletePartner(string email)
         {
-            var exist = await PartnerExist(email);
-            if(exist == null)
+            var exist = await _unitOfWork.PartnerRepo.SingleOrDefaultAsync(u => u.UserEmail == email);
+            if (exist == null)
             {
                 throw new KeyNotFoundException("Partner does not exist");
             }
