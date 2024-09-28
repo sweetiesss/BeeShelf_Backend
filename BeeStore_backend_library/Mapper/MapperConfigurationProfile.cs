@@ -1,7 +1,10 @@
 ﻿using AutoMapper;
 using BeeStore_Repository.DTO;
+using BeeStore_Repository.DTO.InventoryDTOs;
 using BeeStore_Repository.DTO.PartnerDTOs;
+using BeeStore_Repository.DTO.ProductDTOs;
 using BeeStore_Repository.DTO.UserDTOs;
+using BeeStore_Repository.DTO.WarehouseDTOs;
 using BeeStore_Repository.Mapper.CustomResolver;
 using BeeStore_Repository.Models;
 using Microsoft.EntityFrameworkCore.Internal;
@@ -31,6 +34,12 @@ namespace BeeStore_Repository.Mapper
                     .ForMember(dest => dest.Picture_Link, opt => opt.MapFrom<CustomPictureLinkResolver>());
             CreateMap<Partner, PartnerListDTO>();
             CreateMap<UpgradeToPartnerRequest, Partner>();
+            CreateMap<Warehouse, WarehouseListDTO>();
+            CreateMap<WarehouseCreateDTO, Warehouse>();
+            CreateMap<Inventory, InventoryListDTO>();
+            CreateMap<InventoryCreateDTO, Inventory>();
+            CreateMap<Product, ProductListDTO>();
+            CreateMap<ProductCreateDTO, Product>();
             }
         }
     }

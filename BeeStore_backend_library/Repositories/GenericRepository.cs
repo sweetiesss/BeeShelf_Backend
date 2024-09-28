@@ -4,6 +4,7 @@ using BeeStore_Repository.DTO;
 using BeeStore_Repository.Interfaces;
 using BeeStore_Repository.Models;
 using Microsoft.EntityFrameworkCore;
+using System;
 using System.Linq;
 using System.Linq.Expressions;
 using static Amazon.S3.Util.S3EventNotification;
@@ -21,10 +22,10 @@ namespace BeeStore_Repository.Repositories
             _dbSet = context.Set<T>();
         }
 
-        //public async Task<T> GetByIdAsync(int id)
-        //{
-        //    return await _dbSet.FindAsync(id);
-        //}
+        public async Task<T> GetByIdAsync(int id)
+        {
+            return await _dbSet.FindAsync(id);
+        }
 
         public Task<List<T>> GetAllAsync() => _dbSet.Where(x => x.IsDeleted.Equals(false)).ToListAsync();
 
@@ -63,9 +64,9 @@ namespace BeeStore_Repository.Repositories
         }
 
 
-        public async Task<T> GetByKeyAsync<TKey>(TKey key, Expression<Func<T, bool>> keySelector)
+        public async Task<T> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate)
         {
-            return await _dbSet.Where(keySelector).FirstOrDefaultAsync();
+            return await _dbSet.FirstOrDefaultAsync(predicate);
         }
 
         
