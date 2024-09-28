@@ -25,8 +25,7 @@ namespace BeeStore_Repository.Services
 
         public async Task<UserCreateRequestDTO> CreateUser(UserCreateRequestDTO user)
         {
-            Expression<Func<User, bool>> keySelector = u => u.Email == user.Email;
-            var exist = await _unitOfWork.UserRepo.GetByKeyAsync(user.Email, keySelector);
+            var exist = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Email == user.Email);
             if (exist != null)
             {
                 throw new DuplicateException("Email already exist");
@@ -39,8 +38,7 @@ namespace BeeStore_Repository.Services
 
         public async Task<string> DeleteUser(string email)
         {
-            Expression<Func<User, bool>> keySelector = u => u.Email == email;
-            var exist = await _unitOfWork.UserRepo.GetByKeyAsync(email, keySelector);
+            var exist = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Email == email);
             if (exist != null)
             {
                 _unitOfWork.UserRepo.SoftDelete(exist);
@@ -69,8 +67,7 @@ namespace BeeStore_Repository.Services
 
         public async Task<UserListDTO> Login(string email, string password)
         {
-            var user = await _unitOfWork.UserRepo.GetQueryable();
-            var exist = await user.Where(a => a.Email == email).FirstOrDefaultAsync();
+            var exist = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Email == email);
             if (exist != null)
             {
                 if (exist.Password.Equals(password))
@@ -86,14 +83,13 @@ namespace BeeStore_Repository.Services
             }
             else
             {
-                throw new KeyNotFoundException("User not found");
+                throw new KeyNotFoundException("Email not found");
             }
         }
 
         public async Task<UserUpdateRequestDTO> UpdateUser(UserUpdateRequestDTO user)
         {
-            Expression<Func<User, bool>> keySelector = u => u.Email == user.Email;
-            var exist = await _unitOfWork.UserRepo.GetByKeyAsync(user.Email, keySelector);
+            var exist = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Email == user.Email);
             if (exist != null)
             {
                 if (!String.IsNullOrEmpty(user.Password) && !user.Password.Equals("string"))

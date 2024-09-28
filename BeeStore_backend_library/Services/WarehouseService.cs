@@ -29,20 +29,11 @@ namespace BeeStore_Repository.Services
             _logger = logger;
         }
 
-        public async Task<Warehouse> WarehouseExist(string name)
-        {
-            Expression<Func<Warehouse, bool>> keySelector = u => u.Name == name;
-            var exist = await _unitOfWork.WarehouseRepo.GetByKeyAsync(name, keySelector);
-            if (exist == null)
-            {
-                return null;
-            }
-            return exist;
-        }
+ 
 
         public async Task<WarehouseCreateDTO> CreateWarehouse(WarehouseCreateDTO request)
         {
-            var exist = await WarehouseExist(request.Name);
+            var exist = await _unitOfWork.WarehouseRepo.SingleOrDefaultAsync(u => u.Name == request.Name);
             if (exist != null)
             {
                 throw new DuplicateException("Warehouse with this name already exists.");
@@ -56,17 +47,14 @@ namespace BeeStore_Repository.Services
 
         public async Task<string> DeleteWarehouse(int id)
         {
-            var exist = await _unitOfWork.WarehouseRepo.GetAllAsync();
-            foreach(var item in exist)
+            var exist = await _unitOfWork.WarehouseRepo.SingleOrDefaultAsync(u => u.Id == id);
+            if(exist == null)
             {
-                if (item.Id == id)
-                {
-                    _unitOfWork.WarehouseRepo.SoftDelete(item);
-                    await _unitOfWork.SaveAsync();
-                    return "Success";
-                }
+                throw new KeyNotFoundException("No warehouse found.");
             }
-            throw new KeyNotFoundException("No warehouse found.");
+            _unitOfWork.WarehouseRepo.SoftDelete(exist);
+            await _unitOfWork.SaveAsync();
+            return "Success";
         }
 
         public async Task<Pagination<WarehouseListDTO>> GetWarehouseList(int pageIndex, int pageSize)
@@ -79,7 +67,7 @@ namespace BeeStore_Repository.Services
 
         public async Task<WarehouseCreateDTO> UpdateWarehouse(WarehouseCreateDTO request)
         {
-            var exist = await WarehouseExist(request.Name);
+            var exist = await _unitOfWork.WarehouseRepo.SingleOrDefaultAsync(u => u.Name == request.Name);
             if (exist == null)
             {
                 throw new DuplicateException("No warehouse with this name found.");
