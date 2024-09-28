@@ -16,7 +16,7 @@ namespace BeeStore_Api.Controllers
 
         [HttpGet]
         public async Task<IActionResult> GetProductList([FromQuery][DefaultValue(0)] int pageIndex,
-                                                    [FromQuery][DefaultValue(0)] int pageSize)
+                                                    [FromQuery][DefaultValue(10)] int pageSize)
         {
             var result = await _productService.GetProductList(pageIndex, pageSize);
             return Ok(result);
