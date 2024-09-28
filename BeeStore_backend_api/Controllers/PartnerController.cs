@@ -35,7 +35,7 @@ namespace BeeStore_Api.Controllers
             var result = await _partnerService.UpdatePartner(request);
             return Ok(result);
         }
-        [HttpDelete]
+        [HttpDelete("{email}")]
         public async Task<IActionResult> DeletePartner(string email)
         {
             var result = await _partnerService.DeletePartner(email);
