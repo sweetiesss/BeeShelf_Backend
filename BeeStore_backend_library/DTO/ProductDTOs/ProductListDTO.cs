@@ -24,9 +24,11 @@ namespace BeeStore_Repository.DTO.ProductDTOs
 
         public DateTime? ExpirationDate { get; set; }
 
-        public int? PictureId { get; set; }
+        public string Picture_Link { get; set; }
+        //public int? PictureId { get; set; }
 
-        public int? ProductCategoryId { get; set; }
+        public string ProductCategoryName { get; set; }
+        //public int? ProductCategoryId { get; set; }
 
         public string? Origin { get; set; }
 

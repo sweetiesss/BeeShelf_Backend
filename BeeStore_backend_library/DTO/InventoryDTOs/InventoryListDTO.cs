@@ -20,7 +20,8 @@ namespace BeeStore_Repository.DTO.InventoryDTOs
 
         public DateTime? ExpirationDate { get; set; }
 
-        public int? WarehouseId { get; set; }
+        public string WarehouseName {  get; set; }
+        //public int? WarehouseId { get; set; }
 
         //public ulong? IsDeleted { get; set; }
     }

@@ -31,14 +31,17 @@ namespace BeeStore_Repository.Mapper
                  .ForMember(dest => dest.RoleId, opt => opt.MapFrom<CustomRoleNameReverseResolver>());
             CreateMap<User, UserListDTO>()
                     .ForMember(dest => dest.RoleName, opt => opt.MapFrom<CustomRoleNameResolver>())
-                    .ForMember(dest => dest.Picture_Link, opt => opt.MapFrom<CustomPictureLinkResolver>());
+                    .ForMember(dest => dest.Picture_Link, opt => opt.MapFrom<CustomPictureLinkResolverUser>());
             CreateMap<Partner, PartnerListDTO>();
             CreateMap<UpgradeToPartnerRequest, Partner>();
             CreateMap<Warehouse, WarehouseListDTO>();
             CreateMap<WarehouseCreateDTO, Warehouse>();
-            CreateMap<Inventory, InventoryListDTO>();
+            CreateMap<Inventory, InventoryListDTO>()
+                .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom<CustomWarehouseNameResolver>());
             CreateMap<InventoryCreateDTO, Inventory>();
-            CreateMap<Product, ProductListDTO>();
+            CreateMap<Product, ProductListDTO>()
+                .ForMember(dest => dest.Picture_Link, opt => opt.MapFrom<CustomPictureLinkResolverProduct>())
+                .ForMember(dest => dest.ProductCategoryName, opt => opt.MapFrom<CustomProductCategoryResolverProduct>());
             CreateMap<ProductCreateDTO, Product>();
             }
         }
