@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace BeeStore_Repository.Mapper.CustomResolver
 {
-    public class CustomPictureLinkResolver : IValueResolver<User, UserListDTO, string?>
+    public class CustomPictureLinkResolverUser : IValueResolver<User, UserListDTO, string?>
     {
         private readonly BeeStoreDbContext _context;
 
-        public CustomPictureLinkResolver(BeeStoreDbContext context)
+        public CustomPictureLinkResolverUser(BeeStoreDbContext context)
         {
             _context = context;
         }
