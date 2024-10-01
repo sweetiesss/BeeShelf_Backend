@@ -13,7 +13,7 @@ namespace BeeStore_Api.Controllers
             _pictureService = pictureService;
         }
 
-        [HttpPost("picture/upload")]
+        [HttpPost()]
         public async Task<IActionResult> Upload([FromForm(Name = "image")] IFormFile file)
         {
 

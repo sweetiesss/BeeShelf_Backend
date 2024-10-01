@@ -8,43 +8,192 @@
     "**/platforms"
   ],
   "GlobalConfiguration": {
-    "BaseUrl": "https://localhost:7001"
+    "BaseUrl": "https://localhost:7001",
+    "Hosts": {
+      "Service": "https://beeshelfapi.azurewebsites.net"
+    },
+    "LoadBalancerOptions": {
+      "Type": "RoundRobin"
+    },
+    "HealthCheckOptions": {
+      "Timeout": 5000,
+      "Interval": 10000,
+      "Retries": 3,
+      "Path": "/health"
+    },
+    "RateLimitOptions": {
+      "ClientWhitelist": [],
+      "EnableRateLimiting": true,
+      "Period": "5s",
+      "PeriodTimespan": 3,
+      "Limit": 3
+    }
   },
   "Routes": [
-    {
-      "UpstreamPathTemplate": "/gateway/{everything}",
-      "UpstreamHttpMethod": [ "Get" ],
-      "UpstreamHeaderTransform": {
-        "X-Api-Key": "b3e4f7b76e344c90bc5e1f1d8d6c2f98"
-      },
-      "DownstreamPathTemplate": "/api/{everything}",
+    { // User Path
+      "UpstreamPathTemplate": "/gateway/user/{everything}",
+      "UpstreamHttpMethod": [],
+      "DownstreamPathTemplate": "/api/User/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         {
           "Host": "localhost",
           "Port": 7092
+        },
+        {
+          "Host": "{Service}",
+          "Port": 443
         }
       ],
-      "AuthenticationOptions": {
-        "AuthenticationProviderKey": "Bearer",
-        "AllowedScopes": []
-      },
-      "LoadBalancerOptions": {
-        "Type": "RoundRobin"
-      },
-      "HealthCheckOptions": {
-        "Timeout": 5000,
-        "Interval": 10000,
-        "Retries": 3,
-        "Path": "/health"
-      },
-      "RateLimitOptions": {
-        "ClientWhitelist": [],
-        "EnableRateLimiting": true,
-        "Period": "5s",
-        "PeriodTimespan": 3,
-        "Limit": 3
-      }
+      "SwaggerKey": "user"
+    }, // Inventory Path
+    {
+      "UpstreamPathTemplate": "/gateway/inventory/{everything}",
+      "UpstreamHttpMethod": [],
+      "DownstreamPathTemplate": "/api/Inventory/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7092
+        },
+        {
+          "Host": "{Service}",
+          "Port": 443
+        }
+      ],
+      "SwaggerKey": "inventory"
+    },
+    { // Partner Path
+      "UpstreamPathTemplate": "/gateway/partner/{everything}",
+      "UpstreamHttpMethod": [],
+      "DownstreamPathTemplate": "/api/Partner/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7092
+        },
+        {
+          "Host": "{Service}",
+          "Port": 443
+        }
+      ],
+      "SwaggerKey": "partner"
+    },
+    { // Image Test Path
+      "UpstreamPathTemplate": "/gateway/picture/{everything}",
+      "UpstreamHttpMethod": [],
+      "DownstreamPathTemplate": "/api/Picture/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7092
+        },
+        {
+          "Host": "{Service}",
+          "Port": 443
+        }
+      ],
+      "SwaggerKey": "image"
+    },
+    { // Product Path
+      "UpstreamPathTemplate": "/gateway/product/{everything}",
+      "UpstreamHttpMethod": [],
+      "DownstreamPathTemplate": "/api/Product/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7092
+        },
+        {
+          "Host": "{Service}",
+          "Port": 443
+        }
+      ],
+      "SwaggerKey": "product"
+    },
+
+    { // Warehouse Path
+      "UpstreamPathTemplate": "/gateway/warehouse/{everything}",
+      "UpstreamHttpMethod": [],
+      "DownstreamPathTemplate": "/api/Warehouse/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7092
+        },
+        {
+          "Host": "{Service}",
+          "Port": 443
+        }
+      ],
+      "SwaggerKey": "warehouse"
+    }
+  ],
+  "SwaggerEndPoints": [
+    {
+      "Key": "image",
+      "Config": [
+        {
+          "Name": "image gateway API",
+          "version": "v1",
+          "Url": "https://localhost:7092/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "user",
+      "Config": [
+        {
+          "Name": "user gateway API",
+          "version": "v1",
+          "Url": "https://localhost:7092/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "inventory",
+      "Config": [
+        {
+          "Name": "inventory gateway API",
+          "version": "v1",
+          "Url": "https://localhost:7092/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "partner",
+      "Config": [
+        {
+          "Name": "partner gateway API",
+          "version": "v1",
+          "Url": "https://localhost:7092/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "product",
+      "Config": [
+        {
+          "Name": "product gateway API",
+          "version": "v1",
+          "Url": "https://localhost:7092/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "warehouse",
+      "Config": [
+        {
+          "Name": "warehouse gateway API",
+          "version": "v1",
+          "Url": "https://localhost:7092/swagger/v1/swagger.json"
+        }
+      ]
     }
   ]
 }
