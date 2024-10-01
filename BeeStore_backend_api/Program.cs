@@ -92,7 +92,7 @@ app.UseHttpsRedirection();
 app.UseMiddleware<GlobalExceptionMiddleware>();
 if (builder.Environment.IsProduction()) 
 { 
-    //app.UseMiddleware<ApiKeyAuthMiddleware>();
+    app.UseMiddleware<ApiKeyAuthMiddleware>();
 }
 
 app.UseAuthentication();
