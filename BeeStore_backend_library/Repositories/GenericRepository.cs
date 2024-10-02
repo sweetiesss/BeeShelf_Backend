@@ -4,6 +4,7 @@ using BeeStore_Repository.DTO;
 using BeeStore_Repository.Interfaces;
 using BeeStore_Repository.Models;
 using Microsoft.EntityFrameworkCore;
+using NLog.Filters;
 using System;
 using System.Linq;
 using System.Linq.Expressions;
@@ -28,6 +29,10 @@ namespace BeeStore_Repository.Repositories
         }
 
         public Task<List<T>> GetAllAsync() => _dbSet.Where(x => x.IsDeleted.Equals(false)).ToListAsync();
+
+        public async Task<IEnumerable<T>> GetFiltered(Expression<Func<T, bool>> filter)
+        => await _dbSet.Where(filter).ToListAsync();
+        
 
 
         public virtual async Task<IQueryable<T>> GetQueryable()

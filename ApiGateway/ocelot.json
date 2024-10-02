@@ -47,7 +47,7 @@
       ],
       "SwaggerKey": "user"
     }, // Inventory Path
-    {
+    { 
       "UpstreamPathTemplate": "/gateway/inventory/{everything}",
       "UpstreamHttpMethod": [],
       "DownstreamPathTemplate": "/api/Inventory/{everything}",
