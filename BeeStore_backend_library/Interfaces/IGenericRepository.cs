@@ -7,6 +7,7 @@ namespace BeeStore_Repository.Interfaces
     {
         //Task<T> GetByIdAsync(int id);
         Task<List<T>> GetAllAsync();
+        Task<IEnumerable<T>> GetFiltered(Expression<Func<T, bool>> filter);
         Task<T> SingleOrDefaultAsync(Expression<Func<T, bool>> predicate);
         Task AddAsync(T entity);
         Task AddRangeAsync(List<T> entities);
