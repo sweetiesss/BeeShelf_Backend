@@ -34,6 +34,13 @@ builder.Services.AddSwaggerGen();
 
 builder.Services.ConfigureDownstreamHostAndPortsPlaceholders(builder.Configuration);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAllOrigins",
+        builder => builder.AllowAnyOrigin() // Allows all origins
+                          .AllowAnyHeader() // Allows any headers
+                          .AllowAnyMethod()); // Allows any HTTP methods
+});
 
 var app = builder.Build();
 
@@ -45,7 +52,7 @@ if (app.Environment.IsDevelopment())
 app.UseSwaggerForOcelotUI();
 app.UseSwagger();
 app.UseSwaggerUI();
-
+app.UseCors("AllowAllOrigins");
 // Other middleware
 var client = new SecretClient(new Uri(keyVaultURL), new EnvironmentCredential());
 

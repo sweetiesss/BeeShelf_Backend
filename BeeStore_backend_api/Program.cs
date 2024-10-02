@@ -72,6 +72,14 @@ if (builder.Environment.IsProduction())
         s3BucketUrl.Value.Value
     ));
 
+    builder.Services.AddCors(options =>
+    {
+        options.AddPolicy("AllowSpecificOrigins",
+            builder => builder.WithOrigins("http://localhost:3000", "https://beeshelfgateway.azurewebsites.net")
+                              .AllowAnyHeader()
+                              .AllowAnyMethod()
+                              .AllowCredentials());
+    });
 }
 
 
@@ -93,6 +101,7 @@ app.UseMiddleware<GlobalExceptionMiddleware>();
 if (builder.Environment.IsProduction()) 
 { 
     app.UseMiddleware<ApiKeyAuthMiddleware>();
+    app.UseCors("AllowSpecificOrigins");
 }
 
 app.UseAuthentication();
