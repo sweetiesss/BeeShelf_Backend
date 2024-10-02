@@ -5,9 +5,8 @@ namespace BeeStore_Repository.Models;
 
 public partial class Order : BaseEntity
 {
-    //public int Id { get; set; }
 
-    public string? PartnerEmail { get; set; }
+    public int? UserId { get; set; }
 
     public DateTime? CreateDate { get; set; }
 
@@ -31,11 +30,9 @@ public partial class Order : BaseEntity
 
     public int? ProductId { get; set; }
 
-    //public ulong? IsDeleted { get; set; }
-
-    public virtual User? PartnerEmailNavigation { get; set; }
-
     public virtual Picture? Picture { get; set; }
 
     public virtual Product? Product { get; set; }
+
+    public virtual User? User { get; set; }
 }

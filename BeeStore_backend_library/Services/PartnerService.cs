@@ -36,14 +36,14 @@ namespace BeeStore_Repository.Services
             return await ListPagination<PartnerListDTO>.PaginateList(result, pageIndex, pageSize);
         }
 
-        public async Task<UpgradeToPartnerRequest> UpgradeToPartner(UpgradeToPartnerRequest request)
+        public async Task<PartnerUpdateRequest> UpgradeToPartner(PartnerUpdateRequest request)
         {
-            if (await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Email == request.UserEmail) == null)
+            if (await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Id == request.UserId) == null)
             {
                 throw new KeyNotFoundException("User not found.");
             }
             
-            if (await _unitOfWork.PartnerRepo.SingleOrDefaultAsync(u => u.UserEmail == request.UserEmail) != null)
+            if (await _unitOfWork.PartnerRepo.SingleOrDefaultAsync(u => u.UserId == request.UserId) != null)
             {
                 throw new DuplicateException("User is already a partner");
             }
@@ -57,7 +57,7 @@ namespace BeeStore_Repository.Services
 
         public async Task<PartnerUpdateRequest> UpdatePartner(PartnerUpdateRequest request)
         {
-            var exist = await _unitOfWork.PartnerRepo.SingleOrDefaultAsync(u => u.UserEmail == request.UserEmail);
+            var exist = await _unitOfWork.PartnerRepo.SingleOrDefaultAsync(u => u.UserId == request.UserId);
             if(exist == null)
             {
                 throw new KeyNotFoundException("Partner does not exist");
@@ -81,9 +81,9 @@ namespace BeeStore_Repository.Services
             return request;
         }
 
-        public async Task<string> DeletePartner(string email)
+        public async Task<string> DeletePartner(int id)
         {
-            var exist = await _unitOfWork.PartnerRepo.SingleOrDefaultAsync(u => u.UserEmail == email);
+            var exist = await _unitOfWork.PartnerRepo.SingleOrDefaultAsync(u => u.Id == id);
             if (exist == null)
             {
                 throw new KeyNotFoundException("Partner does not exist");

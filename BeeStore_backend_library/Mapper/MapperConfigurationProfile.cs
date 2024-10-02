@@ -32,8 +32,9 @@ namespace BeeStore_Repository.Mapper
             CreateMap<User, UserListDTO>()
                     .ForMember(dest => dest.RoleName, opt => opt.MapFrom<CustomRoleNameResolver>())
                     .ForMember(dest => dest.Picture_Link, opt => opt.MapFrom<CustomPictureLinkResolverUser>());
-            CreateMap<Partner, PartnerListDTO>();
-            CreateMap<UpgradeToPartnerRequest, Partner>();
+            CreateMap<Partner, PartnerListDTO>()
+                .ForMember(dest => dest.User_Email, opt => opt.MapFrom<CustomUserEmailResolverPartner>());
+            CreateMap<PartnerUpdateRequest, Partner>();
             CreateMap<Warehouse, WarehouseListDTO>();
             CreateMap<WarehouseCreateDTO, Warehouse>();
             CreateMap<Inventory, InventoryListDTO>()

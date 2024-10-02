@@ -15,6 +15,6 @@ namespace BeeStore_Repository.Services.Interfaces
         Task<Pagination<UserListDTO>> GetAllUser(int pageIndex, int pageSize);
         Task<UserCreateRequestDTO> CreateUser(UserCreateRequestDTO user);
         Task<UserUpdateRequestDTO> UpdateUser(UserUpdateRequestDTO user);
-        Task<string> DeleteUser(string email);
+        Task<string> DeleteUser(int id);
     }
 }

@@ -46,10 +46,10 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
-        [HttpDelete("{email}")]
-        public async Task<IActionResult> DeleteUser(string email)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUser(int id)
         {
-            var result = await _userService.DeleteUser(email);
+            var result = await _userService.DeleteUser(id);
             return Ok(result);
         }
 
