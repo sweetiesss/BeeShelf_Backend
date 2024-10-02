@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using BeeStore_Repository.DTO;
 using BeeStore_Repository.DTO.InventoryDTOs;
+using BeeStore_Repository.DTO.PackageDTOs;
 using BeeStore_Repository.DTO.PartnerDTOs;
+using BeeStore_Repository.DTO.ProductCategoryDTOs;
 using BeeStore_Repository.DTO.ProductDTOs;
 using BeeStore_Repository.DTO.UserDTOs;
 using BeeStore_Repository.DTO.WarehouseDTOs;
@@ -43,6 +45,11 @@ namespace BeeStore_Repository.Mapper
                 .ForMember(dest => dest.Picture_Link, opt => opt.MapFrom<CustomPictureLinkResolverProduct>())
                 .ForMember(dest => dest.ProductCategoryName, opt => opt.MapFrom<CustomProductCategoryResolverProduct>());
             CreateMap<ProductCreateDTO, Product>();
+            CreateMap<ProductCategory, ProductCategoryListDTO>();
+            CreateMap<ProductCategoryCreateDTO, ProductCategory>();
+            CreateMap<Package, PackageListDTO>()
+                .ForMember(dest => dest.ProductName, opt => opt.MapFrom<CustomProductNameResolverPackage>());
+            CreateMap<PackageCreateDTO, Package>();
             }
         }
     }

@@ -47,7 +47,7 @@
       ],
       "SwaggerKey": "user"
     }, // Inventory Path
-    { 
+    {
       "UpstreamPathTemplate": "/gateway/inventory/{everything}",
       "UpstreamHttpMethod": [],
       "DownstreamPathTemplate": "/api/Inventory/{everything}",
@@ -132,6 +132,42 @@
         }
       ],
       "SwaggerKey": "warehouse"
+    },
+
+    { // ProductCategory Path
+      "UpstreamPathTemplate": "/gateway/productCategory/{everything}",
+      "UpstreamHttpMethod": [],
+      "DownstreamPathTemplate": "/api/ProductCategory/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7092
+        },
+        {
+          "Host": "{Service}",
+          "Port": 443
+        }
+      ],
+      "SwaggerKey": "productCategory"
+    },
+
+    { //package Path
+      "UpstreamPathTemplate": "/gateway/package/{everything}",
+      "UpstreamHttpMethod": [],
+      "DownstreamPathTemplate": "/api/Package/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7092
+        },
+        {
+          "Host": "{Service}",
+          "Port": 443
+        }
+      ],
+      "SwaggerKey": "package"
     }
   ],
   "SwaggerEndPoints": [
@@ -195,6 +231,28 @@
       "Config": [
         {
           "Name": "warehouse gateway API",
+          "version": "v1",
+          //"Url": "https://localhost:7092/swagger/v1/swagger.json"
+          "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "productCategory",
+      "Config": [
+        {
+          "Name": "productCategory gateway API",
+          "version": "v1",
+          //"Url": "https://localhost:7092/swagger/v1/swagger.json"
+          "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "package",
+      "Config": [
+        {
+          "Name": "package gateway API",
           "version": "v1",
           //"Url": "https://localhost:7092/swagger/v1/swagger.json"
           "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"

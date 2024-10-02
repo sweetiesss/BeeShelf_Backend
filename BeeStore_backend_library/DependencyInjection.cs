@@ -32,12 +32,12 @@ namespace BeeStore_Repository
             services.AddScoped<IWarehouseService, WarehouseService>();
             services.AddScoped<IInventoryService, InventoryService>();
             services.AddScoped<IProductService, ProductService>();
+            services.AddScoped<IProductCategoryService, ProductCategoryService>();
+            services.AddScoped<IPackageService, PackageService>();
             services.AddScoped<ILoggerManager, LoggerManager>();
             services.AddScoped<IJWTService, JWTService>();
             services.AddScoped<UnitOfWork>();
             services.AddScoped<GlobalExceptionMiddleware>();
-            services.AddScoped<CustomRoleNameResolver>();
-            services.AddScoped<CustomRoleNameReverseResolver>();
 
             // Auto mapper
             services.AddAutoMapper(typeof(MapperConfigurationsProfile).Assembly);

@@ -46,6 +46,8 @@ namespace BeeStore_Repository.Services
                     await _unitOfWork.SaveAsync();
                 }
             }
+            request.CreateDate = DateTime.Now;
+            request.ExpirationDate = null;
             var result = _mapper.Map<Product>(request);
             await _unitOfWork.ProductRepo.AddAsync(result);
             await _unitOfWork.SaveAsync();
@@ -175,7 +177,7 @@ namespace BeeStore_Repository.Services
             exist.Origin = request.Origin;
             exist.Weight = request.Weight;
             exist.Price = request.Price;
-            exist.ExpirationDate = DateTime.Now; //NOT IMPLEMENTED
+            exist.ExpirationDate = null; //NOT IMPLEMENTED
             exist.PictureId = request.PictureId;
             exist.ProductCategoryId = request.ProductCategoryId;
             exist.ProductAmount = request.ProductAmount;
