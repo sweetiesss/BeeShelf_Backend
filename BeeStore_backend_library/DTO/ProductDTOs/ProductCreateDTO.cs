@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace BeeStore_Repository.DTO.ProductDTOs
@@ -17,10 +18,12 @@ namespace BeeStore_Repository.DTO.ProductDTOs
 
         public decimal Weight { get; set; }
 
-        public DateTime? CreateDate { get; set; }
+        [JsonIgnore]
+        public DateTime? CreateDate { get; set; } = DateTime.Now;
 
         public int ProductAmount { get; set; }
 
+        [JsonIgnore]
         public DateTime? ExpirationDate { get; set; }
 
         public int PictureId { get; set; }
