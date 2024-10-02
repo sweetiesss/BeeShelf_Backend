@@ -27,23 +27,29 @@ namespace BeeStore_Repository.Services
             _mapper = mapper;
             _logger = logger;
         }
-        public async Task<InventoryListDTO> AddPartnerToInventory(int id, string email)
+        public async Task<InventoryListDTO> AddPartnerToInventory(int id, int userId)
         {
             var exist = await _unitOfWork.InventoryRepo.GetByIdAsync(id);
             if (exist == null)
             {
                 throw new KeyNotFoundException("Inventory not found.");
             }
-            if(exist.PartnerEmail != null)
+            if(exist.UserId != null)
             {
                 throw new DuplicateException("This inventory is already occupied.");
             }
-            var user = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Email == email);
+            var user = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Id == userId);
             if (user == null)
             {
                 throw new KeyNotFoundException("User not found");
             }
-            exist.PartnerEmail = user.Email;
+            var partner =await _unitOfWork.PartnerRepo.SingleOrDefaultAsync(u => u.UserId == userId);
+            if (partner == null)
+            {
+                throw new KeyNotFoundException("This user is not a partner.");
+            }
+
+            exist.UserId = user.Id;
             _unitOfWork.InventoryRepo.Update(exist);
             await _unitOfWork.SaveAsync();
             var result = _mapper.Map<InventoryListDTO>(exist);

@@ -21,9 +21,7 @@ namespace BeeStore_Repository.DTO.PartnerDTOs
 
         public string? BankAccountNumber { get; set; }
 
-        public string? UserEmail { get; set; }
-
-        [JsonIgnore]
-        public ulong? IsDeleted { get; set; }
+        //public int? UserId { get; set; }
+        public string User_Email {  get; set; }
     }
 }
