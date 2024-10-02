@@ -19,6 +19,8 @@ namespace BeeStore_Repository
         private GenericRepository<Warehouse> warehouseRepo;
         private GenericRepository<Inventory> inventoryRepo;
         private GenericRepository<Product> productRepo;
+        private GenericRepository<ProductCategory> productCategoryRepo;
+        private GenericRepository<Package> packageRepo;
 
         public UnitOfWork(BeeStoreDbContext context)
         {
@@ -94,6 +96,30 @@ namespace BeeStore_Repository
                     productRepo = new GenericRepository<Product>(_context);
                 }
                 return productRepo;
+            }
+        }
+
+        public GenericRepository<ProductCategory> ProductCategoryRepo
+        {
+            get
+            {
+                if (productCategoryRepo == null)
+                {
+                    productCategoryRepo = new GenericRepository<ProductCategory>(_context);
+                }
+                return productCategoryRepo;
+            }
+        }
+
+        public GenericRepository<Package> PackageRepo
+        {
+            get
+            {
+                if (packageRepo == null)
+                {
+                    packageRepo = new GenericRepository<Package>(_context);
+                }
+                return packageRepo;
             }
         }
 

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace BeeStore_Repository.DTO.ProductDTOs
@@ -22,7 +23,8 @@ namespace BeeStore_Repository.DTO.ProductDTOs
 
         public int? ProductAmount { get; set; }
 
-        public DateTime? ExpirationDate { get; set; }
+        [JsonIgnore]
+        public DateTime? ExpirationDate { get; set; }   //THIS SHOULD NOT BE HERE
 
         public string Picture_Link { get; set; }
         //public int? PictureId { get; set; }
