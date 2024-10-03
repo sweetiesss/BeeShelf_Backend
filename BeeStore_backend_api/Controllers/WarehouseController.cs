@@ -9,10 +9,19 @@ namespace BeeStore_Api.Controllers
     public class WarehouseController : BaseController
     {
         private readonly IWarehouseService _warehouseService;
+        private readonly IWarehouseCategoryService _warehouseCategoryService;
+        private readonly IWarehouseShipperService _warehouseShipperService;
+        private readonly IWarehouseStaffService _warehouseStaffService;
 
-        public WarehouseController(IWarehouseService warehouseService)
+        public WarehouseController(IWarehouseService warehouseService,
+                                    IWarehouseCategoryService warehouseCategoryService,
+                                    IWarehouseShipperService warehouseShipperService,
+                                    IWarehouseStaffService warehouseStaffService)
         {
             _warehouseService = warehouseService;
+            _warehouseCategoryService = warehouseCategoryService;
+            _warehouseShipperService = warehouseShipperService;
+            _warehouseStaffService = warehouseStaffService;
         }
 
         [HttpGet]
@@ -20,6 +29,30 @@ namespace BeeStore_Api.Controllers
                                                                [FromQuery][DefaultValue(10)] int pageSize)
         {
             var result = await _warehouseService.GetWarehouseList(pageIndex, pageSize);
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetWarehouseShipperList([FromQuery][DefaultValue(0)] int pageIndex,
+                                                               [FromQuery][DefaultValue(10)] int pageSize)
+        {
+            var result = await _warehouseShipperService.GetWarehouseShipperList(pageIndex, pageSize);
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetWarehouseStaffList([FromQuery][DefaultValue(0)] int pageIndex,
+                                                               [FromQuery][DefaultValue(10)] int pageSize)
+        {
+            var result = await _warehouseStaffService.GetWarehouseStaffList(pageIndex, pageSize);
+            return Ok(result);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetWarehouseCategoryList([FromQuery][DefaultValue(0)] int pageIndex,
+                                                               [FromQuery][DefaultValue(10)] int pageSize)
+        {
+            var result = await _warehouseCategoryService.GetWarehouseCategoryList(pageIndex, pageSize);
             return Ok(result);
         }
 

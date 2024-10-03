@@ -6,7 +6,10 @@ using BeeStore_Repository.DTO.PartnerDTOs;
 using BeeStore_Repository.DTO.ProductCategoryDTOs;
 using BeeStore_Repository.DTO.ProductDTOs;
 using BeeStore_Repository.DTO.UserDTOs;
+using BeeStore_Repository.DTO.WarehouseCategoryDTOs;
 using BeeStore_Repository.DTO.WarehouseDTOs;
+using BeeStore_Repository.DTO.WarehouseShipperDTOs;
+using BeeStore_Repository.DTO.WarehouseStaffDTOs;
 using BeeStore_Repository.Mapper.CustomResolver;
 using BeeStore_Repository.Models;
 using Microsoft.EntityFrameworkCore.Internal;
@@ -51,6 +54,16 @@ namespace BeeStore_Repository.Mapper
             CreateMap<Package, PackageListDTO>()
                 .ForMember(dest => dest.ProductName, opt => opt.MapFrom<CustomProductNameResolverPackage>());
             CreateMap<PackageCreateDTO, Package>();
+            CreateMap<WarehouseCategory, WarehouseCategoryListDTO>()
+                .ForMember(dest => dest.ProductCategoryName, opt => opt.MapFrom<CustomProductCategoryResolverWarehouseCategory>())
+                .ForMember(dest => dest.warehouse_name, opt => opt.MapFrom<CustomWarehouseNameResolverWarehouseCategory>());
+            CreateMap<WarehouseShipper, WarehouseShipperListDTO>()
+                .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom<CustomWarehouseNameResolverWarehouseShipper>())
+                .ForMember(dest => dest.user_email, opt => opt.MapFrom<CustomUserEmailResolverWarehouseShipper>());
+            CreateMap<WarehouseStaff, WarehouseStaffListDTO>()
+                .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom<CustomWarehouseNameResolverWarehouseStaff>())
+                .ForMember(dest => dest.user_email, opt => opt.MapFrom<CustomUserEmailResolverWarehouseStaff>());
         }
         }
+    }
     }

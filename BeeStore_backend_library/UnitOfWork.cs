@@ -21,6 +21,9 @@ namespace BeeStore_Repository
         private GenericRepository<Product> productRepo;
         private GenericRepository<ProductCategory> productCategoryRepo;
         private GenericRepository<Package> packageRepo;
+        private GenericRepository<WarehouseCategory> warehouseCategory;
+        private GenericRepository<WarehouseShipper> warehouseShipper;
+        private GenericRepository<WarehouseStaff> warehouseStaff;
 
         public UnitOfWork(BeeStoreDbContext context)
         {
@@ -120,6 +123,42 @@ namespace BeeStore_Repository
                     packageRepo = new GenericRepository<Package>(_context);
                 }
                 return packageRepo;
+            }
+        }
+
+        public GenericRepository<WarehouseCategory> WarehouseCategory
+        {
+            get
+            {
+                if (warehouseCategory == null)
+                {
+                    warehouseCategory = new GenericRepository<WarehouseCategory>(_context);
+                }
+                return warehouseCategory;
+            }
+        }
+
+        public GenericRepository<WarehouseShipper> WarehouseShipper
+        {
+            get
+            {
+                if (warehouseShipper == null)
+                {
+                    warehouseShipper = new GenericRepository<WarehouseShipper>(_context);
+                }
+                return warehouseShipper;
+            }
+        }
+
+        public GenericRepository<WarehouseStaff> WarehouseStaff
+        {
+            get
+            {
+                if (warehouseStaff == null)
+                {
+                    warehouseStaff = new GenericRepository<WarehouseStaff>(_context);
+                }
+                return warehouseStaff;
             }
         }
 
