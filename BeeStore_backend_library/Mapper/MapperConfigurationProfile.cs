@@ -51,6 +51,6 @@ namespace BeeStore_Repository.Mapper
             CreateMap<Package, PackageListDTO>()
                 .ForMember(dest => dest.ProductName, opt => opt.MapFrom<CustomProductNameResolverPackage>());
             CreateMap<PackageCreateDTO, Package>();
-            }
+        }
         }
     }

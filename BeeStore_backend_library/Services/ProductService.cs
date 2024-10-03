@@ -46,8 +46,14 @@ namespace BeeStore_Repository.Services
                     await _unitOfWork.SaveAsync();
                 }
             }
+            var productCategpry = await _unitOfWork.ProductCategoryRepo.SingleOrDefaultAsync(u => u.Id == request.ProductCategoryId);
+            if (productCategpry == null)
+            {
+                throw new KeyNotFoundException("Product category does not exist.");
+            }
             request.CreateDate = DateTime.Now;
-            request.ExpirationDate = null;
+            request.ExpirationDate = request.CreateDate.Value.AddDays(productCategpry.ExpireIn.Value);
+
             var result = _mapper.Map<Product>(request);
             await _unitOfWork.ProductRepo.AddAsync(result);
             await _unitOfWork.SaveAsync();
@@ -179,11 +185,13 @@ namespace BeeStore_Repository.Services
                 }
             }
 
+            var productCategory =await  _unitOfWork.ProductCategoryRepo.SingleOrDefaultAsync(u => u.Id == request.ProductCategoryId);
+
             exist.Name = request.Name;
             exist.Origin = request.Origin;
             exist.Weight = request.Weight;
             exist.Price = request.Price;
-            exist.ExpirationDate = null; //NOT IMPLEMENTED
+            exist.ExpirationDate = exist.CreateDate.Value.AddDays(productCategory.ExpireIn.Value);
             exist.PictureId = request.PictureId;
             exist.ProductCategoryId = request.ProductCategoryId;
             exist.ProductAmount = request.ProductAmount;
