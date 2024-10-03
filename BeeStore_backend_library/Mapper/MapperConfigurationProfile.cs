@@ -63,7 +63,7 @@ namespace BeeStore_Repository.Mapper
             CreateMap<WarehouseStaff, WarehouseStaffListDTO>()
                 .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom<CustomWarehouseNameResolverWarehouseStaff>())
                 .ForMember(dest => dest.user_email, opt => opt.MapFrom<CustomUserEmailResolverWarehouseStaff>());
-
+        }
         }
     }
     }
