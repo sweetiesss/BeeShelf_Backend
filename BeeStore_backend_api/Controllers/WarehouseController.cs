@@ -1,4 +1,7 @@
-﻿using BeeStore_Repository.DTO.WarehouseDTOs;
+﻿using BeeStore_Repository.DTO.WarehouseCategoryDTOs;
+using BeeStore_Repository.DTO.WarehouseDTOs;
+using BeeStore_Repository.DTO.WarehouseShipperDTOs;
+using BeeStore_Repository.DTO.WarehouseStaffDTOs;
 using BeeStore_Repository.Services.Interfaces;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel;
@@ -40,6 +43,21 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetWarehouseShipperList(int id, [FromQuery][DefaultValue(0)] int pageIndex,
+                                                               [FromQuery][DefaultValue(10)] int pageSize)
+        {
+            var result = await _warehouseShipperService.GetWarehouseShipperList(id, pageIndex, pageSize);
+            return Ok(result);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddWarehouseShipper(List<WarehouseShipperCreateDTO> request)
+        {
+            var result = await _warehouseShipperService.AddShipperToWarehouse(request);
+            return Ok(result);
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetWarehouseStaffList([FromQuery][DefaultValue(0)] int pageIndex,
                                                                [FromQuery][DefaultValue(10)] int pageSize)
@@ -48,11 +66,41 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetWarehouseStaffList(int id, [FromQuery][DefaultValue(0)] int pageIndex,
+                                                              [FromQuery][DefaultValue(10)] int pageSize)
+        {
+            var result = await _warehouseStaffService.GetWarehouseStaffList(id, pageIndex, pageSize);
+            return Ok(result);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddWarehouseStaff(List<WarehouseStaffCreateDTO> request)
+        {
+            var result = await _warehouseStaffService.AddStaffToWarehouse(request);
+            return Ok(result);
+        }
+
         [HttpGet]
         public async Task<IActionResult> GetWarehouseCategoryList([FromQuery][DefaultValue(0)] int pageIndex,
                                                                [FromQuery][DefaultValue(10)] int pageSize)
         {
             var result = await _warehouseCategoryService.GetWarehouseCategoryList(pageIndex, pageSize);
+            return Ok(result);
+        }
+
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetWarehouseCategoryList(int id, [FromQuery][DefaultValue(0)] int pageIndex,
+                                                               [FromQuery][DefaultValue(10)] int pageSize)
+        {
+            var result = await _warehouseCategoryService.GetWarehouseCategoryList(id, pageIndex, pageSize);
+            return Ok(result);
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddWarehouseCategory(List<WarehouseCategoryCreateDTO> request)
+        {
+            var result = await _warehouseCategoryService.AddCategoryToWarehouse(request);
             return Ok(result);
         }
 

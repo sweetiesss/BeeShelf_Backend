@@ -12,6 +12,9 @@ namespace BeeStore_Repository.Services.Interfaces
     public interface IWarehouseShipperService
     {
         Task<Pagination<WarehouseShipperListDTO>> GetWarehouseShipperList(int pageIndex, int pageSize);
+        Task<Pagination<WarehouseShipperListDTO>> GetWarehouseShipperList(int id, int pageIndex, int pageSize);
+        Task<List<WarehouseShipperCreateDTO>> AddShipperToWarehouse(List<WarehouseShipperCreateDTO> request);
+
 
     }
 }
