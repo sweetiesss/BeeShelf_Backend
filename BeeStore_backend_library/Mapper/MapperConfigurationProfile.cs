@@ -37,33 +37,54 @@ namespace BeeStore_Repository.Mapper
             CreateMap<User, UserListDTO>()
                     .ForMember(dest => dest.RoleName, opt => opt.MapFrom<CustomRoleNameResolver>())
                     .ForMember(dest => dest.Picture_Link, opt => opt.MapFrom<CustomPictureLinkResolverUser>());
+
+
             CreateMap<Partner, PartnerListDTO>()
                 .ForMember(dest => dest.User_Email, opt => opt.MapFrom<CustomUserEmailResolverPartner>());
             CreateMap<PartnerUpdateRequest, Partner>();
+
+
             CreateMap<Warehouse, WarehouseListDTO>();
             CreateMap<WarehouseCreateDTO, Warehouse>();
+
+
             CreateMap<Inventory, InventoryListDTO>()
                 .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom<CustomWarehouseNameResolver>());
             CreateMap<InventoryCreateDTO, Inventory>();
+
+
             CreateMap<Product, ProductListDTO>()
                 .ForMember(dest => dest.Picture_Link, opt => opt.MapFrom<CustomPictureLinkResolverProduct>())
                 .ForMember(dest => dest.ProductCategoryName, opt => opt.MapFrom<CustomProductCategoryResolverProduct>());
             CreateMap<ProductCreateDTO, Product>();
+
+
             CreateMap<ProductCategory, ProductCategoryListDTO>();
             CreateMap<ProductCategoryCreateDTO, ProductCategory>();
+
+
             CreateMap<Package, PackageListDTO>()
                 .ForMember(dest => dest.ProductName, opt => opt.MapFrom<CustomProductNameResolverPackage>());
             CreateMap<PackageCreateDTO, Package>();
+
+
             CreateMap<WarehouseCategory, WarehouseCategoryListDTO>()
                 .ForMember(dest => dest.ProductCategoryName, opt => opt.MapFrom<CustomProductCategoryResolverWarehouseCategory>())
                 .ForMember(dest => dest.warehouse_name, opt => opt.MapFrom<CustomWarehouseNameResolverWarehouseCategory>());
+            CreateMap<WarehouseCategoryCreateDTO, WarehouseCategory>();
+
+
             CreateMap<WarehouseShipper, WarehouseShipperListDTO>()
                 .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom<CustomWarehouseNameResolverWarehouseShipper>())
                 .ForMember(dest => dest.user_email, opt => opt.MapFrom<CustomUserEmailResolverWarehouseShipper>());
+            CreateMap<WarehouseShipperCreateDTO,  WarehouseShipper>();
+
+
             CreateMap<WarehouseStaff, WarehouseStaffListDTO>()
                 .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom<CustomWarehouseNameResolverWarehouseStaff>())
                 .ForMember(dest => dest.user_email, opt => opt.MapFrom<CustomUserEmailResolverWarehouseStaff>());
+            CreateMap<WarehouseStaffCreateDTO, WarehouseStaff>();
         }
         }
     }
-    }
+    
