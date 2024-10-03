@@ -26,7 +26,11 @@
       "launchUrl": "swagger",
       "applicationUrl": "https://localhost:7001;http://localhost:5041",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "AZURE_CLIENT_ID": "b3cf0cb2-f49d-44a5-927b-c0a7e650c654",
+        "AZURE_TENANT_ID": "1591d8e7-5b2b-4f46-96ce-b114a3f08b18",
+        "AZURE_CLIENT_SECRET": "yx88Q~EzcmdzbuWZoOx46AWJXofWMnl_uMnHGb2O",
+        "API_KEY": "b3e4f7b76e344c90bc5e1f1d8d6c2f98"
       }
     },
     "IIS Express": {
