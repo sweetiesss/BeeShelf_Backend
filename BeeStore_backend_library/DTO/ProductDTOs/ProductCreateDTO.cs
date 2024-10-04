@@ -23,9 +23,6 @@ namespace BeeStore_Repository.DTO.ProductDTOs
 
         public int? ProductAmount { get; set; }
 
-        [JsonIgnore]
-        public DateTime? ExpirationDate { get; set; }
-
         public int? PictureId { get; set; }
 
         public int? ProductCategoryId { get; set; }

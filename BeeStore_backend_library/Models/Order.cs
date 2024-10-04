@@ -24,11 +24,14 @@ public partial class Order : BaseEntity
 
     public string? CodStatus { get; set; }
 
-    public DateTime? DeliverBy { get; set; }
+    public int? DeliverBy { get; set; }
 
     public int? PictureId { get; set; }
 
     public int? ProductId { get; set; }
+
+
+    public virtual User? DeliverByNavigation { get; set; }
 
     public virtual Picture? Picture { get; set; }
 

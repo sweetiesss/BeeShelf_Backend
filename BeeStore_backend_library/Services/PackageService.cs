@@ -28,10 +28,13 @@ namespace BeeStore_Repository.Services
 
         public async Task<PackageCreateDTO> CreatePackage(PackageCreateDTO request)
         {
-            var inventory = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Id == request.InventoryId);
-            if(inventory == null)
+            if (request.InventoryId != null)
             {
-                throw new KeyNotFoundException("Inventory does not exist.");
+                var inventory = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Id == request.InventoryId);
+                if(inventory == null)
+                {
+                    throw new KeyNotFoundException("Inventory does not exist.");
+                }
             }
             var product = await _unitOfWork.ProductRepo.SingleOrDefaultAsync(u => u.Id == request.ProductId); 
             if(product == null)
@@ -76,10 +79,13 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException("Package does not exist.");
             }
-            var inventory = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Id == request.InventoryId);
-            if (inventory == null)
+            if(request.InventoryId != null)
             {
-                throw new KeyNotFoundException("Inventory does not exist.");
+                var inventory = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Id == request.InventoryId);
+                if (inventory == null)
+                {
+                    throw new KeyNotFoundException("Inventory does not exist.");
+                }
             }
             var product = await _unitOfWork.ProductRepo.SingleOrDefaultAsync(u => u.Id == request.ProductId);
             if (product == null)

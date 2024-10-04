@@ -4,13 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using BeeStore_Repository.Models;
 
 namespace BeeStore_Repository.Data;
-
 public partial class BeeStoreDbContext : DbContext
 {
-
-
     public BeeStoreDbContext(DbContextOptions<BeeStoreDbContext> options)
-        : base(options)
+            : base(options)
     {
     }
 
@@ -95,6 +92,8 @@ public partial class BeeStoreDbContext : DbContext
 
             entity.ToTable("Order");
 
+            entity.HasIndex(e => e.DeliverBy, "deliver_by");
+
             entity.HasIndex(e => e.PictureId, "picture_id");
 
             entity.HasIndex(e => e.ProductId, "product_id");
@@ -113,9 +112,7 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.CreateDate)
                 .HasColumnType("datetime")
                 .HasColumnName("create_date");
-            entity.Property(e => e.DeliverBy)
-                .HasColumnType("datetime")
-                .HasColumnName("deliver_by");
+            entity.Property(e => e.DeliverBy).HasColumnName("deliver_by");
             entity.Property(e => e.IsDeleted)
                 .HasDefaultValueSql("b'0'")
                 .HasColumnType("bit(1)")
@@ -141,15 +138,19 @@ public partial class BeeStoreDbContext : DbContext
                 .HasColumnName("total_price");
             entity.Property(e => e.UserId).HasColumnName("user_id");
 
+            entity.HasOne(d => d.DeliverByNavigation).WithMany(p => p.OrderDeliverByNavigations)
+                .HasForeignKey(d => d.DeliverBy)
+                .HasConstraintName("Order_ibfk_2");
+
             entity.HasOne(d => d.Picture).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.PictureId)
-                .HasConstraintName("Order_ibfk_2");
+                .HasConstraintName("Order_ibfk_3");
 
             entity.HasOne(d => d.Product).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.ProductId)
-                .HasConstraintName("Order_ibfk_3");
+                .HasConstraintName("Order_ibfk_4");
 
-            entity.HasOne(d => d.User).WithMany(p => p.Orders)
+            entity.HasOne(d => d.User).WithMany(p => p.OrderUsers)
                 .HasForeignKey(d => d.UserId)
                 .HasConstraintName("Order_ibfk_1");
         });
@@ -268,9 +269,6 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.CreateDate)
                 .HasColumnType("datetime")
                 .HasColumnName("create_date");
-            entity.Property(e => e.ExpirationDate)
-                .HasColumnType("datetime")
-                .HasColumnName("expiration_date");
             entity.Property(e => e.IsDeleted)
                 .HasDefaultValueSql("b'0'")
                 .HasColumnType("bit(1)")
@@ -341,6 +339,8 @@ public partial class BeeStoreDbContext : DbContext
 
             entity.HasIndex(e => e.SendToInventory, "send_to_inventory");
 
+            entity.HasIndex(e => e.UserId, "user_id");
+
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CreateDate)
                 .HasColumnType("datetime")
@@ -369,6 +369,7 @@ public partial class BeeStoreDbContext : DbContext
                 .HasColumnName("status")
                 .UseCollation("utf8mb3_general_ci")
                 .HasCharSet("utf8mb3");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
 
             entity.HasOne(d => d.Package).WithMany(p => p.Requests)
                 .HasForeignKey(d => d.PackageId)
@@ -377,6 +378,10 @@ public partial class BeeStoreDbContext : DbContext
             entity.HasOne(d => d.SendToInventoryNavigation).WithMany(p => p.Requests)
                 .HasForeignKey(d => d.SendToInventory)
                 .HasConstraintName("Request_ibfk_1");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Requests)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("Request_ibfk_3");
         });
 
         modelBuilder.Entity<Role>(entity =>
@@ -623,4 +628,3 @@ public partial class BeeStoreDbContext : DbContext
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }
-

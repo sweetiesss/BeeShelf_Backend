@@ -5,6 +5,7 @@ namespace BeeStore_Repository.Models;
 
 public partial class Product : BaseEntity
 {
+
     public int? UserId { get; set; }
 
     public string? Name { get; set; }
@@ -17,13 +18,12 @@ public partial class Product : BaseEntity
 
     public int? ProductAmount { get; set; }
 
-    public DateTime? ExpirationDate { get; set; }
-
     public int? PictureId { get; set; }
 
     public int? ProductCategoryId { get; set; }
 
     public string? Origin { get; set; }
+
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 

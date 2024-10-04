@@ -22,9 +22,11 @@ namespace BeeStore_Repository
         private GenericRepository<Product> productRepo;
         private GenericRepository<ProductCategory> productCategoryRepo;
         private GenericRepository<Package> packageRepo;
-        private GenericRepository<WarehouseCategory> warehouseCategory;
-        private GenericRepository<WarehouseShipper> warehouseShipper;
-        private GenericRepository<WarehouseStaff> warehouseStaff;
+        private GenericRepository<WarehouseCategory> warehouseCategoryRepo;
+        private GenericRepository<WarehouseShipper> warehouseShipperRepo;
+        private GenericRepository<WarehouseStaff> warehouseStaffRepo;
+        private GenericRepository<Request> requestRepo;
+        private GenericRepository<Order> orderRepo;
 
         public UnitOfWork(BeeStoreDbContext context)
         {
@@ -139,39 +141,63 @@ namespace BeeStore_Repository
             }
         }
 
-        public GenericRepository<WarehouseCategory> WarehouseCategory
+        public GenericRepository<WarehouseCategory> WarehouseCategoryRepo
         {
             get
             {
-                if (warehouseCategory == null)
+                if (warehouseCategoryRepo == null)
                 {
-                    warehouseCategory = new GenericRepository<WarehouseCategory>(_context);
+                    warehouseCategoryRepo = new GenericRepository<WarehouseCategory>(_context);
                 }
-                return warehouseCategory;
+                return warehouseCategoryRepo;
             }
         }
 
-        public GenericRepository<WarehouseShipper> WarehouseShipper
+        public GenericRepository<WarehouseShipper> WarehouseShipperRepo
         {
             get
             {
-                if (warehouseShipper == null)
+                if (warehouseShipperRepo == null)
                 {
-                    warehouseShipper = new GenericRepository<WarehouseShipper>(_context);
+                    warehouseShipperRepo = new GenericRepository<WarehouseShipper>(_context);
                 }
-                return warehouseShipper;
+                return warehouseShipperRepo;
             }
         }
 
-        public GenericRepository<WarehouseStaff> WarehouseStaff
+        public GenericRepository<WarehouseStaff> WarehouseStaffRepo
         {
             get
             {
-                if (warehouseStaff == null)
+                if (warehouseStaffRepo == null)
                 {
-                    warehouseStaff = new GenericRepository<WarehouseStaff>(_context);
+                    warehouseStaffRepo = new GenericRepository<WarehouseStaff>(_context);
                 }
-                return warehouseStaff;
+                return warehouseStaffRepo;
+            }
+        }
+
+        public GenericRepository<Request> RequestRepo
+        {
+            get
+            {
+                if (requestRepo == null)
+                {
+                    requestRepo = new GenericRepository<Request>(_context);
+                }
+                return requestRepo;
+            }
+        }
+
+        public GenericRepository<Order> OrderRepo
+        {
+            get
+            {
+                if(orderRepo == null)
+                {
+                    orderRepo = new GenericRepository<Order>(_context);
+                }
+                return orderRepo;
             }
         }
 

@@ -5,6 +5,7 @@ namespace BeeStore_Repository.Models;
 
 public partial class Package : BaseEntity
 {
+
     public DateTime? CreateDate { get; set; }
 
     public decimal? Weight { get; set; }
@@ -18,6 +19,7 @@ public partial class Package : BaseEntity
     public DateTime? ExpirationDate { get; set; }
 
     public int? InventoryId { get; set; }
+
 
     public virtual Inventory? Inventory { get; set; }
 

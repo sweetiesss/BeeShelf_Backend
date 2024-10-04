@@ -65,7 +65,7 @@ namespace BeeStore_Repository.Services
                 }
 
                 //check if user is arleady working at here or another place
-                var existWorking = await _unitOfWork.WarehouseStaff.FirstOrDefaultAsync(u => u.UserId == item.UserId);
+                var existWorking = await _unitOfWork.WarehouseStaffRepo.FirstOrDefaultAsync(u => u.UserId == item.UserId);
                 if (existWorking != null)
                 {
                     if (existWorking.IsDeleted != true)
@@ -77,7 +77,7 @@ namespace BeeStore_Repository.Services
                     else
                     {
                         existWorking.UserId = null;
-                        _unitOfWork.WarehouseStaff.Update(existWorking);
+                        _unitOfWork.WarehouseStaffRepo.Update(existWorking);
                         await _unitOfWork.SaveAsync();
                     }
                 }
@@ -88,7 +88,7 @@ namespace BeeStore_Repository.Services
                 throw new DuplicateException("Failed to add. These user are already working at a warehouse " + error);
             }
             var result = _mapper.Map<List<WarehouseStaff>>(request);
-            await _unitOfWork.WarehouseStaff.AddRangeAsync(result);
+            await _unitOfWork.WarehouseStaffRepo.AddRangeAsync(result);
             await _unitOfWork.SaveAsync();
             return request;
         
@@ -96,14 +96,14 @@ namespace BeeStore_Repository.Services
 
         public async Task<Pagination<WarehouseStaffListDTO>> GetWarehouseStaffList(int pageIndex, int pageSize)
         {
-            var list = await _unitOfWork.WarehouseStaff.GetAllAsync();
+            var list = await _unitOfWork.WarehouseStaffRepo.GetAllAsync();
             var result = _mapper.Map<List<WarehouseStaffListDTO>>(list);
             return (await ListPagination<WarehouseStaffListDTO>.PaginateList(result, pageIndex, pageSize));
         }
 
         public async Task<Pagination<WarehouseStaffListDTO>> GetWarehouseStaffList(int id, int pageIndex, int pageSize)
         {
-            var list = await _unitOfWork.WarehouseStaff.GetFiltered(u => u.WarehouseId == id);
+            var list = await _unitOfWork.WarehouseStaffRepo.GetFiltered(u => u.WarehouseId == id);
             var result = _mapper.Map<List<WarehouseStaffListDTO>>(list);
             return (await ListPagination<WarehouseStaffListDTO>.PaginateList(result, pageIndex, pageSize));
         }

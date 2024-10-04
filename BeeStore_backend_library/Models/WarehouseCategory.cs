@@ -10,6 +10,7 @@ public partial class WarehouseCategory : BaseEntity
 
     public int? ProductCategoryId { get; set; }
 
+
     public virtual ProductCategory? ProductCategory { get; set; }
 
     public virtual Warehouse? Warehouse { get; set; }

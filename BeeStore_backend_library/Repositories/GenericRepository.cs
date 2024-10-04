@@ -9,6 +9,7 @@ using System;
 using System.Linq;
 using System.Linq.Expressions;
 using static Amazon.S3.Util.S3EventNotification;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace BeeStore_Repository.Repositories
 {
@@ -35,15 +36,34 @@ namespace BeeStore_Repository.Repositories
         
 
 
-        public virtual async Task<IQueryable<T>> GetQueryable()
+        public async Task<List<T>> GetQueryable(Func<IQueryable<T>, IQueryable<T>> includes = null)
         {
             IQueryable<T> query = _dbSet;
-            return query;
+            if (includes != null)
+            {
+                query = includes(query);
+            }
+
+            return await query.ToListAsync();
         }
 
-        public async Task<T> SingleOrDefaultAsync(Expression<Func<T, bool>> predicate)
+        //public async Task<T> SingleOrDefaultAsync(Expression<Func<T, bool>> predicate)
+        //{
+        //    return await _dbSet.SingleOrDefaultAsync(predicate);
+        //}
+
+        public async Task<T> SingleOrDefaultAsync(
+        Expression<Func<T, bool>> predicate,
+        Func<IQueryable<T>, IQueryable<T>> includes = null)
         {
-            return await _dbSet.SingleOrDefaultAsync(predicate);
+            IQueryable<T> query = _dbSet;
+
+            if (includes != null)
+            {
+                query = includes(query);
+            }
+
+            return await query.SingleOrDefaultAsync(predicate);
         }
 
         public async Task AddAsync(T entity)

@@ -37,6 +37,8 @@ namespace BeeStore_Repository
             services.AddScoped<IWarehouseCategoryService, WarehouseCategoryService>();
             services.AddScoped<IWarehouseShipperService, WarehouseShipperService>();
             services.AddScoped<IWarehouseStaffService, WarehouseStaffService>();
+            services.AddScoped<IRequestService, RequestService>();
+            services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<ILoggerManager, LoggerManager>();
             services.AddScoped<IJWTService, JWTService>();
             services.AddScoped<UnitOfWork>();

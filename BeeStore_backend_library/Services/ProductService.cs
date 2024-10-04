@@ -52,7 +52,6 @@ namespace BeeStore_Repository.Services
                 throw new KeyNotFoundException("Product category does not exist.");
             }
             request.CreateDate = DateTime.Now;
-            request.ExpirationDate = request.CreateDate.Value.AddDays(productCategpry.ExpireIn.Value);
 
             var result = _mapper.Map<Product>(request);
             await _unitOfWork.ProductRepo.AddAsync(result);
@@ -191,7 +190,6 @@ namespace BeeStore_Repository.Services
             exist.Origin = request.Origin;
             exist.Weight = request.Weight;
             exist.Price = request.Price;
-            exist.ExpirationDate = exist.CreateDate.Value.AddDays(productCategory.ExpireIn.Value);
             exist.PictureId = request.PictureId;
             exist.ProductCategoryId = request.ProductCategoryId;
             exist.ProductAmount = request.ProductAmount;
