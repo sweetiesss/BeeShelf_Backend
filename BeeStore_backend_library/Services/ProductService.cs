@@ -32,7 +32,7 @@ namespace BeeStore_Repository.Services
 
         public async Task<ProductCreateDTO> CreateProduct(ProductCreateDTO request)
         {
-            var exist = await _unitOfWork.ProductRepo.FirstOrDefaultAsync(u => u.Name == request.Name && u.PartnerEmail == request.PartnerEmail);
+            var exist = await _unitOfWork.ProductRepo.FirstOrDefaultAsync(u => u.Name == request.Name && u.UserId == request.UserId);
             if (exist != null)
             {
                 if(exist.IsDeleted == false)
@@ -46,6 +46,13 @@ namespace BeeStore_Repository.Services
                     await _unitOfWork.SaveAsync();
                 }
             }
+            var productCategpry = await _unitOfWork.ProductCategoryRepo.SingleOrDefaultAsync(u => u.Id == request.ProductCategoryId);
+            if (productCategpry == null)
+            {
+                throw new KeyNotFoundException("Product category does not exist.");
+            }
+            request.CreateDate = DateTime.Now;
+
             var result = _mapper.Map<Product>(request);
             await _unitOfWork.ProductRepo.AddAsync(result);
             await _unitOfWork.SaveAsync();
@@ -78,8 +85,8 @@ namespace BeeStore_Repository.Services
             //proces request list
             foreach (var item in request)
             {
-                var exist = await _unitOfWork.ProductRepo.FirstOrDefaultAsync(u => u.Name == item.Name && u.PartnerEmail == item.PartnerEmail);
-                if (exist != null && exist.PartnerEmail == item.PartnerEmail)
+                var exist = await _unitOfWork.ProductRepo.FirstOrDefaultAsync(u => u.Name == item.Name && u.UserId == item.UserId);
+                if (exist != null && exist.UserId == item.UserId)
                 {
                     if(exist.IsDeleted == true)
                     {
@@ -126,7 +133,12 @@ namespace BeeStore_Repository.Services
 
         public async Task<Pagination<ProductListDTO>> GetProductListByEmail(string email, int pageIndex, int pageSize)
         {
-            var list = await _unitOfWork.ProductRepo.GetFiltered(u => u.PartnerEmail.Equals(email));
+            var user = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Email == email);
+            if(user == null)
+            {
+                throw new KeyNotFoundException("User not found.");
+            }
+            var list = await _unitOfWork.ProductRepo.GetFiltered(u => u.UserId.Equals(user.Id));
             var result = _mapper.Map<List<ProductListDTO>>(list);
             return (await ListPagination<ProductListDTO>.PaginateList(result, pageIndex, pageSize));
         }
@@ -140,10 +152,11 @@ namespace BeeStore_Repository.Services
                 throw new KeyNotFoundException("This product doesn't exist or has already been deleted.");
             }
 
-            //Check if the product's email match with the request email
-            if (exist.PartnerEmail != request.PartnerEmail)
+
+            //Check if the product's user Id match with the request user Id
+            if (exist.UserId != request.UserId)
             {
-                throw new AppException("Email misamatched.");
+                throw new AppException("User misamatched.");
             }
 
             //Check for duplicate name
@@ -154,7 +167,7 @@ namespace BeeStore_Repository.Services
             //If deleted status is true then update the name of that duplicate product to null
             //Then proceed to update
             
-            var duplicateName = await _unitOfWork.ProductRepo.SingleOrDefaultAsync(u => u.Name == request.Name && u.PartnerEmail == request.PartnerEmail);
+            var duplicateName = await _unitOfWork.ProductRepo.SingleOrDefaultAsync(u => u.Name == request.Name && u.UserId == request.UserId);
 
             if (duplicateName != null) 
             {
@@ -171,11 +184,12 @@ namespace BeeStore_Repository.Services
                 }
             }
 
+            var productCategory =await  _unitOfWork.ProductCategoryRepo.SingleOrDefaultAsync(u => u.Id == request.ProductCategoryId);
+
             exist.Name = request.Name;
             exist.Origin = request.Origin;
             exist.Weight = request.Weight;
             exist.Price = request.Price;
-            exist.ExpirationDate = DateTime.Now; //NOT IMPLEMENTED
             exist.PictureId = request.PictureId;
             exist.ProductCategoryId = request.ProductCategoryId;
             exist.ProductAmount = request.ProductAmount;

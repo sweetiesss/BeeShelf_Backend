@@ -11,8 +11,8 @@ namespace BeeStore_Repository.Services.Interfaces
     public interface IPartnerService
     {
         Task<Pagination<PartnerListDTO>> GetPartnerList(int pageIndex, int pageSize);
-        Task<UpgradeToPartnerRequest> UpgradeToPartner(UpgradeToPartnerRequest request);
+        Task<PartnerUpdateRequest> UpgradeToPartner(PartnerUpdateRequest request);
         Task<PartnerUpdateRequest> UpdatePartner(PartnerUpdateRequest request);
-        Task<string> DeletePartner(string email);
+        Task<string> DeletePartner(int id);
     }
 }

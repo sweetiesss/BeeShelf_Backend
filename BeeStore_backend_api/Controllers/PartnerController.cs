@@ -23,7 +23,7 @@ namespace BeeStore_Api.Controllers
         }
 
         [HttpPost]
-        public async Task<IActionResult> UpgradeToPartner(UpgradeToPartnerRequest request)
+        public async Task<IActionResult> UpgradeToPartner(PartnerUpdateRequest request)
         {
             var result = await _partnerService.UpgradeToPartner(request);
             return Ok(result);
@@ -35,10 +35,10 @@ namespace BeeStore_Api.Controllers
             var result = await _partnerService.UpdatePartner(request);
             return Ok(result);
         }
-        [HttpDelete("{email}")]
-        public async Task<IActionResult> DeletePartner(string email)
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeletePartner(int id)
         {
-            var result = await _partnerService.DeletePartner(email);
+            var result = await _partnerService.DeletePartner(id);
             return Ok(result);
         }
     }

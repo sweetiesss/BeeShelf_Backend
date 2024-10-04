@@ -5,7 +5,6 @@ namespace BeeStore_Repository.Models;
 
 public partial class Warehouse : BaseEntity
 {
-    //public int Id { get; set; }
 
     public string? Name { get; set; }
 
@@ -15,7 +14,6 @@ public partial class Warehouse : BaseEntity
 
     public DateTime? CreateDate { get; set; }
 
-    //public ulong? IsDeleted { get; set; }
 
     public virtual ICollection<Inventory> Inventories { get; set; } = new List<Inventory>();
 
