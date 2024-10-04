@@ -5,6 +5,9 @@ namespace BeeStore_Repository.Models;
 
 public partial class Request : BaseEntity
 {
+
+    public int? UserId { get; set; }
+
     public string? Name { get; set; }
 
     public string? Description { get; set; }
@@ -19,7 +22,10 @@ public partial class Request : BaseEntity
 
     public string? RequestType { get; set; }
 
+
     public virtual Package? Package { get; set; }
 
     public virtual Inventory? SendToInventoryNavigation { get; set; }
+
+    public virtual User? User { get; set; }
 }

@@ -21,14 +21,14 @@ namespace BeeStore_Repository.Services
 
         public async Task<Pagination<WarehouseShipperListDTO>> GetWarehouseShipperList(int pageIndex, int pageSize)
         {
-            var list = await _unitOfWork.WarehouseShipper.GetAllAsync();
+            var list = await _unitOfWork.WarehouseShipperRepo.GetAllAsync();
             var result = _mapper.Map<List<WarehouseShipperListDTO>>(list);
             return (await ListPagination<WarehouseShipperListDTO>.PaginateList(result, pageIndex, pageSize));
         }
 
         public async Task<Pagination<WarehouseShipperListDTO>> GetWarehouseShipperList(int id, int pageIndex, int pageSize)
         {
-            var list = await _unitOfWork.WarehouseShipper.GetFiltered(u => u.WarehouseId == id);
+            var list = await _unitOfWork.WarehouseShipperRepo.GetFiltered(u => u.WarehouseId == id);
             var result = _mapper.Map<List<WarehouseShipperListDTO>>(list);
             return (await ListPagination<WarehouseShipperListDTO>.PaginateList(result, pageIndex, pageSize));
         }
@@ -74,7 +74,7 @@ namespace BeeStore_Repository.Services
                 }
 
                 //check if user is arleady working at here or another place
-                var existWorking = await _unitOfWork.WarehouseShipper.FirstOrDefaultAsync(u => u.UserId == item.UserId);
+                var existWorking = await _unitOfWork.WarehouseShipperRepo.FirstOrDefaultAsync(u => u.UserId == item.UserId);
                 if(existWorking != null)
                 {
                     if(existWorking.IsDeleted != true)
@@ -86,7 +86,7 @@ namespace BeeStore_Repository.Services
                     else
                     {
                         existWorking.UserId = null;
-                        _unitOfWork.WarehouseShipper.Update(existWorking);
+                        _unitOfWork.WarehouseShipperRepo.Update(existWorking);
                         await _unitOfWork.SaveAsync();
                     }
                 }
@@ -97,7 +97,7 @@ namespace BeeStore_Repository.Services
                 throw new DuplicateException("Failed to add. These user are already working at a warehouse " + error);
             }
             var result = _mapper.Map<List<WarehouseShipper>>(request);
-            await _unitOfWork.WarehouseShipper.AddRangeAsync(result);
+            await _unitOfWork.WarehouseShipperRepo.AddRangeAsync(result);
             await _unitOfWork.SaveAsync();
             return request;
         }

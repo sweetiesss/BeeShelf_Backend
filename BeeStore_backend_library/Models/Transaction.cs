@@ -22,6 +22,7 @@ public partial class Transaction : BaseEntity
 
     public string? CancellationReason { get; set; }
 
+
     public virtual Inventory? Item { get; set; }
 
     public virtual User? User { get; set; }

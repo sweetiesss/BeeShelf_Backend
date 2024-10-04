@@ -56,13 +56,13 @@ namespace BeeStore_Repository.Services
                     throw new KeyNotFoundException($"Product with this id doesnt exist: {item.ProductCategoryId}");
                 }
 
-                var exist = await _unitOfWork.WarehouseCategory.FirstOrDefaultAsync(u => u.WarehouseId == item.WarehouseId && u.ProductCategoryId == item.ProductCategoryId);
+                var exist = await _unitOfWork.WarehouseCategoryRepo.FirstOrDefaultAsync(u => u.WarehouseId == item.WarehouseId && u.ProductCategoryId == item.ProductCategoryId);
                 if (exist != null)
                 {
                     if (exist.IsDeleted == true)
                     {
                         exist.WarehouseId = null;
-                        _unitOfWork.WarehouseCategory.Update(exist);
+                        _unitOfWork.WarehouseCategoryRepo.Update(exist);
                         await _unitOfWork.SaveAsync();
                     }
                     else
@@ -78,21 +78,21 @@ namespace BeeStore_Repository.Services
                 throw new DuplicateException("Failed to add. Warehouse with these category already exist: " + error);
             }
             var result = _mapper.Map<List<WarehouseCategory>>(request);
-            await _unitOfWork.WarehouseCategory.AddRangeAsync(result);
+            await _unitOfWork.WarehouseCategoryRepo.AddRangeAsync(result);
             await _unitOfWork.SaveAsync();
             return request;
         }
 
         public async Task<Pagination<WarehouseCategoryListDTO>> GetWarehouseCategoryList(int pageIndex, int pageSize)
         {
-            var list = await _unitOfWork.WarehouseCategory.GetAllAsync();
+            var list = await _unitOfWork.WarehouseCategoryRepo.GetAllAsync();
             var result = _mapper.Map<List<WarehouseCategoryListDTO>>(list);
             return (await ListPagination<WarehouseCategoryListDTO>.PaginateList(result, pageIndex, pageSize));
         }
 
         public async Task<Pagination<WarehouseCategoryListDTO>> GetWarehouseCategoryList(int id, int pageIndex, int pageSize)
         {
-            var list = await _unitOfWork.WarehouseCategory.GetFiltered(u => u.WarehouseId == id);
+            var list = await _unitOfWork.WarehouseCategoryRepo.GetFiltered(u => u.WarehouseId == id);
             var result = _mapper.Map<List<WarehouseCategoryListDTO>>(list);
             return (await ListPagination<WarehouseCategoryListDTO>.PaginateList(result, pageIndex, pageSize));
         }

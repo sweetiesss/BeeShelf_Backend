@@ -8,7 +8,13 @@ namespace BeeStore_Repository.Interfaces
         //Task<T> GetByIdAsync(int id);
         Task<List<T>> GetAllAsync();
         Task<IEnumerable<T>> GetFiltered(Expression<Func<T, bool>> filter);
-        Task<T> SingleOrDefaultAsync(Expression<Func<T, bool>> predicate);
+        //Task<T> SingleOrDefaultAsync(Expression<Func<T, bool>> predicate);
+        Task<T> SingleOrDefaultAsync(
+        Expression<Func<T, bool>> predicate,
+        Func<IQueryable<T>, IQueryable<T>> includes = null);
+
+        Task<List<T>> GetQueryable(Func<IQueryable<T>, IQueryable<T>> includes = null);
+
         Task AddAsync(T entity);
         Task AddRangeAsync(List<T> entities);
         void Update(T entity);

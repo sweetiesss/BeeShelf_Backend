@@ -166,6 +166,40 @@
         }
       ],
       "SwaggerKey": "package"
+    },
+    { // request Path
+      "UpstreamPathTemplate": "/gateway/request/{everything}",
+      "UpstreamHttpMethod": [],
+      "DownstreamPathTemplate": "/api/Request/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7092
+        },
+        {
+          "Host": "{Service}",
+          "Port": 443
+        }
+      ],
+      "SwaggerKey": "request"
+    },
+    { // order Path
+      "UpstreamPathTemplate": "/gateway/order/{everything}",
+      "UpstreamHttpMethod": [],
+      "DownstreamPathTemplate": "/api/Order/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "localhost",
+          "Port": 7092
+        },
+        {
+          "Host": "{Service}",
+          "Port": 443
+        }
+      ],
+      "SwaggerKey": "order"
     }
   ],
   "SwaggerEndPoints": [
@@ -251,6 +285,28 @@
       "Config": [
         {
           "Name": "package gateway API",
+          "version": "v1",
+          //"Url": "https://localhost:7092/swagger/v1/swagger.json"
+          "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "request",
+      "Config": [
+        {
+          "Name": "request gateway API",
+          "version": "v1",
+          //"Url": "https://localhost:7092/swagger/v1/swagger.json"
+          "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "order",
+      "Config": [
+        {
+          "Name": "order gateway API",
           "version": "v1",
           //"Url": "https://localhost:7092/swagger/v1/swagger.json"
           "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"

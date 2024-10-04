@@ -1,10 +1,12 @@
 ﻿using AutoMapper;
 using BeeStore_Repository.DTO;
 using BeeStore_Repository.DTO.InventoryDTOs;
+using BeeStore_Repository.DTO.OrderDTOs;
 using BeeStore_Repository.DTO.PackageDTOs;
 using BeeStore_Repository.DTO.PartnerDTOs;
 using BeeStore_Repository.DTO.ProductCategoryDTOs;
 using BeeStore_Repository.DTO.ProductDTOs;
+using BeeStore_Repository.DTO.RequestDTOs;
 using BeeStore_Repository.DTO.UserDTOs;
 using BeeStore_Repository.DTO.WarehouseCategoryDTOs;
 using BeeStore_Repository.DTO.WarehouseDTOs;
@@ -84,6 +86,18 @@ namespace BeeStore_Repository.Mapper
                 .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom<CustomWarehouseNameResolverWarehouseStaff>())
                 .ForMember(dest => dest.user_email, opt => opt.MapFrom<CustomUserEmailResolverWarehouseStaff>());
             CreateMap<WarehouseStaffCreateDTO, WarehouseStaff>();
+
+            CreateMap<Request, RequestListDTO>()
+                .ForMember(dest => dest.user_email, opt => opt.MapFrom<CustomUserEmailResolverRequest>())
+                .ForMember(dest => dest.ProductName, opt => opt.MapFrom<CustomProductNameResolverRequest>());
+            CreateMap<RequestCreateDTO, Request>();
+
+            CreateMap<Order, OrderListDTO>()
+                .ForMember(dest => dest.user_email, opt => opt.MapFrom<CustomUserEmailResolverOrder>())
+                .ForMember(dest => dest.deliver_by, opt => opt.MapFrom<CustomUserEmailShipperResolverOrder>())
+                .ForMember(dest => dest.picture_link, opt => opt.MapFrom<CustomPictureLinkResolverOrder>())
+                .ForMember(dest => dest.product_name, opt => opt.MapFrom<CustomProductNameResolverOrder>());
+            CreateMap<OrderCreateDTO, Order>();
         }
         }
     }
