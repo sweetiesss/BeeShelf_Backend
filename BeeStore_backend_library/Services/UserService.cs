@@ -36,9 +36,9 @@ namespace BeeStore_Repository.Services
             return user;
         }
 
-        public async Task<string> DeleteUser(string email)
+        public async Task<string> DeleteUser(int id)
         {
-            var exist = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Email == email);
+            var exist = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Id == id);
             if (exist != null)
             {
                 _unitOfWork.UserRepo.SoftDelete(exist);

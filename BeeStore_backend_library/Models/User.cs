@@ -5,7 +5,6 @@ namespace BeeStore_Repository.Models;
 
 public partial class User : BaseEntity
 {
-    //public int Id { get; set; }
 
     public string Email { get; set; } = null!;
 
@@ -21,7 +20,6 @@ public partial class User : BaseEntity
 
     public int? PictureId { get; set; }
 
-    //public ulong? IsDeleted { get; set; }
 
     public string? Setting { get; set; }
 
@@ -29,13 +27,17 @@ public partial class User : BaseEntity
 
     public virtual ICollection<Inventory> Inventories { get; set; } = new List<Inventory>();
 
-    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
+    public virtual ICollection<Order> OrderDeliverByNavigations { get; set; } = new List<Order>();
+
+    public virtual ICollection<Order> OrderUsers { get; set; } = new List<Order>();
 
     public virtual ICollection<Partner> Partners { get; set; } = new List<Partner>();
 
     public virtual Picture? Picture { get; set; }
 
     public virtual ICollection<Product> Products { get; set; } = new List<Product>();
+
+    public virtual ICollection<Request> Requests { get; set; } = new List<Request>();
 
     public virtual Role? Role { get; set; }
 

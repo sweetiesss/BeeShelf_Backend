@@ -4,12 +4,10 @@ using Microsoft.EntityFrameworkCore;
 using BeeStore_Repository.Models;
 
 namespace BeeStore_Repository.Data;
-
 public partial class BeeStoreDbContext : DbContext
 {
-
     public BeeStoreDbContext(DbContextOptions<BeeStoreDbContext> options)
-        : base(options)
+            : base(options)
     {
     }
 
@@ -55,7 +53,7 @@ public partial class BeeStoreDbContext : DbContext
 
             entity.ToTable("Inventory");
 
-            entity.HasIndex(e => e.PartnerEmail, "partner_email");
+            entity.HasIndex(e => e.UserId, "user_id");
 
             entity.HasIndex(e => e.WarehouseId, "warehouse_id");
 
@@ -73,15 +71,14 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.MaxWeight)
                 .HasPrecision(10, 2)
                 .HasColumnName("max_weight");
-            entity.Property(e => e.PartnerEmail).HasColumnName("partner_email");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
             entity.Property(e => e.WarehouseId).HasColumnName("warehouse_id");
             entity.Property(e => e.Weight)
                 .HasPrecision(10, 2)
                 .HasColumnName("weight");
 
-            entity.HasOne(d => d.PartnerEmailNavigation).WithMany(p => p.Inventories)
-                .HasPrincipalKey(p => p.Email)
-                .HasForeignKey(d => d.PartnerEmail)
+            entity.HasOne(d => d.User).WithMany(p => p.Inventories)
+                .HasForeignKey(d => d.UserId)
                 .HasConstraintName("Inventory_ibfk_1");
 
             entity.HasOne(d => d.Warehouse).WithMany(p => p.Inventories)
@@ -95,11 +92,13 @@ public partial class BeeStoreDbContext : DbContext
 
             entity.ToTable("Order");
 
-            entity.HasIndex(e => e.PartnerEmail, "partner_email");
+            entity.HasIndex(e => e.DeliverBy, "deliver_by");
 
             entity.HasIndex(e => e.PictureId, "picture_id");
 
             entity.HasIndex(e => e.ProductId, "product_id");
+
+            entity.HasIndex(e => e.UserId, "user_id");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CancellationReason)
@@ -107,21 +106,22 @@ public partial class BeeStoreDbContext : DbContext
                 .HasColumnName("cancellation_reason");
             entity.Property(e => e.CodStatus)
                 .HasMaxLength(15)
-                .HasColumnName("COD_Status");
+                .HasColumnName("COD_Status")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
             entity.Property(e => e.CreateDate)
                 .HasColumnType("datetime")
                 .HasColumnName("create_date");
-            entity.Property(e => e.DeliverBy)
-                .HasColumnType("datetime")
-                .HasColumnName("deliver_by");
+            entity.Property(e => e.DeliverBy).HasColumnName("deliver_by");
             entity.Property(e => e.IsDeleted)
                 .HasDefaultValueSql("b'0'")
                 .HasColumnType("bit(1)")
                 .HasColumnName("is_deleted");
             entity.Property(e => e.OrderStatus)
                 .HasMaxLength(15)
-                .HasColumnName("order_status");
-            entity.Property(e => e.PartnerEmail).HasColumnName("partner_email");
+                .HasColumnName("order_status")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
             entity.Property(e => e.PictureId).HasColumnName("picture_id");
             entity.Property(e => e.ProductAmount).HasColumnName("product_amount");
             entity.Property(e => e.ProductId).HasColumnName("product_id");
@@ -130,23 +130,29 @@ public partial class BeeStoreDbContext : DbContext
                 .HasColumnName("receiver_address");
             entity.Property(e => e.ReceiverPhone)
                 .HasMaxLength(50)
-                .HasColumnName("receiver_phone");
+                .HasColumnName("receiver_phone")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
             entity.Property(e => e.TotalPrice)
                 .HasPrecision(10, 2)
                 .HasColumnName("total_price");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
 
-            entity.HasOne(d => d.PartnerEmailNavigation).WithMany(p => p.Orders)
-                .HasPrincipalKey(p => p.Email)
-                .HasForeignKey(d => d.PartnerEmail)
-                .HasConstraintName("Order_ibfk_1");
+            entity.HasOne(d => d.DeliverByNavigation).WithMany(p => p.OrderDeliverByNavigations)
+                .HasForeignKey(d => d.DeliverBy)
+                .HasConstraintName("Order_ibfk_2");
 
             entity.HasOne(d => d.Picture).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.PictureId)
-                .HasConstraintName("Order_ibfk_2");
+                .HasConstraintName("Order_ibfk_3");
 
             entity.HasOne(d => d.Product).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.ProductId)
-                .HasConstraintName("Order_ibfk_3");
+                .HasConstraintName("Order_ibfk_4");
+
+            entity.HasOne(d => d.User).WithMany(p => p.OrderUsers)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("Order_ibfk_1");
         });
 
         modelBuilder.Entity<Package>(entity =>
@@ -193,18 +199,24 @@ public partial class BeeStoreDbContext : DbContext
 
             entity.ToTable("Partner");
 
-            entity.HasIndex(e => e.UserEmail, "user_email");
+            entity.HasIndex(e => e.UserId, "user_id");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.BankAccountNumber)
                 .HasMaxLength(255)
-                .HasColumnName("bank_account_number");
+                .HasColumnName("bank_account_number")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
             entity.Property(e => e.BankName)
                 .HasMaxLength(255)
-                .HasColumnName("bank_name");
+                .HasColumnName("bank_name")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
             entity.Property(e => e.CitizenIdentificationNumber)
                 .HasMaxLength(255)
-                .HasColumnName("citizen_identification_number");
+                .HasColumnName("citizen_identification_number")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
             entity.Property(e => e.CreateDate)
                 .HasColumnType("datetime")
                 .HasColumnName("create_date");
@@ -215,11 +227,10 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.UpdateDate)
                 .HasColumnType("datetime")
                 .HasColumnName("update_date");
-            entity.Property(e => e.UserEmail).HasColumnName("user_email");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
 
-            entity.HasOne(d => d.UserEmailNavigation).WithMany(p => p.Partners)
-                .HasPrincipalKey(p => p.Email)
-                .HasForeignKey(d => d.UserEmail)
+            entity.HasOne(d => d.User).WithMany(p => p.Partners)
+                .HasForeignKey(d => d.UserId)
                 .HasConstraintName("Partner_ibfk_1");
         });
 
@@ -248,44 +259,40 @@ public partial class BeeStoreDbContext : DbContext
 
             entity.ToTable("Product");
 
-            entity.HasIndex(e => e.PartnerEmail, "partner_email");
-
             entity.HasIndex(e => e.PictureId, "picture_id");
 
             entity.HasIndex(e => e.ProductCategoryId, "product_category_id");
+
+            entity.HasIndex(e => e.UserId, "user_id");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CreateDate)
                 .HasColumnType("datetime")
                 .HasColumnName("create_date");
-            entity.Property(e => e.ExpirationDate)
-                .HasColumnType("datetime")
-                .HasColumnName("expiration_date");
             entity.Property(e => e.IsDeleted)
                 .HasDefaultValueSql("b'0'")
                 .HasColumnType("bit(1)")
                 .HasColumnName("is_deleted");
             entity.Property(e => e.Name)
                 .HasMaxLength(255)
-                .HasColumnName("name");
+                .HasColumnName("name")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
             entity.Property(e => e.Origin)
                 .HasMaxLength(255)
-                .HasColumnName("origin");
-            entity.Property(e => e.PartnerEmail).HasColumnName("partner_email");
+                .HasColumnName("origin")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
             entity.Property(e => e.PictureId).HasColumnName("picture_id");
             entity.Property(e => e.Price)
                 .HasPrecision(10, 2)
                 .HasColumnName("price");
             entity.Property(e => e.ProductAmount).HasColumnName("product_amount");
             entity.Property(e => e.ProductCategoryId).HasColumnName("product_category_id");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
             entity.Property(e => e.Weight)
                 .HasPrecision(10, 2)
                 .HasColumnName("weight");
-
-            entity.HasOne(d => d.PartnerEmailNavigation).WithMany(p => p.Products)
-                .HasPrincipalKey(p => p.Email)
-                .HasForeignKey(d => d.PartnerEmail)
-                .HasConstraintName("Product_ibfk_1");
 
             entity.HasOne(d => d.Picture).WithMany(p => p.Products)
                 .HasForeignKey(d => d.PictureId)
@@ -294,6 +301,10 @@ public partial class BeeStoreDbContext : DbContext
             entity.HasOne(d => d.ProductCategory).WithMany(p => p.Products)
                 .HasForeignKey(d => d.ProductCategoryId)
                 .HasConstraintName("Product_ibfk_3");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Products)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("Product_ibfk_1");
         });
 
         modelBuilder.Entity<ProductCategory>(entity =>
@@ -313,7 +324,9 @@ public partial class BeeStoreDbContext : DbContext
                 .HasColumnName("type_description");
             entity.Property(e => e.TypeName)
                 .HasMaxLength(255)
-                .HasColumnName("type_name");
+                .HasColumnName("type_name")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
         });
 
         modelBuilder.Entity<Request>(entity =>
@@ -325,6 +338,8 @@ public partial class BeeStoreDbContext : DbContext
             entity.HasIndex(e => e.PackageId, "package_id");
 
             entity.HasIndex(e => e.SendToInventory, "send_to_inventory");
+
+            entity.HasIndex(e => e.UserId, "user_id");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CreateDate)
@@ -339,12 +354,22 @@ public partial class BeeStoreDbContext : DbContext
                 .HasColumnName("is_deleted");
             entity.Property(e => e.Name)
                 .HasMaxLength(255)
-                .HasColumnName("name");
+                .HasColumnName("name")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
             entity.Property(e => e.PackageId).HasColumnName("package_id");
+            entity.Property(e => e.RequestType)
+                .HasMaxLength(15)
+                .HasColumnName("request_type")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
             entity.Property(e => e.SendToInventory).HasColumnName("send_to_inventory");
             entity.Property(e => e.Status)
                 .HasMaxLength(15)
-                .HasColumnName("status");
+                .HasColumnName("status")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
 
             entity.HasOne(d => d.Package).WithMany(p => p.Requests)
                 .HasForeignKey(d => d.PackageId)
@@ -353,6 +378,10 @@ public partial class BeeStoreDbContext : DbContext
             entity.HasOne(d => d.SendToInventoryNavigation).WithMany(p => p.Requests)
                 .HasForeignKey(d => d.SendToInventory)
                 .HasConstraintName("Request_ibfk_1");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Requests)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("Request_ibfk_3");
         });
 
         modelBuilder.Entity<Role>(entity =>
@@ -368,22 +397,23 @@ public partial class BeeStoreDbContext : DbContext
                 .HasColumnName("is_deleted");
             entity.Property(e => e.RoleName)
                 .HasMaxLength(255)
-                .HasColumnName("role_name");
+                .HasColumnName("role_name")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
         });
 
         modelBuilder.Entity<Transaction>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.HasIndex(e => e.BuyerEmail, "buyer_email");
-
             entity.HasIndex(e => e.ItemId, "item_id");
+
+            entity.HasIndex(e => e.UserId, "user_id");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Amount)
                 .HasPrecision(10, 2)
                 .HasColumnName("amount");
-            entity.Property(e => e.BuyerEmail).HasColumnName("buyer_email");
             entity.Property(e => e.CancellationReason)
                 .HasColumnType("text")
                 .HasColumnName("cancellation_reason");
@@ -400,19 +430,23 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.ItemId).HasColumnName("item_id");
             entity.Property(e => e.Status)
                 .HasMaxLength(15)
-                .HasColumnName("status");
+                .HasColumnName("status")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
             entity.Property(e => e.TransactionCode)
                 .HasMaxLength(255)
-                .HasColumnName("transaction_code");
-
-            entity.HasOne(d => d.BuyerEmailNavigation).WithMany(p => p.Transactions)
-                .HasPrincipalKey(p => p.Email)
-                .HasForeignKey(d => d.BuyerEmail)
-                .HasConstraintName("Transactions_ibfk_2");
+                .HasColumnName("transaction_code")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
 
             entity.HasOne(d => d.Item).WithMany(p => p.Transactions)
                 .HasForeignKey(d => d.ItemId)
                 .HasConstraintName("Transactions_ibfk_1");
+
+            entity.HasOne(d => d.User).WithMany(p => p.Transactions)
+                .HasForeignKey(d => d.UserId)
+                .HasConstraintName("Transactions_ibfk_2");
         });
 
         modelBuilder.Entity<User>(entity =>
@@ -431,28 +465,41 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.CreateDate)
                 .HasColumnType("datetime")
                 .HasColumnName("create_date");
-            entity.Property(e => e.Email).HasColumnName("email");
+            entity.Property(e => e.Email)
+                .HasColumnName("email")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
             entity.Property(e => e.FirstName)
                 .HasMaxLength(255)
-                .HasColumnName("first_name");
+                .HasColumnName("first_name")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
             entity.Property(e => e.IsDeleted)
                 .HasDefaultValueSql("b'0'")
                 .HasColumnType("bit(1)")
                 .HasColumnName("is_deleted");
             entity.Property(e => e.LastName)
                 .HasMaxLength(255)
-                .HasColumnName("last_name");
+                .HasColumnName("last_name")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
             entity.Property(e => e.Password)
                 .HasMaxLength(255)
-                .HasColumnName("password");
+                .HasColumnName("password")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
             entity.Property(e => e.Phone)
                 .HasMaxLength(50)
-                .HasColumnName("phone");
+                .HasColumnName("phone")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
             entity.Property(e => e.PictureId).HasColumnName("picture_id");
             entity.Property(e => e.RoleId).HasColumnName("role_id");
             entity.Property(e => e.Setting)
                 .HasMaxLength(255)
-                .HasColumnName("setting");
+                .HasColumnName("setting")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
 
             entity.HasOne(d => d.Picture).WithMany(p => p.Users)
                 .HasForeignKey(d => d.PictureId)
@@ -482,7 +529,9 @@ public partial class BeeStoreDbContext : DbContext
                 .HasColumnName("location");
             entity.Property(e => e.Name)
                 .HasMaxLength(255)
-                .HasColumnName("name");
+                .HasColumnName("name")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
             entity.Property(e => e.Size)
                 .HasPrecision(10, 2)
                 .HasColumnName("size");
@@ -521,7 +570,7 @@ public partial class BeeStoreDbContext : DbContext
 
             entity.ToTable("Warehouse_Shipper");
 
-            entity.HasIndex(e => e.UserEmail, "user_email");
+            entity.HasIndex(e => e.UserId, "user_id");
 
             entity.HasIndex(e => e.WarehouseId, "warehouse_id");
 
@@ -532,13 +581,14 @@ public partial class BeeStoreDbContext : DbContext
                 .HasColumnName("is_deleted");
             entity.Property(e => e.Status)
                 .HasMaxLength(15)
-                .HasColumnName("status");
-            entity.Property(e => e.UserEmail).HasColumnName("user_email");
+                .HasColumnName("status")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
             entity.Property(e => e.WarehouseId).HasColumnName("warehouse_id");
 
-            entity.HasOne(d => d.UserEmailNavigation).WithMany(p => p.WarehouseShippers)
-                .HasPrincipalKey(p => p.Email)
-                .HasForeignKey(d => d.UserEmail)
+            entity.HasOne(d => d.User).WithMany(p => p.WarehouseShippers)
+                .HasForeignKey(d => d.UserId)
                 .HasConstraintName("Warehouse_Shipper_ibfk_1");
 
             entity.HasOne(d => d.Warehouse).WithMany(p => p.WarehouseShippers)
@@ -552,7 +602,7 @@ public partial class BeeStoreDbContext : DbContext
 
             entity.ToTable("Warehouse_Staff");
 
-            entity.HasIndex(e => e.UserEmail, "user_email");
+            entity.HasIndex(e => e.UserId, "user_id");
 
             entity.HasIndex(e => e.WarehouseId, "warehouse_id");
 
@@ -561,12 +611,11 @@ public partial class BeeStoreDbContext : DbContext
                 .HasDefaultValueSql("b'0'")
                 .HasColumnType("bit(1)")
                 .HasColumnName("is_deleted");
-            entity.Property(e => e.UserEmail).HasColumnName("user_email");
+            entity.Property(e => e.UserId).HasColumnName("user_id");
             entity.Property(e => e.WarehouseId).HasColumnName("warehouse_id");
 
-            entity.HasOne(d => d.UserEmailNavigation).WithMany(p => p.WarehouseStaffs)
-                .HasPrincipalKey(p => p.Email)
-                .HasForeignKey(d => d.UserEmail)
+            entity.HasOne(d => d.User).WithMany(p => p.WarehouseStaffs)
+                .HasForeignKey(d => d.UserId)
                 .HasConstraintName("Warehouse_Staff_ibfk_1");
 
             entity.HasOne(d => d.Warehouse).WithMany(p => p.WarehouseStaffs)
@@ -579,4 +628,3 @@ public partial class BeeStoreDbContext : DbContext
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }
-

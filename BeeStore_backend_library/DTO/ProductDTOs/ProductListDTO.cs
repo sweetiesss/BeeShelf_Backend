@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace BeeStore_Repository.DTO.ProductDTOs
@@ -10,7 +11,7 @@ namespace BeeStore_Repository.DTO.ProductDTOs
     {
         public int Id { get; set; }
 
-        public string? PartnerEmail { get; set; }
+        public int? UserId { get; set; }
 
         public string? Name { get; set; }
 
@@ -21,8 +22,6 @@ namespace BeeStore_Repository.DTO.ProductDTOs
         public DateTime? CreateDate { get; set; }
 
         public int? ProductAmount { get; set; }
-
-        public DateTime? ExpirationDate { get; set; }
 
         public string Picture_Link { get; set; }
         //public int? PictureId { get; set; }

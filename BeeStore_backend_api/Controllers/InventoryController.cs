@@ -22,10 +22,10 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
-        [HttpPost("{id}/{email}")]
-        public async Task<IActionResult> AddPartnerToInventory(int id, string email)
+        [HttpPost("{id}/{userId}")]
+        public async Task<IActionResult> AddPartnerToInventory(int id, int userId)
         {
-            var result = await _inventoryService.AddPartnerToInventory(id, email);
+            var result = await _inventoryService.AddPartnerToInventory(id, userId);
             return Ok(result);
         }
 

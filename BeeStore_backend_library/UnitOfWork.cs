@@ -14,11 +14,19 @@ namespace BeeStore_Repository
     {
         private BeeStoreDbContext _context;
         private GenericRepository<User> userRepo;
+        private GenericRepository<Role> roleRepo;
         private GenericRepository<Picture> pictureRepo;
         private GenericRepository<Partner> partnerRepo;
         private GenericRepository<Warehouse> warehouseRepo;
         private GenericRepository<Inventory> inventoryRepo;
         private GenericRepository<Product> productRepo;
+        private GenericRepository<ProductCategory> productCategoryRepo;
+        private GenericRepository<Package> packageRepo;
+        private GenericRepository<WarehouseCategory> warehouseCategoryRepo;
+        private GenericRepository<WarehouseShipper> warehouseShipperRepo;
+        private GenericRepository<WarehouseStaff> warehouseStaffRepo;
+        private GenericRepository<Request> requestRepo;
+        private GenericRepository<Order> orderRepo;
 
         public UnitOfWork(BeeStoreDbContext context)
         {
@@ -34,6 +42,18 @@ namespace BeeStore_Repository
                     userRepo = new GenericRepository<User>(_context);
                 }
                 return userRepo;
+            }
+        }
+
+        public GenericRepository<Role> RoleRepo
+        {
+            get
+            {
+                if (roleRepo == null)
+                {
+                    roleRepo = new GenericRepository<Role>(_context);
+                }
+                return roleRepo;
             }
         }
 
@@ -94,6 +114,90 @@ namespace BeeStore_Repository
                     productRepo = new GenericRepository<Product>(_context);
                 }
                 return productRepo;
+            }
+        }
+
+        public GenericRepository<ProductCategory> ProductCategoryRepo
+        {
+            get
+            {
+                if (productCategoryRepo == null)
+                {
+                    productCategoryRepo = new GenericRepository<ProductCategory>(_context);
+                }
+                return productCategoryRepo;
+            }
+        }
+
+        public GenericRepository<Package> PackageRepo
+        {
+            get
+            {
+                if (packageRepo == null)
+                {
+                    packageRepo = new GenericRepository<Package>(_context);
+                }
+                return packageRepo;
+            }
+        }
+
+        public GenericRepository<WarehouseCategory> WarehouseCategoryRepo
+        {
+            get
+            {
+                if (warehouseCategoryRepo == null)
+                {
+                    warehouseCategoryRepo = new GenericRepository<WarehouseCategory>(_context);
+                }
+                return warehouseCategoryRepo;
+            }
+        }
+
+        public GenericRepository<WarehouseShipper> WarehouseShipperRepo
+        {
+            get
+            {
+                if (warehouseShipperRepo == null)
+                {
+                    warehouseShipperRepo = new GenericRepository<WarehouseShipper>(_context);
+                }
+                return warehouseShipperRepo;
+            }
+        }
+
+        public GenericRepository<WarehouseStaff> WarehouseStaffRepo
+        {
+            get
+            {
+                if (warehouseStaffRepo == null)
+                {
+                    warehouseStaffRepo = new GenericRepository<WarehouseStaff>(_context);
+                }
+                return warehouseStaffRepo;
+            }
+        }
+
+        public GenericRepository<Request> RequestRepo
+        {
+            get
+            {
+                if (requestRepo == null)
+                {
+                    requestRepo = new GenericRepository<Request>(_context);
+                }
+                return requestRepo;
+            }
+        }
+
+        public GenericRepository<Order> OrderRepo
+        {
+            get
+            {
+                if(orderRepo == null)
+                {
+                    orderRepo = new GenericRepository<Order>(_context);
+                }
+                return orderRepo;
             }
         }
 
