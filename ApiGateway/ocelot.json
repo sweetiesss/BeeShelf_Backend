@@ -36,10 +36,10 @@
       "DownstreamPathTemplate": "/api/User/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7092
-        },
+        //{
+        //  "Host": "localhost",
+        //  "Port": 7092
+        //},
         {
           "Host": "{Service}",
           "Port": 443
@@ -53,10 +53,10 @@
       "DownstreamPathTemplate": "/api/Inventory/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7092
-        },
+        //{
+        //  "Host": "localhost",
+        //  "Port": 7092
+        //},
         {
           "Host": "{Service}",
           "Port": 443
@@ -70,10 +70,10 @@
       "DownstreamPathTemplate": "/api/Partner/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7092
-        },
+        //{
+        //  "Host": "localhost",
+        //  "Port": 7092
+        //},
         {
           "Host": "{Service}",
           "Port": 443
@@ -87,10 +87,10 @@
       "DownstreamPathTemplate": "/api/Picture/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7092
-        },
+        //{
+        //  "Host": "localhost",
+        //  "Port": 7092
+        //},
         {
           "Host": "{Service}",
           "Port": 443
@@ -104,10 +104,10 @@
       "DownstreamPathTemplate": "/api/Product/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7092
-        },
+        //{
+        //  "Host": "localhost",
+        //  "Port": 7092
+        //},
         {
           "Host": "{Service}",
           "Port": 443
@@ -122,10 +122,10 @@
       "DownstreamPathTemplate": "/api/Warehouse/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7092
-        },
+        //{
+        //  "Host": "localhost",
+        //  "Port": 7092
+        //},
         {
           "Host": "{Service}",
           "Port": 443
@@ -139,10 +139,10 @@
       "DownstreamPathTemplate": "/api/ProductCategory/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7092
-        },
+        //{
+        //  "Host": "localhost",
+        //  "Port": 7092
+        //},
         {
           "Host": "{Service}",
           "Port": 443
@@ -156,10 +156,10 @@
       "DownstreamPathTemplate": "/api/Package/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7092
-        },
+        //{
+        //  "Host": "localhost",
+        //  "Port": 7092
+        //},
         {
           "Host": "{Service}",
           "Port": 443
@@ -173,10 +173,10 @@
       "DownstreamPathTemplate": "/api/Request/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7092
-        },
+        //{
+        //  "Host": "localhost",
+        //  "Port": 7092
+        //},
         {
           "Host": "{Service}",
           "Port": 443
@@ -190,10 +190,10 @@
       "DownstreamPathTemplate": "/api/Order/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7092
-        },
+        //{
+        //  "Host": "localhost",
+        //  "Port": 7092
+        //},
         {
           "Host": "{Service}",
           "Port": 443
