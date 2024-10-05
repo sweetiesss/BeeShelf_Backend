@@ -53,6 +53,7 @@ if (builder.Environment.IsProduction())
     var s3SecretKey = client.GetSecret("BeeStore-S3-SecretKey");
     var s3BucketName = client.GetSecret("BeeStore-BucketName");
     var s3BucketUrl = client.GetSecret("BeeStore-S3-BucketURL");
+    var gatewayUrl = client.GetSecret("BeeStore-Gateway-URL");
 
     if (dbConnectionSecret.Value != null)
     {
@@ -65,17 +66,22 @@ if (builder.Environment.IsProduction())
 
     builder.Services.AddJwtAuthenticationProduction(client);
 
-    builder.Services.AddTransient<IPictureService>(_ =>
-    new PictureService(
-        new AmazonS3Client(s3AccessKey.Value.Value, s3SecretKey.Value.Value, RegionEndpoint.APNortheast1),
-        s3BucketName.Value.Value,
-        s3BucketUrl.Value.Value
-    ));
+    builder.Services.AddScoped<IPictureService>(provider =>
+    {
+        var unitOfWork = provider.GetRequiredService<UnitOfWork>();
+
+        return new PictureService(
+            new AmazonS3Client(s3AccessKey.Value.Value, s3SecretKey.Value.Value, RegionEndpoint.APNortheast1),
+            s3BucketName.Value.Value,
+            s3BucketUrl.Value.Value,
+            unitOfWork
+        );
+    });
 
     builder.Services.AddCors(options =>
     {
         options.AddPolicy("AllowSpecificOrigins",
-            builder => builder.WithOrigins("http://localhost:3000", "https://beeshelfgateway.azurewebsites.net")
+            builder => builder.WithOrigins("http://localhost:3000", gatewayUrl.Value.Value)
                               .AllowAnyHeader()
                               .AllowAnyMethod()
                               .AllowCredentials());
