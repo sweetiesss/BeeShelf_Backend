@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BeeStore_Repository.DTO;
 using BeeStore_Repository.DTO.OrderDTOs;
+using BeeStore_Repository.Enums;
 using BeeStore_Repository.Logger;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
@@ -19,6 +20,7 @@ namespace BeeStore_Repository.Services
         private readonly UnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILoggerManager _logger;
+        private readonly OrderStatusEnums _ORDERSTATUS;
         public OrderService(UnitOfWork unitOfWork, IMapper mapper, ILoggerManager logger)
         {
             _unitOfWork = unitOfWork;
@@ -137,18 +139,59 @@ namespace BeeStore_Repository.Services
             return request;
         }
 
-        public async Task<string> UpdateOrderStatus(int id, string orderStatus)
+        public async Task<string> UpdateOrderStatus(int id, int orderStatus)
         {
             var exist = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u => u.Id == id);
             if (exist == null)
             {
                 throw new KeyNotFoundException("Order not found.");
             }
-            if (exist.OrderStatus != "Pending")
+            string orderStatusUpdate = null;
+
+            //if (exist.OrderStatus != "Pending")
+            //{
+            //    throw new ApplicationException("You can't edit already processed orders.");
+            //}
+            
+            if (orderStatus == 1)        //Pending
             {
-                throw new ApplicationException("You can't edit processed orders.");
+                return "Success";
             }
-            exist.OrderStatus = orderStatus;
+            if(orderStatus == 2)        //Processing
+            {
+                if(exist.OrderStatus == "Pending")
+                {
+                    orderStatusUpdate = "Proccessing";
+                }
+                else
+                {
+                    throw new ApplicationException("You can't edit already processed orders.");
+                }
+            }
+            if(orderStatus == 3)    //Shipped
+            {
+                if (exist.OrderStatus == "Processing")
+                {
+                    orderStatusUpdate = "Shipped";
+                }
+                else
+                {
+                    throw new ApplicationException("You can't edit unprocess or finished orders.");
+                }
+            }
+            if(orderStatus == 4) //Canceled
+            {
+                if(exist.OrderStatus == "Shipped")
+                {
+                    throw new ApplicationException("You can't canceled finished orders.");
+                }
+                orderStatusUpdate = "Canceled";
+            } 
+
+
+
+
+            exist.OrderStatus = orderStatusUpdate;
             _unitOfWork.OrderRepo.Update(exist);
             await _unitOfWork.SaveAsync();
             return "Success";
