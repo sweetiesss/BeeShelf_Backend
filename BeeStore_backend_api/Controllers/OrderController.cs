@@ -55,7 +55,7 @@ namespace BeeStore_Api.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateOrderStatus(int id, string orderStatus)
+        public async Task<IActionResult> UpdateOrderStatus(int id, int orderStatus)
         {
             var result = await _orderService.UpdateOrderStatus(id, orderStatus);
             return Ok(result);

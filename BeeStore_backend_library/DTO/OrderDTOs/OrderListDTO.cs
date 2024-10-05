@@ -8,7 +8,7 @@ namespace BeeStore_Repository.DTO.OrderDTOs
 {
     public class OrderListDTO
     {
-
+        public int Id { get; set; } 
         //public int? UserId { get; set; }
         public string user_email {  get; set; }
         public DateTime? CreateDate { get; set; }
