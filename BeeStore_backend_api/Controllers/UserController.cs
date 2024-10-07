@@ -11,17 +11,20 @@ namespace BeeStore_Api.Controllers
     public class UserController : BaseController
     {
         private readonly IUserService _userService;
+        private readonly IJWTService _jwtService;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService, IJWTService jwtService)
         {
             _userService = userService;
+            _jwtService = jwtService;
         }
 
         [HttpPost]
         public async Task<IActionResult> Login([FromBody]UserLoginRequestDTO request)
         {
             var result = await _userService.Login(request.email, request.password);
-            return Ok(result);
+
+            return Ok(_jwtService.GenerateJwtToken(result.Email, result.RoleName));
         }
 
         [HttpGet]

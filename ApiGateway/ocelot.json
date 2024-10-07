@@ -36,14 +36,14 @@
       "DownstreamPathTemplate": "/api/User/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
-        //{
-        //  "Host": "localhost",
-        //  "Port": 7092
-        //},
         {
-          "Host": "{Service}",
-          "Port": 443
+          "Host": "localhost",
+          "Port": 7092
         }
+        //{
+        //  "Host": "{Service}",
+        //  "Port": 443
+        //}
       ],
       "SwaggerKey": "user"
     }, // Inventory Path
@@ -122,14 +122,14 @@
       "DownstreamPathTemplate": "/api/Warehouse/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
-        //{
-        //  "Host": "localhost",
-        //  "Port": 7092
-        //},
         {
-          "Host": "{Service}",
-          "Port": 443
+          "Host": "localhost",
+          "Port": 7092
         }
+        //{
+        //  "Host": "{Service}",
+        //  "Port": 443
+        //}
       ],
       "SwaggerKey": "warehouse"
     },
