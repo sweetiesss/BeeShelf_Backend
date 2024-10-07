@@ -3,6 +3,7 @@ using BeeStore_Repository.DTO.WarehouseDTOs;
 using BeeStore_Repository.DTO.WarehouseShipperDTOs;
 using BeeStore_Repository.DTO.WarehouseStaffDTOs;
 using BeeStore_Repository.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel;
 using ZstdSharp.Unsafe;
@@ -28,6 +29,7 @@ namespace BeeStore_Api.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetWarehouseList([FromQuery][DefaultValue(0)] int pageIndex,
                                                                [FromQuery][DefaultValue(10)] int pageSize)
         {
