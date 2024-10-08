@@ -1,9 +1,9 @@
 ﻿using BeeStore_Repository.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BeeStore_Api.Controllers
 {
-    [ApiController]
     public class PictureController : BaseController
     {
         private readonly IPictureService _pictureService;

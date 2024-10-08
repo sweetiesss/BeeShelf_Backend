@@ -3,12 +3,14 @@ using BeeStore_Repository.DTO.WarehouseDTOs;
 using BeeStore_Repository.DTO.WarehouseShipperDTOs;
 using BeeStore_Repository.DTO.WarehouseStaffDTOs;
 using BeeStore_Repository.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel;
 using ZstdSharp.Unsafe;
 
 namespace BeeStore_Api.Controllers
 {
+    [Authorize(Roles = "Admin,Manager")]
     public class WarehouseController : BaseController
     {
         private readonly IWarehouseService _warehouseService;
@@ -59,6 +61,7 @@ namespace BeeStore_Api.Controllers
         }
 
         [HttpGet]
+
         public async Task<IActionResult> GetWarehouseStaffList([FromQuery][DefaultValue(0)] int pageIndex,
                                                                [FromQuery][DefaultValue(10)] int pageSize)
         {

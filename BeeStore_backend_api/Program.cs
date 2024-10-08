@@ -66,7 +66,7 @@ if (builder.Environment.IsProduction())
 
     builder.Services.AddJwtAuthenticationProduction(client);
 
-    builder.Services.AddScoped<IPictureService>(provider =>
+    builder.Services.AddTransient<IPictureService>(provider =>
     {
         var unitOfWork = provider.GetRequiredService<UnitOfWork>();
 

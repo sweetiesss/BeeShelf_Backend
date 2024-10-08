@@ -1,10 +1,12 @@
 ﻿using BeeStore_Repository.DTO.InventoryDTOs;
 using BeeStore_Repository.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel;
 
 namespace BeeStore_Api.Controllers
 {
+    [Authorize(Roles = "Admin,Manager")]
     public class InventoryController : BaseController
     {
         private readonly IInventoryService _inventoryService;
@@ -15,6 +17,7 @@ namespace BeeStore_Api.Controllers
         }
 
         [HttpGet]
+        [Authorize(Roles = "Admin,Manager,Staff")]
         public async Task<IActionResult> GetInventoryList([FromQuery][DefaultValue(0)] int pageIndex,
                                                                [FromQuery][DefaultValue(10)] int pageSize)
         {
