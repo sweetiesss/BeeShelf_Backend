@@ -33,13 +33,13 @@ namespace BeeStore_Repository.Services
                 var inventory = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Id == request.InventoryId);
                 if(inventory == null)
                 {
-                    throw new KeyNotFoundException("Inventory does not exist.");
+                    throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
                 }
             }
             var product = await _unitOfWork.ProductRepo.SingleOrDefaultAsync(u => u.Id == request.ProductId); 
             if(product == null)
             {
-                throw new KeyNotFoundException("Product does not exist.");
+                throw new KeyNotFoundException(ResponseMessage.ProductIdNotFound);
             }
 
             
@@ -58,11 +58,11 @@ namespace BeeStore_Repository.Services
             var exist = await _unitOfWork.PackageRepo.SingleOrDefaultAsync(u => u.Id == id);
             if (exist == null)
             {
-                throw new KeyNotFoundException("Package does not exist.");
+                throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
             }
             _unitOfWork.PackageRepo.SoftDelete(exist);
             await _unitOfWork.SaveAsync();
-            return "Success";
+            return ResponseMessage.Success;
         }
 
         public async Task<Pagination<PackageListDTO>> GetPackageList(int pageIndex, int pageSize)
@@ -77,20 +77,20 @@ namespace BeeStore_Repository.Services
             var exist = await _unitOfWork.PackageRepo.SingleOrDefaultAsync(u => u.Id ==  id);
             if (exist == null)
             {
-                throw new KeyNotFoundException("Package does not exist.");
+                throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
             }
             if(request.InventoryId != null)
             {
                 var inventory = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Id == request.InventoryId);
                 if (inventory == null)
                 {
-                    throw new KeyNotFoundException("Inventory does not exist.");
+                    throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
                 }
             }
             var product = await _unitOfWork.ProductRepo.SingleOrDefaultAsync(u => u.Id == request.ProductId);
             if (product == null)
             {
-                throw new KeyNotFoundException("Product does not exist.");
+                throw new KeyNotFoundException(ResponseMessage.ProductIdNotFound);
             }
             var productCategory = await _unitOfWork.ProductCategoryRepo.SingleOrDefaultAsync(u => u.Id == product.ProductCategoryId);
             exist.Weight = request.Weight;

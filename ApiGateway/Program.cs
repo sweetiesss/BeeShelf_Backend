@@ -14,10 +14,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Configuration.AddEnvironmentVariables();
 
 
-var keyVaultURL = builder.Configuration.GetSection("KeyVault:KeyVaultURL").Value!.ToString();
+var keyVaultURL = builder.Configuration
+                         .GetSection("KeyVault")
+                         .Get<AppConfiguration>();
 
 builder.Configuration.AddAzureKeyVault(
-    new Uri(keyVaultURL),
+    new Uri(keyVaultURL.KeyVaultURL),
     new EnvironmentCredential()
 );
 
@@ -54,7 +56,7 @@ app.UseSwagger();
 app.UseSwaggerUI();
 app.UseCors("AllowAllOrigins");
 // Other middleware
-var client = new SecretClient(new Uri(keyVaultURL), new EnvironmentCredential());
+var client = new SecretClient(new Uri(keyVaultURL.KeyVaultURL), new EnvironmentCredential());
 
 var apikey = client.GetSecret("BeeStore-Apikey").Value.Value;
 if (!string.IsNullOrEmpty(apikey))

@@ -37,7 +37,7 @@ namespace BeeStore_Repository.Services
             {
                 if(exist.IsDeleted == false)
                 {
-                    throw new DuplicateException("A product with this name already exist.");
+                    throw new DuplicateException(ResponseMessage.ProductNameDuplicate);
                 }
                 if(exist.IsDeleted == true)
                 {
@@ -49,7 +49,7 @@ namespace BeeStore_Repository.Services
             var productCategpry = await _unitOfWork.ProductCategoryRepo.SingleOrDefaultAsync(u => u.Id == request.ProductCategoryId);
             if (productCategpry == null)
             {
-                throw new KeyNotFoundException("Product category does not exist.");
+                throw new KeyNotFoundException(ResponseMessage.ProductCategoryIdNotFound);
             }
             request.CreateDate = DateTime.Now;
 
@@ -78,7 +78,7 @@ namespace BeeStore_Repository.Services
                 error = sb.ToString();
                 if (!String.IsNullOrEmpty(error))
                 {
-                    throw new DuplicateException("Please check provided list. The following name is duplicate: " + error);
+                    throw new DuplicateException(ResponseMessage.ProductListDuplicate + error);
                 }
             }
             
@@ -103,7 +103,7 @@ namespace BeeStore_Repository.Services
             error = sb.ToString();
             if (!String.IsNullOrEmpty(error))
             {
-                    throw new DuplicateException("Failed to add. Product with these name already exist in your account: " + error);
+                    throw new DuplicateException(ResponseMessage.ProductNameDuplicate + error);
             }
             var result = _mapper.Map<List<Product>>(request);
             await _unitOfWork.ProductRepo.AddRangeAsync(result);
@@ -116,11 +116,11 @@ namespace BeeStore_Repository.Services
             var exist = await _unitOfWork.ProductRepo.SingleOrDefaultAsync(u => u.Id == id);
             if (exist == null)
             {
-                throw new KeyNotFoundException("Product does not exist.");
+                throw new KeyNotFoundException(ResponseMessage.ProductIdNotFound);
             }
                 _unitOfWork.ProductRepo.SoftDelete(exist);
                 await _unitOfWork.SaveAsync();
-                return "Success";
+                return ResponseMessage.Success;
 
         }
 
@@ -136,7 +136,7 @@ namespace BeeStore_Repository.Services
             var user = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Email == email);
             if(user == null)
             {
-                throw new KeyNotFoundException("User not found.");
+                throw new KeyNotFoundException(ResponseMessage.UserEmailNotFound);
             }
             var list = await _unitOfWork.ProductRepo.GetFiltered(u => u.UserId.Equals(user.Id));
             var result = _mapper.Map<List<ProductListDTO>>(list);
@@ -149,7 +149,7 @@ namespace BeeStore_Repository.Services
             var exist = await _unitOfWork.ProductRepo.SingleOrDefaultAsync(u => u.Id == id);
             if(exist == null || exist.IsDeleted == true)
             {
-                throw new KeyNotFoundException("This product doesn't exist or has already been deleted.");
+                throw new KeyNotFoundException(ResponseMessage.ProductIdNotFound);
             }
 
 
@@ -173,7 +173,7 @@ namespace BeeStore_Repository.Services
             {
                 if (duplicateName.Id != id && duplicateName.IsDeleted == false)
                 {
-                    throw new DuplicateException("A product with this name already exist.");
+                    throw new DuplicateException(ResponseMessage.ProductNameDuplicate);
                 }
 
                 if (duplicateName.IsDeleted == true)

@@ -1,19 +1,11 @@
 ﻿using AutoMapper;
 using BeeStore_Repository.DTO;
-using BeeStore_Repository.DTO.PartnerDTOs;
 using BeeStore_Repository.DTO.WarehouseDTOs;
 using BeeStore_Repository.Logger;
 using BeeStore_Repository.Logger.GlobalExceptionHandler.CustomException;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion.Internal;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BeeStore_Repository.Services
 {
@@ -28,8 +20,6 @@ namespace BeeStore_Repository.Services
             _mapper = mapper;
             _logger = logger;
         }
-
- 
 
         public async Task<WarehouseCreateDTO> CreateWarehouse(WarehouseCreateDTO request)
         {
@@ -48,7 +38,7 @@ namespace BeeStore_Repository.Services
         public async Task<string> DeleteWarehouse(int id)
         {
             var exist = await _unitOfWork.WarehouseRepo.SingleOrDefaultAsync(u => u.Id == id);
-            if(exist == null)
+            if (exist == null)
             {
                 throw new KeyNotFoundException("No warehouse found.");
             }
@@ -72,7 +62,7 @@ namespace BeeStore_Repository.Services
             {
                 throw new DuplicateException("No warehouse with this name found.");
             }
-            
+
             if (!String.IsNullOrEmpty(request.Location) && !request.Location.Equals("string"))
             {
                 exist.Location = request.Location;

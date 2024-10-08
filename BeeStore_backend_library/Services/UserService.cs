@@ -28,7 +28,7 @@ namespace BeeStore_Repository.Services
             var exist = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Email == user.Email);
             if (exist != null)
             {
-                throw new DuplicateException("Email already exist");
+                throw new DuplicateException(ResponseMessage.UserEmailDuplicate);
             }
             var result = _mapper.Map<User>(user);
             await _unitOfWork.UserRepo.AddAsync(result);
@@ -46,9 +46,9 @@ namespace BeeStore_Repository.Services
             }
             else
             {
-                throw new KeyNotFoundException("User not found");
+                throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
             }
-            return "Success";
+            return ResponseMessage.Success;
         }
 
         public async Task<Pagination<UserListDTO>> GetAllUser(int pageIndex, int pageSize)
@@ -56,7 +56,7 @@ namespace BeeStore_Repository.Services
             var list = await _unitOfWork.UserRepo.GetAllAsync();
             if (list == null)
             {
-                _logger.LogError("No user found.");
+                //implement later
             }
 
             var result = _mapper.Map<List<UserListDTO>>(list);
@@ -76,14 +76,12 @@ namespace BeeStore_Repository.Services
                 }
                 else
                 {
-                    _logger.LogError("Password is incorrect user id: " + exist.Id);
-                    throw new KeyNotFoundException("Password is incorrect");
-                    ///PLACEHOLDER WILL CHANGE LATER
+                    throw new KeyNotFoundException(ResponseMessage.UserPasswordError);
                 }
             }
             else
             {
-                throw new KeyNotFoundException("Email not found");
+                throw new KeyNotFoundException(ResponseMessage.UserEmailNotFound);
             }
         }
 
@@ -119,7 +117,7 @@ namespace BeeStore_Repository.Services
             }
             else
             {
-                throw new KeyNotFoundException("User not found.");
+                throw new KeyNotFoundException(ResponseMessage.UserEmailNotFound);
             }
 
             return user;

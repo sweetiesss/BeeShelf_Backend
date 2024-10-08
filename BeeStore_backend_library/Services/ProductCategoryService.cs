@@ -40,7 +40,7 @@ namespace BeeStore_Repository.Services
                 }
                 else
                 {
-                    throw new DuplicateException("This category name already exist.");
+                    throw new DuplicateException(ResponseMessage.ProductCategoryDuplicate);
                 }
             }
             var result = _mapper.Map<ProductCategory>(request);
@@ -54,11 +54,11 @@ namespace BeeStore_Repository.Services
             var exist = await _unitOfWork.ProductCategoryRepo.SingleOrDefaultAsync(u => u.Id == id);
             if (exist == null)
             {
-                throw new DuplicateException("This category does not exist.");
+                throw new DuplicateException(ResponseMessage.ProductCategoryIdNotFound);
             }
             _unitOfWork.ProductCategoryRepo.SoftDelete(exist);
             await _unitOfWork.SaveAsync();
-            return "Success";
+            return ResponseMessage.Success;
         }
 
         public async Task<Pagination<ProductCategoryListDTO>> GetProductCategoryList(int pageIndex, int pageSize)
@@ -83,13 +83,13 @@ namespace BeeStore_Repository.Services
                 }
                 else if(exist.Id != id)
                 {
-                    throw new DuplicateException("This category name already exist.");
+                    throw new DuplicateException(ResponseMessage.ProductCategoryDuplicate);
                 }
             }
             var prodCat = await _unitOfWork.ProductCategoryRepo.SingleOrDefaultAsync(u => u.Id == id);
             if(prodCat == null)
             {
-                throw new KeyNotFoundException("This product category does not exist");
+                throw new KeyNotFoundException(ResponseMessage.ProductCategoryIdNotFound);
             }
             prodCat.TypeName = request.TypeName;
             prodCat.TypeDescription = request.TypeDescription;
