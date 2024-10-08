@@ -7,6 +7,7 @@ using BeeStore_Repository.Logger.GlobalExceptionHandler.CustomException;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -32,21 +33,20 @@ namespace BeeStore_Repository.Services
             var exist = await _unitOfWork.InventoryRepo.GetByIdAsync(id);
             if (exist == null)
             {
-                throw new KeyNotFoundException("Inventory not found.");
+                throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
             }
             if(exist.UserId != null)
             {
-                throw new DuplicateException("This inventory is already occupied.");
+                throw new DuplicateException(ResponseMessage.InventoryOccupied);
             }
             var user = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Id == userId);
             if (user == null)
             {
-                throw new KeyNotFoundException("User not found");
+                throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
             }
-            var partner =await _unitOfWork.PartnerRepo.SingleOrDefaultAsync(u => u.UserId == userId);
-            if (partner == null)
+            if (user.RoleId != 4)
             {
-                throw new KeyNotFoundException("This user is not a partner.");
+                throw new KeyNotFoundException(ResponseMessage.UserRoleNotPartnerError);
             }
 
             exist.UserId = user.Id;
@@ -62,7 +62,7 @@ namespace BeeStore_Repository.Services
             var exist = await _unitOfWork.WarehouseRepo.GetByIdAsync(request.WarehouseId);
             if(exist == null)
             {
-                throw new KeyNotFoundException("Warehouse not found.");
+                throw new KeyNotFoundException(ResponseMessage.WarehouseIdNotFound);
             }
             var result = _mapper.Map<Inventory>(request);
             result.BoughtDate = DateTime.Now;
@@ -78,11 +78,11 @@ namespace BeeStore_Repository.Services
             var exist = await _unitOfWork.InventoryRepo.GetByIdAsync(id);
             if (exist == null)
             {
-                throw new KeyNotFoundException("Inventory not found.");
+                throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
             }
             _unitOfWork.InventoryRepo.SoftDelete(exist);
             await _unitOfWork.SaveAsync();
-            return "Success";
+            return ResponseMessage.Success;
         }
 
         public async Task<InventoryUpdateDTO> UpdateInventory(InventoryUpdateDTO request)
@@ -91,7 +91,7 @@ namespace BeeStore_Repository.Services
             var exist = await _unitOfWork.InventoryRepo.GetByIdAsync(request.Id);
             if (exist == null)
             {
-                throw new KeyNotFoundException("Inventory not found.");
+                throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
             }
             if(request.Weight != null)
             {
@@ -110,6 +110,15 @@ namespace BeeStore_Repository.Services
         public async Task<Pagination<InventoryListDTO>> GetInventoryList(int pageIndex, int pageSize)
         {
             var list = await _unitOfWork.InventoryRepo.GetAllAsync();
+            var result = _mapper.Map<List<InventoryListDTO>>(list);
+            return (await ListPagination<InventoryListDTO>.PaginateList(result, pageIndex, pageSize));
+        }
+
+        public async Task<Pagination<InventoryListDTO>> GetInventoryList(string email, int pageIndex, int pageSize)
+        {
+            var user = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Email == email);
+            var list = await _unitOfWork.InventoryRepo.GetFiltered(u => u.UserId.Equals(user.Id));
+            
             var result = _mapper.Map<List<InventoryListDTO>>(list);
             return (await ListPagination<InventoryListDTO>.PaginateList(result, pageIndex, pageSize));
         }

@@ -20,13 +20,15 @@ namespace BeeStore_Repository.DTO.UserDTOs
 
         public string? Phone { get; set; }
 
-        public DateTime? CreateDate { get; set; }
+        [JsonIgnore]
+        public DateTime? CreateDate { get; set; } = DateTime.Now;
 
         public int? PictureId { get; set; }
 
         [JsonIgnore]
         public bool? IsDeleted { get; set; } = false;
 
-        public string RoleName { get; set; }
+        [JsonIgnore]
+        public string RoleName { get; set; } = "User";
     }
 }

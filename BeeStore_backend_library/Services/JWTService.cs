@@ -1,6 +1,8 @@
-﻿using Azure.Identity;
+﻿using Azure;
+using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using BeeStore_Repository.Services.Interfaces;
+using BeeStore_Repository.Utils;
 using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
@@ -76,7 +78,7 @@ namespace BeeStore_Repository.Services
 
             if (string.IsNullOrEmpty(secretResponse.Value.Value))
             {
-                throw new InvalidOperationException("Key Vault JWT Secret Key values are missing.");
+                throw new InvalidOperationException(ResponseMessage.JWTSecretKeyError);
             }
 
 
@@ -88,7 +90,7 @@ namespace BeeStore_Repository.Services
 
             if (string.IsNullOrEmpty(secretResponse.Value.Value))
             {
-                throw new InvalidOperationException("Key Vault JWT Issuer values are missing.");
+                throw new InvalidOperationException(ResponseMessage.JWTIssuerValueError);
             }
 
             return secretResponse.Value.Value;
@@ -100,7 +102,7 @@ namespace BeeStore_Repository.Services
 
             if (string.IsNullOrEmpty(secretResponse.Value.Value))
             {
-                throw new InvalidOperationException("Key Vault JWT Audience values are missing.");
+                throw new InvalidOperationException(ResponseMessage.JwtAudienceValueError);
             }
 
             return secretResponse.Value.Value;

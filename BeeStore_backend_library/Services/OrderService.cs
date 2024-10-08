@@ -20,7 +20,6 @@ namespace BeeStore_Repository.Services
         private readonly UnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILoggerManager _logger;
-        private readonly OrderStatusEnums _ORDERSTATUS;
         public OrderService(UnitOfWork unitOfWork, IMapper mapper, ILoggerManager logger)
         {
             _unitOfWork = unitOfWork;
@@ -62,35 +61,34 @@ namespace BeeStore_Repository.Services
                                                                        query => query.Include(o => o.Role));
             if(user == null)
             {
-                throw new KeyNotFoundException("Partner not found.");
+                throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
             }
-            if (user.Role.RoleName != "Partner")
+            if (user.RoleId != 4)
             {
-                throw new ApplicationException("User is not a partner.");
+                throw new ApplicationException(ResponseMessage.UserRoleNotPartnerError);
             }
             
             if(request.DeliverBy != 0)
             {
-                var shipper = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Id == request.DeliverBy,
-                                                                       query => query.Include(o => o.Role));
+                var shipper = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Id == request.DeliverBy);
 
                 if (shipper == null)
                 {
-                    throw new KeyNotFoundException("Shipper not found.");
+                    throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
                 }
-                if (shipper.Role.RoleName != "Shipper")
+                if (shipper.RoleId != 5)
                 {
-                    throw new ApplicationException("User in deliver_by is not a shipper.");
+                    throw new ApplicationException(ResponseMessage.UserRoleNotShipperError);
                 }
             }
 
             var product = await _unitOfWork.ProductRepo.SingleOrDefaultAsync(u => u.Id == request.ProductId);
             if (product == null)
             {
-                throw new KeyNotFoundException("No product found.");
+                throw new KeyNotFoundException(ResponseMessage.ProductIdNotFound);
             }
             request.CreateDate = DateTime.Now;
-            request.OrderStatus = "Pending";
+            request.OrderStatus = "Pending";        ////////////////////////////////////////////////////////
             var result = _mapper.Map<Order>(request);
             await _unitOfWork.OrderRepo.AddAsync(result);
             await _unitOfWork.SaveAsync();
@@ -103,15 +101,15 @@ namespace BeeStore_Repository.Services
             var exist = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u =>u.Id == id);
             if(exist == null)
             {
-                throw new KeyNotFoundException("Order not found.");
+                throw new KeyNotFoundException(ResponseMessage.OrderIdNotFound);
             }
             if (exist.OrderStatus != "Pending")
             {
-                throw new ApplicationException("You can't delete processed orders.");
+                throw new ApplicationException(ResponseMessage.OrderProccessedError);
             }
             _unitOfWork.OrderRepo.SoftDelete(exist);
             await _unitOfWork.SaveAsync();
-            return "Success";
+            return ResponseMessage.Success;
         }
 
         public async Task<OrderCreateDTO> UpdateOrder(int id, OrderCreateDTO request)
@@ -119,11 +117,11 @@ namespace BeeStore_Repository.Services
             var exist = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u => u.Id == id);
             if (exist == null)
             {
-                throw new KeyNotFoundException("Order not found.");
+                throw new KeyNotFoundException(ResponseMessage.OrderIdNotFound);
             }
             if (exist.OrderStatus != "Pending")
             {
-                throw new ApplicationException("You can't edit processed orders.");
+                throw new ApplicationException(ResponseMessage.OrderProccessedError);
             }
             exist.PictureId = request.PictureId;
             exist.TotalPrice = request.TotalPrice;
@@ -148,11 +146,15 @@ namespace BeeStore_Repository.Services
             }
             string orderStatusUpdate = null;
 
-            //if (exist.OrderStatus != "Pending")
-            //{
-            //    throw new ApplicationException("You can't edit already processed orders.");
-            //}
-            
+            //I will change this mess later
+            //I will change this mess later
+            //I will change this mess later
+            //I will change this mess later
+            //I will change this mess later
+            //I will change this mess later
+
+
+
             if (orderStatus == 1)        //Pending
             {
                 return "Success";
@@ -194,7 +196,7 @@ namespace BeeStore_Repository.Services
             exist.OrderStatus = orderStatusUpdate;
             _unitOfWork.OrderRepo.Update(exist);
             await _unitOfWork.SaveAsync();
-            return "Success";
+            return ResponseMessage.Success;
         }
     }
 }

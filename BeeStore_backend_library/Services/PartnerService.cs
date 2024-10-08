@@ -38,20 +38,29 @@ namespace BeeStore_Repository.Services
 
         public async Task<PartnerUpdateRequest> UpgradeToPartner(PartnerUpdateRequest request)
         {
-            if (await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Id == request.UserId) == null)
+            var user = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Id == request.UserId);
+            if (user == null)
             {
-                throw new KeyNotFoundException("User not found.");
+                throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
             }
+            if (user.RoleId != 6)
+            {
+                throw new ApplicationException(ResponseMessage.UserRoleError);
+            }
+
             
-            if (await _unitOfWork.PartnerRepo.SingleOrDefaultAsync(u => u.UserId == request.UserId) != null)
-            {
-                throw new DuplicateException("User is already a partner");
-            }
+            //if (await _unitOfWork.PartnerRepo.SingleOrDefaultAsync(u => u.UserId == request.UserId) != null)
+            //{
+            //    throw new DuplicateException("User is already a partner");
+            //}
             request.CreateDate = DateTime.Now;
             request.UpdateDate = DateTime.Now;
             var partner = _mapper.Map<Partner>(request);
             await _unitOfWork.PartnerRepo.AddAsync(partner);
+            user.RoleId = 4;
             await _unitOfWork.SaveAsync();
+            
+
             return request;
         }
 
@@ -60,7 +69,7 @@ namespace BeeStore_Repository.Services
             var exist = await _unitOfWork.PartnerRepo.SingleOrDefaultAsync(u => u.UserId == request.UserId);
             if(exist == null)
             {
-                throw new KeyNotFoundException("Partner does not exist");
+                throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
             }
             exist.UpdateDate = DateTime.Now;
             if (!String.IsNullOrEmpty(request.BankAccountNumber) && !request.BankAccountNumber.Equals("string"))
@@ -86,11 +95,11 @@ namespace BeeStore_Repository.Services
             var exist = await _unitOfWork.PartnerRepo.SingleOrDefaultAsync(u => u.Id == id);
             if (exist == null)
             {
-                throw new KeyNotFoundException("Partner does not exist");
+                throw new KeyNotFoundException(ResponseMessage.PartnerIdNotFound);
             }
             _unitOfWork.PartnerRepo.SoftDelete(exist);
             await _unitOfWork.SaveAsync();
-            return "Success";
+            return ResponseMessage.Success;
         }
     }
 }

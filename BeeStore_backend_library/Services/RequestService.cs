@@ -7,6 +7,7 @@ using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
 using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -31,17 +32,26 @@ namespace BeeStore_Repository.Services
             var user = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Id == request.UserId);
             if(user == null)
             {
-                throw new KeyNotFoundException("User not found.");
+                throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
             }
             var inventory = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Id == request.SendToInventory);
             if(inventory == null)
             {
-                throw new KeyNotFoundException("Inventory not found.");
+                throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
             }
-            var package = await _unitOfWork.PackageRepo.SingleOrDefaultAsync(u => u.Id == request.PackageId);
-            if(package == null)
+
+            var package = await _unitOfWork.PackageRepo.SingleOrDefaultAsync(u => u.Id.Equals(request.PackageId),
+                                                                                query => query.Include(o => o.Product)
+                                                                                .ThenInclude(item => item.ProductCategory));
+            if (package == null)
             {
-                throw new KeyNotFoundException("Package not found.");
+                throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
+            }
+
+            var totalWeight = inventory.Weight + (package.Product.Weight * package.ProductAmount);
+            if (totalWeight > inventory.MaxWeight)
+            {
+                throw new ApplicationException(ResponseMessage.InventoryOverWeightError);
             }
             request.Status = "Pending";
             var result = _mapper.Map<Request>(request);
@@ -55,11 +65,11 @@ namespace BeeStore_Repository.Services
             var exist = await _unitOfWork.RequestRepo.SingleOrDefaultAsync(u => u.Id == id);
             if(exist == null)
             {
-                throw new KeyNotFoundException("Request not found.");
+                throw new KeyNotFoundException(ResponseMessage.RequestIdNotFound);
             }
             _unitOfWork.RequestRepo.SoftDelete(exist);
             await _unitOfWork.SaveAsync();
-            return "Success";
+            return ResponseMessage.Success;
         }
 
         public async Task<Pagination<RequestListDTO>> GetRequestList(int pageIndex, int pageSize)
@@ -79,29 +89,29 @@ namespace BeeStore_Repository.Services
 
         public async Task<RequestCreateDTO> UpdateRequest(int id, RequestCreateDTO request)
         {
+            var exist = await _unitOfWork.RequestRepo.SingleOrDefaultAsync(u => u.Id == id);
+            if (exist == null)
+            {
+                throw new KeyNotFoundException(ResponseMessage.RequestIdNotFound);
+            }
             var user = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Id == request.UserId);
             if (user == null)
             {
-                throw new KeyNotFoundException("User not found.");
+                throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
             }
             var inventory = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Id == request.SendToInventory);
             if (inventory == null)
             {
-                throw new KeyNotFoundException("Inventory not found.");
+                throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
             }
             var package = await _unitOfWork.PackageRepo.SingleOrDefaultAsync(u => u.Id == request.PackageId);
             if (package == null)
             {
-                throw new KeyNotFoundException("Package not found.");
-            }
-            var exist = await _unitOfWork.RequestRepo.SingleOrDefaultAsync(u => u.Id == id);
-            if(exist == null)
-            {
-                throw new KeyNotFoundException("Request not found.");
+                throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
             }
             if(exist.Status != "Pending")
             {
-                throw new ApplicationException("This request has already been processed.");
+                throw new ApplicationException(ResponseMessage.RequestStatusError);
             }
             exist.SendToInventory = request.SendToInventory;
             exist.Description = request.Description;
@@ -111,6 +121,55 @@ namespace BeeStore_Repository.Services
             _unitOfWork.RequestRepo.Update(exist);
             await _unitOfWork.SaveAsync();
             return request;
+        }
+
+        public async Task<RequestListDTO> UpdateRequestStatus(int id, int statusId)
+        {
+            string status = null;
+            var exist = await _unitOfWork.RequestRepo.SingleOrDefaultAsync(u => u.Id == id);
+            if (exist == null)
+            {
+                throw new KeyNotFoundException(ResponseMessage.RequestIdNotFound);
+            }
+            if (exist.Status != "Pending")
+            {
+                throw new ApplicationException(ResponseMessage.RequestStatusError);
+            }
+            if (statusId == 1)
+            {
+                status = "Approved.";
+                var package = await _unitOfWork.PackageRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.PackageId),
+                                                                                 query => query.Include(o => o.Product)
+                                                                                 .ThenInclude(item => item.ProductCategory));
+                if(package == null)
+                {
+                    throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
+                }
+                var inventory = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.SendToInventory));
+                if (inventory == null)
+                {
+                    throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
+                }
+                var totalWeight = inventory.Weight + (package.Product.Weight * package.ProductAmount);
+                if (totalWeight > inventory.MaxWeight)
+                {
+                    throw new ApplicationException(ResponseMessage.InventoryOverWeightError);
+                }
+
+                package.InventoryId = exist.SendToInventory;
+                package.ExpirationDate = DateTime.Now.AddDays(package.Product.ProductCategory.ExpireIn.Value);
+
+                inventory.Weight = totalWeight;
+
+            }
+            if (statusId == 2)
+            {
+                status = "Reject";
+            }
+            exist.Status = status;
+            await _unitOfWork.SaveAsync();
+            var result = _mapper.Map<RequestListDTO>(exist);
+            return result;
         }
     }
 }

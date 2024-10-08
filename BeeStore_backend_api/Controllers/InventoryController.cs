@@ -25,6 +25,15 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
+        [HttpGet("{email}")]
+        [Authorize(Roles = "Admin,Manager,Staff,Partner")]
+        public async Task<IActionResult> GetInventoryList(string email, [FromQuery][DefaultValue(0)] int pageIndex,
+                                                               [FromQuery][DefaultValue(10)] int pageSize)
+        {
+            var result = await _inventoryService.GetInventoryList(email, pageIndex, pageSize);
+            return Ok(result);
+        }
+
         [HttpPost("{id}/{userId}")]
         public async Task<IActionResult> AddPartnerToInventory(int id, int userId)
         {
