@@ -2,26 +2,22 @@
 using BeeStore_Repository.DTO.UserDTOs;
 using BeeStore_Repository.Logger;
 using BeeStore_Repository.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel;
 
 namespace BeeStore_Api.Controllers
 {
-    [ApiController]
+    [Authorize(Roles = "Admin")]
     public class UserController : BaseController
     {
         private readonly IUserService _userService;
+        private readonly IJWTService _jwtService;
 
-        public UserController(IUserService userService)
+        public UserController(IUserService userService, IJWTService jwtService)
         {
             _userService = userService;
-        }
-
-        [HttpPost]
-        public async Task<IActionResult> Login([FromBody]UserLoginRequestDTO request)
-        {
-            var result = await _userService.Login(request.email, request.password);
-            return Ok(result);
+            _jwtService = jwtService;
         }
 
         [HttpGet]

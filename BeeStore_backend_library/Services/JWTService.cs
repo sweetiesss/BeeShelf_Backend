@@ -32,11 +32,12 @@ namespace BeeStore_Repository.Services
             _client = new SecretClient(new Uri(_keyVaultURL), new EnvironmentCredential());
         }
 
-        public string GenerateJwtToken(string userEmail)
+        public string GenerateJwtToken(string userEmail, string userRole)
         {
             var claims = new[]
             {
                 new Claim(JwtRegisteredClaimNames.Email, userEmail),
+                new Claim(ClaimTypes.Role, userRole),
                 new Claim(JwtRegisteredClaimNames.Sub, userEmail),
                 new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
             };

@@ -30,6 +30,23 @@
     }
   },
   "Routes": [
+    { // Auth Path
+      "UpstreamPathTemplate": "/gateway/auth/{everything}",
+      "UpstreamHttpMethod": [],
+      "DownstreamPathTemplate": "/api/Auth/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        //{
+        //  "Host": "localhost",
+        //  "Port": 7092
+        //},
+        {
+          "Host": "{Service}",
+          "Port": 443
+        }
+      ],
+      "SwaggerKey": "auth"
+    },
     { // User Path
       "UpstreamPathTemplate": "/gateway/user/{everything}",
       "UpstreamHttpMethod": [],
@@ -46,8 +63,8 @@
         }
       ],
       "SwaggerKey": "user"
-    }, // Inventory Path
-    { 
+    },
+    { // Inventory Path
       "UpstreamPathTemplate": "/gateway/inventory/{everything}",
       "UpstreamHttpMethod": [],
       "DownstreamPathTemplate": "/api/Inventory/{everything}",
@@ -204,13 +221,24 @@
   ],
   "SwaggerEndPoints": [
     {
+      "Key": "auth",
+      "Config": [
+        {
+          "Name": "auth gateway API",
+          "version": "v1",
+          //"Url": "https://localhost:7092/swagger/v1/swagger.json"
+          "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
       "Key": "image",
       "Config": [
         {
           "Name": "image gateway API",
           "version": "v1",
-          "Url": "https://localhost:7092/swagger/v1/swagger.json"
-          //"Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
+          //"Url": "https://localhost:7092/swagger/v1/swagger.json"
+          "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
         }
       ]
     },

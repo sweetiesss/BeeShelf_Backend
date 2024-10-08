@@ -27,7 +27,7 @@ namespace BeeStore_Repository
         {
             // Scoped
             services.AddScoped<IUserService, UserService>();
-            services.AddScoped<IPictureService, PictureService>();
+            //services.AddScoped<IPictureService, PictureService>();
             services.AddScoped<IPartnerService, PartnerService>();
             services.AddScoped<IWarehouseService, WarehouseService>();
             services.AddScoped<IInventoryService, InventoryService>();
