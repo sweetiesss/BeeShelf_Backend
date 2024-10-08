@@ -1,5 +1,6 @@
 ﻿using BeeStore_Repository.DTO.PackageDTOs;
 using BeeStore_Repository.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel;
 
