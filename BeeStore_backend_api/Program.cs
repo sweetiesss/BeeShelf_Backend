@@ -40,14 +40,16 @@ if (builder.Environment.IsDevelopment())
 
 if (builder.Environment.IsProduction())
 {
-    var keyVaultURL = builder.Configuration.GetSection("KeyVault:KeyVaultURL").Value!.ToString();
+    var keyVaultURL = builder.Configuration
+                             .GetSection("KeyVault")
+                             .Get<AppConfiguration>();
 
     builder.Configuration.AddAzureKeyVault(
-        new Uri(keyVaultURL),
+        new Uri(keyVaultURL.KeyVaultURL),
         new EnvironmentCredential()
     );
 
-    var client = new SecretClient(new Uri(keyVaultURL), new EnvironmentCredential());
+    var client = new SecretClient(new Uri(keyVaultURL.KeyVaultURL), new EnvironmentCredential());
     var dbConnectionSecret = client.GetSecret("DBConnection");
     var s3AccessKey = client.GetSecret("BeeStore-S3-AccessKey");
     var s3SecretKey = client.GetSecret("BeeStore-S3-SecretKey");

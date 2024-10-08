@@ -32,8 +32,10 @@ namespace BeeStore_Repository.Repositories
         public Task<List<T>> GetAllAsync() => _dbSet.Where(x => x.IsDeleted.Equals(false)).ToListAsync();
 
         public async Task<IEnumerable<T>> GetFiltered(Expression<Func<T, bool>> filter)
-        => await _dbSet.Where(filter).ToListAsync();
-        
+        {
+            
+            return await _dbSet.Where(x=> x.IsDeleted.Equals(false)).Where(filter).ToListAsync();
+        }
 
 
         public async Task<List<T>> GetQueryable(Func<IQueryable<T>, IQueryable<T>> includes = null)

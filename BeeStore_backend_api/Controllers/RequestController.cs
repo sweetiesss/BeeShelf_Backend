@@ -45,6 +45,13 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateRequestStatus(int id, int statusId)
+        {
+            var result = await _requestService.UpdateRequestStatus(id, statusId);
+            return Ok(result);
+        }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteRequest(int id)
         {
