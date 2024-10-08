@@ -36,10 +36,10 @@
       "DownstreamPathTemplate": "/api/Auth/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
-        //{
-        //  "Host": "localhost",
-        //  "Port": 7092
-        //},
+        {
+          "Host": "localhost",
+          "Port": 7092
+        },
         {
           "Host": "{Service}",
           "Port": 443
@@ -226,8 +226,8 @@
         {
           "Name": "auth gateway API",
           "version": "v1",
-          //"Url": "https://localhost:7092/swagger/v1/swagger.json"
-          "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
+          "Url": "https://localhost:7092/swagger/v1/swagger.json"
+          //"Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
         }
       ]
     },

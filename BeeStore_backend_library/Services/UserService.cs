@@ -31,6 +31,7 @@ namespace BeeStore_Repository.Services
                 throw new DuplicateException(ResponseMessage.UserEmailDuplicate);
             }
             var result = _mapper.Map<User>(user);
+            result.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
             await _unitOfWork.UserRepo.AddAsync(result);
             await _unitOfWork.SaveAsync();
             return user;
@@ -70,11 +71,18 @@ namespace BeeStore_Repository.Services
             var exist = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Email == email);
             if (exist != null)
             {
-                if (exist.Password.Equals(password))
+                try
                 {
-                    return _mapper.Map<UserListDTO>(exist);
+                    if (BCrypt.Net.BCrypt.Verify(password, exist.Password))
+                    {
+                        return _mapper.Map<UserListDTO>(exist);
+                    }
+                    else
+                    {
+                        throw new KeyNotFoundException(ResponseMessage.UserPasswordError);
+                    }
                 }
-                else
+                catch (Exception)
                 {
                     throw new KeyNotFoundException(ResponseMessage.UserPasswordError);
                 }
@@ -92,7 +100,7 @@ namespace BeeStore_Repository.Services
             {
                 if (!String.IsNullOrEmpty(user.Password) && !user.Password.Equals("string"))
                 {
-                    exist.Password = user.Password;
+                    exist.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
                 }
                 if (!user.PictureId.Equals(0))
                 {
