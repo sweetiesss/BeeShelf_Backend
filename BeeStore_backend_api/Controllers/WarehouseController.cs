@@ -10,6 +10,7 @@ using ZstdSharp.Unsafe;
 
 namespace BeeStore_Api.Controllers
 {
+    [Authorize(Roles = "Admin,Manager")]
     public class WarehouseController : BaseController
     {
         private readonly IWarehouseService _warehouseService;
@@ -29,7 +30,6 @@ namespace BeeStore_Api.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetWarehouseList([FromQuery][DefaultValue(0)] int pageIndex,
                                                                [FromQuery][DefaultValue(10)] int pageSize)
         {
@@ -61,6 +61,7 @@ namespace BeeStore_Api.Controllers
         }
 
         [HttpGet]
+
         public async Task<IActionResult> GetWarehouseStaffList([FromQuery][DefaultValue(0)] int pageIndex,
                                                                [FromQuery][DefaultValue(10)] int pageSize)
         {

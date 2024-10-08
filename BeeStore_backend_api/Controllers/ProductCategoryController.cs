@@ -1,10 +1,12 @@
 ﻿using BeeStore_Repository.DTO.ProductCategoryDTOs;
 using BeeStore_Repository.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel;
 
 namespace BeeStore_Api.Controllers
 {
+    [Authorize(Roles = "Admin,Manager")]
     public class ProductCategoryController : BaseController
     {
         private readonly IProductCategoryService _productCategoryService;
