@@ -1,7 +1,9 @@
 ﻿using BeeStore_Repository.DTO.ProductCategoryDTOs;
+using BeeStore_Repository.Services;
 using BeeStore_Repository.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using System.ComponentModel;
 
 namespace BeeStore_Api.Controllers
@@ -10,6 +12,8 @@ namespace BeeStore_Api.Controllers
     public class ProductCategoryController : BaseController
     {
         private readonly IProductCategoryService _productCategoryService;
+        private readonly IMemoryCache _memoryCache;
+        private const string cacheKey = "productCategoryCache";
 
         public ProductCategoryController(IProductCategoryService productCategoryService)
         {
@@ -20,7 +24,18 @@ namespace BeeStore_Api.Controllers
         public async Task<IActionResult> GetProductCategoryList([FromQuery][DefaultValue(0)] int pageIndex,
                                                                 [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _productCategoryService.GetProductCategoryList(pageIndex, pageSize);
+            if (!_memoryCache.TryGetValue(cacheKey, out var result))
+            {
+                result = await _productCategoryService.GetProductCategoryList(pageIndex, pageSize);
+
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(30))
+                    .SetAbsoluteExpiration(TimeSpan.FromHours(1));
+
+                _memoryCache.Set(cacheKey, result, cacheEntryOptions);
+            }
+
+            
             return Ok(result);
         }
 
