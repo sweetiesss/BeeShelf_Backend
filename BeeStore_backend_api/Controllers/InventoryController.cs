@@ -1,7 +1,9 @@
-﻿using BeeStore_Repository.DTO.InventoryDTOs;
+﻿using BeeStore_Repository.DTO;
+using BeeStore_Repository.DTO.InventoryDTOs;
 using BeeStore_Repository.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using System.ComponentModel;
 
 namespace BeeStore_Api.Controllers
@@ -10,10 +12,12 @@ namespace BeeStore_Api.Controllers
     public class InventoryController : BaseController
     {
         private readonly IInventoryService _inventoryService;
-
-        public InventoryController(IInventoryService inventoryService)
+        private readonly IMemoryCache _memoryCache;
+        private const string cacheKey = "inventoryCache";
+        public InventoryController(IInventoryService inventoryService, IMemoryCache memoryCache)
         {
             _inventoryService = inventoryService;
+            _memoryCache = memoryCache;
         }
 
         [HttpGet]
@@ -30,7 +34,16 @@ namespace BeeStore_Api.Controllers
         public async Task<IActionResult> GetInventoryList(string email, [FromQuery][DefaultValue(0)] int pageIndex,
                                                                [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _inventoryService.GetInventoryList(email, pageIndex, pageSize);
+            if (!_memoryCache.TryGetValue(cacheKey, out var result)) // result here have the variable types as Pagination<InventoryListDTO>
+            {
+               result = await _inventoryService.GetInventoryList(email, pageIndex, pageSize);
+
+               var cacheEntryOptions = new MemoryCacheEntryOptions()
+                   .SetSlidingExpiration(TimeSpan.FromMinutes(5))
+                   .SetAbsoluteExpiration(TimeSpan.FromHours(1));
+
+                _memoryCache.Set(cacheKey, result, cacheEntryOptions);
+            }
             return Ok(result);
         }
 

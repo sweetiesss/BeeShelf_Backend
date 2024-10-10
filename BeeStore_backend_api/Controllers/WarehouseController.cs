@@ -5,6 +5,7 @@ using BeeStore_Repository.DTO.WarehouseStaffDTOs;
 using BeeStore_Repository.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Caching.Memory;
 using System.ComponentModel;
 using ZstdSharp.Unsafe;
 
@@ -17,23 +18,38 @@ namespace BeeStore_Api.Controllers
         private readonly IWarehouseCategoryService _warehouseCategoryService;
         private readonly IWarehouseShipperService _warehouseShipperService;
         private readonly IWarehouseStaffService _warehouseStaffService;
+        private readonly IMemoryCache _memoryCache;
+        private const string warehouseCacheKey = "allWarehouseCache";
+        private const string categoryCacheKey = "allWarehouseCategoryCache";
+
 
         public WarehouseController(IWarehouseService warehouseService,
                                     IWarehouseCategoryService warehouseCategoryService,
                                     IWarehouseShipperService warehouseShipperService,
-                                    IWarehouseStaffService warehouseStaffService)
+                                    IWarehouseStaffService warehouseStaffService,
+                                    IMemoryCache memoryCache)
         {
             _warehouseService = warehouseService;
             _warehouseCategoryService = warehouseCategoryService;
             _warehouseShipperService = warehouseShipperService;
             _warehouseStaffService = warehouseStaffService;
+            _memoryCache = memoryCache;
         }
 
         [HttpGet]
         public async Task<IActionResult> GetWarehouseList([FromQuery][DefaultValue(0)] int pageIndex,
                                                                [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _warehouseService.GetWarehouseList(pageIndex, pageSize);
+            if (!_memoryCache.TryGetValue(warehouseCacheKey, out var result))
+            {
+                result = await _warehouseService.GetWarehouseList(pageIndex, pageSize);
+
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(15))
+                    .SetAbsoluteExpiration(TimeSpan.FromHours(1));
+
+                _memoryCache.Set(warehouseCacheKey, result, cacheEntryOptions);
+            }
             return Ok(result);
         }
 
@@ -88,7 +104,17 @@ namespace BeeStore_Api.Controllers
         public async Task<IActionResult> GetWarehouseCategoryList([FromQuery][DefaultValue(0)] int pageIndex,
                                                                [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _warehouseCategoryService.GetWarehouseCategoryList(pageIndex, pageSize);
+            if (!_memoryCache.TryGetValue(categoryCacheKey, out var result))
+            {
+                result = await _warehouseCategoryService.GetWarehouseCategoryList(pageIndex, pageSize);
+
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(30))
+                    .SetAbsoluteExpiration(TimeSpan.FromHours(1));
+
+                _memoryCache.Set(categoryCacheKey, result, cacheEntryOptions);
+            }
+            
             return Ok(result);
         }
 
