@@ -259,8 +259,8 @@
         {
           "Name": "inventory gateway API",
           "version": "v1",
-          //"Url": "https://localhost:7092/swagger/v1/swagger.json"
-          "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
+          "Url": "https://localhost:7092/swagger/v1/swagger.json"
+          //"Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
         }
       ]
     },
