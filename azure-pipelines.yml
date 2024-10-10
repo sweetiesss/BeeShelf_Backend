@@ -42,5 +42,4 @@ stages:
           repository: 'beestorecicd'
           command: 'push'
           tags: |
-            $(Build.BuildId)
             latest
