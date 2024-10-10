@@ -53,7 +53,7 @@ namespace BeeStore_Repository
 
 
             // DB context
-            services.AddDbContext<BeeStoreDbContext>(option => option.UseMySQL(databaseConnection));
+            services.AddDbContext<BeeStoreDbContext>(option => option.UseLazyLoadingProxies().UseMySQL(databaseConnection));
 
             // Singleton
             services.AddSingleton<AppConfiguration>();
