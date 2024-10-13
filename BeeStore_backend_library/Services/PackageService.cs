@@ -93,7 +93,6 @@ namespace BeeStore_Repository.Services
                 throw new KeyNotFoundException(ResponseMessage.ProductIdNotFound);
             }
             var productCategory = await _unitOfWork.ProductCategoryRepo.SingleOrDefaultAsync(u => u.Id == product.ProductCategoryId);
-            exist.Weight = request.Weight;
             exist.ProductAmount = request.ProductAmount;
             exist.ProductId = request.ProductId;
             exist.InventoryId = request.InventoryId;

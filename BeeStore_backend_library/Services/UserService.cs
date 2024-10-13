@@ -130,5 +130,16 @@ namespace BeeStore_Repository.Services
 
             return user;
         }
+
+        public async Task<UserListDTO> GetUser(string email)
+        {
+            var user = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Email == email);
+            if (user == null)
+            {
+                throw new KeyNotFoundException(ResponseMessage.UserEmailNotFound);
+            }
+            var result = _mapper.Map<UserListDTO>(user);
+            return result;
+        }
     }
 }

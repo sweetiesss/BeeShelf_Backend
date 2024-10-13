@@ -9,6 +9,7 @@ namespace BeeStore_Repository.DTO.InventoryDTOs
 {
     public class InventoryCreateDTO
     {
+        public string Name { get; set; }
         public decimal? MaxWeight { get; set; }
 
         public decimal? Weight { get; set; }

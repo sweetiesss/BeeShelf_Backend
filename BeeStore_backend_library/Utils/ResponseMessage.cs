@@ -33,6 +33,7 @@ namespace BeeStore_Repository.Utils
         public const string InventoryIdNotFound = "Inventory Id not found.";
         public const string InventoryOccupied = "Inventory is already occupied.";
         public const string InventoryOverWeightError = "Inventory will exceed the max weight if this item is added in.";
+        public const string InventoryNameDuplicate = "Inventory Name already exist.";
 
 
         //Warehouse response message

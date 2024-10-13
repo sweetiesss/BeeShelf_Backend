@@ -5,6 +5,7 @@ namespace BeeStore_Repository.Models;
 
 public partial class Transaction : BaseEntity
 {
+    //public int Id { get; set; }
 
     public string? TransactionCode { get; set; }
 
@@ -22,6 +23,7 @@ public partial class Transaction : BaseEntity
 
     public string? CancellationReason { get; set; }
 
+    //public ulong? IsDeleted { get; set; }
 
     public virtual Inventory? Item { get; set; }
 

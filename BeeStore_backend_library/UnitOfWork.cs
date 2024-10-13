@@ -1,4 +1,6 @@
 ﻿using BeeStore_Repository.Data;
+using BeeStore_Repository.DTO.InventoryDTOs;
+using BeeStore_Repository.DTO.WarehouseDTOs;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -19,7 +21,7 @@ namespace BeeStore_Repository
         private GenericRepository<Partner> partnerRepo;
         private GenericRepository<Warehouse> warehouseRepo;
         private GenericRepository<Inventory> inventoryRepo;
-        private GenericRepository<Product> productRepo;
+        private GenericRepository<Product> productRepo; 
         private GenericRepository<ProductCategory> productCategoryRepo;
         private GenericRepository<Package> packageRepo;
         private GenericRepository<WarehouseCategory> warehouseCategoryRepo;
@@ -219,6 +221,7 @@ namespace BeeStore_Repository
             }
             disposed = true;
         }
+
 
         public void Dispose()
         {
