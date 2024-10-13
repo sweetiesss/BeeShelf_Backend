@@ -5,11 +5,13 @@ namespace BeeStore_Repository.Models;
 
 public partial class Picture : BaseEntity
 {
+    //public int Id { get; set; }
 
     public string? PictureLink { get; set; }
 
     public DateTime? CreateDate { get; set; }
 
+    //public ulong? IsDeleted { get; set; }
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 

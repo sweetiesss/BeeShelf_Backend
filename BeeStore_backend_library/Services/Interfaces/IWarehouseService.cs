@@ -11,6 +11,7 @@ namespace BeeStore_Repository.Services.Interfaces
     public interface IWarehouseService
     {
         Task<Pagination<WarehouseListDTO>> GetWarehouseList(int pageIndex, int pageSize);
+        Task<List<WarehouseListInventoryDTO>> GetWarehouseByUserId(int userId);
         Task<WarehouseCreateDTO> CreateWarehouse(WarehouseCreateDTO request);
         Task<WarehouseCreateDTO> UpdateWarehouse(WarehouseCreateDTO request);
         Task<string> DeleteWarehouse(int id);
