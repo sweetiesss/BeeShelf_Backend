@@ -10,6 +10,8 @@ namespace BeeStore_Repository.DTO.InventoryDTOs
     {
         public int Id { get; set; }
 
+        public string Name { get; set; }
+
         public int? UserId { get; set; }
 
         public decimal? MaxWeight { get; set; }
@@ -22,6 +24,5 @@ namespace BeeStore_Repository.DTO.InventoryDTOs
 
         public string WarehouseName {  get; set; }
         //public int? WarehouseId { get; set; }
-
     }
 }

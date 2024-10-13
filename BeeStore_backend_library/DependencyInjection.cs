@@ -44,6 +44,9 @@ namespace BeeStore_Repository
             services.AddScoped<UnitOfWork>();
             services.AddScoped<GlobalExceptionMiddleware>();
 
+            //Memory Cache
+            services.AddMemoryCache();
+
             // Auto mapper
             services.AddAutoMapper(typeof(MapperConfigurationsProfile).Assembly);
 

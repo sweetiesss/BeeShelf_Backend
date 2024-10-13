@@ -64,6 +64,12 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.WarehouseIdNotFound);
             }
+            var dupe = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Name.Equals(request.Name,
+                                                                            StringComparison.OrdinalIgnoreCase));
+            if (dupe != null)
+            {
+                throw new ApplicationException(ResponseMessage.InventoryNameDuplicate);
+            }
             var result = _mapper.Map<Inventory>(request);
             result.BoughtDate = DateTime.Now;
             result.ExpirationDate = DateTime.Now;
@@ -93,7 +99,13 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
             }
-            if(request.Weight != null)
+            var dupe = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Name.Equals(request.Name,
+                                                                            StringComparison.OrdinalIgnoreCase));
+            if (dupe != null)
+            {
+                throw new ApplicationException(ResponseMessage.InventoryNameDuplicate);
+            }
+            if (request.Weight != null)
             {
                 exist.Weight = request.Weight;
             }

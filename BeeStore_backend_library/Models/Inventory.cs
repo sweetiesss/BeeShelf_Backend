@@ -5,6 +5,9 @@ namespace BeeStore_Repository.Models;
 
 public partial class Inventory : BaseEntity
 {
+    //public int Id { get; set; }
+
+    public string? Name { get; set; }
 
     public int? UserId { get; set; }
 
@@ -18,6 +21,7 @@ public partial class Inventory : BaseEntity
 
     public int? WarehouseId { get; set; }
 
+    //public ulong? IsDeleted { get; set; }
 
     public virtual ICollection<Package> Packages { get; set; } = new List<Package>();
 

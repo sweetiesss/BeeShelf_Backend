@@ -21,8 +21,6 @@ namespace BeeStore_Repository.DTO.ProductDTOs
 
         public DateTime? CreateDate { get; set; }
 
-        public int? ProductAmount { get; set; }
-
         public string Picture_Link { get; set; }
         //public int? PictureId { get; set; }
 
