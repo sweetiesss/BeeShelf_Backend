@@ -28,6 +28,13 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
+        [HttpGet("{email}")]
+        public async Task<IActionResult> GetUser(string email)
+        {
+            var result = await _userService.GetUser(email);
+            return Ok(result);
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateUser([FromBody]UserCreateRequestDTO user)
         {

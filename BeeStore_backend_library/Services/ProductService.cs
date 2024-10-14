@@ -192,7 +192,6 @@ namespace BeeStore_Repository.Services
             exist.Price = request.Price;
             exist.PictureId = request.PictureId;
             exist.ProductCategoryId = request.ProductCategoryId;
-            exist.ProductAmount = request.ProductAmount;
             _unitOfWork.ProductRepo.Update(exist);
             await _unitOfWork.SaveAsync();
             return request;

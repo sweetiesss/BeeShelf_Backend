@@ -115,7 +115,6 @@ namespace BeeStore_Repository.Services
             }
             exist.SendToInventory = request.SendToInventory;
             exist.Description = request.Description;
-            exist.Name = request.Name;
             exist.PackageId = request.PackageId;
             exist.RequestType = request.RequestType;
             _unitOfWork.RequestRepo.Update(exist);

@@ -10,7 +10,6 @@ namespace BeeStore_Repository.DTO.RequestDTOs
     {
         public int Id { get; set; }
         public string user_email { get; set; }
-        public string? Name { get; set; }
 
         public string? Description { get; set; }
 

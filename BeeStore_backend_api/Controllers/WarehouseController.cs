@@ -53,6 +53,14 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
+        [HttpGet("{id}")]
+        public async Task<IActionResult> GetWarehouseByUserId(int id)
+        {
+            var result = await _warehouseService.GetWarehouseByUserId(id);
+            return Ok(result);
+        }
+
+
         [HttpGet]
         public async Task<IActionResult> GetWarehouseShipperList([FromQuery][DefaultValue(0)] int pageIndex,
                                                                [FromQuery][DefaultValue(10)] int pageSize)
