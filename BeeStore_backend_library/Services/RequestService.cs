@@ -79,10 +79,9 @@ namespace BeeStore_Repository.Services
             return await ListPagination<RequestListDTO>.PaginateList(result, pageIndex, pageSize);
         }
 
-        public async Task<Pagination<RequestListDTO>> GetRequestList(string email, int pageIndex, int pageSize)
+        public async Task<Pagination<RequestListDTO>> GetRequestList(int userId, int pageIndex, int pageSize)
         {
-            var requests = await _unitOfWork.RequestRepo.GetQueryable(query => query.Include(o => o.User));
-            var list = requests.Where(u => u.User.Email == email).ToList();
+            var list = await _unitOfWork.RequestRepo.GetFiltered(u => u.UserId.Equals(userId));
             var result = _mapper.Map<List<RequestListDTO>>(list);
             return await ListPagination<RequestListDTO>.PaginateList(result, pageIndex, pageSize);
         }

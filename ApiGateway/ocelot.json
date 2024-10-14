@@ -33,13 +33,13 @@
     { // Auth Path
       "UpstreamPathTemplate": "/gateway/auth/{everything}",
       "UpstreamHttpMethod": [],
-      "DownstreamPathTemplate": "/api/Auth/{everything}",
+      "DownstreamPathTemplate": "/api/auth/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7092
-        },
+        //{
+        //  "Host": "localhost",
+        //  "Port": 7092
+        //},
         {
           "Host": "{Service}",
           "Port": 443
@@ -50,7 +50,7 @@
     { // User Path
       "UpstreamPathTemplate": "/gateway/user/{everything}",
       "UpstreamHttpMethod": [],
-      "DownstreamPathTemplate": "/api/User/{everything}",
+      "DownstreamPathTemplate": "/api/user/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         //{
@@ -67,7 +67,7 @@
     { // Inventory Path
       "UpstreamPathTemplate": "/gateway/inventory/{everything}",
       "UpstreamHttpMethod": [],
-      "DownstreamPathTemplate": "/api/Inventory/{everything}",
+      "DownstreamPathTemplate": "/api/inventory/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         //{
@@ -84,7 +84,7 @@
     { // Partner Path
       "UpstreamPathTemplate": "/gateway/partner/{everything}",
       "UpstreamHttpMethod": [],
-      "DownstreamPathTemplate": "/api/Partner/{everything}",
+      "DownstreamPathTemplate": "/api/partner/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         //{
@@ -101,7 +101,7 @@
     { // Picture Path
       "UpstreamPathTemplate": "/gateway/picture/{everything}",
       "UpstreamHttpMethod": [],
-      "DownstreamPathTemplate": "/api/Picture/{everything}",
+      "DownstreamPathTemplate": "/api/picture/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         //{
@@ -118,7 +118,7 @@
     { // Product Path
       "UpstreamPathTemplate": "/gateway/product/{everything}",
       "UpstreamHttpMethod": [],
-      "DownstreamPathTemplate": "/api/Product/{everything}",
+      "DownstreamPathTemplate": "/api/product/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         //{
@@ -136,7 +136,7 @@
     { // Warehouse Path
       "UpstreamPathTemplate": "/gateway/warehouse/{everything}",
       "UpstreamHttpMethod": [],
-      "DownstreamPathTemplate": "/api/Warehouse/{everything}",
+      "DownstreamPathTemplate": "/api/warehouse/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         //{
@@ -151,9 +151,9 @@
       "SwaggerKey": "warehouse"
     },
     { // productCategory Path
-      "UpstreamPathTemplate": "/gateway/productCategory/{everything}",
+      "UpstreamPathTemplate": "/gateway/product-category/{everything}",
       "UpstreamHttpMethod": [],
-      "DownstreamPathTemplate": "/api/ProductCategory/{everything}",
+      "DownstreamPathTemplate": "/api/product-category/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         //{
@@ -170,7 +170,7 @@
     { // package Path
       "UpstreamPathTemplate": "/gateway/package/{everything}",
       "UpstreamHttpMethod": [],
-      "DownstreamPathTemplate": "/api/Package/{everything}",
+      "DownstreamPathTemplate": "/api/package/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         //{
@@ -187,7 +187,7 @@
     { // request Path
       "UpstreamPathTemplate": "/gateway/request/{everything}",
       "UpstreamHttpMethod": [],
-      "DownstreamPathTemplate": "/api/Request/{everything}",
+      "DownstreamPathTemplate": "/api/request/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         //{
@@ -204,7 +204,7 @@
     { // order Path
       "UpstreamPathTemplate": "/gateway/order/{everything}",
       "UpstreamHttpMethod": [],
-      "DownstreamPathTemplate": "/api/Order/{everything}",
+      "DownstreamPathTemplate": "/api/order/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         //{
@@ -226,8 +226,8 @@
         {
           "Name": "auth gateway API",
           "version": "v1",
-          "Url": "https://localhost:7092/swagger/v1/swagger.json"
-          //"Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
+          //"Url": "https://localhost:7092/swagger/v1/swagger.json"
+          "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
         }
       ]
     },
@@ -259,8 +259,8 @@
         {
           "Name": "inventory gateway API",
           "version": "v1",
-          "Url": "https://localhost:7092/swagger/v1/swagger.json"
-          //"Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
+          //"Url": "https://localhost:7092/swagger/v1/swagger.json"
+          "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
         }
       ]
     },
@@ -292,8 +292,8 @@
         {
           "Name": "warehouse gateway API",
           "version": "v1",
-          "Url": "https://localhost:7092/swagger/v1/swagger.json"
-          //"Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
+          //"Url": "https://localhost:7092/swagger/v1/swagger.json"
+          "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
         }
       ]
     },

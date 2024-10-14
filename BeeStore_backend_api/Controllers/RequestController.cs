@@ -15,6 +15,7 @@ namespace BeeStore_Api.Controllers
             _requestService = requestService;
         }
 
+        [Route("get-requests")]
         [HttpGet]
         public async Task<IActionResult> GetRequestList([FromQuery][DefaultValue(0)] int pageIndex,
                                                     [FromQuery][DefaultValue(10)] int pageSize)
@@ -23,14 +24,16 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{email}")]
-        public async Task<IActionResult> GetRequestList(string email, [FromQuery][DefaultValue(0)] int pageIndex,
+        [Route("get-requests/{userId}")]
+        [HttpGet]
+        public async Task<IActionResult> GetRequestList(int userId, [FromQuery][DefaultValue(0)] int pageIndex,
                                                     [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _requestService.GetRequestList(email, pageIndex, pageSize);
+            var result = await _requestService.GetRequestList(userId, pageIndex, pageSize);
             return Ok(result);
         }
 
+        [Route("create-request")]
         [HttpPost]
         public async Task<IActionResult> CreateRequest(RequestCreateDTO request)
         {
@@ -38,21 +41,24 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
-        [HttpPut("{id}")]
+        [Route("update-request/{id}")]
+        [HttpPut]
         public async Task<IActionResult> UpdateRequest(int id, RequestCreateDTO request)
         {
             var result = await _requestService.UpdateRequest(id, request);
             return Ok(result);
         }
 
-        [HttpPut("{id}")]
+        [Route("update-request-status/{id}")]
+        [HttpPut]
         public async Task<IActionResult> UpdateRequestStatus(int id, int statusId)
         {
             var result = await _requestService.UpdateRequestStatus(id, statusId);
             return Ok(result);
         }
 
-        [HttpDelete("{id}")]
+        [Route("delete-request/{id}")]
+        [HttpDelete]
         public async Task<IActionResult> DeleteRequest(int id)
         {
             var result = await _requestService.DeleteRequest(id);

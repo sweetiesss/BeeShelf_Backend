@@ -65,6 +65,17 @@ namespace BeeStore_Repository.Services
             return ResponseMessage.Success;
         }
 
+        public async Task<PackageListDTO> GetPackageById(int id)
+        {
+            var exist = await _unitOfWork.PackageRepo.SingleOrDefaultAsync(u => u.Id.Equals(id));
+            if(exist == null)
+            {
+                throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
+            }
+            var result = _mapper.Map<PackageListDTO>(exist);
+            return result;
+        }
+
         public async Task<Pagination<PackageListDTO>> GetPackageList(int pageIndex, int pageSize)
         {
             var list = await _unitOfWork.PackageRepo.GetAllAsync();

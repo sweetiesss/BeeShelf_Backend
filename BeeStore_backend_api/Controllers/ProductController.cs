@@ -14,6 +14,7 @@ namespace BeeStore_Api.Controllers
             _productService = productService;
         }
 
+        [Route("get-products")]
         [HttpGet]
         public async Task<IActionResult> GetProductList([FromQuery][DefaultValue(0)] int pageIndex,
                                                     [FromQuery][DefaultValue(10)] int pageSize)
@@ -22,14 +23,16 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{email}")]
-        public async Task<IActionResult> GetProductListByEmail(string email,[FromQuery][DefaultValue(0)] int pageIndex,
+        [Route("get-products/{userId}")]
+        [HttpGet]
+        public async Task<IActionResult> GetProductListByEmail(int userId,[FromQuery][DefaultValue(0)] int pageIndex,
                                                     [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _productService.GetProductListByEmail(email, pageIndex, pageSize);
+            var result = await _productService.GetProductListByEmail(userId, pageIndex, pageSize);
             return Ok(result);
         }
 
+        [Route("create-product")]
         [HttpPost]
         public async Task<IActionResult> CreateProduct(ProductCreateDTO request)
         {
@@ -37,6 +40,7 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
+        [Route("create-products")]
         [HttpPost]
         public async Task<IActionResult> CreateProductRange(List<ProductCreateDTO> request)
         {
@@ -44,14 +48,16 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
-        [HttpPut("{id}")]
+        [Route("update-product/{id}")]
+        [HttpPut]
         public async Task<IActionResult> UpdateProduct(int id, ProductCreateDTO request)
         {
             var result = await _productService.UpdateProduct(id, request);
             return Ok(result);
         }
-
-        [HttpDelete("{id}")]
+        
+        [Route("delete-product/{id}")]
+        [HttpDelete]
         public async Task<IActionResult> DeleteProduct(int id)
         {
             var result = await _productService.DeleteProduct(id);
