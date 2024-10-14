@@ -20,6 +20,7 @@ namespace BeeStore_Api.Controllers
             _memoryCache = memoryCache;
         }
 
+        [Route("get-inventories")]
         [HttpGet]
         [Authorize(Roles = "Admin,Manager,Staff")]
         public async Task<IActionResult> GetInventoryList([FromQuery][DefaultValue(0)] int pageIndex,
@@ -29,14 +30,15 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{email}")]
+        [Route("get-inventories/{userId}")]
+        [HttpGet]
         [Authorize(Roles = "Admin,Manager,Staff,Partner")]
-        public async Task<IActionResult> GetInventoryList(string email, [FromQuery][DefaultValue(0)] int pageIndex,
+        public async Task<IActionResult> GetInventoryList(int userId, [FromQuery][DefaultValue(0)] int pageIndex,
                                                                [FromQuery][DefaultValue(10)] int pageSize)
         {
             if (!_memoryCache.TryGetValue(cacheKey, out var result)) // result here have the variable types as Pagination<InventoryListDTO>
             {
-               result = await _inventoryService.GetInventoryList(email, pageIndex, pageSize);
+               result = await _inventoryService.GetInventoryList(userId, pageIndex, pageSize);
 
                var cacheEntryOptions = new MemoryCacheEntryOptions()
                    .SetSlidingExpiration(TimeSpan.FromMinutes(5))
@@ -47,13 +49,23 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
-        [HttpPost("{id}/{userId}")]
+        [Route("get-inventory/{id}")]
+        [HttpGet]
+        public async Task<IActionResult> GetInventoryById(int id)
+        {
+            var result = await _inventoryService.GetInventoryById(id);
+            return Ok(result);
+        }
+
+        [Route("add-partner-to-inventory/{id}/{userId}")]
+        [HttpPost]
         public async Task<IActionResult> AddPartnerToInventory(int id, int userId)
         {
             var result = await _inventoryService.AddPartnerToInventory(id, userId);
             return Ok(result);
         }
 
+        [Route("create-inventory")]
         [HttpPost]
         public async Task<IActionResult> CreateInventory(InventoryCreateDTO request)
         {
@@ -61,6 +73,7 @@ namespace BeeStore_Api.Controllers
             return Ok(result);  
         }
 
+        [Route("update-inventory")]
         [HttpPut]
         public async Task<IActionResult> UpdateInventory(InventoryUpdateDTO request)
         {
@@ -68,7 +81,8 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
-        [HttpDelete("{id}")]
+        [Route("delete-inventory/{id}")]
+        [HttpDelete]
         public async Task<IActionResult> DeleteInventory(int id)
         {
             var result = await _inventoryService.DeleteInventory(id);

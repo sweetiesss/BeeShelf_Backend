@@ -15,6 +15,7 @@ namespace BeeStore_Api.Controllers
             _packageService = packageService;
         }
 
+        [Route("get-packages")]
         [HttpGet]
         public async Task<IActionResult> GetPackageList([FromQuery][DefaultValue(0)] int pageIndex,
                                                                [FromQuery][DefaultValue(10)] int pageSize)
@@ -23,6 +24,15 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
+        [Route("get-package/{id}")]
+        [HttpGet]
+        public async Task<IActionResult> GetPackageById(int id)
+        {
+            var result = await _packageService.GetPackageById(id);
+            return Ok(result);
+        }
+
+        [Route("create-package")]
         [HttpPost]
         public async Task<IActionResult> CreatePackage(PackageCreateDTO request)
         {
@@ -30,14 +40,16 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
-        [HttpPut("{id}")]
+        [Route("update-package/{id}")]
+        [HttpPut]
         public async Task<IActionResult> UpdatePackage(int id, PackageCreateDTO request)
         {
             var result = await _packageService.UpdatePackage(id, request);
             return Ok(result);
         }
 
-        [HttpDelete("{id}")]
+        [Route("delete-package/{id}")]
+        [HttpDelete]
         public async Task<IActionResult> DeletePackage(int id)
         {
             var result = await _packageService.DeletePackage(id);

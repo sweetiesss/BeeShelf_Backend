@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Amazon.S3.Model;
+using AutoMapper;
 using BeeStore_Repository.DTO;
 using BeeStore_Repository.DTO.InventoryDTOs;
 using BeeStore_Repository.DTO.WarehouseDTOs;
@@ -59,35 +60,19 @@ namespace BeeStore_Repository.Services
 
         public async Task<List<WarehouseListInventoryDTO>> GetWarehouseByUserId(int userId)
         {
-            var query = await _unitOfWork.WarehouseRepo.GetQueryable(q => q
-                .Include(w => w.Inventories)
-            //.ThenInclude(i => i.User)
-            );
-            var result = query
-                .Where(w => w.Inventories.Any(i => i.UserId == userId && !i.IsDeleted))
-                .Select(w => new WarehouseListInventoryDTO
-                {
-                    Id = w.Id,
-                    Name = w.Name,
-                    Size = w.Size,
-                    Location = w.Location,
-                    CreateDate = w.CreateDate,
-                    TotalInventory = w.Inventories.Count(i => i.UserId == userId && !i.IsDeleted),
-                    Inventories = w.Inventories
-                        .Where(i => i.User.Id == userId && !i.IsDeleted)
-                        .Select(i => new InventoryListDTO
-                        {
-                            Id = i.Id,
-                            UserId = i.UserId,
-                            Name = i.Name,
-                            MaxWeight = i.MaxWeight,
-                            Weight = i.Weight,
-                            BoughtDate = i.BoughtDate,
-                            WarehouseName = w.Name,
-                            ExpirationDate = i.ExpirationDate
-                        }).ToList()
-                })
-                .ToList();
+            var list = await _unitOfWork.WarehouseRepo.GetQueryable(wh => wh
+                                                       .Where(w => w.Inventories.Any(inventory => inventory.UserId == userId))
+        .Select(warehouse => new Warehouse
+        {
+            Id = warehouse.Id,
+            Location = warehouse.Location,
+            Name = warehouse.Name,
+            Size = warehouse.Size,
+            CreateDate = warehouse.CreateDate,
+            Inventories = warehouse.Inventories.Where(inventory => inventory.UserId == userId).ToList()
+        }));
+            var result = _mapper.Map<List<WarehouseListInventoryDTO>>(list);
+          
             return result;
         }
 

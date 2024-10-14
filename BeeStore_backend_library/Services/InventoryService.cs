@@ -126,13 +126,23 @@ namespace BeeStore_Repository.Services
             return (await ListPagination<InventoryListDTO>.PaginateList(result, pageIndex, pageSize));
         }
 
-        public async Task<Pagination<InventoryListDTO>> GetInventoryList(string email, int pageIndex, int pageSize)
+        public async Task<Pagination<InventoryListDTO>> GetInventoryList(int userId, int pageIndex, int pageSize)
         {
-            var user = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Email == email);
-            var list = await _unitOfWork.InventoryRepo.GetFiltered(u => u.UserId.Equals(user.Id));
+            var list = await _unitOfWork.InventoryRepo.GetFiltered(u => u.UserId.Equals(userId));
             
             var result = _mapper.Map<List<InventoryListDTO>>(list);
             return (await ListPagination<InventoryListDTO>.PaginateList(result, pageIndex, pageSize));
+        }
+
+        public async Task<InventoryListPackagesDTO> GetInventoryById(int id)
+        {
+            var exist = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Id.Equals(id));
+            if(exist == null)
+            {
+                throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
+            }
+            var result = _mapper.Map<InventoryListPackagesDTO>(exist);
+            return result;
         }
     }
 }

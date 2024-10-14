@@ -13,7 +13,7 @@ namespace BeeStore_Repository.Services.Interfaces
     {
         Task<UserListDTO> Login(string email, string password);
         Task<Pagination<UserListDTO>> GetAllUser(int pageIndex, int pageSize);
-        Task<UserListDTO> GetUser(string email);
+        Task<UserListDTO> GetUser(int id);
         Task<UserCreateRequestDTO> CreateUser(UserCreateRequestDTO user);
         Task<UserUpdateRequestDTO> UpdateUser(UserUpdateRequestDTO user);
         Task<string> DeleteUser(int id);

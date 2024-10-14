@@ -11,7 +11,7 @@ namespace BeeStore_Repository.Services.Interfaces
     public interface IRequestService
     {
         Task<Pagination<RequestListDTO>> GetRequestList(int pageIndex, int pageSize);
-        Task<Pagination<RequestListDTO>> GetRequestList(string email, int pageIndex, int pageSize);
+        Task<Pagination<RequestListDTO>> GetRequestList(int userId, int pageIndex, int pageSize);
 
         Task<RequestListDTO> UpdateRequestStatus(int id, int statusId);
         Task<RequestCreateDTO> CreateRequest(RequestCreateDTO request);

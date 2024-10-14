@@ -17,6 +17,7 @@ namespace BeeStore_Api.Controllers
             _userService = userService;
         }
 
+        [Route("login")]
         [HttpPost]
         public async Task<IActionResult> Login([FromBody] UserLoginRequestDTO request)
         {
@@ -25,6 +26,7 @@ namespace BeeStore_Api.Controllers
             return Ok(_jwtService.GenerateJwtToken(result.Email, result.RoleName));
         }
 
+        [Route("sign-up")]
         [HttpPost]
         public async Task<IActionResult> Signup([FromBody] UserCreateRequestDTO user)
         {

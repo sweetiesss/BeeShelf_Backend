@@ -48,11 +48,17 @@ namespace BeeStore_Repository.Mapper
 
             CreateMap<Warehouse, WarehouseListDTO>();
             CreateMap<WarehouseCreateDTO, Warehouse>();
+            CreateMap<Warehouse, WarehouseListInventoryDTO>()
+                .ForMember(dest => dest.TotalInventory, opt => opt.MapFrom(src => src.Inventories.Count()))
+                .ForMember(dest => dest.Inventories, opt => opt.MapFrom(src => src.Inventories));
 
 
             CreateMap<Inventory, InventoryListDTO>()
                 .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom<CustomWarehouseNameResolver>());
             CreateMap<InventoryCreateDTO, Inventory>();
+            CreateMap<Inventory, InventoryListPackagesDTO>()
+                .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom(src => src.Warehouse.Name))
+                .ForMember(dest => dest.Packages, opt => opt.MapFrom(src =>src.Packages));
 
 
             CreateMap<Product, ProductListDTO>()

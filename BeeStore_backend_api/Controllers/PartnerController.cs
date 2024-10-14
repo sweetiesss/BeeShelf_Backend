@@ -15,6 +15,7 @@ namespace BeeStore_Api.Controllers
             _partnerService = partnerService;
         }
 
+        [Route("get-partners")]
         [HttpGet]
         public async Task<IActionResult> GetPartnerList([FromQuery][DefaultValue(0)] int pageIndex,
                                                                [FromQuery][DefaultValue(10)] int pageSize)
@@ -23,6 +24,7 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
+        [Route("upgrade-to-partner")]
         [HttpPost]
         public async Task<IActionResult> UpgradeToPartner(PartnerUpdateRequest request)
         {
@@ -30,13 +32,16 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
+        [Route("update-partner")]
         [HttpPut]
         public async Task<IActionResult> UpdatePartner(PartnerUpdateRequest request)
         {
             var result = await _partnerService.UpdatePartner(request);
             return Ok(result);
         }
-        [HttpDelete("{id}")]
+
+        [Route("delete-partner/{id}")]
+        [HttpDelete]
         public async Task<IActionResult> DeletePartner(int id)
         {
             var result = await _partnerService.DeletePartner(id);

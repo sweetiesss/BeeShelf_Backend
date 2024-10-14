@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BeeStore_Api.Controllers
 {
-    [Route("api/[controller]/[action]")]
+    [Route("api/[controller]/")]
     [ApiController]
     [Authorize]
     public class BaseController : ControllerBase
