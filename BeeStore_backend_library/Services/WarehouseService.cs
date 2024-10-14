@@ -1,11 +1,13 @@
 ﻿using AutoMapper;
 using BeeStore_Repository.DTO;
+using BeeStore_Repository.DTO.InventoryDTOs;
 using BeeStore_Repository.DTO.WarehouseDTOs;
 using BeeStore_Repository.Logger;
 using BeeStore_Repository.Logger.GlobalExceptionHandler.CustomException;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
+using Microsoft.EntityFrameworkCore;
 
 namespace BeeStore_Repository.Services
 {
@@ -53,6 +55,40 @@ namespace BeeStore_Repository.Services
             var result = _mapper.Map<List<WarehouseListDTO>>(list);
 
             return await ListPagination<WarehouseListDTO>.PaginateList(result, pageIndex, pageSize);
+        }
+
+        public async Task<List<WarehouseListInventoryDTO>> GetWarehouseByUserId(int userId)
+        {
+            var query = await _unitOfWork.WarehouseRepo.GetQueryable(q => q
+                .Include(w => w.Inventories)
+            //.ThenInclude(i => i.User)
+            );
+            var result = query
+                .Where(w => w.Inventories.Any(i => i.UserId == userId && !i.IsDeleted))
+                .Select(w => new WarehouseListInventoryDTO
+                {
+                    Id = w.Id,
+                    Name = w.Name,
+                    Size = w.Size,
+                    Location = w.Location,
+                    CreateDate = w.CreateDate,
+                    TotalInventory = w.Inventories.Count(i => i.UserId == userId && !i.IsDeleted),
+                    Inventories = w.Inventories
+                        .Where(i => i.User.Id == userId && !i.IsDeleted)
+                        .Select(i => new InventoryListDTO
+                        {
+                            Id = i.Id,
+                            UserId = i.UserId,
+                            Name = i.Name,
+                            MaxWeight = i.MaxWeight,
+                            Weight = i.Weight,
+                            BoughtDate = i.BoughtDate,
+                            WarehouseName = w.Name,
+                            ExpirationDate = i.ExpirationDate
+                        }).ToList()
+                })
+                .ToList();
+            return result;
         }
 
         public async Task<WarehouseCreateDTO> UpdateWarehouse(WarehouseCreateDTO request)

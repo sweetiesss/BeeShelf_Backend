@@ -6,8 +6,10 @@ using BeeStore_Repository.Models;
 namespace BeeStore_Repository.Data;
 public partial class BeeStoreDbContext : DbContext
 {
+
+
     public BeeStoreDbContext(DbContextOptions<BeeStoreDbContext> options)
-            : base(options)
+        : base(options)
     {
     }
 
@@ -71,6 +73,11 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.MaxWeight)
                 .HasPrecision(10, 2)
                 .HasColumnName("max_weight");
+            entity.Property(e => e.Name)
+                .HasMaxLength(50)
+                .HasColumnName("name")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
             entity.Property(e => e.UserId).HasColumnName("user_id");
             entity.Property(e => e.WarehouseId).HasColumnName("warehouse_id");
             entity.Property(e => e.Weight)
@@ -102,10 +109,12 @@ public partial class BeeStoreDbContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CancellationReason)
-                .HasColumnType("text")
-                .HasColumnName("cancellation_reason");
+                .HasMaxLength(70)
+                .HasColumnName("cancellation_reason")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
             entity.Property(e => e.CodStatus)
-                .HasMaxLength(15)
+                .HasMaxLength(5)
                 .HasColumnName("COD_Status")
                 .UseCollation("utf8mb3_general_ci")
                 .HasCharSet("utf8mb3");
@@ -118,7 +127,7 @@ public partial class BeeStoreDbContext : DbContext
                 .HasColumnType("bit(1)")
                 .HasColumnName("is_deleted");
             entity.Property(e => e.OrderStatus)
-                .HasMaxLength(15)
+                .HasMaxLength(10)
                 .HasColumnName("order_status")
                 .UseCollation("utf8mb3_general_ci")
                 .HasCharSet("utf8mb3");
@@ -126,13 +135,13 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.ProductAmount).HasColumnName("product_amount");
             entity.Property(e => e.ProductId).HasColumnName("product_id");
             entity.Property(e => e.ReceiverAddress)
-                .HasColumnType("text")
-                .HasColumnName("receiver_address");
-            entity.Property(e => e.ReceiverPhone)
-                .HasMaxLength(50)
-                .HasColumnName("receiver_phone")
+                .HasMaxLength(70)
+                .HasColumnName("receiver_address")
                 .UseCollation("utf8mb3_general_ci")
                 .HasCharSet("utf8mb3");
+            entity.Property(e => e.ReceiverPhone)
+                .HasMaxLength(10)
+                .HasColumnName("receiver_phone");
             entity.Property(e => e.TotalPrice)
                 .HasPrecision(10, 2)
                 .HasColumnName("total_price");
@@ -180,9 +189,6 @@ public partial class BeeStoreDbContext : DbContext
                 .HasColumnName("is_deleted");
             entity.Property(e => e.ProductAmount).HasColumnName("product_amount");
             entity.Property(e => e.ProductId).HasColumnName("product_id");
-            entity.Property(e => e.Weight)
-                .HasPrecision(10, 2)
-                .HasColumnName("weight");
 
             entity.HasOne(d => d.Inventory).WithMany(p => p.Packages)
                 .HasForeignKey(d => d.InventoryId)
@@ -203,20 +209,16 @@ public partial class BeeStoreDbContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.BankAccountNumber)
-                .HasMaxLength(255)
-                .HasColumnName("bank_account_number")
-                .UseCollation("utf8mb3_general_ci")
-                .HasCharSet("utf8mb3");
+                .HasMaxLength(50)
+                .HasColumnName("bank_account_number");
             entity.Property(e => e.BankName)
-                .HasMaxLength(255)
+                .HasMaxLength(50)
                 .HasColumnName("bank_name")
                 .UseCollation("utf8mb3_general_ci")
                 .HasCharSet("utf8mb3");
             entity.Property(e => e.CitizenIdentificationNumber)
-                .HasMaxLength(255)
-                .HasColumnName("citizen_identification_number")
-                .UseCollation("utf8mb3_general_ci")
-                .HasCharSet("utf8mb3");
+                .HasMaxLength(50)
+                .HasColumnName("citizen_identification_number");
             entity.Property(e => e.CreateDate)
                 .HasColumnType("datetime")
                 .HasColumnName("create_date");
@@ -249,7 +251,7 @@ public partial class BeeStoreDbContext : DbContext
                 .HasColumnType("bit(1)")
                 .HasColumnName("is_deleted");
             entity.Property(e => e.PictureLink)
-                .HasColumnType("text")
+                .HasMaxLength(100)
                 .HasColumnName("picture_link");
         });
 
@@ -274,12 +276,12 @@ public partial class BeeStoreDbContext : DbContext
                 .HasColumnType("bit(1)")
                 .HasColumnName("is_deleted");
             entity.Property(e => e.Name)
-                .HasMaxLength(255)
+                .HasMaxLength(50)
                 .HasColumnName("name")
                 .UseCollation("utf8mb3_general_ci")
                 .HasCharSet("utf8mb3");
             entity.Property(e => e.Origin)
-                .HasMaxLength(255)
+                .HasMaxLength(50)
                 .HasColumnName("origin")
                 .UseCollation("utf8mb3_general_ci")
                 .HasCharSet("utf8mb3");
@@ -287,7 +289,6 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.Price)
                 .HasPrecision(10, 2)
                 .HasColumnName("price");
-            entity.Property(e => e.ProductAmount).HasColumnName("product_amount");
             entity.Property(e => e.ProductCategoryId).HasColumnName("product_category_id");
             entity.Property(e => e.UserId).HasColumnName("user_id");
             entity.Property(e => e.Weight)
@@ -320,10 +321,12 @@ public partial class BeeStoreDbContext : DbContext
                 .HasColumnType("bit(1)")
                 .HasColumnName("is_deleted");
             entity.Property(e => e.TypeDescription)
-                .HasColumnType("text")
-                .HasColumnName("type_description");
+                .HasMaxLength(100)
+                .HasColumnName("type_description")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
             entity.Property(e => e.TypeName)
-                .HasMaxLength(255)
+                .HasMaxLength(50)
                 .HasColumnName("type_name")
                 .UseCollation("utf8mb3_general_ci")
                 .HasCharSet("utf8mb3");
@@ -346,26 +349,23 @@ public partial class BeeStoreDbContext : DbContext
                 .HasColumnType("datetime")
                 .HasColumnName("create_date");
             entity.Property(e => e.Description)
-                .HasColumnType("text")
-                .HasColumnName("description");
+                .HasMaxLength(100)
+                .HasColumnName("description")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
             entity.Property(e => e.IsDeleted)
                 .HasDefaultValueSql("b'0'")
                 .HasColumnType("bit(1)")
                 .HasColumnName("is_deleted");
-            entity.Property(e => e.Name)
-                .HasMaxLength(255)
-                .HasColumnName("name")
-                .UseCollation("utf8mb3_general_ci")
-                .HasCharSet("utf8mb3");
             entity.Property(e => e.PackageId).HasColumnName("package_id");
             entity.Property(e => e.RequestType)
-                .HasMaxLength(15)
+                .HasMaxLength(10)
                 .HasColumnName("request_type")
                 .UseCollation("utf8mb3_general_ci")
                 .HasCharSet("utf8mb3");
             entity.Property(e => e.SendToInventory).HasColumnName("send_to_inventory");
             entity.Property(e => e.Status)
-                .HasMaxLength(15)
+                .HasMaxLength(10)
                 .HasColumnName("status")
                 .UseCollation("utf8mb3_general_ci")
                 .HasCharSet("utf8mb3");
@@ -396,7 +396,7 @@ public partial class BeeStoreDbContext : DbContext
                 .HasColumnType("bit(1)")
                 .HasColumnName("is_deleted");
             entity.Property(e => e.RoleName)
-                .HasMaxLength(255)
+                .HasMaxLength(50)
                 .HasColumnName("role_name")
                 .UseCollation("utf8mb3_general_ci")
                 .HasCharSet("utf8mb3");
@@ -415,26 +415,30 @@ public partial class BeeStoreDbContext : DbContext
                 .HasPrecision(10, 2)
                 .HasColumnName("amount");
             entity.Property(e => e.CancellationReason)
-                .HasColumnType("text")
-                .HasColumnName("cancellation_reason");
+                .HasMaxLength(100)
+                .HasColumnName("cancellation_reason")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
             entity.Property(e => e.CreateDate)
                 .HasColumnType("datetime")
                 .HasColumnName("create_date");
             entity.Property(e => e.Description)
-                .HasColumnType("text")
-                .HasColumnName("description");
+                .HasMaxLength(100)
+                .HasColumnName("description")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
             entity.Property(e => e.IsDeleted)
                 .HasDefaultValueSql("b'0'")
                 .HasColumnType("bit(1)")
                 .HasColumnName("is_deleted");
             entity.Property(e => e.ItemId).HasColumnName("item_id");
             entity.Property(e => e.Status)
-                .HasMaxLength(15)
+                .HasMaxLength(10)
                 .HasColumnName("status")
                 .UseCollation("utf8mb3_general_ci")
                 .HasCharSet("utf8mb3");
             entity.Property(e => e.TransactionCode)
-                .HasMaxLength(255)
+                .HasMaxLength(50)
                 .HasColumnName("transaction_code")
                 .UseCollation("utf8mb3_general_ci")
                 .HasCharSet("utf8mb3");
@@ -466,11 +470,12 @@ public partial class BeeStoreDbContext : DbContext
                 .HasColumnType("datetime")
                 .HasColumnName("create_date");
             entity.Property(e => e.Email)
+                .HasMaxLength(50)
                 .HasColumnName("email")
                 .UseCollation("utf8mb3_general_ci")
                 .HasCharSet("utf8mb3");
             entity.Property(e => e.FirstName)
-                .HasMaxLength(255)
+                .HasMaxLength(50)
                 .HasColumnName("first_name")
                 .UseCollation("utf8mb3_general_ci")
                 .HasCharSet("utf8mb3");
@@ -479,20 +484,18 @@ public partial class BeeStoreDbContext : DbContext
                 .HasColumnType("bit(1)")
                 .HasColumnName("is_deleted");
             entity.Property(e => e.LastName)
-                .HasMaxLength(255)
+                .HasMaxLength(50)
                 .HasColumnName("last_name")
                 .UseCollation("utf8mb3_general_ci")
                 .HasCharSet("utf8mb3");
             entity.Property(e => e.Password)
-                .HasMaxLength(255)
+                .HasMaxLength(100)
                 .HasColumnName("password")
                 .UseCollation("utf8mb3_general_ci")
                 .HasCharSet("utf8mb3");
             entity.Property(e => e.Phone)
-                .HasMaxLength(50)
-                .HasColumnName("phone")
-                .UseCollation("utf8mb3_general_ci")
-                .HasCharSet("utf8mb3");
+                .HasMaxLength(10)
+                .HasColumnName("phone");
             entity.Property(e => e.PictureId).HasColumnName("picture_id");
             entity.Property(e => e.RoleId).HasColumnName("role_id");
             entity.Property(e => e.Setting)
@@ -525,10 +528,12 @@ public partial class BeeStoreDbContext : DbContext
                 .HasColumnType("bit(1)")
                 .HasColumnName("is_deleted");
             entity.Property(e => e.Location)
-                .HasColumnType("text")
-                .HasColumnName("location");
+                .HasMaxLength(70)
+                .HasColumnName("location")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
             entity.Property(e => e.Name)
-                .HasMaxLength(255)
+                .HasMaxLength(50)
                 .HasColumnName("name")
                 .UseCollation("utf8mb3_general_ci")
                 .HasCharSet("utf8mb3");
@@ -580,7 +585,7 @@ public partial class BeeStoreDbContext : DbContext
                 .HasColumnType("bit(1)")
                 .HasColumnName("is_deleted");
             entity.Property(e => e.Status)
-                .HasMaxLength(15)
+                .HasMaxLength(10)
                 .HasColumnName("status")
                 .UseCollation("utf8mb3_general_ci")
                 .HasCharSet("utf8mb3");

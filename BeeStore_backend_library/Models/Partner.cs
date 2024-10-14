@@ -5,6 +5,7 @@ namespace BeeStore_Repository.Models;
 
 public partial class Partner : BaseEntity
 {
+    //public int Id { get; set; }
 
     public string? CitizenIdentificationNumber { get; set; }
 
@@ -18,6 +19,7 @@ public partial class Partner : BaseEntity
 
     public int? UserId { get; set; }
 
+    //public ulong? IsDeleted { get; set; }
 
     public virtual User? User { get; set; }
 }
