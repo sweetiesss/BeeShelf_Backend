@@ -47,7 +47,7 @@ namespace BeeStore_Repository.Services
             var productCategory = await _unitOfWork.ProductCategoryRepo.SingleOrDefaultAsync(u => u.Id == product.ProductCategoryId);
 
             result.CreateDate = DateTime.Now;
-            result.ExpirationDate = DateTime.Now.AddDays(productCategory.ExpireIn.Value);
+            result.ExpirationDate = DateTime.Now.AddDays(productCategory.ExpireIn!.Value);
             await _unitOfWork.PackageRepo.AddAsync(result);
             await _unitOfWork.SaveAsync();
             return request;
@@ -107,7 +107,7 @@ namespace BeeStore_Repository.Services
             exist.ProductAmount = request.ProductAmount;
             exist.ProductId = request.ProductId;
             exist.InventoryId = request.InventoryId;
-            exist.ExpirationDate = DateTime.Now.AddDays(productCategory.ExpireIn.Value);
+            exist.ExpirationDate = DateTime.Now.AddDays(productCategory.ExpireIn!.Value);
             _unitOfWork.PackageRepo.Update(exist);
             await _unitOfWork.SaveAsync();
             return request;
