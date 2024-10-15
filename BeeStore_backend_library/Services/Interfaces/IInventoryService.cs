@@ -11,7 +11,8 @@ namespace BeeStore_Repository.Services.Interfaces
     public interface IInventoryService
     {
         Task<Pagination<InventoryListDTO>> GetInventoryList(int pageIndex, int pageSize);
-        Task<Pagination<InventoryListDTO>> GetInventoryList(string email, int pageIndex, int pageSize);
+        Task<Pagination<InventoryListDTO>> GetInventoryList(int userId, int pageIndex, int pageSize);
+        Task<InventoryListPackagesDTO> GetInventoryById(int id);
 
         Task<InventoryCreateDTO> CreateInventory(InventoryCreateDTO request);
         Task<InventoryUpdateDTO> UpdateInventory(InventoryUpdateDTO request);

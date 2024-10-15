@@ -20,6 +20,7 @@ namespace BeeStore_Api.Controllers
             _jwtService = jwtService;
         }
 
+        [Route("get-users")]
         [HttpGet]
         public async Task<IActionResult> GetUsers([FromQuery][DefaultValue(0)] int pageIndex,
                                                                [FromQuery][DefaultValue(10)] int pageSize)
@@ -28,13 +29,15 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{email}")]
-        public async Task<IActionResult> GetUser(string email)
+        [Route("get-user/{id}")]
+        [HttpGet]
+        public async Task<IActionResult> GetUser(int id)
         {
-            var result = await _userService.GetUser(email);
+            var result = await _userService.GetUser(id);
             return Ok(result);
         }
 
+        [Route("create-user")]
         [HttpPost]
         public async Task<IActionResult> CreateUser([FromBody]UserCreateRequestDTO user)
         {
@@ -42,6 +45,7 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
+        [Route("update-user")]
         [HttpPut]
         public async Task<IActionResult> UpdateUser([FromBody]UserUpdateRequestDTO user)
         {
@@ -49,7 +53,8 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
-        [HttpDelete("{id}")]
+        [Route("delete-user/{id}")]
+        [HttpDelete]
         public async Task<IActionResult> DeleteUser(int id)
         {
             var result = await _userService.DeleteUser(id);

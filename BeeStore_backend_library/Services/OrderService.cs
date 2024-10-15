@@ -34,18 +34,16 @@ namespace BeeStore_Repository.Services
             return await ListPagination<OrderListDTO>.PaginateList(result, pageIndex, pageSize);
         }
 
-        public async Task<Pagination<OrderListDTO>> GetOrderList(string email, int pageIndex, int pageSize)
+        public async Task<Pagination<OrderListDTO>> GetOrderList(int userId, int pageIndex, int pageSize)
         {
-            var query = await _unitOfWork.OrderRepo.GetQueryable(query => query.Include(o => o.User));
-            var list = query.Where(u => u.User.Email == email).ToList();
+            var list = await _unitOfWork.OrderRepo.GetFiltered(u => u.UserId.Equals(userId));
             var result = _mapper.Map<List<OrderListDTO>>(list);
             return await ListPagination<OrderListDTO>.PaginateList(result, pageIndex, pageSize);
         }
 
-        public async Task<Pagination<OrderListDTO>> GetDeliverOrderList(string shipperEmail, int pageIndex, int pageSize)
+        public async Task<Pagination<OrderListDTO>> GetDeliverOrderList(int userId, int pageIndex, int pageSize)
         {
-            var query = await _unitOfWork.OrderRepo.GetQueryable(query => query.Include(o => o.DeliverByNavigation));
-            var list = query.Where(u => u.DeliverByNavigation.Email == shipperEmail).ToList();
+            var list = await _unitOfWork.OrderRepo.GetFiltered(u => u.DeliverBy.Equals(userId));
             var result = _mapper.Map<List<OrderListDTO>>(list);
             return await ListPagination<OrderListDTO>.PaginateList(result, pageIndex, pageSize);
         }

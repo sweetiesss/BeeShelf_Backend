@@ -8,6 +8,7 @@ using BeeStore_Repository.Mapper.CustomResolver;
 using BeeStore_Repository.Services;
 using BeeStore_Repository.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -75,6 +76,7 @@ namespace BeeStore_Repository
             services.AddHealthChecks();
             services.AddHttpContextAccessor();
             services.AddSingleton<GlobalExceptionMiddleware>();
+            services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
             return services;
         }
 

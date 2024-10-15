@@ -36,6 +36,7 @@ namespace BeeStore_Api.Controllers
             _memoryCache = memoryCache;
         }
 
+        [Route("get-warehouses")]
         [HttpGet]
         public async Task<IActionResult> GetWarehouseList([FromQuery][DefaultValue(0)] int pageIndex,
                                                                [FromQuery][DefaultValue(10)] int pageSize)
@@ -53,14 +54,16 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetWarehouseByUserId(int id)
+        [Route("get-warehouse-by-user/{userId}")]
+        [HttpGet]
+        public async Task<IActionResult> GetWarehouseByUserId(int userId)
         {
-            var result = await _warehouseService.GetWarehouseByUserId(id);
+            var result = await _warehouseService.GetWarehouseByUserId(userId);
             return Ok(result);
         }
 
 
+        [Route("get-warehouse-shippers")]
         [HttpGet]
         public async Task<IActionResult> GetWarehouseShipperList([FromQuery][DefaultValue(0)] int pageIndex,
                                                                [FromQuery][DefaultValue(10)] int pageSize)
@@ -69,7 +72,8 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{id}")]
+        [Route("get-warehouse-shippers/{id}")]
+        [HttpGet]
         public async Task<IActionResult> GetWarehouseShipperList(int id, [FromQuery][DefaultValue(0)] int pageIndex,
                                                                [FromQuery][DefaultValue(10)] int pageSize)
         {
@@ -77,6 +81,7 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
+        [Route("add-shippers-to-warehouse")]
         [HttpPost]
         public async Task<IActionResult> AddWarehouseShipper(List<WarehouseShipperCreateDTO> request)
         {
@@ -84,8 +89,8 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
+        [Route("get-warehouse-staffs")]
         [HttpGet]
-
         public async Task<IActionResult> GetWarehouseStaffList([FromQuery][DefaultValue(0)] int pageIndex,
                                                                [FromQuery][DefaultValue(10)] int pageSize)
         {
@@ -93,7 +98,8 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{id}")]
+        [Route("get-warehouse-staffs/{id}")]
+        [HttpGet]
         public async Task<IActionResult> GetWarehouseStaffList(int id, [FromQuery][DefaultValue(0)] int pageIndex,
                                                               [FromQuery][DefaultValue(10)] int pageSize)
         {
@@ -101,6 +107,7 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
+        [Route("add-staffs-to-warehouse")]
         [HttpPost]
         public async Task<IActionResult> AddWarehouseStaff(List<WarehouseStaffCreateDTO> request)
         {
@@ -108,6 +115,7 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
+        [Route("get-warehouse-categories")]
         [HttpGet]
         public async Task<IActionResult> GetWarehouseCategoryList([FromQuery][DefaultValue(0)] int pageIndex,
                                                                [FromQuery][DefaultValue(10)] int pageSize)
@@ -126,7 +134,8 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{id}")]
+        [Route("get-warehouse-categories/{id}")]
+        [HttpGet]
         public async Task<IActionResult> GetWarehouseCategoryList(int id, [FromQuery][DefaultValue(0)] int pageIndex,
                                                                [FromQuery][DefaultValue(10)] int pageSize)
         {
@@ -134,6 +143,7 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
+        [Route("add-categories-to-warehouse")]
         [HttpPost]
         public async Task<IActionResult> AddWarehouseCategory(List<WarehouseCategoryCreateDTO> request)
         {
@@ -141,6 +151,7 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
+        [Route("create-warehouse")]
         [HttpPost]
         public async Task<IActionResult> CreateWarehouse(WarehouseCreateDTO request)
         {
@@ -148,6 +159,7 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
+        [Route("update-warehouse")]
         [HttpPut]
         public async Task<IActionResult> UpdateWarehouse(WarehouseCreateDTO request)
         {
@@ -155,7 +167,8 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
-        [HttpDelete("{id}")]
+        [Route("delete-warehouse/{id}")]
+        [HttpDelete]
         public async Task<IActionResult> DeleteWarehouse(int id)
         {
             var result = await _warehouseService.DeleteWarehouse(id);

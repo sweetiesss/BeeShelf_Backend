@@ -20,6 +20,7 @@ namespace BeeStore_Api.Controllers
             _productCategoryService = productCategoryService;
         }
 
+        [Route("get-product-categories")]
         [HttpGet]
         public async Task<IActionResult> GetProductCategoryList([FromQuery][DefaultValue(0)] int pageIndex,
                                                                 [FromQuery][DefaultValue(10)] int pageSize)
@@ -39,6 +40,7 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
+        [Route("create-product-category")]
         [HttpPost]
         public async Task<IActionResult> CreateProductCategory(ProductCategoryCreateDTO request)
         {
@@ -46,14 +48,16 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
-        [HttpPut("{id}")]
+        [Route("update-product-category/{id}")]
+        [HttpPut]
         public async Task<IActionResult> UpdateProductCategory(int id, ProductCategoryCreateDTO request)
         {
             var result = await _productCategoryService.UpdateProductCategory(id, request);
             return Ok(result);
         }
 
-        [HttpDelete("{id}")]
+        [Route("delete-product-category/{id}")]
+        [HttpDelete]
         public async Task<IActionResult> DeleteProductCategory(int id)
         {
             var result = await _productCategoryService.DeleteProductCategory(id);
