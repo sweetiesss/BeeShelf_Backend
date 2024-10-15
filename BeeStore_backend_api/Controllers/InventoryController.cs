@@ -8,7 +8,6 @@ using System.ComponentModel;
 
 namespace BeeStore_Api.Controllers
 {
-    [Authorize(Roles = "Admin,Manager")]
     public class InventoryController : BaseController
     {
         private readonly IInventoryService _inventoryService;
@@ -50,6 +49,7 @@ namespace BeeStore_Api.Controllers
         }
 
         [Route("get-inventory/{id}")]
+        [Authorize(Roles = "Admin,Manager,Staff")]
         [HttpGet]
         public async Task<IActionResult> GetInventoryById(int id)
         {
@@ -58,6 +58,7 @@ namespace BeeStore_Api.Controllers
         }
 
         [Route("add-partner-to-inventory/{id}/{userId}")]
+        [Authorize(Roles = "Admin,Manager")]
         [HttpPost]
         public async Task<IActionResult> AddPartnerToInventory(int id, int userId)
         {
@@ -66,6 +67,7 @@ namespace BeeStore_Api.Controllers
         }
 
         [Route("create-inventory")]
+        [Authorize(Roles = "Admin,Manager")]
         [HttpPost]
         public async Task<IActionResult> CreateInventory(InventoryCreateDTO request)
         {
@@ -74,6 +76,7 @@ namespace BeeStore_Api.Controllers
         }
 
         [Route("update-inventory")]
+        [Authorize(Roles = "Admin,Manager")]
         [HttpPut]
         public async Task<IActionResult> UpdateInventory(InventoryUpdateDTO request)
         {
@@ -82,6 +85,7 @@ namespace BeeStore_Api.Controllers
         }
 
         [Route("delete-inventory/{id}")]
+        [Authorize(Roles = "Admin,Manager")]
         [HttpDelete]
         public async Task<IActionResult> DeleteInventory(int id)
         {

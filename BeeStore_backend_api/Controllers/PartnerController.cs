@@ -6,6 +6,7 @@ using System.ComponentModel;
 
 namespace BeeStore_Api.Controllers
 {
+    [Authorize(Roles = "Admin,Manager")]
     public class PartnerController : BaseController
     {
         private readonly IPartnerService _partnerService;
