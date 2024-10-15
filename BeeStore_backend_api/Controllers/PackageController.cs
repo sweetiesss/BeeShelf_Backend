@@ -15,6 +15,7 @@ namespace BeeStore_Api.Controllers
             _packageService = packageService;
         }
 
+        [Authorize(Roles = "Admin,Manager")]
         [Route("get-packages")]
         [HttpGet]
         public async Task<IActionResult> GetPackageList([FromQuery][DefaultValue(0)] int pageIndex,
@@ -25,6 +26,7 @@ namespace BeeStore_Api.Controllers
         }
 
         [Route("get-package/{id}")]
+        [Authorize(Roles = "Partner")]
         [HttpGet]
         public async Task<IActionResult> GetPackageById(int id)
         {
@@ -33,6 +35,7 @@ namespace BeeStore_Api.Controllers
         }
 
         [Route("create-package")]
+        [Authorize(Roles = "Partner")]
         [HttpPost]
         public async Task<IActionResult> CreatePackage(PackageCreateDTO request)
         {
@@ -41,6 +44,7 @@ namespace BeeStore_Api.Controllers
         }
 
         [Route("update-package/{id}")]
+        [Authorize(Roles = "Partner")]
         [HttpPut]
         public async Task<IActionResult> UpdatePackage(int id, PackageCreateDTO request)
         {
@@ -49,6 +53,7 @@ namespace BeeStore_Api.Controllers
         }
 
         [Route("delete-package/{id}")]
+        [Authorize(Roles = "Partner")]
         [HttpDelete]
         public async Task<IActionResult> DeletePackage(int id)
         {

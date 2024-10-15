@@ -9,8 +9,6 @@ using ZstdSharp.Unsafe;
 
 namespace BeeStore_Api.Controllers
 {
-
-    [Authorize]
     public class OrderController : BaseController
     {
         private readonly IOrderService _orderService;
@@ -21,6 +19,7 @@ namespace BeeStore_Api.Controllers
         }
 
         [Route("get-orders")]
+        [Authorize(Roles = "Admin,Manager,Staff")]
         [HttpGet]
         public async Task<IActionResult> GetOrderList([FromQuery][DefaultValue(0)] int pageIndex,
                                                                [FromQuery][DefaultValue(10)] int pageSize)
@@ -30,6 +29,7 @@ namespace BeeStore_Api.Controllers
         }
 
         [Route("get-orders/{userId}")]
+        [Authorize(Roles = "Partner")]
         [HttpGet]
         public async Task<IActionResult> GetOrderList(int userId, [FromQuery][DefaultValue(0)] int pageIndex,
                                                                [FromQuery][DefaultValue(10)] int pageSize)
@@ -39,6 +39,7 @@ namespace BeeStore_Api.Controllers
         }
 
         [Route("get-shipper-orders/{userId}")]
+        [Authorize(Roles = "Admin,Manager,Shipper")]
         [HttpGet]
         public async Task<IActionResult> GetShipperOrderList(int userId, [FromQuery][DefaultValue(0)] int pageIndex,
                                                                [FromQuery][DefaultValue(10)] int pageSize)
@@ -48,6 +49,7 @@ namespace BeeStore_Api.Controllers
         }
 
         [Route("create-order")]
+        [Authorize(Roles = "Partner")]
         [HttpPost]
         public async Task<IActionResult> CreateOrder(OrderCreateDTO request)
         {
@@ -56,6 +58,7 @@ namespace BeeStore_Api.Controllers
         }
 
         [Route("update-order/{id}")]
+        [Authorize(Roles = "Partner")]
         [HttpPut]
         public async Task<IActionResult> UpdateOrder(int id, OrderCreateDTO request)
         {
@@ -64,6 +67,7 @@ namespace BeeStore_Api.Controllers
         }
 
         [Route("update-order-status/{id}")]
+        [Authorize(Roles = "Admin,Manager,Staff")]
         [HttpPut]
         public async Task<IActionResult> UpdateOrderStatus(int id, int orderStatus)
         {
@@ -72,6 +76,7 @@ namespace BeeStore_Api.Controllers
         }
 
         [Route("delete-order/{id}")]
+        [Authorize(Roles = "Partner")]
         [HttpDelete]
         public async Task<IActionResult> DeleteOrder(int id)
         {
