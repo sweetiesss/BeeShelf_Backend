@@ -7,6 +7,7 @@ using BeeStore_Repository.DTO.PartnerDTOs;
 using BeeStore_Repository.DTO.ProductCategoryDTOs;
 using BeeStore_Repository.DTO.ProductDTOs;
 using BeeStore_Repository.DTO.RequestDTOs;
+using BeeStore_Repository.DTO.RoleDTOs;
 using BeeStore_Repository.DTO.UserDTOs;
 using BeeStore_Repository.DTO.WarehouseCategoryDTOs;
 using BeeStore_Repository.DTO.WarehouseDTOs;
@@ -28,18 +29,30 @@ namespace BeeStore_Repository.Mapper
         {
             public MapperConfigurationsProfile()
             {
-            
+            //////////////////hầu hết mấy cái custom resolver sẽ bỏ (chủ yếu là mấy cái từ Entity => DTO)
+            //////////////////tại sao chưa bỏ? tại t lười, :)
             CreateMap(typeof(Pagination<>), typeof(Pagination<>));
             CreateMap(typeof(Task<>), typeof(Pagination<>));
             CreateMap(typeof(InternalDbSet<>), typeof(IQueryable<>));
             CreateMap(typeof(UserCreateRequestDTO), typeof(User));
-            
+
             CreateMap<UserCreateRequestDTO, User>()
-                 .ForMember(dest => dest.RoleId, opt => opt.MapFrom<CustomRoleNameReverseResolver>());
+                 .ForMember(dest => dest.RoleId, opt => opt.MapFrom<CustomRoleNameReverseResolver<UserCreateRequestDTO>>())
+                 .ForMember(dest => dest.Password, opt => opt.MapFrom(src => BCrypt.Net.BCrypt.HashPassword(src.Password)));
+            CreateMap<UserSignUpRequestDTO, User>()
+                 .ForMember(dest => dest.RoleId, opt => opt.MapFrom<CustomRoleNameReverseResolver<UserSignUpRequestDTO>>())
+                 .ForMember(dest => dest.Password, opt => opt.MapFrom(src => BCrypt.Net.BCrypt.HashPassword(src.Password)));
             CreateMap<User, UserListDTO>()
                     .ForMember(dest => dest.RoleName, opt => opt.MapFrom<CustomRoleNameResolver>())
-                    .ForMember(dest => dest.Picture_Link, opt => opt.MapFrom<CustomPictureLinkResolverUser>());
+                    .ForMember(dest => dest.Picture_Link, opt => opt.MapFrom<CustomPictureLinkResolverUser>())
+                    .ForMember(dest => dest.BankAccountNumber, opt => opt.MapFrom(src => src.Partners
+                                                                                    .FirstOrDefault(u => u.UserId.Equals(src.Id))!
+                                                                                    .BankAccountNumber))
+                    .ForMember(dest => dest.BankName, opt => opt.MapFrom(src => src.Partners
+                                                                                    .FirstOrDefault(u => u.UserId.Equals(src.Id))!
+                                                                                    .BankName));
 
+            CreateMap<Role, RoleListDTO>();
 
             CreateMap<Partner, PartnerListDTO>()
                 .ForMember(dest => dest.User_Email, opt => opt.MapFrom<CustomUserEmailResolverPartner>());

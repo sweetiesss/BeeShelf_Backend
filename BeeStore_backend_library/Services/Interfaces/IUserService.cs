@@ -12,9 +12,10 @@ namespace BeeStore_Repository.Services.Interfaces
     public interface IUserService
     {
         Task<UserListDTO> Login(string email, string password);
+        Task<string> SignUp(UserSignUpRequestDTO request);
         Task<Pagination<UserListDTO>> GetAllUser(int pageIndex, int pageSize);
         Task<UserListDTO> GetUser(string email);
-        Task<UserCreateRequestDTO> CreateUser(UserCreateRequestDTO user);
+        Task<string> CreateUser(UserCreateRequestDTO user);
         Task<UserUpdateRequestDTO> UpdateUser(UserUpdateRequestDTO user);
         Task<string> DeleteUser(int id);
     }

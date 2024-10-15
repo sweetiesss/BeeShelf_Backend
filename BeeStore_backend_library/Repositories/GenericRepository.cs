@@ -26,7 +26,7 @@ namespace BeeStore_Repository.Repositories
 
         public async Task<T> GetByIdAsync(int id)
         {
-            return await _dbSet.FindAsync(id);
+            return (await _dbSet.FindAsync(id))!;
         }
 
         public Task<List<T>> GetAllAsync() => _dbSet.Where(x => x.IsDeleted.Equals(false)).ToListAsync();
@@ -46,7 +46,7 @@ namespace BeeStore_Repository.Repositories
                 query = includes(query);
             }
 
-            return await query.ToListAsync();
+            return await query.Where(x => x.IsDeleted.Equals(false)).ToListAsync();
         }
 
         //public async Task<T> SingleOrDefaultAsync(Expression<Func<T, bool>> predicate)
@@ -65,7 +65,7 @@ namespace BeeStore_Repository.Repositories
                 query = includes(query);
             }
 
-            return await query.SingleOrDefaultAsync(predicate);
+            return (await query.Where(x => x.IsDeleted.Equals(false)).SingleOrDefaultAsync(predicate))!;
         }
 
         public async Task AddAsync(T entity)
@@ -93,7 +93,7 @@ namespace BeeStore_Repository.Repositories
 
         public async Task<T> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate)
         {
-            return await _dbSet.FirstOrDefaultAsync(predicate);
+            return (await _dbSet.Where(x => x.IsDeleted.Equals(false)).FirstOrDefaultAsync(predicate))!;
         }
 
         

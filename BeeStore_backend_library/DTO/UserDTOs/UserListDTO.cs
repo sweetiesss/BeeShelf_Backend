@@ -30,5 +30,8 @@ namespace BeeStore_Repository.DTO.UserDTOs
 
         public string RoleName { get; set; }
 
+        public string? BankAccountNumber {  get; set; }
+        public string? BankName { get; set; }
+
     }
 }

@@ -28,6 +28,7 @@ namespace BeeStore_Repository
         {
             // Scoped
             services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IRoleService, RoleService>();
             //services.AddScoped<IPictureService, PictureService>();
             services.AddScoped<IPartnerService, PartnerService>();
             services.AddScoped<IWarehouseService, WarehouseService>();
@@ -97,7 +98,7 @@ namespace BeeStore_Repository
                 ValidateIssuerSigningKey = true,
                 ValidIssuer = configuration["Jwt:Issuer"],
                 ValidAudience = configuration["Jwt:Audience"],
-                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]))
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Key"]!))
             };
         });
 

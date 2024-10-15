@@ -16,6 +16,8 @@ namespace BeeStore_Repository.Utils
         public const string JWTIssuerValueError = "Key Vault JWT Issuer values are missing.";
         public const string JwtAudienceValueError = "Key Vault JWT Audience values are missing.";
 
+        //Role responise message
+        public const string RoleNotFound = "Role not found.";
 
         //User response message
         public const string UserIdNotFound = "User Id not found.";
