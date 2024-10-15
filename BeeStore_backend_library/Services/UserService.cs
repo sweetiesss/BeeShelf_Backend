@@ -66,9 +66,9 @@ namespace BeeStore_Repository.Services
             return await ListPagination<UserListDTO>.PaginateList(result, pageIndex, pageSize);
         }
 
-        public async Task<UserListDTO> GetUser(int id)
+        public async Task<UserListDTO> GetUser(string email)
         {
-            var user = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Id.Equals(id));
+            var user = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Email.Equals(email));
             if (user == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
@@ -82,18 +82,11 @@ namespace BeeStore_Repository.Services
             var exist = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Email == email);
             if (exist != null)
             {
-                try
+                if (BCrypt.Net.BCrypt.Verify(password, exist.Password))
                 {
-                    if (BCrypt.Net.BCrypt.Verify(password, exist.Password))
-                    {
-                        return _mapper.Map<UserListDTO>(exist);
-                    }
-                    else
-                    {
-                        throw new KeyNotFoundException(ResponseMessage.UserPasswordError);
-                    }
+                    return _mapper.Map<UserListDTO>(exist);
                 }
-                catch (Exception)
+                else
                 {
                     throw new KeyNotFoundException(ResponseMessage.UserPasswordError);
                 }
@@ -109,6 +102,8 @@ namespace BeeStore_Repository.Services
             var exist = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Email == user.Email);
             if (exist != null)
             {
+                // Shouldnt let any user to change its own password this easily
+                // I think add an Enter Old Password will get the job done
                 if (!String.IsNullOrEmpty(user.Password) && !user.Password.Equals("string"))
                 {
                     exist.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);

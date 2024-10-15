@@ -1,6 +1,7 @@
 ﻿using BeeStore_Repository.DTO.RequestDTOs;
 using BeeStore_Repository.Services;
 using BeeStore_Repository.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel;
 
@@ -17,6 +18,7 @@ namespace BeeStore_Api.Controllers
 
         [Route("get-requests")]
         [HttpGet]
+        [Authorize(Roles = "Admin,Manager,Staff")]
         public async Task<IActionResult> GetRequestList([FromQuery][DefaultValue(0)] int pageIndex,
                                                     [FromQuery][DefaultValue(10)] int pageSize)
         {
@@ -26,6 +28,7 @@ namespace BeeStore_Api.Controllers
 
         [Route("get-requests/{userId}")]
         [HttpGet]
+        [Authorize(Roles = "Admin,Manager,Staff,Partner")]
         public async Task<IActionResult> GetRequestList(int userId, [FromQuery][DefaultValue(0)] int pageIndex,
                                                     [FromQuery][DefaultValue(10)] int pageSize)
         {
@@ -35,6 +38,7 @@ namespace BeeStore_Api.Controllers
 
         [Route("create-request")]
         [HttpPost]
+        [Authorize(Roles = "Partner")]
         public async Task<IActionResult> CreateRequest(RequestCreateDTO request)
         {
             var result = await _requestService.CreateRequest(request);
@@ -43,6 +47,7 @@ namespace BeeStore_Api.Controllers
 
         [Route("update-request/{id}")]
         [HttpPut]
+        [Authorize(Roles = "Partner")]
         public async Task<IActionResult> UpdateRequest(int id, RequestCreateDTO request)
         {
             var result = await _requestService.UpdateRequest(id, request);
@@ -51,6 +56,7 @@ namespace BeeStore_Api.Controllers
 
         [Route("update-request-status/{id}")]
         [HttpPut]
+        [Authorize(Roles = "Admin,Manager,Staff")]
         public async Task<IActionResult> UpdateRequestStatus(int id, int statusId)
         {
             var result = await _requestService.UpdateRequestStatus(id, statusId);
@@ -58,6 +64,7 @@ namespace BeeStore_Api.Controllers
         }
 
         [Route("delete-request/{id}")]
+        [Authorize(Roles = "Partner")]
         [HttpDelete]
         public async Task<IActionResult> DeleteRequest(int id)
         {

@@ -30,6 +30,12 @@ namespace BeeStore_Api.Controllers
         [HttpPost]
         public async Task<IActionResult> Signup([FromBody] UserCreateRequestDTO user)
         {
+            // optimize EX here: it should be the same for the rest of the API
+            // You dont need to return DTO here. Instead, You should just return status code and no data
+            // the FE are not likely to use this response data anyway
+            // We can check whether the user have been created or not internally
+            // less response = faster API
+            // Also, change to UserRegisterRequestDTO
             var result = await _userService.CreateUser(user);
             return Ok(result);
         }
