@@ -29,6 +29,7 @@ namespace BeeStore_Api.Controllers
 
         [Route("upload-order-image/{id}")]
         [HttpPost]
+        [Authorize(Roles = "Shipper")]
         public async Task<IActionResult> order(int id, [FromForm(Name = "image")] IFormFile file)
         {
             return Ok(await _pictureService.uploadImageForOrder(id, file));
@@ -36,6 +37,7 @@ namespace BeeStore_Api.Controllers
 
         [Route("upload-warehouse-image/{id}")]
         [HttpPost]
+        [Authorize(Roles = "Partner")]
         public async Task<IActionResult> product(int id, [FromForm(Name = "image")] IFormFile file)
         {
             return Ok(await _pictureService.uploadImageForProduct(id, file));

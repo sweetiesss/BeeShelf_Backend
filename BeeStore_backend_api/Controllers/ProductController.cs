@@ -1,10 +1,12 @@
 ﻿using BeeStore_Repository.DTO.ProductDTOs;
 using BeeStore_Repository.Services.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel;
 
 namespace BeeStore_Api.Controllers
 {
+    [Authorize(Roles = "Partner")]
     public class ProductController : BaseController
     {
         private readonly IProductService _productService;
@@ -31,7 +33,7 @@ namespace BeeStore_Api.Controllers
             var result = await _productService.GetProductListByEmail(userId, pageIndex, pageSize);
             return Ok(result);
         }
-
+        
         [Route("create-product")]
         [HttpPost]
         public async Task<IActionResult> CreateProduct(ProductCreateDTO request)

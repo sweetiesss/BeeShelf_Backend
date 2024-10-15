@@ -8,7 +8,7 @@ using System.ComponentModel;
 
 namespace BeeStore_Api.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    
     public class UserController : BaseController
     {
         private readonly IUserService _userService;
@@ -22,6 +22,7 @@ namespace BeeStore_Api.Controllers
 
         [Route("get-users")]
         [HttpGet]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetUsers([FromQuery][DefaultValue(0)] int pageIndex,
                                                                [FromQuery][DefaultValue(10)] int pageSize)
         {
@@ -29,16 +30,18 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
-        [Route("get-user/{id}")]
+        [Route("get-user/{email}")]
         [HttpGet]
-        public async Task<IActionResult> GetUser(int id)
+        [Authorize(Roles = "Admin,Manager,Staff,Partner,Shipper")]
+        public async Task<IActionResult> GetUser(string email)
         {
-            var result = await _userService.GetUser(id);
+            var result = await _userService.GetUser(email);
             return Ok(result);
         }
 
         [Route("create-user")]
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CreateUser([FromBody]UserCreateRequestDTO user)
         {
             var result = await _userService.CreateUser(user);
@@ -47,6 +50,7 @@ namespace BeeStore_Api.Controllers
 
         [Route("update-user")]
         [HttpPut]
+        [Authorize(Roles = "Admin,Manager,Staff,Partner,Shipper")]
         public async Task<IActionResult> UpdateUser([FromBody]UserUpdateRequestDTO user)
         {
             var result = await _userService.UpdateUser(user);
@@ -55,6 +59,7 @@ namespace BeeStore_Api.Controllers
 
         [Route("delete-user/{id}")]
         [HttpDelete]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteUser(int id)
         {
             var result = await _userService.DeleteUser(id);
