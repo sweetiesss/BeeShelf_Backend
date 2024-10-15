@@ -1,7 +1,9 @@
 ﻿using AutoMapper;
 using BeeStore_Repository.Data;
 using BeeStore_Repository.DTO.UserDTOs;
+using BeeStore_Repository.DTO.UserDTOs.Interfaces;
 using BeeStore_Repository.Models;
+using BeeStore_Repository.Utils;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +12,8 @@ using System.Threading.Tasks;
 
 namespace BeeStore_Repository.Mapper.CustomResolver
 {
-    public class CustomRoleNameReverseResolver : IValueResolver<UserCreateRequestDTO, User, int?>
+    public class CustomRoleNameReverseResolver<TSource> : IValueResolver<TSource, User, int?>
+        where TSource : IRoleNameProvider
     {
         private readonly BeeStoreDbContext _context;
 
@@ -20,9 +23,13 @@ namespace BeeStore_Repository.Mapper.CustomResolver
         }
 
 
-        int? IValueResolver<UserCreateRequestDTO, User, int?>.Resolve(UserCreateRequestDTO source, User destination, int? destMember, ResolutionContext context)
+        int? IValueResolver<TSource, User, int?>.Resolve(TSource source, User destination, int? destMember, ResolutionContext context)
         {
             var role = _context.Roles.FirstOrDefault(r => r.RoleName == source.RoleName);
+            if (role.RoleName == null)
+            {
+                throw new KeyNotFoundException(ResponseMessage.RoleNotFound);
+            }
             return role != null ? role.Id : default;
         }
     }

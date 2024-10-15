@@ -23,7 +23,7 @@ namespace BeeStore_Repository.Services
             _logger = logger;
         }
 
-        public async Task<UserCreateRequestDTO> CreateUser(UserCreateRequestDTO user)
+        public async Task<string> CreateUser(UserCreateRequestDTO user)
         {
             var exist = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Email == user.Email);
             if (exist != null)
@@ -31,10 +31,9 @@ namespace BeeStore_Repository.Services
                 throw new DuplicateException(ResponseMessage.UserEmailDuplicate);
             }
             var result = _mapper.Map<User>(user);
-            result.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
             await _unitOfWork.UserRepo.AddAsync(result);
             await _unitOfWork.SaveAsync();
-            return user;
+            return ResponseMessage.Success;
         }
 
         public async Task<string> DeleteUser(int id)
@@ -55,9 +54,9 @@ namespace BeeStore_Repository.Services
         public async Task<Pagination<UserListDTO>> GetAllUser(int pageIndex, int pageSize)
         {
             var list = await _unitOfWork.UserRepo.GetAllAsync();
-            if (list == null)
+            if (list.Count == 0)
             {
-                //implement later
+                throw new ApplicationException();
             }
 
             var result = _mapper.Map<List<UserListDTO>>(list);
@@ -97,16 +96,32 @@ namespace BeeStore_Repository.Services
             }
         }
 
+        public async Task<string> SignUp(UserSignUpRequestDTO request)
+        {
+            var exist = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Email == request.Email);
+            if (exist != null)
+            {
+                throw new DuplicateException(ResponseMessage.UserEmailDuplicate);
+            }
+            if (request.RoleName != Constants.RoleName.User)
+            {
+                throw new ApplicationException();
+            }
+            var result = _mapper.Map<User>(request);
+            await _unitOfWork.UserRepo.AddAsync(result);
+            await _unitOfWork.SaveAsync();
+            return ResponseMessage.Success;
+        }
+
         public async Task<UserUpdateRequestDTO> UpdateUser(UserUpdateRequestDTO user)
         {
             var exist = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Email == user.Email);
             if (exist != null)
             {
-                // Shouldnt let any user to change its own password this easily
-                // I think add an Enter Old Password will get the job done
-                if (!String.IsNullOrEmpty(user.Password) && !user.Password.Equals("string"))
+                //CHECK OLD PASSWORD
+                if (BCrypt.Net.BCrypt.Verify(user.ConfirmPassword, exist.Password))
                 {
-                    exist.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
+                    throw new ApplicationException(ResponseMessage.UserPasswordError);
                 }
                 if (!user.PictureId.Equals(0))
                 {
@@ -136,5 +151,6 @@ namespace BeeStore_Repository.Services
 
             return user;
         }
+
     }
 }

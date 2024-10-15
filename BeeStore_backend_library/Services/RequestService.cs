@@ -108,7 +108,7 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
             }
-            if(exist.Status != "Pending")
+            if(!exist.Status.Equals(Constants.RequestStatus.Pending, StringComparison.OrdinalIgnoreCase))
             {
                 throw new ApplicationException(ResponseMessage.RequestStatusError);
             }
@@ -129,13 +129,14 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.RequestIdNotFound);
             }
-            if (exist.Status != "Pending")
+            if (!exist.Status.Equals(Constants.RequestStatus.Pending))
             {
                 throw new ApplicationException(ResponseMessage.RequestStatusError);
             }
             if (statusId == 1)
             {
-                status = "Approved.";
+                status = Constants.RequestStatus.Approved;
+                //Since lazy loading is enable, might have to change the query later (too lazy now)
                 var package = await _unitOfWork.PackageRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.PackageId),
                                                                                  query => query.Include(o => o.Product)
                                                                                  .ThenInclude(item => item.ProductCategory));
@@ -155,14 +156,14 @@ namespace BeeStore_Repository.Services
                 }
 
                 package.InventoryId = exist.SendToInventory;
-                package.ExpirationDate = DateTime.Now.AddDays(package.Product.ProductCategory.ExpireIn.Value);
+                package.ExpirationDate = DateTime.Now.AddDays(package.Product.ProductCategory!.ExpireIn!.Value);
 
                 inventory.Weight = totalWeight;
 
             }
             if (statusId == 2)
             {
-                status = "Reject";
+                status = Constants.RequestStatus.Reject;
             }
             exist.Status = status;
             await _unitOfWork.SaveAsync();
