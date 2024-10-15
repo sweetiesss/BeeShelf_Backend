@@ -13,25 +13,29 @@ namespace BeeStore_Api.Controllers
             _pictureService = pictureService;
         }
 
-        [HttpPost()]
+        [Route("upload-image")]
+        [HttpPost]
         public async Task<IActionResult> Upload([FromForm(Name = "image")] IFormFile file)
         {
             return Ok(await _pictureService.UploadImage(file));
         }
 
-        [HttpPost("{id}")]
+        [Route("upload-profile-image/{id}")]
+        [HttpPost]
         public async Task<IActionResult> user(int id, [FromForm(Name = "image")] IFormFile file)
         {
             return Ok(await _pictureService.uploadImageForUser(id, file));
         }
 
-        [HttpPost("{id}")]
+        [Route("upload-order-image/{id}")]
+        [HttpPost]
         public async Task<IActionResult> order(int id, [FromForm(Name = "image")] IFormFile file)
         {
             return Ok(await _pictureService.uploadImageForOrder(id, file));
         }
 
-        [HttpPost("{id}")]
+        [Route("upload-warehouse-image/{id}")]
+        [HttpPost]
         public async Task<IActionResult> product(int id, [FromForm(Name = "image")] IFormFile file)
         {
             return Ok(await _pictureService.uploadImageForProduct(id, file));

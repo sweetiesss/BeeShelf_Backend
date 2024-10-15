@@ -11,8 +11,8 @@ namespace BeeStore_Repository.Services.Interfaces
     public interface IOrderService
     {
         Task<Pagination<OrderListDTO>> GetOrderList(int pageIndex, int pageSize);
-        Task<Pagination<OrderListDTO>> GetOrderList(string email , int pageIndex, int pageSize);
-        Task<Pagination<OrderListDTO>> GetDeliverOrderList(string shipperEmail, int pageIndex, int pageSize);
+        Task<Pagination<OrderListDTO>> GetOrderList(int userId , int pageIndex, int pageSize);
+        Task<Pagination<OrderListDTO>> GetDeliverOrderList(int userId, int pageIndex, int pageSize);
 
         Task<OrderCreateDTO> CreateOrder(OrderCreateDTO request);
         Task<string> UpdateOrderStatus(int id, int orderStatus);

@@ -66,12 +66,12 @@ namespace BeeStore_Repository.Services
             return await ListPagination<UserListDTO>.PaginateList(result, pageIndex, pageSize);
         }
 
-        public async Task<UserListDTO> GetUser(string email)
+        public async Task<UserListDTO> GetUser(int id)
         {
-            var user = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Email == email);
+            var user = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Id.Equals(id));
             if (user == null)
             {
-                throw new KeyNotFoundException(ResponseMessage.UserEmailNotFound);
+                throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
             }
             var result = _mapper.Map<UserListDTO>(user);
             return result;

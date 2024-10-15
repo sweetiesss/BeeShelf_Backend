@@ -131,14 +131,9 @@ namespace BeeStore_Repository.Services
             return (await ListPagination<ProductListDTO>.PaginateList(result, pageIndex, pageSize));
         }
 
-        public async Task<Pagination<ProductListDTO>> GetProductListByEmail(string email, int pageIndex, int pageSize)
+        public async Task<Pagination<ProductListDTO>> GetProductListByEmail(int userId, int pageIndex, int pageSize)
         {
-            var user = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Email == email);
-            if(user == null)
-            {
-                throw new KeyNotFoundException(ResponseMessage.UserEmailNotFound);
-            }
-            var list = await _unitOfWork.ProductRepo.GetFiltered(u => u.UserId.Equals(user.Id));
+            var list = await _unitOfWork.ProductRepo.GetFiltered(u => u.UserId.Equals(userId));
             var result = _mapper.Map<List<ProductListDTO>>(list);
             return (await ListPagination<ProductListDTO>.PaginateList(result, pageIndex, pageSize));
         }
