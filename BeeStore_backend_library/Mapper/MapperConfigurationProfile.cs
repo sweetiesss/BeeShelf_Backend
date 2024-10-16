@@ -38,10 +38,13 @@ namespace BeeStore_Repository.Mapper
 
             CreateMap<UserCreateRequestDTO, User>()
                  .ForMember(dest => dest.RoleId, opt => opt.MapFrom<CustomRoleNameReverseResolver<UserCreateRequestDTO>>())
-                 .ForMember(dest => dest.Password, opt => opt.MapFrom(src => BCrypt.Net.BCrypt.HashPassword(src.Password)));
+                     .ForMember(dest => dest.Password, opt => opt.MapFrom(src => BCrypt.Net.BCrypt.HashPassword(src.Password)));
             CreateMap<UserSignUpRequestDTO, User>()
-                 .ForMember(dest => dest.RoleId, opt => opt.MapFrom<CustomRoleNameReverseResolver<UserSignUpRequestDTO>>())
-                 .ForMember(dest => dest.Password, opt => opt.MapFrom(src => BCrypt.Net.BCrypt.HashPassword(src.Password)));
+                 .ForMember(dest => dest.RoleId, opt => opt.MapFrom<CustomRoleNameReverseResolver<UserSignUpRequestDTO>>());
+            // You Ducking Fumpass for adding these         
+            // I put it outside for later auto generated
+            // Logic is Admin Create -> No Mail send, User Regis -> Mail send
+            //.ForMember(dest => dest.Password, opt => opt.MapFrom(src => BCrypt.Net.BCrypt.HashPassword(src.Password)));
             CreateMap<User, UserListDTO>()
                     .ForMember(dest => dest.RoleName, opt => opt.MapFrom<CustomRoleNameResolver>())
                     .ForMember(dest => dest.Picture_Link, opt => opt.MapFrom<CustomPictureLinkResolverUser>())
