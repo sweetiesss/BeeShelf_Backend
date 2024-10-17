@@ -23,8 +23,7 @@ namespace BeeStore_Api.Controllers
 
         [Route("get-users")]
         [HttpGet]
-        //[Authorize(Roles = "Admin")]
-        [AllowAnonymous]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetUsers([FromQuery][DefaultValue(0)] int pageIndex,
                                                                [FromQuery][DefaultValue(10)] int pageSize)
         {
