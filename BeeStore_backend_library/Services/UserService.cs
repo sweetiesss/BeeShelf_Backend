@@ -22,13 +22,6 @@ namespace BeeStore_Repository.Services
         private readonly UnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILoggerManager _logger;
-        private readonly SecretClient _client = new SecretClient(new Uri("https://beestore-keyvault.vault.azure.net/"), new EnvironmentCredential());
-        private const int DEFAULT_PASSWORD_LENGTH = 12;
-        private const string lowercaseLetters = "abcdefghijklmnopqrstuvwxyz";
-        private const string uppercaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        private const string digits = "0123456789";
-        private const string specialCharacters = "!@#$%^&*()_+-=[]{}|;:',.<>?/";
-        private const string characterSet = lowercaseLetters + uppercaseLetters + digits + specialCharacters;
         public UserService(UnitOfWork unitOfWork, IMapper mapper, ILoggerManager logger)
         {
             _unitOfWork = unitOfWork;
@@ -89,6 +82,11 @@ namespace BeeStore_Repository.Services
                 throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
             }
             var result = _mapper.Map<UserListDTO>(user);
+
+            // hand mapping for
+
+            result.RoleName = _unitOfWork.RoleRepo.SingleOrDefaultAsync((u => u.Id == user.RoleId)).Result.RoleName;
+
             return result;
         }
 
@@ -126,7 +124,7 @@ namespace BeeStore_Repository.Services
             }
             var result = _mapper.Map<User>(request);
 
-            string generatePassword = GeneratePassword(DEFAULT_PASSWORD_LENGTH);
+            string generatePassword = GeneratePassword(Constants.Smtp.DEFAULT_PASSWORD_LENGTH);
 
             result.Password = BCrypt.Net.BCrypt.HashPassword(generatePassword);
 
@@ -186,15 +184,19 @@ namespace BeeStore_Repository.Services
             }
             var config = new ConfigurationBuilder()
                 .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-                .AddJsonFile("appsettings.json").Build();
+                .AddJsonFile(Constants.DefaultString.systemJsonFile).Build();
 
             var mailConfig = config.GetSection("Mail").Get<AppConfiguration>();
+
+            var keyVault = config.GetSection("KeyVault").Get<AppConfiguration>();
+
+            var _client = new SecretClient(new Uri(keyVault.KeyVaultURL), new EnvironmentCredential());
 
             string smtpPassword = _client.GetSecret("BeeStore-Smtp-Password").Value.Value;
 
             MailMessage mailMessage = new MailMessage();
             mailMessage.From = new MailAddress(mailConfig.sourceMail);
-            mailMessage.Subject = "BeeShelf Account Password";
+            mailMessage.Subject = Constants.Smtp.registerMailSubject;
             mailMessage.To.Add(new MailAddress(targetMail));
             // Ignore this abomination below
             mailMessage.Body = @"
@@ -216,7 +218,7 @@ namespace BeeStore_Repository.Services
                                 </html>";
             mailMessage.IsBodyHtml = true;
 
-            var smtpClient = new SmtpClient("smtp.gmail.com")
+            var smtpClient = new SmtpClient(Constants.Smtp.smtp)
             {
                 Port = 587,
                 Credentials = new NetworkCredential(mailConfig.sourceMail, smtpPassword),
@@ -236,8 +238,8 @@ namespace BeeStore_Repository.Services
                 for (int i = 0; i < length; i++)
                 {
                     rng.GetBytes(randomBytes);
-                    int randomIndex = randomBytes[0] % characterSet.Length;
-                    password[i] = characterSet[randomIndex];
+                    int randomIndex = randomBytes[0] % Constants.Smtp.characterSet.Length;
+                    password[i] = Constants.Smtp.characterSet[randomIndex];
                 }
             }
 
