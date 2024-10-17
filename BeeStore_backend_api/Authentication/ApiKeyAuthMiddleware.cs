@@ -1,6 +1,5 @@
 ﻿using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
-using BeeStore_Repository.Data;
 
 namespace BeeStore_Api.Authentication
 {

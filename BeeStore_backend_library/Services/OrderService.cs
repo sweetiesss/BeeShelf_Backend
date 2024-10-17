@@ -1,17 +1,11 @@
 ﻿using AutoMapper;
 using BeeStore_Repository.DTO;
 using BeeStore_Repository.DTO.OrderDTOs;
-using BeeStore_Repository.Enums;
 using BeeStore_Repository.Logger;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BeeStore_Repository.Services
 {
@@ -50,11 +44,11 @@ namespace BeeStore_Repository.Services
 
 
 
-        public async Task<OrderCreateDTO> CreateOrder(OrderCreateDTO request)
+        public async Task<string> CreateOrder(OrderCreateDTO request)
         {
             var user = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Id == request.UserId,
                                                                        query => query.Include(o => o.Role));
-            if(user == null)
+            if (user == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
             }
@@ -63,8 +57,8 @@ namespace BeeStore_Repository.Services
             {
                 throw new ApplicationException(ResponseMessage.UserRoleNotPartnerError);
             }
-            
-            if(request.DeliverBy != 0)
+
+            if (request.DeliverBy != 0)
             {
                 var shipper = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Id == request.DeliverBy);
 
@@ -89,14 +83,14 @@ namespace BeeStore_Repository.Services
             var result = _mapper.Map<Order>(request);
             await _unitOfWork.OrderRepo.AddAsync(result);
             await _unitOfWork.SaveAsync();
-            return request;
+            return ResponseMessage.Success;
 
         }
 
         public async Task<string> DeleteOrder(int id)
         {
-            var exist = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u =>u.Id == id);
-            if(exist == null)
+            var exist = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u => u.Id == id);
+            if (exist == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.OrderIdNotFound);
             }
@@ -109,7 +103,7 @@ namespace BeeStore_Repository.Services
             return ResponseMessage.Success;
         }
 
-        public async Task<OrderCreateDTO> UpdateOrder(int id, OrderCreateDTO request)
+        public async Task<string> UpdateOrder(int id, OrderCreateDTO request)
         {
             var exist = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u => u.Id == id);
             if (exist == null)
@@ -131,7 +125,7 @@ namespace BeeStore_Repository.Services
             exist.ProductId = request.ProductId;
             _unitOfWork.OrderRepo.Update(exist);
             await _unitOfWork.SaveAsync();
-            return request;
+            return ResponseMessage.Success;
         }
 
         public async Task<string> UpdateOrderStatus(int id, int orderStatus)
@@ -148,9 +142,9 @@ namespace BeeStore_Repository.Services
                 return ResponseMessage.Success;
             }
 
-            if(orderStatus == 2)        //Processing
+            if (orderStatus == 2)        //Processing
             {
-                if(exist.OrderStatus == Constants.Status.Pending)
+                if (exist.OrderStatus == Constants.Status.Pending)
                 {
                     orderStatusUpdate = Constants.Status.Processing;
                 }
@@ -160,7 +154,7 @@ namespace BeeStore_Repository.Services
                 }
             }
 
-            if(orderStatus == 3)    //Shipped
+            if (orderStatus == 3)    //Shipped
             {
                 if (exist.OrderStatus == Constants.Status.Processing)
                 {
@@ -172,14 +166,14 @@ namespace BeeStore_Repository.Services
                 }
             }
 
-            if(orderStatus == 4) //Canceled
+            if (orderStatus == 4) //Canceled
             {
-                if(exist.OrderStatus == Constants.Status.Shipped)
+                if (exist.OrderStatus == Constants.Status.Shipped)
                 {
                     throw new ApplicationException(ResponseMessage.OrderCanceledError);
                 }
                 orderStatusUpdate = Constants.Status.Canceled;
-            } 
+            }
 
             exist.OrderStatus = orderStatusUpdate;
             _unitOfWork.OrderRepo.Update(exist);

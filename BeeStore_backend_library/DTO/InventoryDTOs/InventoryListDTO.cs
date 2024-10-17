@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BeeStore_Repository.DTO.InventoryDTOs
+﻿namespace BeeStore_Repository.DTO.InventoryDTOs
 {
     public class InventoryListDTO
     {
@@ -22,7 +16,7 @@ namespace BeeStore_Repository.DTO.InventoryDTOs
 
         public DateTime? ExpirationDate { get; set; }
 
-        public string WarehouseName {  get; set; }
+        public string WarehouseName { get; set; }
         //public int? WarehouseId { get; set; }
     }
 }

@@ -19,7 +19,7 @@ namespace BeeStore_Repository.Services
             _mapper = mapper;
         }
 
-        public async Task<List<WarehouseStaffCreateDTO>> AddStaffToWarehouse(List<WarehouseStaffCreateDTO> request)
+        public async Task<string> AddStaffToWarehouse(List<WarehouseStaffCreateDTO> request)
         {
             StringBuilder sb = new StringBuilder();
             string error = string.Empty;
@@ -83,7 +83,7 @@ namespace BeeStore_Repository.Services
             var result = _mapper.Map<List<WarehouseStaff>>(request);
             await _unitOfWork.WarehouseStaffRepo.AddRangeAsync(result);
             await _unitOfWork.SaveAsync();
-            return request;
+            return ResponseMessage.Success;
 
         }
 

@@ -1,14 +1,11 @@
-﻿using Amazon.S3.Model;
-using AutoMapper;
+﻿using AutoMapper;
 using BeeStore_Repository.DTO;
-using BeeStore_Repository.DTO.InventoryDTOs;
 using BeeStore_Repository.DTO.WarehouseDTOs;
 using BeeStore_Repository.Logger;
 using BeeStore_Repository.Logger.GlobalExceptionHandler.CustomException;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
-using Microsoft.EntityFrameworkCore;
 
 namespace BeeStore_Repository.Services
 {
@@ -24,7 +21,7 @@ namespace BeeStore_Repository.Services
             _logger = logger;
         }
 
-        public async Task<WarehouseCreateDTO> CreateWarehouse(WarehouseCreateDTO request)
+        public async Task<string> CreateWarehouse(WarehouseCreateDTO request)
         {
             var exist = await _unitOfWork.WarehouseRepo.SingleOrDefaultAsync(u => u.Name == request.Name);
             if (exist != null)
@@ -35,7 +32,7 @@ namespace BeeStore_Repository.Services
             warehouse.CreateDate = DateTime.Now;
             await _unitOfWork.WarehouseRepo.AddAsync(warehouse);
             await _unitOfWork.SaveAsync();
-            return request;
+            return ResponseMessage.Success;
         }
 
         public async Task<string> DeleteWarehouse(int id)
@@ -73,11 +70,11 @@ namespace BeeStore_Repository.Services
             Inventories = warehouse.Inventories.Where(inventory => inventory.UserId == userId).ToList()
         }));
             var result = _mapper.Map<List<WarehouseListInventoryDTO>>(list);
-          
+
             return result;
         }
 
-        public async Task<WarehouseCreateDTO> UpdateWarehouse(int id, WarehouseCreateDTO request)
+        public async Task<string> UpdateWarehouse(int id, WarehouseCreateDTO request)
         {
             var exist = await _unitOfWork.WarehouseRepo.SingleOrDefaultAsync(u => u.Id == id);
             if (exist == null)
@@ -102,7 +99,7 @@ namespace BeeStore_Repository.Services
 
             _unitOfWork.WarehouseRepo.Update(exist);
             await _unitOfWork.SaveAsync();
-            return request;
+            return ResponseMessage.Success;
 
         }
     }

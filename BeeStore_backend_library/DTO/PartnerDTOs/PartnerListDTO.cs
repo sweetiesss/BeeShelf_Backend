@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-
-namespace BeeStore_Repository.DTO.PartnerDTOs
+﻿namespace BeeStore_Repository.DTO.PartnerDTOs
 {
     public class PartnerListDTO
     {
@@ -22,6 +15,6 @@ namespace BeeStore_Repository.DTO.PartnerDTOs
         public string? BankAccountNumber { get; set; }
 
         //public int? UserId { get; set; }
-        public string User_Email {  get; set; }
+        public string User_Email { get; set; }
     }
 }

@@ -16,19 +16,14 @@ using BeeStore_Repository.DTO.WarehouseStaffDTOs;
 using BeeStore_Repository.Mapper.CustomResolver;
 using BeeStore_Repository.Models;
 using Microsoft.EntityFrameworkCore.Internal;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BeeStore_Repository.Mapper
 {
 
     public class MapperConfigurationsProfile : Profile
+    {
+        public MapperConfigurationsProfile()
         {
-            public MapperConfigurationsProfile()
-            {
             CreateMap(typeof(Pagination<>), typeof(Pagination<>));
             CreateMap(typeof(Task<>), typeof(Pagination<>));
             CreateMap(typeof(InternalDbSet<>), typeof(IQueryable<>));
@@ -44,13 +39,13 @@ namespace BeeStore_Repository.Mapper
                     .ForMember(dest => dest.Picture_Link, opt => opt.MapFrom(src => src.Picture.PictureLink))
                     .ForMember(dest => dest.BankAccountNumber, opt => opt.MapFrom(src => src.Partners
                                                                                             .FirstOrDefault(u => u.UserId.Equals(src.Id))
-                                                                                            .BankAccountNumber)) 
+                                                                                            .BankAccountNumber))
                     .ForMember(dest => dest.BankName, opt => opt.MapFrom(src => src.Partners
                                                                                             .FirstOrDefault(u => u.UserId.Equals(src.Id))
                                                                                             .BankName));
 
             CreateMap<Role, RoleListDTO>();
-            
+
             CreateMap<Partner, PartnerListDTO>()
                 .ForMember(dest => dest.User_Email, opt => opt.MapFrom<CustomUserEmailResolverPartner>());
             CreateMap<PartnerUpdateRequest, Partner>();
@@ -68,7 +63,7 @@ namespace BeeStore_Repository.Mapper
             CreateMap<InventoryCreateDTO, Inventory>();
             CreateMap<Inventory, InventoryListPackagesDTO>()
                 .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom(src => src.Warehouse.Name))
-                .ForMember(dest => dest.Packages, opt => opt.MapFrom(src =>src.Packages));
+                .ForMember(dest => dest.Packages, opt => opt.MapFrom(src => src.Packages));
 
 
             CreateMap<Product, ProductListDTO>()
@@ -95,7 +90,7 @@ namespace BeeStore_Repository.Mapper
             CreateMap<WarehouseShipper, WarehouseShipperListDTO>()
                 .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom<CustomWarehouseNameResolverWarehouseShipper>())
                 .ForMember(dest => dest.user_email, opt => opt.MapFrom<CustomUserEmailResolverWarehouseShipper>());
-            CreateMap<WarehouseShipperCreateDTO,  WarehouseShipper>();
+            CreateMap<WarehouseShipperCreateDTO, WarehouseShipper>();
 
 
             CreateMap<WarehouseStaff, WarehouseStaffListDTO>()
@@ -115,6 +110,5 @@ namespace BeeStore_Repository.Mapper
                 .ForMember(dest => dest.product_name, opt => opt.MapFrom<CustomProductNameResolverOrder>());
             CreateMap<OrderCreateDTO, Order>();
         }
-        }
     }
-    
+}

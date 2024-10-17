@@ -1,10 +1,4 @@
 ﻿using BeeStore_Repository.DTO.InventoryDTOs;
-using BeeStore_Repository.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BeeStore_Repository.DTO.WarehouseDTOs
 {

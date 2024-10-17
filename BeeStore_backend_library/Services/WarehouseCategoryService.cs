@@ -19,7 +19,7 @@ namespace BeeStore_Repository.Services
             _mapper = mapper;
         }
 
-        public async Task<List<WarehouseCategoryCreateDTO>> AddCategoryToWarehouse(List<WarehouseCategoryCreateDTO> request)
+        public async Task<string> AddCategoryToWarehouse(List<WarehouseCategoryCreateDTO> request)
         {
             StringBuilder sb = new StringBuilder();
             string error = string.Empty;
@@ -74,7 +74,7 @@ namespace BeeStore_Repository.Services
             var result = _mapper.Map<List<WarehouseCategory>>(request);
             await _unitOfWork.WarehouseCategoryRepo.AddRangeAsync(result);
             await _unitOfWork.SaveAsync();
-            return request;
+            return ResponseMessage.Success;
         }
 
         public async Task<Pagination<WarehouseCategoryListDTO>> GetWarehouseCategoryList(int pageIndex, int pageSize)

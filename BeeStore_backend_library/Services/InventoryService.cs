@@ -20,7 +20,7 @@ namespace BeeStore_Repository.Services
             _mapper = mapper;
             _logger = logger;
         }
-        public async Task<InventoryListDTO> AddPartnerToInventory(int id, int userId)
+        public async Task<string> AddPartnerToInventory(int id, int userId)
         {
             var exist = await _unitOfWork.InventoryRepo.GetByIdAsync(id);
             if (exist == null)
@@ -44,12 +44,11 @@ namespace BeeStore_Repository.Services
             exist.UserId = user.Id;
             _unitOfWork.InventoryRepo.Update(exist);
             await _unitOfWork.SaveAsync();
-            var result = _mapper.Map<InventoryListDTO>(exist);
-            return result;
+            return ResponseMessage.Success;
         }
 
 
-        public async Task<InventoryCreateDTO> CreateInventory(InventoryCreateDTO request)
+        public async Task<string> CreateInventory(InventoryCreateDTO request)
         {
             var exist = await _unitOfWork.WarehouseRepo.GetByIdAsync(request.WarehouseId);
             if (exist == null)
@@ -67,7 +66,7 @@ namespace BeeStore_Repository.Services
             result.ExpirationDate = DateTime.Now;
             await _unitOfWork.InventoryRepo.AddAsync(result);
             await _unitOfWork.SaveAsync();
-            return request;
+            return ResponseMessage.Success;
 
         }
 
@@ -83,7 +82,7 @@ namespace BeeStore_Repository.Services
             return ResponseMessage.Success;
         }
 
-        public async Task<InventoryUpdateDTO> UpdateInventory(InventoryUpdateDTO request)
+        public async Task<string> UpdateInventory(InventoryUpdateDTO request)
         {
 
             var exist = await _unitOfWork.InventoryRepo.GetByIdAsync(request.Id);
@@ -107,7 +106,7 @@ namespace BeeStore_Repository.Services
             }
             _unitOfWork.InventoryRepo.Update(exist);
             await _unitOfWork.SaveAsync();
-            return request;
+            return ResponseMessage.Success;
 
         }
 
