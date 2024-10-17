@@ -1,15 +1,8 @@
-﻿using Amazon.S3.Model;
-using BeeStore_Repository.Data;
-using BeeStore_Repository.DTO;
+﻿using BeeStore_Repository.Data;
 using BeeStore_Repository.Interfaces;
 using BeeStore_Repository.Models;
 using Microsoft.EntityFrameworkCore;
-using NLog.Filters;
-using System;
-using System.Linq;
 using System.Linq.Expressions;
-using static Amazon.S3.Util.S3EventNotification;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace BeeStore_Repository.Repositories
 {
@@ -33,8 +26,8 @@ namespace BeeStore_Repository.Repositories
 
         public async Task<IEnumerable<T>> GetFiltered(Expression<Func<T, bool>> filter)
         {
-            
-            return await _dbSet.Where(x=> x.IsDeleted.Equals(false)).Where(filter).ToListAsync();
+
+            return await _dbSet.Where(x => x.IsDeleted.Equals(false)).Where(filter).ToListAsync();
         }
 
 
@@ -75,7 +68,7 @@ namespace BeeStore_Repository.Repositories
 
         public async Task AddRangeAsync(List<T> entities)
         {
-            
+
             await _dbSet.AddRangeAsync(entities);
         }
 
@@ -96,7 +89,7 @@ namespace BeeStore_Repository.Repositories
             return (await _dbSet.Where(x => x.IsDeleted.Equals(false)).FirstOrDefaultAsync(predicate))!;
         }
 
-        
+
         public void SoftDelete(T entity)
         {
             entity.IsDeleted = true;

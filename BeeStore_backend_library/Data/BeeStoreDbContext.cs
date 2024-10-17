@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using BeeStore_Repository.Models;
 using Microsoft.EntityFrameworkCore;
-using BeeStore_Repository.Models;
 
 namespace BeeStore_Repository.Data;
 public partial class BeeStoreDbContext : DbContext

@@ -1,5 +1,4 @@
-﻿using BeeStore_Repository.DTO;
-using BeeStore_Repository.DTO.InventoryDTOs;
+﻿using BeeStore_Repository.DTO.InventoryDTOs;
 using BeeStore_Repository.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -37,11 +36,11 @@ namespace BeeStore_Api.Controllers
         {
             if (!_memoryCache.TryGetValue(cacheKey, out var result)) // result here have the variable types as Pagination<InventoryListDTO>
             {
-               result = await _inventoryService.GetInventoryList(userId, pageIndex, pageSize);
+                result = await _inventoryService.GetInventoryList(userId, pageIndex, pageSize);
 
-               var cacheEntryOptions = new MemoryCacheEntryOptions()
-                   .SetSlidingExpiration(TimeSpan.FromMinutes(5))
-                   .SetAbsoluteExpiration(TimeSpan.FromHours(1));
+                var cacheEntryOptions = new MemoryCacheEntryOptions()
+                    .SetSlidingExpiration(TimeSpan.FromMinutes(5))
+                    .SetAbsoluteExpiration(TimeSpan.FromHours(1));
 
                 _memoryCache.Set(cacheKey, result, cacheEntryOptions);
             }
@@ -72,7 +71,7 @@ namespace BeeStore_Api.Controllers
         public async Task<IActionResult> CreateInventory(InventoryCreateDTO request)
         {
             var result = await _inventoryService.CreateInventory(request);
-            return Ok(result);  
+            return Ok(result);
         }
 
         [Route("update-inventory")]

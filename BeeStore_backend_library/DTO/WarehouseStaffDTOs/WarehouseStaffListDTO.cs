@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BeeStore_Repository.DTO.WarehouseStaffDTOs
+﻿namespace BeeStore_Repository.DTO.WarehouseStaffDTOs
 {
     public class WarehouseStaffListDTO
     {

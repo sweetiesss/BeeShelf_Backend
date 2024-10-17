@@ -7,6 +7,6 @@ namespace BeeStore_Repository.Services.Interfaces
     {
         Task<Pagination<WarehouseStaffListDTO>> GetWarehouseStaffList(int pageIndex, int pageSize);
         Task<Pagination<WarehouseStaffListDTO>> GetWarehouseStaffList(int id, int pageIndex, int pageSize);
-        Task<List<WarehouseStaffCreateDTO>> AddStaffToWarehouse(List<WarehouseStaffCreateDTO> request);
+        Task<string> AddStaffToWarehouse(List<WarehouseStaffCreateDTO> request);
     }
 }

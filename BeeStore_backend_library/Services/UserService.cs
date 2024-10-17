@@ -136,7 +136,7 @@ namespace BeeStore_Repository.Services
             return ResponseMessage.Success;
         }
 
-        public async Task<UserUpdateRequestDTO> UpdateUser(UserUpdateRequestDTO user)
+        public async Task<string> UpdateUser(UserUpdateRequestDTO user)
         {
             var exist = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Email == user.Email);
             if (exist != null)
@@ -172,7 +172,7 @@ namespace BeeStore_Repository.Services
                 throw new KeyNotFoundException(ResponseMessage.UserEmailNotFound);
             }
 
-            return user;
+            return ResponseMessage.Success;
         }
 
 

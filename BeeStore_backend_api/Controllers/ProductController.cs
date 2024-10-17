@@ -27,13 +27,13 @@ namespace BeeStore_Api.Controllers
 
         [Route("get-products/{userId}")]
         [HttpGet]
-        public async Task<IActionResult> GetProductListByEmail(int userId,[FromQuery][DefaultValue(0)] int pageIndex,
+        public async Task<IActionResult> GetProductListByEmail(int userId, [FromQuery][DefaultValue(0)] int pageIndex,
                                                     [FromQuery][DefaultValue(10)] int pageSize)
         {
             var result = await _productService.GetProductListByEmail(userId, pageIndex, pageSize);
             return Ok(result);
         }
-        
+
         [Route("create-product")]
         [HttpPost]
         public async Task<IActionResult> CreateProduct(ProductCreateDTO request)
@@ -57,7 +57,7 @@ namespace BeeStore_Api.Controllers
             var result = await _productService.UpdateProduct(id, request);
             return Ok(result);
         }
-        
+
         [Route("delete-product/{id}")]
         [HttpDelete]
         public async Task<IActionResult> DeleteProduct(int id)

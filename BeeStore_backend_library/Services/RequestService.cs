@@ -21,7 +21,7 @@ namespace BeeStore_Repository.Services
             _logger = logger;
         }
 
-        public async Task<RequestCreateDTO> CreateRequest(RequestCreateDTO request)
+        public async Task<string> CreateRequest(RequestCreateDTO request)
         {
             var user = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Id == request.UserId);
             if (user == null)
@@ -51,7 +51,7 @@ namespace BeeStore_Repository.Services
             var result = _mapper.Map<Request>(request);
             await _unitOfWork.RequestRepo.AddAsync(result);
             await _unitOfWork.SaveAsync();
-            return request;
+            return ResponseMessage.Success;
         }
 
         public async Task<string> DeleteRequest(int id)
@@ -80,7 +80,7 @@ namespace BeeStore_Repository.Services
             return await ListPagination<RequestListDTO>.PaginateList(result, pageIndex, pageSize);
         }
 
-        public async Task<RequestCreateDTO> UpdateRequest(int id, RequestCreateDTO request)
+        public async Task<string> UpdateRequest(int id, RequestCreateDTO request)
         {
             var exist = await _unitOfWork.RequestRepo.SingleOrDefaultAsync(u => u.Id == id);
             if (exist == null)
@@ -112,10 +112,10 @@ namespace BeeStore_Repository.Services
             exist.RequestType = request.RequestType;
             _unitOfWork.RequestRepo.Update(exist);
             await _unitOfWork.SaveAsync();
-            return request;
+            return ResponseMessage.Success;
         }
 
-        public async Task<RequestListDTO> UpdateRequestStatus(int id, int statusId)
+        public async Task<string> UpdateRequestStatus(int id, int statusId)
         {
             string status = null;
             var exist = await _unitOfWork.RequestRepo.SingleOrDefaultAsync(u => u.Id == id);
@@ -160,7 +160,7 @@ namespace BeeStore_Repository.Services
             exist.Status = status;
             await _unitOfWork.SaveAsync();
             var result = _mapper.Map<RequestListDTO>(exist);
-            return result;
+            return ResponseMessage.Success;
         }
     }
 }

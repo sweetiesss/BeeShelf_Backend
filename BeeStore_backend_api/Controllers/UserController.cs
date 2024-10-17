@@ -1,7 +1,4 @@
-﻿using BeeStore_Repository.Data;
-using BeeStore_Repository.DTO.UserDTOs;
-using BeeStore_Repository.Logger;
-using BeeStore_Repository.Models;
+﻿using BeeStore_Repository.DTO.UserDTOs;
 using BeeStore_Repository.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -9,7 +6,7 @@ using System.ComponentModel;
 
 namespace BeeStore_Api.Controllers
 {
-    
+
     public class UserController : BaseController
     {
         private readonly IUserService _userService;
@@ -43,7 +40,7 @@ namespace BeeStore_Api.Controllers
         [Route("create-user")]
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> CreateUser([FromBody]UserCreateRequestDTO user)
+        public async Task<IActionResult> CreateUser([FromBody] UserCreateRequestDTO user)
         {
             var result = await _userService.CreateUser(user);
             return Ok(result);
@@ -52,7 +49,7 @@ namespace BeeStore_Api.Controllers
         [Route("update-user")]
         [HttpPut]
         [Authorize(Roles = "Admin,Manager,Staff,Partner,Shipper")]
-        public async Task<IActionResult> UpdateUser([FromBody]UserUpdateRequestDTO user)
+        public async Task<IActionResult> UpdateUser([FromBody] UserUpdateRequestDTO user)
         {
             var result = await _userService.UpdateUser(user);
             return Ok(result);

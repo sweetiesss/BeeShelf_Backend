@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-
-namespace BeeStore_Repository.DTO.UserDTOs
+﻿namespace BeeStore_Repository.DTO.UserDTOs
 {
     public class UserListDTO
     {
@@ -30,7 +23,7 @@ namespace BeeStore_Repository.DTO.UserDTOs
 
         public string RoleName { get; set; }
 
-        public string? BankAccountNumber {  get; set; }
+        public string? BankAccountNumber { get; set; }
         public string? BankName { get; set; }
 
     }

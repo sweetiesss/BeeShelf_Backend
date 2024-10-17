@@ -1,13 +1,7 @@
 ﻿using AutoMapper;
 using BeeStore_Repository.Data;
 using BeeStore_Repository.DTO.OrderDTOs;
-using BeeStore_Repository.DTO.PartnerDTOs;
 using BeeStore_Repository.Models;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BeeStore_Repository.Mapper.CustomResolver
 {

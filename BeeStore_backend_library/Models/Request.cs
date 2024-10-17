@@ -1,10 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace BeeStore_Repository.Models;
+﻿namespace BeeStore_Repository.Models;
 
 public partial class Request : BaseEntity
-{ 
+{
     //public int Id { get; set; }
 
     public int? UserId { get; set; }

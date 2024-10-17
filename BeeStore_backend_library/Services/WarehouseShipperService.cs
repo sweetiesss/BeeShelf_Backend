@@ -33,7 +33,7 @@ namespace BeeStore_Repository.Services
             return (await ListPagination<WarehouseShipperListDTO>.PaginateList(result, pageIndex, pageSize));
         }
 
-        public async Task<List<WarehouseShipperCreateDTO>> AddShipperToWarehouse(List<WarehouseShipperCreateDTO> request)
+        public async Task<string> AddShipperToWarehouse(List<WarehouseShipperCreateDTO> request)
         {
             StringBuilder sb = new StringBuilder();
             string error = string.Empty;
@@ -68,16 +68,16 @@ namespace BeeStore_Repository.Services
                 }
 
                 var role = await _unitOfWork.RoleRepo.SingleOrDefaultAsync(u => u.Id == user.RoleId);
-                if(role.RoleName != Constants.RoleName.Shipper)
+                if (role.RoleName != Constants.RoleName.Shipper)
                 {
                     throw new AppException(ResponseMessage.UserRoleNotShipperError + $": {user.Email}");
                 }
 
                 //check if user is arleady working at here or another place
                 var existWorking = await _unitOfWork.WarehouseShipperRepo.FirstOrDefaultAsync(u => u.UserId == item.UserId);
-                if(existWorking != null)
+                if (existWorking != null)
                 {
-                    if(existWorking.IsDeleted != true)
+                    if (existWorking.IsDeleted != true)
                     {
                         //throw new DuplicateException($"This user is already working at a warehouse: ID: {existWorking.User.Id}");
                         sb.Append($"{existWorking.User.Id}, ");
@@ -99,7 +99,7 @@ namespace BeeStore_Repository.Services
             var result = _mapper.Map<List<WarehouseShipper>>(request);
             await _unitOfWork.WarehouseShipperRepo.AddRangeAsync(result);
             await _unitOfWork.SaveAsync();
-            return request;
+            return ResponseMessage.Success;
         }
 
     }

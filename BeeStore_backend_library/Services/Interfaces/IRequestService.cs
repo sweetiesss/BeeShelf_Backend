@@ -1,10 +1,5 @@
 ﻿using BeeStore_Repository.DTO;
 using BeeStore_Repository.DTO.RequestDTOs;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BeeStore_Repository.Services.Interfaces
 {
@@ -13,9 +8,9 @@ namespace BeeStore_Repository.Services.Interfaces
         Task<Pagination<RequestListDTO>> GetRequestList(int pageIndex, int pageSize);
         Task<Pagination<RequestListDTO>> GetRequestList(int userId, int pageIndex, int pageSize);
 
-        Task<RequestListDTO> UpdateRequestStatus(int id, int statusId);
-        Task<RequestCreateDTO> CreateRequest(RequestCreateDTO request);
-        Task<RequestCreateDTO> UpdateRequest(int id, RequestCreateDTO request);
-        Task<string> DeleteRequest(int id);        
+        Task<string> UpdateRequestStatus(int id, int statusId);
+        Task<string> CreateRequest(RequestCreateDTO request);
+        Task<string> UpdateRequest(int id, RequestCreateDTO request);
+        Task<string> DeleteRequest(int id);
     }
 }
