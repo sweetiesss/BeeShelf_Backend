@@ -7,7 +7,6 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using System.ComponentModel;
-using ZstdSharp.Unsafe;
 
 namespace BeeStore_Api.Controllers
 {
@@ -137,7 +136,7 @@ namespace BeeStore_Api.Controllers
 
                 _memoryCache.Set(categoryCacheKey, result, cacheEntryOptions);
             }
-            
+
             return Ok(result);
         }
 
@@ -171,7 +170,7 @@ namespace BeeStore_Api.Controllers
         [Route("update-warehouse/{id}")]
         [HttpPut]
         [Authorize(Roles = "Admin,Manager")]
-        public async Task<IActionResult> UpdateWarehouse(int id,WarehouseCreateDTO request)
+        public async Task<IActionResult> UpdateWarehouse(int id, WarehouseCreateDTO request)
         {
             var result = await _warehouseService.UpdateWarehouse(id, request);
             return Ok(result);

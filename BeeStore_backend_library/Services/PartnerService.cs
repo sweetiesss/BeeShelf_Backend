@@ -28,7 +28,7 @@ namespace BeeStore_Repository.Services
             return await ListPagination<PartnerListDTO>.PaginateList(result, pageIndex, pageSize);
         }
 
-        public async Task<PartnerUpdateRequest> UpgradeToPartner(PartnerUpdateRequest request)
+        public async Task<string> UpgradeToPartner(PartnerUpdateRequest request)
         {
             var user = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Id == request.UserId);
             if (user == null)
@@ -48,10 +48,10 @@ namespace BeeStore_Repository.Services
             await _unitOfWork.SaveAsync();
 
 
-            return request;
+            return ResponseMessage.Success;
         }
 
-        public async Task<PartnerUpdateRequest> UpdatePartner(PartnerUpdateRequest request)
+        public async Task<string> UpdatePartner(PartnerUpdateRequest request)
         {
             var exist = await _unitOfWork.PartnerRepo.SingleOrDefaultAsync(u => u.UserId == request.UserId);
             if (exist == null)
@@ -59,17 +59,17 @@ namespace BeeStore_Repository.Services
                 throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
             }
             exist.UpdateDate = DateTime.Now;
-            if (!String.IsNullOrEmpty(request.BankAccountNumber) && 
+            if (!String.IsNullOrEmpty(request.BankAccountNumber) &&
                 !request.BankAccountNumber.Equals(Constants.DefaultString.String))
             {
                 exist.BankAccountNumber = request.BankAccountNumber;
             }
-            if (!String.IsNullOrEmpty(request.CitizenIdentificationNumber) && 
+            if (!String.IsNullOrEmpty(request.CitizenIdentificationNumber) &&
                 !request.CitizenIdentificationNumber.Equals(Constants.DefaultString.String))
             {
                 exist.CitizenIdentificationNumber = request.CitizenIdentificationNumber;
             }
-            if (!String.IsNullOrEmpty(request.BankName) && 
+            if (!String.IsNullOrEmpty(request.BankName) &&
                 !request.BankName.Equals(Constants.DefaultString.String))
             {
                 exist.BankName = request.BankName;
@@ -77,7 +77,7 @@ namespace BeeStore_Repository.Services
 
             _unitOfWork.PartnerRepo.Update(exist);
             await _unitOfWork.SaveAsync();
-            return request;
+            return ResponseMessage.Success;
         }
 
         public async Task<string> DeletePartner(int id)

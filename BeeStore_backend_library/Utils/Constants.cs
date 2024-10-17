@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BeeStore_Repository.Utils
+﻿namespace BeeStore_Repository.Utils
 {
     public static class Constants
     {

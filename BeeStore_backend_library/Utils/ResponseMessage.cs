@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BeeStore_Repository.Utils
+﻿namespace BeeStore_Repository.Utils
 {
     public static class ResponseMessage
     {
@@ -72,6 +66,6 @@ namespace BeeStore_Repository.Utils
         public const string WarehouseCategoryAddListFailed = "Failed to add. Warehouse with these category already exist: ";
         public const string WarehouseCategoryDuplicateList = "Please check provided list. The following category is duplicate: ";
 
-        
+
     }
 }

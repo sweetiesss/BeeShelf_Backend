@@ -1,12 +1,6 @@
 ﻿using BeeStore_Repository.Data;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Repositories;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BeeStore_Repository
 {
@@ -194,7 +188,7 @@ namespace BeeStore_Repository
         {
             get
             {
-                if(orderRepo == null)
+                if (orderRepo == null)
                 {
                     orderRepo = new GenericRepository<Order>(_context);
                 }

@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BeeStore_Repository.DTO.OrderDTOs
+﻿namespace BeeStore_Repository.DTO.OrderDTOs
 {
     public class OrderListDTO
     {
-        public int Id { get; set; } 
+        public int Id { get; set; }
         //public int? UserId { get; set; }
-        public string user_email {  get; set; }
+        public string user_email { get; set; }
         public DateTime? CreateDate { get; set; }
 
         public string? OrderStatus { get; set; }
@@ -28,7 +22,7 @@ namespace BeeStore_Repository.DTO.OrderDTOs
         public string? CodStatus { get; set; }
 
         //public int? DeliverBy { get; set; }
-        public string deliver_by {  get; set; }
+        public string deliver_by { get; set; }
 
         //public int? PictureId { get; set; }
         public string picture_link { get; set; }
