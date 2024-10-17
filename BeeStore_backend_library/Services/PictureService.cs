@@ -1,5 +1,4 @@
 ﻿using Amazon.S3;
-using Amazon.S3.Model;
 using Amazon.S3.Transfer;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
@@ -120,5 +119,5 @@ namespace BeeStore_Repository.Services
         }
     }
 
-   
+
 }

@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
+using BeeStore_Repository.Data;
 using BeeStore_Repository.DTO;
 using BeeStore_Repository.DTO.UserDTOs;
 using BeeStore_Repository.Logger;
@@ -8,9 +9,8 @@ using BeeStore_Repository.Logger.GlobalExceptionHandler.CustomException;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
-using Castle.Core.Configuration;
 using Microsoft.EntityFrameworkCore;
-using System.Linq.Expressions;
+using Microsoft.Extensions.Configuration;
 using System.Net;
 using System.Net.Mail;
 using System.Security.Cryptography;
@@ -22,8 +22,7 @@ namespace BeeStore_Repository.Services
         private readonly UnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILoggerManager _logger;
-        private readonly SecretClient _client = new SecretClient(new Uri("https://beestore-keyvault.vault.azure.net/"), new EnvironmentCredential());;
-
+        private readonly SecretClient _client = new SecretClient(new Uri("https://beestore-keyvault.vault.azure.net/"), new EnvironmentCredential());
         private const int DEFAULT_PASSWORD_LENGTH = 12;
         private const string lowercaseLetters = "abcdefghijklmnopqrstuvwxyz";
         private const string uppercaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -67,7 +66,10 @@ namespace BeeStore_Repository.Services
 
         public async Task<Pagination<UserListDTO>> GetAllUser(int pageIndex, int pageSize)
         {
-            var list = await _unitOfWork.UserRepo.GetAllAsync();
+            var list = await _unitOfWork.UserRepo.GetQueryable(query => query
+                                                                     .Include(o => o.Role!)
+                                                                     .Include(o => o.Picture!)
+                                                                     .Include(o => o.Partners));
             if (list.Count == 0)
             {
                 throw new ApplicationException();
@@ -92,7 +94,8 @@ namespace BeeStore_Repository.Services
 
         public async Task<UserListDTO> Login(string email, string password)
         {
-            var exist = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Email == email);
+            var exist = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Email == email,
+                                                                        query => query.Include(o => o.Role));
             if (exist != null)
             {
                 if (BCrypt.Net.BCrypt.Verify(password, exist.Password))
@@ -149,15 +152,15 @@ namespace BeeStore_Repository.Services
                 {
                     exist.PictureId = user.PictureId;
                 }
-                if (!String.IsNullOrEmpty(user.Phone) && !user.Phone.Equals("string"))
+                if (!String.IsNullOrEmpty(user.Phone) && !user.Phone.Equals(Constants.DefaultString.String))
                 {
                     exist.Phone = user.Phone;
                 }
-                if (!String.IsNullOrEmpty(user.FirstName) && !user.FirstName.Equals("string"))
+                if (!String.IsNullOrEmpty(user.FirstName) && !user.FirstName.Equals(Constants.DefaultString.String))
                 {
                     exist.FirstName = user.FirstName;
                 }
-                if (!String.IsNullOrEmpty(user.LastName) && !user.LastName.Equals("string"))
+                if (!String.IsNullOrEmpty(user.LastName) && !user.LastName.Equals(Constants.DefaultString.String))
                 {
                     exist.LastName = user.LastName;
                 }
@@ -181,12 +184,16 @@ namespace BeeStore_Repository.Services
             {
                 throw new ArgumentNullException(nameof(userGeneratedPassword));
             }
+            var config = new ConfigurationBuilder()
+                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                .AddJsonFile("appsettings.json").Build();
 
-            string sourceMail = "beeshelf.notification@gmail.com";
+            var mailConfig = config.GetSection("Mail").Get<AppConfiguration>();
+
             string smtpPassword = _client.GetSecret("BeeStore-Smtp-Password").Value.Value;
 
             MailMessage mailMessage = new MailMessage();
-            mailMessage.From = new MailAddress(sourceMail);
+            mailMessage.From = new MailAddress(mailConfig.sourceMail);
             mailMessage.Subject = "BeeShelf Account Password";
             mailMessage.To.Add(new MailAddress(targetMail));
             // Ignore this abomination below
@@ -212,7 +219,7 @@ namespace BeeStore_Repository.Services
             var smtpClient = new SmtpClient("smtp.gmail.com")
             {
                 Port = 587,
-                Credentials = new NetworkCredential(sourceMail, smtpPassword),
+                Credentials = new NetworkCredential(mailConfig.sourceMail, smtpPassword),
                 EnableSsl = true
             };
 
@@ -220,7 +227,7 @@ namespace BeeStore_Repository.Services
         }
 
         private static string GeneratePassword(int length)
-        { 
+        {
 
             char[] password = new char[length];
             using (var rng = RandomNumberGenerator.Create())

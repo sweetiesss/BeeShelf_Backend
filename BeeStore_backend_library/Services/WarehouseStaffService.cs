@@ -1,16 +1,11 @@
 ﻿using AutoMapper;
 using BeeStore_Repository.DTO;
-using BeeStore_Repository.DTO.WarehouseShipperDTOs;
 using BeeStore_Repository.DTO.WarehouseStaffDTOs;
 using BeeStore_Repository.Logger.GlobalExceptionHandler.CustomException;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace BeeStore_Repository.Services
 {
@@ -44,7 +39,7 @@ namespace BeeStore_Repository.Services
                 error = sb.ToString();
                 if (!String.IsNullOrEmpty(error))
                 {
-                    throw new DuplicateException("Please check provided list. The following user is duplicate: " + error);
+                    throw new DuplicateException(ResponseMessage.WarehouseUserDuplicateList + error);
                 }
             }
 
@@ -55,13 +50,13 @@ namespace BeeStore_Repository.Services
 
                 if (user == null)
                 {
-                    throw new KeyNotFoundException($"Product with this id doesnt exist: {item.UserId}");
+                    throw new KeyNotFoundException(ResponseMessage.ProductIdNotFound + $": {item.UserId}");
                 }
 
                 var role = await _unitOfWork.RoleRepo.SingleOrDefaultAsync(u => u.Id == user.RoleId);
-                if (role.RoleName != "Staff")
+                if (role.RoleName != Constants.RoleName.Staff)
                 {
-                    throw new AppException($"This user is not a staff: ID: {user.Id} EMAIL: {user.Email}");
+                    throw new AppException(ResponseMessage.UserRoleNotStaffError + $": {user.Email}");
                 }
 
                 //check if user is arleady working at here or another place
@@ -70,9 +65,7 @@ namespace BeeStore_Repository.Services
                 {
                     if (existWorking.IsDeleted != true)
                     {
-                        //throw new DuplicateException($"This user is already working at a warehouse: ID: {existWorking.User.Id}");
                         sb.Append($"{existWorking.User.Id}, ");
-
                     }
                     else
                     {
@@ -85,13 +78,13 @@ namespace BeeStore_Repository.Services
             error = sb.ToString();
             if (!String.IsNullOrEmpty(error))
             {
-                throw new DuplicateException("Failed to add. These user are already working at a warehouse " + error);
+                throw new DuplicateException(ResponseMessage.WarehouseUserAddListFailed + error);
             }
             var result = _mapper.Map<List<WarehouseStaff>>(request);
             await _unitOfWork.WarehouseStaffRepo.AddRangeAsync(result);
             await _unitOfWork.SaveAsync();
             return request;
-        
+
         }
 
         public async Task<Pagination<WarehouseStaffListDTO>> GetWarehouseStaffList(int pageIndex, int pageSize)

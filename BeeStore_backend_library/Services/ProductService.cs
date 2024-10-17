@@ -1,20 +1,12 @@
-﻿using Amazon.Runtime.EventStreams.Internal;
-using AutoMapper;
+﻿using AutoMapper;
 using BeeStore_Repository.DTO;
-using BeeStore_Repository.DTO.InventoryDTOs;
 using BeeStore_Repository.DTO.ProductDTOs;
 using BeeStore_Repository.Logger;
 using BeeStore_Repository.Logger.GlobalExceptionHandler.CustomException;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
-using Microsoft.AspNetCore.Http.HttpResults;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace BeeStore_Repository.Services
 {
@@ -32,14 +24,15 @@ namespace BeeStore_Repository.Services
 
         public async Task<ProductCreateDTO> CreateProduct(ProductCreateDTO request)
         {
-            var exist = await _unitOfWork.ProductRepo.FirstOrDefaultAsync(u => u.Name == request.Name && u.UserId == request.UserId);
+            var exist = await _unitOfWork.ProductRepo.FirstOrDefaultAsync(u => u.Name == request.Name && 
+                                                                          u.UserId == request.UserId);
             if (exist != null)
             {
-                if(exist.IsDeleted == false)
+                if (exist.IsDeleted == false)
                 {
                     throw new DuplicateException(ResponseMessage.ProductNameDuplicate);
                 }
-                if(exist.IsDeleted == true)
+                if (exist.IsDeleted == true)
                 {
                     exist.Name = null;
                     _unitOfWork.ProductRepo.Update(exist);
@@ -66,12 +59,12 @@ namespace BeeStore_Repository.Services
 
             //check dupes in list
             var dupes = request.Select((x, i) => new { index = i, value = x })
-                   .GroupBy(x => new { x.value.Name})
+                   .GroupBy(x => new { x.value.Name })
                    .Where(x => x.Skip(1).Any());
 
             if (dupes.Any())
             {
-                foreach(var group in dupes)
+                foreach (var group in dupes)
                 {
                     sb.Append($"{group.Key.Name}, ");
                 }
@@ -81,14 +74,14 @@ namespace BeeStore_Repository.Services
                     throw new DuplicateException(ResponseMessage.ProductListDuplicate + error);
                 }
             }
-            
+
             //proces request list
             foreach (var item in request)
             {
                 var exist = await _unitOfWork.ProductRepo.FirstOrDefaultAsync(u => u.Name == item.Name && u.UserId == item.UserId);
                 if (exist != null && exist.UserId == item.UserId)
                 {
-                    if(exist.IsDeleted == true)
+                    if (exist.IsDeleted == true)
                     {
                         exist.Name = null;
                         _unitOfWork.ProductRepo.Update(exist);
@@ -103,7 +96,7 @@ namespace BeeStore_Repository.Services
             error = sb.ToString();
             if (!String.IsNullOrEmpty(error))
             {
-                    throw new DuplicateException(ResponseMessage.ProductNameDuplicate + error);
+                throw new DuplicateException(ResponseMessage.ProductNameDuplicate + error);
             }
             var result = _mapper.Map<List<Product>>(request);
             await _unitOfWork.ProductRepo.AddRangeAsync(result);
@@ -118,9 +111,9 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.ProductIdNotFound);
             }
-                _unitOfWork.ProductRepo.SoftDelete(exist);
-                await _unitOfWork.SaveAsync();
-                return ResponseMessage.Success;
+            _unitOfWork.ProductRepo.SoftDelete(exist);
+            await _unitOfWork.SaveAsync();
+            return ResponseMessage.Success;
 
         }
 
@@ -142,7 +135,7 @@ namespace BeeStore_Repository.Services
         {
             //Check if the product exist or not
             var exist = await _unitOfWork.ProductRepo.SingleOrDefaultAsync(u => u.Id == id);
-            if(exist == null || exist.IsDeleted == true)
+            if (exist == null || exist.IsDeleted == true)
             {
                 throw new KeyNotFoundException(ResponseMessage.ProductIdNotFound);
             }
@@ -151,7 +144,7 @@ namespace BeeStore_Repository.Services
             //Check if the product's user Id match with the request user Id
             if (exist.UserId != request.UserId)
             {
-                throw new AppException("User misamatched.");
+                throw new AppException(ResponseMessage.UserMismatch);
             }
 
             //Check for duplicate name
@@ -161,10 +154,10 @@ namespace BeeStore_Repository.Services
             //If deleted status is false and it has the same id then it's fine to update
             //If deleted status is true then update the name of that duplicate product to null
             //Then proceed to update
-            
+
             var duplicateName = await _unitOfWork.ProductRepo.SingleOrDefaultAsync(u => u.Name == request.Name && u.UserId == request.UserId);
 
-            if (duplicateName != null) 
+            if (duplicateName != null)
             {
                 if (duplicateName.Id != id && duplicateName.IsDeleted == false)
                 {
@@ -179,7 +172,7 @@ namespace BeeStore_Repository.Services
                 }
             }
 
-            var productCategory =await  _unitOfWork.ProductCategoryRepo.SingleOrDefaultAsync(u => u.Id == request.ProductCategoryId);
+            var productCategory = await _unitOfWork.ProductCategoryRepo.SingleOrDefaultAsync(u => u.Id == request.ProductCategoryId);
 
             exist.Name = request.Name;
             exist.Origin = request.Origin;
