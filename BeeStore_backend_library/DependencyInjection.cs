@@ -52,7 +52,6 @@ namespace BeeStore_Repository
             // Auto mapper
             services.AddAutoMapper(typeof(MapperConfigurationsProfile).Assembly);
 
-
             // Logger
             LogManager.LoadConfiguration(string.Concat(Directory.GetCurrentDirectory(), "/nlog.config"));
 
@@ -60,10 +59,10 @@ namespace BeeStore_Repository
             // DB context
             services.AddDbContext<BeeStoreDbContext>(option => option.UseLazyLoadingProxies().UseMySQL(databaseConnection));
 
+
             // Singleton
             services.AddSingleton<AppConfiguration>();
             services.AddSingleton<IAmazonS3, AmazonS3Client>();
-
             return services;
 
 

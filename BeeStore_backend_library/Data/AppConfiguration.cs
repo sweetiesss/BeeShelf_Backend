@@ -10,5 +10,6 @@ namespace BeeStore_Repository.Data
     {
         public string DatabaseConnection { get; set; } = string.Empty;
         public string KeyVaultURL { get; set; }
+        public string sourceMail {  get; set; }
     }
 }

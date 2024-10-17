@@ -40,6 +40,7 @@ namespace BeeStore_Repository
                 if (userRepo == null)
                 {
                     userRepo = new GenericRepository<User>(_context);
+                    _context.ChangeTracker.LazyLoadingEnabled = false;
                 }
                 return userRepo;
             }

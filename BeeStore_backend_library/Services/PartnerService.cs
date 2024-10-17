@@ -1,18 +1,10 @@
 ﻿using AutoMapper;
 using BeeStore_Repository.DTO;
 using BeeStore_Repository.DTO.PartnerDTOs;
-using BeeStore_Repository.DTO.UserDTOs;
 using BeeStore_Repository.Logger;
-using BeeStore_Repository.Logger.GlobalExceptionHandler.CustomException;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BeeStore_Repository.Services
 {
@@ -32,7 +24,7 @@ namespace BeeStore_Repository.Services
         {
             var list = await _unitOfWork.PartnerRepo.GetAllAsync();
             var result = _mapper.Map<List<PartnerListDTO>>(list);
-            
+
             return await ListPagination<PartnerListDTO>.PaginateList(result, pageIndex, pageSize);
         }
 
@@ -48,18 +40,13 @@ namespace BeeStore_Repository.Services
                 throw new ApplicationException(ResponseMessage.UserRoleError);
             }
 
-            
-            //if (await _unitOfWork.PartnerRepo.SingleOrDefaultAsync(u => u.UserId == request.UserId) != null)
-            //{
-            //    throw new DuplicateException("User is already a partner");
-            //}
             request.CreateDate = DateTime.Now;
             request.UpdateDate = DateTime.Now;
             var partner = _mapper.Map<Partner>(request);
             await _unitOfWork.PartnerRepo.AddAsync(partner);
             user.RoleId = 4;
             await _unitOfWork.SaveAsync();
-            
+
 
             return request;
         }
@@ -67,20 +54,23 @@ namespace BeeStore_Repository.Services
         public async Task<PartnerUpdateRequest> UpdatePartner(PartnerUpdateRequest request)
         {
             var exist = await _unitOfWork.PartnerRepo.SingleOrDefaultAsync(u => u.UserId == request.UserId);
-            if(exist == null)
+            if (exist == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
             }
             exist.UpdateDate = DateTime.Now;
-            if (!String.IsNullOrEmpty(request.BankAccountNumber) && !request.BankAccountNumber.Equals("string"))
-            { 
+            if (!String.IsNullOrEmpty(request.BankAccountNumber) && 
+                !request.BankAccountNumber.Equals(Constants.DefaultString.String))
+            {
                 exist.BankAccountNumber = request.BankAccountNumber;
             }
-            if (!String.IsNullOrEmpty(request.CitizenIdentificationNumber) && !request.CitizenIdentificationNumber.Equals("string"))
+            if (!String.IsNullOrEmpty(request.CitizenIdentificationNumber) && 
+                !request.CitizenIdentificationNumber.Equals(Constants.DefaultString.String))
             {
                 exist.CitizenIdentificationNumber = request.CitizenIdentificationNumber;
             }
-            if (!String.IsNullOrEmpty(request.BankName) && !request.BankName.Equals("string"))
+            if (!String.IsNullOrEmpty(request.BankName) && 
+                !request.BankName.Equals(Constants.DefaultString.String))
             {
                 exist.BankName = request.BankName;
             }
