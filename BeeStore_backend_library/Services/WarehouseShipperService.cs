@@ -53,7 +53,7 @@ namespace BeeStore_Repository.Services
                 error = sb.ToString();
                 if (!String.IsNullOrEmpty(error))
                 {
-                    throw new DuplicateException("Please check provided list. The following user is duplicate: " + error);
+                    throw new DuplicateException(ResponseMessage.WarehouseUserDuplicateList + error);
                 }
             }
 
@@ -64,13 +64,13 @@ namespace BeeStore_Repository.Services
 
                 if (user == null)
                 {
-                    throw new KeyNotFoundException($"Product with this id doesnt exist: {item.UserId}");
+                    throw new KeyNotFoundException(ResponseMessage.ProductIdNotFound + $": {item.UserId}");
                 }
 
                 var role = await _unitOfWork.RoleRepo.SingleOrDefaultAsync(u => u.Id == user.RoleId);
-                if(role.RoleName != "Shipper")
+                if(role.RoleName != Constants.RoleName.Shipper)
                 {
-                    throw new AppException($"This user is not a shipper: ID: {user.Id} EMAIL: {user.Email}");
+                    throw new AppException(ResponseMessage.UserRoleNotShipperError + $": {user.Email}");
                 }
 
                 //check if user is arleady working at here or another place
@@ -94,7 +94,7 @@ namespace BeeStore_Repository.Services
             error = sb.ToString();
             if (!String.IsNullOrEmpty(error))
             {
-                throw new DuplicateException("Failed to add. These user are already working at a warehouse " + error);
+                throw new DuplicateException(ResponseMessage.WarehouseUserAddListFailed + error);
             }
             var result = _mapper.Map<List<WarehouseShipper>>(request);
             await _unitOfWork.WarehouseShipperRepo.AddRangeAsync(result);

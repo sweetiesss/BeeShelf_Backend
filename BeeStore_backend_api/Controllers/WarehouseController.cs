@@ -168,12 +168,12 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
-        [Route("update-warehouse")]
+        [Route("update-warehouse/{id}")]
         [HttpPut]
         [Authorize(Roles = "Admin,Manager")]
-        public async Task<IActionResult> UpdateWarehouse(WarehouseCreateDTO request)
+        public async Task<IActionResult> UpdateWarehouse(int id,WarehouseCreateDTO request)
         {
-            var result = await _warehouseService.UpdateWarehouse(request);
+            var result = await _warehouseService.UpdateWarehouse(id, request);
             return Ok(result);
         }
 

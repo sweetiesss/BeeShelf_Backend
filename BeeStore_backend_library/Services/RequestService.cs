@@ -6,12 +6,6 @@ using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BeeStore_Repository.Services
 {
@@ -30,12 +24,12 @@ namespace BeeStore_Repository.Services
         public async Task<RequestCreateDTO> CreateRequest(RequestCreateDTO request)
         {
             var user = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Id == request.UserId);
-            if(user == null)
+            if (user == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
             }
             var inventory = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Id == request.SendToInventory);
-            if(inventory == null)
+            if (inventory == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
             }
@@ -53,7 +47,7 @@ namespace BeeStore_Repository.Services
             {
                 throw new ApplicationException(ResponseMessage.InventoryOverWeightError);
             }
-            request.Status = "Pending";
+            request.Status = Constants.Status.Pending;
             var result = _mapper.Map<Request>(request);
             await _unitOfWork.RequestRepo.AddAsync(result);
             await _unitOfWork.SaveAsync();
@@ -63,7 +57,7 @@ namespace BeeStore_Repository.Services
         public async Task<string> DeleteRequest(int id)
         {
             var exist = await _unitOfWork.RequestRepo.SingleOrDefaultAsync(u => u.Id == id);
-            if(exist == null)
+            if (exist == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.RequestIdNotFound);
             }
@@ -108,7 +102,7 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
             }
-            if(!exist.Status.Equals(Constants.RequestStatus.Pending, StringComparison.OrdinalIgnoreCase))
+            if (!exist.Status.Equals(Constants.Status.Pending, StringComparison.OrdinalIgnoreCase))
             {
                 throw new ApplicationException(ResponseMessage.RequestStatusError);
             }
@@ -129,18 +123,16 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.RequestIdNotFound);
             }
-            if (!exist.Status.Equals(Constants.RequestStatus.Pending))
+            if (!exist.Status.Equals(Constants.Status.Pending))
             {
                 throw new ApplicationException(ResponseMessage.RequestStatusError);
             }
             if (statusId == 1)
             {
-                status = Constants.RequestStatus.Approved;
-                //Since lazy loading is enable, might have to change the query later (too lazy now)
-                var package = await _unitOfWork.PackageRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.PackageId),
-                                                                                 query => query.Include(o => o.Product)
-                                                                                 .ThenInclude(item => item.ProductCategory));
-                if(package == null)
+                status = Constants.Status.Approved;
+
+                var package = await _unitOfWork.PackageRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.PackageId));
+                if (package == null)
                 {
                     throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
                 }
@@ -163,7 +155,7 @@ namespace BeeStore_Repository.Services
             }
             if (statusId == 2)
             {
-                status = Constants.RequestStatus.Reject;
+                status = Constants.Status.Reject;
             }
             exist.Status = status;
             await _unitOfWork.SaveAsync();

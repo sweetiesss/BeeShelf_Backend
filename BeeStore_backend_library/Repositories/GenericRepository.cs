@@ -46,7 +46,7 @@ namespace BeeStore_Repository.Repositories
                 query = includes(query);
             }
 
-            return await query.Where(x => x.IsDeleted.Equals(false)).ToListAsync();
+            return await query.ToListAsync();
         }
 
         //public async Task<T> SingleOrDefaultAsync(Expression<Func<T, bool>> predicate)

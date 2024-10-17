@@ -1,16 +1,10 @@
 ﻿using AutoMapper;
 using BeeStore_Repository.DTO;
 using BeeStore_Repository.DTO.PackageDTOs;
-using BeeStore_Repository.DTO.ProductCategoryDTOs;
 using BeeStore_Repository.Logger;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BeeStore_Repository.Services
 {
@@ -31,18 +25,18 @@ namespace BeeStore_Repository.Services
             if (request.InventoryId != null)
             {
                 var inventory = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Id == request.InventoryId);
-                if(inventory == null)
+                if (inventory == null)
                 {
                     throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
                 }
             }
-            var product = await _unitOfWork.ProductRepo.SingleOrDefaultAsync(u => u.Id == request.ProductId); 
-            if(product == null)
+            var product = await _unitOfWork.ProductRepo.SingleOrDefaultAsync(u => u.Id == request.ProductId);
+            if (product == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.ProductIdNotFound);
             }
 
-            
+
             var result = _mapper.Map<Package>(request);
             var productCategory = await _unitOfWork.ProductCategoryRepo.SingleOrDefaultAsync(u => u.Id == product.ProductCategoryId);
 
@@ -68,7 +62,7 @@ namespace BeeStore_Repository.Services
         public async Task<PackageListDTO> GetPackageById(int id)
         {
             var exist = await _unitOfWork.PackageRepo.SingleOrDefaultAsync(u => u.Id.Equals(id));
-            if(exist == null)
+            if (exist == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
             }
@@ -85,12 +79,12 @@ namespace BeeStore_Repository.Services
 
         public async Task<PackageCreateDTO> UpdatePackage(int id, PackageCreateDTO request)
         {
-            var exist = await _unitOfWork.PackageRepo.SingleOrDefaultAsync(u => u.Id ==  id);
+            var exist = await _unitOfWork.PackageRepo.SingleOrDefaultAsync(u => u.Id == id);
             if (exist == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
             }
-            if(request.InventoryId != null)
+            if (request.InventoryId != null)
             {
                 var inventory = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Id == request.InventoryId);
                 if (inventory == null)

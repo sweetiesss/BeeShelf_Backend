@@ -29,7 +29,7 @@ namespace BeeStore_Repository.Services
             var exist = await _unitOfWork.WarehouseRepo.SingleOrDefaultAsync(u => u.Name == request.Name);
             if (exist != null)
             {
-                throw new DuplicateException("Warehouse with this name already exists.");
+                throw new DuplicateException(ResponseMessage.WarehouseNameDuplicate);
             }
             var warehouse = _mapper.Map<Warehouse>(request);
             warehouse.CreateDate = DateTime.Now;
@@ -43,11 +43,11 @@ namespace BeeStore_Repository.Services
             var exist = await _unitOfWork.WarehouseRepo.SingleOrDefaultAsync(u => u.Id == id);
             if (exist == null)
             {
-                throw new KeyNotFoundException("No warehouse found.");
+                throw new KeyNotFoundException(ResponseMessage.WarehouseIdNotFound);
             }
             _unitOfWork.WarehouseRepo.SoftDelete(exist);
             await _unitOfWork.SaveAsync();
-            return "Success";
+            return ResponseMessage.Success;
         }
 
         public async Task<Pagination<WarehouseListDTO>> GetWarehouseList(int pageIndex, int pageSize)
@@ -61,6 +61,7 @@ namespace BeeStore_Repository.Services
         public async Task<List<WarehouseListInventoryDTO>> GetWarehouseByUserId(int userId)
         {
             var list = await _unitOfWork.WarehouseRepo.GetQueryable(wh => wh
+                                                       .Where(u => u.IsDeleted.Equals(false))
                                                        .Where(w => w.Inventories.Any(inventory => inventory.UserId == userId))
         .Select(warehouse => new Warehouse
         {
@@ -76,15 +77,21 @@ namespace BeeStore_Repository.Services
             return result;
         }
 
-        public async Task<WarehouseCreateDTO> UpdateWarehouse(WarehouseCreateDTO request)
+        public async Task<WarehouseCreateDTO> UpdateWarehouse(int id, WarehouseCreateDTO request)
         {
-            var exist = await _unitOfWork.WarehouseRepo.SingleOrDefaultAsync(u => u.Name == request.Name);
+            var exist = await _unitOfWork.WarehouseRepo.SingleOrDefaultAsync(u => u.Id == id);
             if (exist == null)
             {
-                throw new DuplicateException("No warehouse with this name found.");
+                throw new KeyNotFoundException(ResponseMessage.WarehouseIdNotFound);
             }
 
-            if (!String.IsNullOrEmpty(request.Location) && !request.Location.Equals("string"))
+            var duplicate = await _unitOfWork.WarehouseRepo.SingleOrDefaultAsync(u => u.Name.Equals(request.Name));
+            if (duplicate != null && duplicate.Id != exist.Id)
+            {
+                throw new DuplicateException(ResponseMessage.WarehouseNameDuplicate);
+            }
+
+            if (!String.IsNullOrEmpty(request.Location) && !request.Location.Equals(Constants.DefaultString.String))
             {
                 exist.Location = request.Location;
             }
