@@ -1,12 +1,6 @@
 ﻿using BeeStore_Repository.DTO.UserDTOs.Interfaces;
 using BeeStore_Repository.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Reflection.Metadata;
-using System.Text;
 using System.Text.Json.Serialization;
-using System.Threading.Tasks;
 
 namespace BeeStore_Repository.DTO.UserDTOs
 {

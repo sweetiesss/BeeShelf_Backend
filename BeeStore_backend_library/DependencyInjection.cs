@@ -4,7 +4,6 @@ using BeeStore_Repository.Data;
 using BeeStore_Repository.Logger;
 using BeeStore_Repository.Logger.GlobalExceptionHandler;
 using BeeStore_Repository.Mapper;
-using BeeStore_Repository.Mapper.CustomResolver;
 using BeeStore_Repository.Services;
 using BeeStore_Repository.Services.Interfaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
@@ -12,12 +11,8 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using NLog;
-using Swashbuckle.AspNetCore.SwaggerGen;
-using System.Configuration;
-using System.Diagnostics;
 using System.Text;
 
 namespace BeeStore_Repository

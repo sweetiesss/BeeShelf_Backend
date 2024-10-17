@@ -20,7 +20,7 @@ namespace BeeStore_Repository.Services
             _logger = logger;
         }
 
-        public async Task<PackageCreateDTO> CreatePackage(PackageCreateDTO request)
+        public async Task<string> CreatePackage(PackageCreateDTO request)
         {
             if (request.InventoryId != null)
             {
@@ -44,7 +44,7 @@ namespace BeeStore_Repository.Services
             result.ExpirationDate = DateTime.Now.AddDays(productCategory.ExpireIn!.Value);
             await _unitOfWork.PackageRepo.AddAsync(result);
             await _unitOfWork.SaveAsync();
-            return request;
+            return ResponseMessage.Success;
         }
 
         public async Task<string> DeletePackage(int id)
@@ -77,7 +77,7 @@ namespace BeeStore_Repository.Services
             return (await ListPagination<PackageListDTO>.PaginateList(result, pageIndex, pageSize));
         }
 
-        public async Task<PackageCreateDTO> UpdatePackage(int id, PackageCreateDTO request)
+        public async Task<string> UpdatePackage(int id, PackageCreateDTO request)
         {
             var exist = await _unitOfWork.PackageRepo.SingleOrDefaultAsync(u => u.Id == id);
             if (exist == null)
@@ -104,7 +104,7 @@ namespace BeeStore_Repository.Services
             exist.ExpirationDate = DateTime.Now.AddDays(productCategory.ExpireIn!.Value);
             _unitOfWork.PackageRepo.Update(exist);
             await _unitOfWork.SaveAsync();
-            return request;
+            return ResponseMessage.Success;
         }
     }
 }

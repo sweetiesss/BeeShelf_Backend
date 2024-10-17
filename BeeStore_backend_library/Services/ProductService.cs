@@ -22,9 +22,9 @@ namespace BeeStore_Repository.Services
             _logger = logger;
         }
 
-        public async Task<ProductCreateDTO> CreateProduct(ProductCreateDTO request)
+        public async Task<string> CreateProduct(ProductCreateDTO request)
         {
-            var exist = await _unitOfWork.ProductRepo.FirstOrDefaultAsync(u => u.Name == request.Name && 
+            var exist = await _unitOfWork.ProductRepo.FirstOrDefaultAsync(u => u.Name == request.Name &&
                                                                           u.UserId == request.UserId);
             if (exist != null)
             {
@@ -49,10 +49,10 @@ namespace BeeStore_Repository.Services
             var result = _mapper.Map<Product>(request);
             await _unitOfWork.ProductRepo.AddAsync(result);
             await _unitOfWork.SaveAsync();
-            return request;
+            return ResponseMessage.Success;
         }
 
-        public async Task<List<ProductCreateDTO>> CreateProductRange(List<ProductCreateDTO> request)
+        public async Task<string> CreateProductRange(List<ProductCreateDTO> request)
         {
             StringBuilder sb = new StringBuilder();
             string error = string.Empty;
@@ -101,7 +101,7 @@ namespace BeeStore_Repository.Services
             var result = _mapper.Map<List<Product>>(request);
             await _unitOfWork.ProductRepo.AddRangeAsync(result);
             await _unitOfWork.SaveAsync();
-            return request;
+            return ResponseMessage.Success;
         }
 
         public async Task<string> DeleteProduct(int id)
@@ -131,7 +131,7 @@ namespace BeeStore_Repository.Services
             return (await ListPagination<ProductListDTO>.PaginateList(result, pageIndex, pageSize));
         }
 
-        public async Task<ProductCreateDTO> UpdateProduct(int id, ProductCreateDTO request)
+        public async Task<string> UpdateProduct(int id, ProductCreateDTO request)
         {
             //Check if the product exist or not
             var exist = await _unitOfWork.ProductRepo.SingleOrDefaultAsync(u => u.Id == id);
@@ -182,7 +182,7 @@ namespace BeeStore_Repository.Services
             exist.ProductCategoryId = request.ProductCategoryId;
             _unitOfWork.ProductRepo.Update(exist);
             await _unitOfWork.SaveAsync();
-            return request;
+            return ResponseMessage.Success;
         }
     }
 }

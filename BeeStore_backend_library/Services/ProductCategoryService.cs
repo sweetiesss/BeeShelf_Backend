@@ -20,7 +20,7 @@ namespace BeeStore_Repository.Services
             _mapper = mapper;
             _logger = logger;
         }
-        public async Task<ProductCategoryCreateDTO> CreateProductCategory(ProductCategoryCreateDTO request)
+        public async Task<string> CreateProductCategory(ProductCategoryCreateDTO request)
         {
             var exist = await _unitOfWork.ProductCategoryRepo.SingleOrDefaultAsync(u => u.TypeName == request.TypeName);
             if (exist != null)
@@ -39,7 +39,7 @@ namespace BeeStore_Repository.Services
             var result = _mapper.Map<ProductCategory>(request);
             await _unitOfWork.ProductCategoryRepo.AddAsync(result);
             await _unitOfWork.SaveAsync();
-            return request;
+            return ResponseMessage.Success;
         }
 
         public async Task<string> DeleteProductCategory(int id)
@@ -62,7 +62,7 @@ namespace BeeStore_Repository.Services
 
         }
 
-        public async Task<ProductCategoryCreateDTO> UpdateProductCategory(int id, ProductCategoryCreateDTO request)
+        public async Task<string> UpdateProductCategory(int id, ProductCategoryCreateDTO request)
         {
 
             var exist = await _unitOfWork.ProductCategoryRepo.SingleOrDefaultAsync(u => u.TypeName == request.TypeName);
@@ -89,7 +89,7 @@ namespace BeeStore_Repository.Services
             prodCat.ExpireIn = request.ExpireIn;
             _unitOfWork.ProductCategoryRepo.Update(prodCat);
             await _unitOfWork.SaveAsync();
-            return request;
+            return ResponseMessage.Success;
         }
     }
 }

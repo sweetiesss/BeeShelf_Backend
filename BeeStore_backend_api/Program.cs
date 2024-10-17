@@ -8,18 +8,8 @@ using BeeStore_Repository.Data;
 using BeeStore_Repository.Logger.GlobalExceptionHandler;
 using BeeStore_Repository.Services;
 using BeeStore_Repository.Services.Interfaces;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Cors.Infrastructure;
-using Microsoft.Azure.KeyVault;
-using Microsoft.Azure.Services.AppAuthentication;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using Microsoft.IdentityModel.Tokens;
-using MySqlX.XDevAPI;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,7 +19,7 @@ if (builder.Environment.IsDevelopment())
 {
     var configuration = builder.Configuration
                         .GetSection("ConnectionStrings")
-                        .Get<AppConfiguration>() 
+                        .Get<AppConfiguration>()
                         ?? throw new ArgumentNullException("Configuration can not be configured.");
     builder.Services.AddInfrastructuresService(configuration.DatabaseConnection);
 
@@ -106,8 +96,8 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 
 app.UseMiddleware<GlobalExceptionMiddleware>();
-if (builder.Environment.IsProduction()) 
-{ 
+if (builder.Environment.IsProduction())
+{
     app.UseMiddleware<ApiKeyAuthMiddleware>();
     app.UseCors("AllowSpecificOrigins");
 }

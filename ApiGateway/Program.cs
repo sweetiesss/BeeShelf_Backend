@@ -1,13 +1,8 @@
-using Microsoft.OpenApi.Models;
-using Ocelot.DependencyInjection;
-using Ocelot.Middleware;
-using MMLib.SwaggerForOcelot.DependencyInjection;
-using Kros.Extensions;
-using Microsoft.Extensions.Configuration;
-using Ocelot.Values;
 using ApiGateway.Config;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
+using Ocelot.DependencyInjection;
+using Ocelot.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 

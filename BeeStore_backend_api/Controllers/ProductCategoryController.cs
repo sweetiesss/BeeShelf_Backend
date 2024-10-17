@@ -1,5 +1,4 @@
 ﻿using BeeStore_Repository.DTO.ProductCategoryDTOs;
-using BeeStore_Repository.Services;
 using BeeStore_Repository.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -36,7 +35,7 @@ namespace BeeStore_Api.Controllers
                 _memoryCache.Set(cacheKey, result, cacheEntryOptions);
             }
 
-            
+
             return Ok(result);
         }
 
