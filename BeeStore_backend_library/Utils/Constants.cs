@@ -30,8 +30,21 @@ namespace BeeStore_Repository.Utils
 
         public static class DefaultString
         {
+            public const string systemJsonFile = "appsettings.json";
             public const string String = "string";
         }
 
+        public static class Smtp
+        {
+            public const int DEFAULT_PASSWORD_LENGTH = 12;
+            public const string lowercaseLetters = "abcdefghijklmnopqrstuvwxyz";
+            public const string uppercaseLetters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+            public const string digits = "0123456789";
+            public const string specialCharacters = "!@#$%^&*()_+-=[]{}|;:',.<>?/";
+            public const string characterSet = lowercaseLetters + uppercaseLetters + digits + specialCharacters;
+            public const string smtp = "smtp.gmail.com";
+
+            public const string registerMailSubject = "BeeShelf Account Password";
+        }
     }
 }
