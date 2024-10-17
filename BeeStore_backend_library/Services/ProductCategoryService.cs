@@ -1,18 +1,11 @@
 ﻿using AutoMapper;
 using BeeStore_Repository.DTO;
 using BeeStore_Repository.DTO.ProductCategoryDTOs;
-using BeeStore_Repository.DTO.ProductDTOs;
 using BeeStore_Repository.Logger;
 using BeeStore_Repository.Logger.GlobalExceptionHandler.CustomException;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
-using MySqlX.XDevAPI.Common;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BeeStore_Repository.Services
 {
@@ -32,7 +25,7 @@ namespace BeeStore_Repository.Services
             var exist = await _unitOfWork.ProductCategoryRepo.SingleOrDefaultAsync(u => u.TypeName == request.TypeName);
             if (exist != null)
             {
-                if(exist.IsDeleted == true)
+                if (exist.IsDeleted == true)
                 {
                     exist.TypeName = null;
                     _unitOfWork.ProductCategoryRepo.Update(exist);
@@ -81,13 +74,13 @@ namespace BeeStore_Repository.Services
                     _unitOfWork.ProductCategoryRepo.Update(exist);
                     await _unitOfWork.SaveAsync();
                 }
-                else if(exist.Id != id)
+                else if (exist.Id != id)
                 {
                     throw new DuplicateException(ResponseMessage.ProductCategoryDuplicate);
                 }
             }
             var prodCat = await _unitOfWork.ProductCategoryRepo.SingleOrDefaultAsync(u => u.Id == id);
-            if(prodCat == null)
+            if (prodCat == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.ProductCategoryIdNotFound);
             }

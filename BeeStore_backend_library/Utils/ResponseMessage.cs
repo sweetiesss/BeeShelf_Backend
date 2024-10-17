@@ -27,6 +27,8 @@ namespace BeeStore_Repository.Utils
         public const string UserRoleError = "This user's role is already higher or equal to Partner.";
         public const string UserRoleNotPartnerError = "This user is not a partner.";
         public const string UserRoleNotShipperError = "This user is not a shipper.";
+        public const string UserRoleNotStaffError = "This user is not a staff.";
+        public const string UserMismatch = "User mismatched.";
 
         //Partner response message
         public const string PartnerIdNotFound = "Partner Id not found.";
@@ -40,6 +42,10 @@ namespace BeeStore_Repository.Utils
 
         //Warehouse response message
         public const string WarehouseIdNotFound = "Warehouse Id not found.";
+        public const string WarehouseNameDuplicate = "Warehouse with this name already exist.";
+        public const string WarehouseUserDuplicateList = "Please check provided list. The following user is duplicate: ";
+        public const string WarehouseUserAddListFailed = "Failed to add. These user are already working at a warehouse ";
+
 
         //Product response message
         public const string ProductIdNotFound = "Product Id not found.";
@@ -51,7 +57,8 @@ namespace BeeStore_Repository.Utils
 
         //Order response message
         public const string OrderIdNotFound = "Order Id not found.";
-        public const string OrderProccessedError = "You can't change proccessed order.";
+        public const string OrderProccessedError = "You can't edit proccessed order.";
+        public const string OrderCanceledError = "You can't canceled finished order.";
 
         //Product category response message
         public const string ProductCategoryIdNotFound = "Product Category Id not found.";
@@ -60,5 +67,11 @@ namespace BeeStore_Repository.Utils
         //Request response message
         public const string RequestIdNotFound = "Request Id not found.";
         public const string RequestStatusError = "Request has already been proccessed.";
+
+        //Warehouse category response message
+        public const string WarehouseCategoryAddListFailed = "Failed to add. Warehouse with these category already exist: ";
+        public const string WarehouseCategoryDuplicateList = "Please check provided list. The following category is duplicate: ";
+
+        
     }
 }

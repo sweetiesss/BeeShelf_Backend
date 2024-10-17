@@ -1,17 +1,11 @@
-﻿using Amazon.S3.Model;
-using AutoMapper;
+﻿using AutoMapper;
 using BeeStore_Repository.DTO;
 using BeeStore_Repository.DTO.WarehouseCategoryDTOs;
-using BeeStore_Repository.Logger;
 using BeeStore_Repository.Logger.GlobalExceptionHandler.CustomException;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace BeeStore_Repository.Services
 {
@@ -45,7 +39,7 @@ namespace BeeStore_Repository.Services
                 error = sb.ToString();
                 if (!String.IsNullOrEmpty(error))
                 {
-                    throw new DuplicateException("Please check provided list. The following category is duplicate: " + error);
+                    throw new DuplicateException(ResponseMessage.WarehouseCategoryDuplicateList + error);
                 }
             }
 
@@ -53,7 +47,7 @@ namespace BeeStore_Repository.Services
             {
                 if ((await _unitOfWork.ProductCategoryRepo.SingleOrDefaultAsync(u => u.Id == item.ProductCategoryId)) == null)
                 {
-                    throw new KeyNotFoundException($"Product with this id doesnt exist: {item.ProductCategoryId}");
+                    throw new KeyNotFoundException(ResponseMessage.ProductIdNotFound + $": {item.ProductCategoryId}");
                 }
 
                 var exist = await _unitOfWork.WarehouseCategoryRepo.FirstOrDefaultAsync(u => u.WarehouseId == item.WarehouseId && u.ProductCategoryId == item.ProductCategoryId);
@@ -75,7 +69,7 @@ namespace BeeStore_Repository.Services
             error = sb.ToString();
             if (!String.IsNullOrEmpty(error))
             {
-                throw new DuplicateException("Failed to add. Warehouse with these category already exist: " + error);
+                throw new DuplicateException(ResponseMessage.WarehouseCategoryAddListFailed + error);
             }
             var result = _mapper.Map<List<WarehouseCategory>>(request);
             await _unitOfWork.WarehouseCategoryRepo.AddRangeAsync(result);

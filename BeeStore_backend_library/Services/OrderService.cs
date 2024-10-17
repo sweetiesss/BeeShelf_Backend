@@ -52,15 +52,13 @@ namespace BeeStore_Repository.Services
 
         public async Task<OrderCreateDTO> CreateOrder(OrderCreateDTO request)
         {
-            //check for userId (both shipper and partner) (also check roles)
-            //check for product
-            
             var user = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Id == request.UserId,
                                                                        query => query.Include(o => o.Role));
             if(user == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
             }
+
             if (user.RoleId != 4)
             {
                 throw new ApplicationException(ResponseMessage.UserRoleNotPartnerError);
@@ -85,8 +83,9 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.ProductIdNotFound);
             }
+
             request.CreateDate = DateTime.Now;
-            request.OrderStatus = "Pending";        ////////////////////////////////////////////////////////
+            request.OrderStatus = Constants.Status.Pending;
             var result = _mapper.Map<Order>(request);
             await _unitOfWork.OrderRepo.AddAsync(result);
             await _unitOfWork.SaveAsync();
@@ -101,7 +100,7 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.OrderIdNotFound);
             }
-            if (exist.OrderStatus != "Pending")
+            if (exist.OrderStatus != Constants.Status.Pending)
             {
                 throw new ApplicationException(ResponseMessage.OrderProccessedError);
             }
@@ -117,7 +116,7 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.OrderIdNotFound);
             }
-            if (exist.OrderStatus != "Pending")
+            if (exist.OrderStatus != Constants.Status.Pending)
             {
                 throw new ApplicationException(ResponseMessage.OrderProccessedError);
             }
@@ -140,56 +139,47 @@ namespace BeeStore_Repository.Services
             var exist = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u => u.Id == id);
             if (exist == null)
             {
-                throw new KeyNotFoundException("Order not found.");
+                throw new KeyNotFoundException(ResponseMessage.OrderIdNotFound);
             }
             string orderStatusUpdate = null;
 
-            //I will change this mess later
-            //I will change this mess later
-            //I will change this mess later
-            //I will change this mess later
-            //I will change this mess later
-            //I will change this mess later
-
-
-
             if (orderStatus == 1)        //Pending
             {
-                return "Success";
+                return ResponseMessage.Success;
             }
+
             if(orderStatus == 2)        //Processing
             {
-                if(exist.OrderStatus == "Pending")
+                if(exist.OrderStatus == Constants.Status.Pending)
                 {
-                    orderStatusUpdate = "Proccessing";
+                    orderStatusUpdate = Constants.Status.Processing;
                 }
                 else
                 {
-                    throw new ApplicationException("You can't edit already processed orders.");
+                    throw new ApplicationException(ResponseMessage.OrderProccessedError);
                 }
             }
+
             if(orderStatus == 3)    //Shipped
             {
-                if (exist.OrderStatus == "Processing")
+                if (exist.OrderStatus == Constants.Status.Processing)
                 {
-                    orderStatusUpdate = "Shipped";
+                    orderStatusUpdate = Constants.Status.Shipped;
                 }
                 else
                 {
-                    throw new ApplicationException("You can't edit unprocess or finished orders.");
+                    throw new ApplicationException(ResponseMessage.OrderProccessedError);
                 }
             }
+
             if(orderStatus == 4) //Canceled
             {
-                if(exist.OrderStatus == "Shipped")
+                if(exist.OrderStatus == Constants.Status.Shipped)
                 {
-                    throw new ApplicationException("You can't canceled finished orders.");
+                    throw new ApplicationException(ResponseMessage.OrderCanceledError);
                 }
-                orderStatusUpdate = "Canceled";
+                orderStatusUpdate = Constants.Status.Canceled;
             } 
-
-
-
 
             exist.OrderStatus = orderStatusUpdate;
             _unitOfWork.OrderRepo.Update(exist);

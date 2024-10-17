@@ -1,19 +1,11 @@
 ﻿using AutoMapper;
 using BeeStore_Repository.DTO;
 using BeeStore_Repository.DTO.InventoryDTOs;
-using BeeStore_Repository.DTO.WarehouseDTOs;
 using BeeStore_Repository.Logger;
 using BeeStore_Repository.Logger.GlobalExceptionHandler.CustomException;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
-using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BeeStore_Repository.Services
 {
@@ -35,7 +27,7 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
             }
-            if(exist.UserId != null)
+            if (exist.UserId != null)
             {
                 throw new DuplicateException(ResponseMessage.InventoryOccupied);
             }
@@ -60,7 +52,7 @@ namespace BeeStore_Repository.Services
         public async Task<InventoryCreateDTO> CreateInventory(InventoryCreateDTO request)
         {
             var exist = await _unitOfWork.WarehouseRepo.GetByIdAsync(request.WarehouseId);
-            if(exist == null)
+            if (exist == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.WarehouseIdNotFound);
             }
@@ -109,7 +101,7 @@ namespace BeeStore_Repository.Services
             {
                 exist.Weight = request.Weight;
             }
-            if(request.MaxWeight != null && request.MaxWeight != 0)
+            if (request.MaxWeight != null && request.MaxWeight != 0)
             {
                 exist.MaxWeight = request.MaxWeight;
             }
@@ -129,7 +121,7 @@ namespace BeeStore_Repository.Services
         public async Task<Pagination<InventoryListDTO>> GetInventoryList(int userId, int pageIndex, int pageSize)
         {
             var list = await _unitOfWork.InventoryRepo.GetFiltered(u => u.UserId.Equals(userId));
-            
+
             var result = _mapper.Map<List<InventoryListDTO>>(list);
             return (await ListPagination<InventoryListDTO>.PaginateList(result, pageIndex, pageSize));
         }
@@ -137,7 +129,7 @@ namespace BeeStore_Repository.Services
         public async Task<InventoryListPackagesDTO> GetInventoryById(int id)
         {
             var exist = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Id.Equals(id));
-            if(exist == null)
+            if (exist == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
             }

@@ -13,7 +13,7 @@ namespace BeeStore_Repository.Services.Interfaces
         Task<Pagination<WarehouseListDTO>> GetWarehouseList(int pageIndex, int pageSize);
         Task<List<WarehouseListInventoryDTO>> GetWarehouseByUserId(int userId);
         Task<WarehouseCreateDTO> CreateWarehouse(WarehouseCreateDTO request);
-        Task<WarehouseCreateDTO> UpdateWarehouse(WarehouseCreateDTO request);
+        Task<WarehouseCreateDTO> UpdateWarehouse(int id, WarehouseCreateDTO request);
         Task<string> DeleteWarehouse(int id);
     }
 }

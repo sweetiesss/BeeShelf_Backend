@@ -18,11 +18,20 @@ namespace BeeStore_Repository.Utils
             public const string Partner = "Partner";
         }
 
-        public static class RequestStatus
+        public static class Status
         {
             public const string Pending = "Pending";
             public const string Approved = "Approved";
             public const string Reject = "Reject";
+            public const string Processing = "Processing";
+            public const string Shipped = "Shipped";
+            public const string Canceled = "Canceled";
         }
+
+        public static class DefaultString
+        {
+            public const string String = "string";
+        }
+
     }
 }
