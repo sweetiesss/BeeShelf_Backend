@@ -23,7 +23,7 @@ namespace BeeStore_Api.Controllers
         {
             var result = await _userService.Login(request.email, request.password);
 
-            return Ok(_jwtService.GenerateJwtToken(result.Email, result.RoleName));
+            return Ok(_jwtService.GenerateJwtToken(result.email, result.role));
         }
 
         [Route("sign-up")]
@@ -32,6 +32,13 @@ namespace BeeStore_Api.Controllers
         {
             var result = await _userService.SignUp(user);
             return Ok(result);
+        }
+
+        [Route("refresh-token")]
+        [HttpPost]
+        public IActionResult RefreshToken([FromBody] UserRefreshTokenRequestDTO jwt)
+        {
+            return Ok(_jwtService.RefreshJWTToken(jwt));
         }
     }
 }
