@@ -11,6 +11,10 @@
         public const string JWTSecretKeyError = "Key Vault JWT Secret Key values are missing.";
         public const string JWTIssuerValueError = "Key Vault JWT Issuer values are missing.";
         public const string JwtAudienceValueError = "Key Vault JWT Audience values are missing.";
+        public const string JwtTokenHasNotExpired = "Token has not expired yet.";
+
+        //Picture response message
+        public const string PictureUploadImageException = "Something wrong while attempting to upload picture.";
 
         //Role responise message
         public const string RoleNotFound = "Role not found.";
