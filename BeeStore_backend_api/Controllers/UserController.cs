@@ -1,4 +1,6 @@
 ﻿using BeeStore_Repository.DTO.UserDTOs;
+using BeeStore_Repository.Enums;
+using BeeStore_Repository.Enums.SortBy;
 using BeeStore_Repository.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,10 +23,14 @@ namespace BeeStore_Api.Controllers
         [Route("get-users")]
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetUsers([FromQuery][DefaultValue(0)] int pageIndex,
-                                                               [FromQuery][DefaultValue(10)] int pageSize)
+        public async Task<IActionResult> GetUsers([FromQuery][DefaultValue(null)] string? search,
+                                                  [FromQuery][DefaultValue(0)] UserSortBy sortBy,
+                                                  [FromQuery][DefaultValue(0)] UserRole filterByRole,
+                                                  [FromQuery][DefaultValue(false)] bool descending,
+                                                  [FromQuery][DefaultValue(0)] int pageIndex,
+                                                  [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _userService.GetAllUser(pageIndex, pageSize);
+            var result = await _userService.GetAllUser(search!, filterByRole, sortBy, descending, pageIndex, pageSize);
             return Ok(result);
         }
 

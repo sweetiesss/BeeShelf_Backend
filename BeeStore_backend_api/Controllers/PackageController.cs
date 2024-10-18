@@ -1,4 +1,6 @@
 ﻿using BeeStore_Repository.DTO.PackageDTOs;
+using BeeStore_Repository.Enums.FilterBy;
+using BeeStore_Repository.Enums.SortBy;
 using BeeStore_Repository.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,10 +20,14 @@ namespace BeeStore_Api.Controllers
         [Authorize(Roles = "Admin,Manager")]
         [Route("get-packages")]
         [HttpGet]
-        public async Task<IActionResult> GetPackageList([FromQuery][DefaultValue(0)] int pageIndex,
-                                                               [FromQuery][DefaultValue(10)] int pageSize)
+        public async Task<IActionResult> GetPackageList([FromQuery][DefaultValue(0)] PackageFilter filterBy,
+                                                        [FromQuery][DefaultValue(null)] string? filterQuery,
+                                                        [FromQuery][DefaultValue(0)] PackageSortBy sortBy,
+                                                        [FromQuery][DefaultValue(false)] bool descending,
+                                                        [FromQuery][DefaultValue(0)] int pageIndex,
+                                                        [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _packageService.GetPackageList(pageIndex, pageSize);
+            var result = await _packageService.GetPackageList(filterBy, filterQuery, sortBy, descending, pageIndex, pageSize);
             return Ok(result);
         }
 

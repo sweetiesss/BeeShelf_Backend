@@ -1,6 +1,7 @@
 ﻿using AutoMapper;
 using BeeStore_Repository.DTO;
 using BeeStore_Repository.DTO.PartnerDTOs;
+using BeeStore_Repository.Enums.SortBy;
 using BeeStore_Repository.Logger;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
@@ -20,9 +21,18 @@ namespace BeeStore_Repository.Services
             _logger = logger;
         }
 
-        public async Task<Pagination<PartnerListDTO>> GetPartnerList(int pageIndex, int pageSize)
+        public async Task<Pagination<PartnerListDTO>> GetPartnerList(SortBy sortby, bool descending, int pageIndex, int pageSize)
         {
-            var list = await _unitOfWork.PartnerRepo.GetAllAsync();
+            string sortCriteria = sortby.ToString();
+
+            var list = await _unitOfWork.PartnerRepo.GetListAsync(
+                filter: null,
+                sortBy: sortCriteria,
+                descending: descending,
+                searchTerm: null,
+                searchProperties: null
+                );
+                
             var result = _mapper.Map<List<PartnerListDTO>>(list);
 
             return await ListPagination<PartnerListDTO>.PaginateList(result, pageIndex, pageSize);

@@ -14,6 +14,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 using NLog;
 using System.Text;
+using System.Text.Json.Serialization;
 
 namespace BeeStore_Repository
 {
@@ -72,6 +73,9 @@ namespace BeeStore_Repository
             services.AddHttpContextAccessor();
             services.AddSingleton<GlobalExceptionMiddleware>();
             services.Configure<RouteOptions>(options => options.LowercaseUrls = true);
+            services.AddControllers()
+                    .AddJsonOptions(options => { options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()); });
+
             return services;
         }
 

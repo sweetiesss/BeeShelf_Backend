@@ -28,6 +28,29 @@
             public const string String = "string";
         }
 
+        public static class SortCriteria
+        {
+            //global
+            public const string CreateDate = "CreateDate";
+
+            //user specific
+            public const string FirstName = "FirstName";
+            public const string LastName = "LastName";
+            public const string Email = "Email";
+
+            //package specific
+            public const string Amount = "Amount";
+            public const string ExpirationDate = "ExpirationDate";
+            public const string ProductAmount = "ProductAmount";
+        }
+
+        public static class FilterCriteria
+        {
+            //package specific
+            public const string ProductId = "ProductId";
+            public const string InventoryId = "InventoryId";
+        }
+
         public static class Smtp
         {
             public const int DEFAULT_PASSWORD_LENGTH = 12;

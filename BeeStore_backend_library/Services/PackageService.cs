@@ -1,10 +1,15 @@
 ﻿using AutoMapper;
 using BeeStore_Repository.DTO;
 using BeeStore_Repository.DTO.PackageDTOs;
+using BeeStore_Repository.Enums.FilterBy;
+using BeeStore_Repository.Enums.SortBy;
 using BeeStore_Repository.Logger;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
+using System.Linq.Expressions;
 
 namespace BeeStore_Repository.Services
 {
@@ -70,9 +75,43 @@ namespace BeeStore_Repository.Services
             return result;
         }
 
-        public async Task<Pagination<PackageListDTO>> GetPackageList(int pageIndex, int pageSize)
+        public async Task<Pagination<PackageListDTO>> GetPackageList(PackageFilter filterBy, string? filterQuery, PackageSortBy sortBy,
+                                                                     bool descending, int pageIndex, int pageSize)
         {
-            var list = await _unitOfWork.PackageRepo.GetAllAsync();
+            if ((!string.IsNullOrEmpty(filterQuery) && filterBy == PackageFilter.None)
+                || (string.IsNullOrEmpty(filterQuery) && filterBy != PackageFilter.None))
+            {
+                throw new BadHttpRequestException(ResponseMessage.BadRequest);
+            }
+
+            
+
+            Expression<Func<Package, bool>> filterExpression = null;
+            switch (filterBy){
+                case PackageFilter.None: filterExpression = null;  break;
+                case PackageFilter.ProductId: filterExpression = u => u.ProductId.Equals(Int32.Parse(filterQuery!)); break;
+                case PackageFilter.InventoryId: filterExpression = u => u.InventoryId.Equals(Int32.Parse(filterQuery!)); break;
+            }
+
+
+            string? sortCriteria = sortBy switch
+            {
+                PackageSortBy.Amount => Constants.SortCriteria.Amount,
+                PackageSortBy.ExpirationDate => Constants.SortCriteria.ExpirationDate,
+                PackageSortBy.CreateDate => Constants.SortCriteria.CreateDate,
+                PackageSortBy.ProductAmount => Constants.SortCriteria.ProductAmount,
+                _ => null
+            };
+
+            var list = await _unitOfWork.PackageRepo.GetListAsync(
+                filter: filterExpression!,
+                includes: null,
+                sortBy: sortCriteria!,
+                descending: descending,
+                searchTerm: null,
+                searchProperties: null
+                );
+         
             var result = _mapper.Map<List<PackageListDTO>>(list);
             return (await ListPagination<PackageListDTO>.PaginateList(result, pageIndex, pageSize));
         }

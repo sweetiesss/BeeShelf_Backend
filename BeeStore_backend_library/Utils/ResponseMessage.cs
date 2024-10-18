@@ -4,6 +4,8 @@
     {
         //General message
         public const string Success = "Success.";
+        public const string InvalidPageSize = "Page size is invalid.";
+        public const string BadRequest = "Bad request.";
 
         //JWT response message
         public const string JWTSecretKeyError = "Key Vault JWT Secret Key values are missing.";
