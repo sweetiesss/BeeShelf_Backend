@@ -28,6 +28,9 @@ namespace BeeStore_Repository.Logger.GlobalExceptionHandler
                     case DuplicateException e:
                         response.StatusCode = (int)HttpStatusCode.BadRequest;
                         break;
+                    case BadHttpRequestException e:
+                        response.StatusCode = (int)HttpStatusCode.BadRequest;
+                        break;
                     case KeyNotFoundException e:
                         response.StatusCode = (int)HttpStatusCode.NotFound;
                         break;

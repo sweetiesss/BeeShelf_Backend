@@ -4,6 +4,8 @@ using Azure.Security.KeyVault.Secrets;
 using BeeStore_Repository.Data;
 using BeeStore_Repository.DTO;
 using BeeStore_Repository.DTO.UserDTOs;
+using BeeStore_Repository.Enums;
+using BeeStore_Repository.Enums.SortBy;
 using BeeStore_Repository.Logger;
 using BeeStore_Repository.Logger.GlobalExceptionHandler.CustomException;
 using BeeStore_Repository.Models;
@@ -11,6 +13,7 @@ using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using System.Linq.Expressions;
 using System.Net;
 using System.Net.Mail;
 using System.Security.Cryptography;
@@ -57,16 +60,48 @@ namespace BeeStore_Repository.Services
             return ResponseMessage.Success;
         }
 
-        public async Task<Pagination<UserListDTO>> GetAllUser(int pageIndex, int pageSize)
+        public async Task<Pagination<UserListDTO>> GetAllUser(string search, UserRole role, UserSortBy sortCriteria,
+                                                              bool order, int pageIndex, int pageSize)
         {
-            var list = await _unitOfWork.UserRepo.GetQueryable(query => query
-                                                                     .Include(o => o.Role!)
-                                                                     .Include(o => o.Picture!)
-                                                                     .Include(o => o.Partners));
-            if (list.Count == 0)
+
+            string? filterQuery = role switch
             {
-                throw new ApplicationException();
+                UserRole.Admin => Constants.RoleName.Admin,
+                UserRole.Manager => Constants.RoleName.Manager,
+                UserRole.Staff => Constants.RoleName.Staff,
+                UserRole.Partner => Constants.RoleName.Partner,
+                UserRole.Shipper => Constants.RoleName.Shipper,
+                UserRole.User => Constants.RoleName.User,
+                UserRole.None => null,
+                _ => null
+            };
+
+            string? sortBy = sortCriteria switch
+            {
+                UserSortBy.Email => Constants.SortCriteria.Email,
+                UserSortBy.CreateDate => Constants.SortCriteria.CreateDate,
+                UserSortBy.FirstName => Constants.SortCriteria.FirstName,
+                UserSortBy.LastName => Constants.SortCriteria.LastName,
+                _ => null
+            };
+
+            Expression<Func<User, bool>> filterExpression = null;
+            if (!string.IsNullOrEmpty(filterQuery))
+            {
+                filterExpression = u => u.Role.RoleName.Equals(filterQuery);
             }
+
+            var list = await _unitOfWork.UserRepo.GetListAsync(
+                filter: u => filterQuery == null || u.Role.RoleName.Equals(filterQuery),
+                includes: query => query.Include(o => o.Role)
+                                        .Include(o => o.Picture)
+                                        .Include(o => o.Partners),
+                sortBy: sortBy!,
+                descending: order,
+                searchTerm: search,
+                searchProperties: new Expression<Func<User, string>>[] { p => p.Email }
+                );
+
 
             var result = _mapper.Map<List<UserListDTO>>(list);
 
@@ -76,16 +111,14 @@ namespace BeeStore_Repository.Services
 
         public async Task<UserListDTO> GetUser(string email)
         {
-            var user = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Email.Equals(email));
+            var user = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Email.Equals(email),
+                                                                       query => query.Include(o => o.Role)
+                                                                                     .Include(o => o.Partners));
             if (user == null)
             {
-                throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
+                throw new KeyNotFoundException(ResponseMessage.UserEmailNotFound);
             }
             var result = _mapper.Map<UserListDTO>(user);
-
-            // hand mapping for
-
-            result.RoleName = _unitOfWork.RoleRepo.SingleOrDefaultAsync((u => u.Id == user.RoleId)).Result.RoleName;
 
             return result;
         }

@@ -1,4 +1,5 @@
 ﻿using BeeStore_Repository.DTO.PartnerDTOs;
+using BeeStore_Repository.Enums.SortBy;
 using BeeStore_Repository.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,10 +19,12 @@ namespace BeeStore_Api.Controllers
 
         [Route("get-partners")]
         [HttpGet]
-        public async Task<IActionResult> GetPartnerList([FromQuery][DefaultValue(0)] int pageIndex,
-                                                               [FromQuery][DefaultValue(10)] int pageSize)
+        public async Task<IActionResult> GetPartnerList([FromQuery][DefaultValue(0)] SortBy sortBy,
+                                                        [FromQuery][DefaultValue(false)] bool descending,
+                                                        [FromQuery][DefaultValue(0)] int pageIndex,
+                                                        [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _partnerService.GetPartnerList(pageIndex, pageSize);
+            var result = await _partnerService.GetPartnerList(sortBy, descending, pageIndex, pageSize);
             return Ok(result);
         }
 
