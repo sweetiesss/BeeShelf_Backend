@@ -7,7 +7,7 @@ namespace BeeStore_Repository.Services.Interfaces
 {
     public interface IUserService
     {
-        Task<UserListDTO> Login(string email, string password);
+        Task<UserLoginResponseDTO> Login(string email, string password);
         Task<string> SignUp(UserSignUpRequestDTO request);
         Task<Pagination<UserListDTO>> GetAllUser(string search, UserRole role, UserSortBy sortBy,
                                                  bool order, int pageIndex, int pageSize);
