@@ -123,7 +123,7 @@ namespace BeeStore_Repository.Services
             return result;
         }
 
-        public async Task<UserListDTO> Login(string email, string password)
+        public async Task<UserLoginResponseDTO> Login(string email, string password)
         {
             var exist = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Email == email,
                                                                         query => query.Include(o => o.Role));
@@ -131,7 +131,7 @@ namespace BeeStore_Repository.Services
             {
                 if (BCrypt.Net.BCrypt.Verify(password, exist.Password))
                 {
-                    return _mapper.Map<UserListDTO>(exist);
+                    return new UserLoginResponseDTO(exist.Email, exist.Role.RoleName);
                 }
                 else
                 {

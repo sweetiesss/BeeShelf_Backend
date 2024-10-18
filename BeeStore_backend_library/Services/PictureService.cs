@@ -2,6 +2,7 @@
 using Amazon.S3.Transfer;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
+using BeeStore_Repository.Utils;
 using Microsoft.AspNetCore.Http;
 
 namespace BeeStore_Repository.Services
@@ -64,7 +65,7 @@ namespace BeeStore_Repository.Services
             }
             catch (Exception ex)
             {
-                throw new Exception("Something wrong while attempting to upload picture");
+                throw new Exception(ResponseMessage.PictureUploadImageException);
             }
         }
 
