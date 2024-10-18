@@ -120,5 +120,91 @@ namespace BeeStore_Repository.Repositories
             }
             return await _dbSet.CountAsync();
         }
+
+        public IQueryable<T> SortBy(IQueryable<T> query, string sortBy, bool descending = false)
+        {
+            if (string.IsNullOrEmpty(sortBy))
+                return query;
+
+            var parameter = Expression.Parameter(typeof(T), "x");
+            var property = Expression.Property(parameter, sortBy);
+            var lambda = Expression.Lambda(property, parameter);
+
+            var methodName = descending ? "OrderByDescending" : "OrderBy";
+            var result = Expression.Call(
+                typeof(Queryable),
+                methodName,
+                new Type[] { query.ElementType, property.Type },
+                query.Expression,
+                lambda
+            );
+
+            return query.Provider.CreateQuery<T>(result);
+        }
+
+        public IQueryable<T> SearchBy(IQueryable<T> query, string searchTerm, params Expression<Func<T, string>>[] properties)
+        {
+            if (string.IsNullOrEmpty(searchTerm))
+                return query;
+
+            var parameter = Expression.Parameter(typeof(T), "x");
+
+            Expression? combinedExpression = null;
+            foreach (var propertyExpression in properties)
+            {
+                var property = Expression.Invoke(propertyExpression, parameter);
+                var containsMethod = typeof(string).GetMethod("Contains", new[] { typeof(string) });
+
+                var searchExpression = Expression.Call(property, containsMethod!, Expression.Constant(searchTerm));
+
+                combinedExpression = combinedExpression == null
+                    ? searchExpression
+                    : Expression.OrElse(combinedExpression, searchExpression);
+            }
+
+            if (combinedExpression == null)
+                return query;
+
+            var lambda = Expression.Lambda<Func<T, bool>>(combinedExpression, parameter);
+            return query.Where(lambda);
+        }
+
+        public IQueryable<T> FilterBy(Expression<Func<T, bool>> predicate)
+        {
+            return _dbSet.Where(predicate);
+        }
+
+        public async Task<List<T>> GetListAsync(
+       Expression<Func<T, bool>> filter = null,
+       Func<IQueryable<T>, IQueryable<T>> includes = null,
+       string sortBy = null,
+       bool descending = false,
+       string searchTerm = null,
+       params Expression<Func<T, string>>[] searchProperties)
+        {
+            IQueryable<T> query = _dbSet;
+
+            if (filter != null)
+            {
+                query = FilterBy(filter);
+            }
+
+            if (!string.IsNullOrEmpty(searchTerm) && searchProperties.Length > 0)
+            {
+                query = SearchBy(query, searchTerm, searchProperties);
+            }
+
+            if (!string.IsNullOrEmpty(sortBy))
+            {
+                query = SortBy(query, sortBy, descending);
+            }
+
+            if (includes != null)
+            {
+                query = includes(query);
+            }
+
+            return await query.Where(x => x.IsDeleted.Equals(false)).ToListAsync();
+        }
     }
 }
