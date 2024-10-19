@@ -79,7 +79,7 @@ namespace BeeStore_Api.Controllers
         [Route("update-order-status/{id}")]
         [Authorize(Roles = "Admin,Manager,Staff,Shipper")]
         [HttpPut]
-        public async Task<IActionResult> UpdateOrderStatus(int id, int orderStatus)
+        public async Task<IActionResult> UpdateOrderStatus(int id, string orderStatus)
         {
             var result = await _orderService.UpdateOrderStatus(id, orderStatus);
             return Ok(result);
