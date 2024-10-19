@@ -15,7 +15,7 @@ namespace BeeStore_Repository.Services.Interfaces
                                                           bool descending, int pageIndex, int pageSize);
 
         Task<string> CreateOrder(OrderCreateDTO request);
-        Task<string> UpdateOrderStatus(int id, int orderStatus);
+        Task<string> UpdateOrderStatus(int id, string orderStatus);
         Task<string> UpdateOrder(int id, OrderCreateDTO request);
         Task<string> DeleteOrder(int id);
     }

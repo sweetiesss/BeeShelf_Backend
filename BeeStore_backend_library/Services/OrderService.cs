@@ -7,6 +7,7 @@ using BeeStore_Repository.Logger;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Linq.Expressions;
@@ -169,25 +170,27 @@ namespace BeeStore_Repository.Services
             return ResponseMessage.Success;
         }
 
-        public async Task<string> UpdateOrderStatus(int id, int orderStatus)
+        public async Task<string> UpdateOrderStatus(int id, string orderStatus)
         {
             var exist = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u => u.Id == id);
             if (exist == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.OrderIdNotFound);
             }
+            bool a = false;
             string orderStatusUpdate = null;
-
-            if (orderStatus == 1)        //Pending
+            orderStatus.Trim();
+            if (orderStatus.Equals(Constants.Status.Pending, StringComparison.OrdinalIgnoreCase))        //Pending
             {
                 return ResponseMessage.Success;
             }
 
-            if (orderStatus == 2)        //Processing
+            if (orderStatus.Equals(Constants.Status.Processing, StringComparison.OrdinalIgnoreCase))        //Processing
             {
                 if (exist.OrderStatus == Constants.Status.Pending)
                 {
                     orderStatusUpdate = Constants.Status.Processing;
+                    a = true;
                 }
                 else
                 {
@@ -195,11 +198,13 @@ namespace BeeStore_Repository.Services
                 }
             }
 
-            if (orderStatus == 3)    //Shipped
+            if (orderStatus.Equals(Constants.Status.Shipped, StringComparison.OrdinalIgnoreCase))    //Shipped
             {
                 if (exist.OrderStatus == Constants.Status.Processing)
                 {
                     orderStatusUpdate = Constants.Status.Shipped;
+                    a = true;
+
                 }
                 else
                 {
@@ -207,13 +212,20 @@ namespace BeeStore_Repository.Services
                 }
             }
 
-            if (orderStatus == 4) //Canceled
+            if (orderStatus.Equals(Constants.Status.Canceled, StringComparison.OrdinalIgnoreCase)) //Canceled
             {
                 if (exist.OrderStatus == Constants.Status.Shipped)
                 {
                     throw new ApplicationException(ResponseMessage.OrderCanceledError);
                 }
                 orderStatusUpdate = Constants.Status.Canceled;
+                a = true;
+
+            }
+
+            if (!a)
+            {
+                throw new BadHttpRequestException(ResponseMessage.BadRequest);
             }
 
             exist.OrderStatus = orderStatusUpdate;
