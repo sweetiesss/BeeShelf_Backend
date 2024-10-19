@@ -9,7 +9,7 @@ namespace BeeStore_Repository.Services.Interfaces
     {
         Task<UserLoginResponseDTO> Login(string email, string password);
         Task<string> SignUp(UserSignUpRequestDTO request);
-        Task<Pagination<UserListDTO>> GetAllUser(string search, UserRole role, UserSortBy sortBy,
+        Task<Pagination<UserListDTO>> GetAllUser(string search, UserRole? role, UserSortBy? sortBy,
                                                  bool order, int pageIndex, int pageSize);
         Task<UserListDTO> GetUser(string email);
         Task<string> CreateUser(UserCreateRequestDTO user);

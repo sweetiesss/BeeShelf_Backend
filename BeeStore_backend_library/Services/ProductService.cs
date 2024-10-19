@@ -1,11 +1,15 @@
 ﻿using AutoMapper;
 using BeeStore_Repository.DTO;
 using BeeStore_Repository.DTO.ProductDTOs;
+using BeeStore_Repository.Enums.FilterBy;
+using BeeStore_Repository.Enums.SortBy;
 using BeeStore_Repository.Logger;
 using BeeStore_Repository.Logger.GlobalExceptionHandler.CustomException;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
+using Microsoft.AspNetCore.Http;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace BeeStore_Repository.Services
@@ -117,16 +121,54 @@ namespace BeeStore_Repository.Services
 
         }
 
-        public async Task<Pagination<ProductListDTO>> GetProductList(int pageIndex, int pageSize)
+        private async Task<List<Product>> ApplyFilterToList(string search, ProductFilter? filterBy, string? filterQuery,
+                                                          ProductSortBy? sortCriteria, bool descending, int? userId = null)
         {
-            var list = await _unitOfWork.ProductRepo.GetAllAsync();
+            if ((!string.IsNullOrEmpty(filterQuery) && filterBy == null)
+                || (string.IsNullOrEmpty(filterQuery) && filterBy != null))
+            {
+                throw new BadHttpRequestException(ResponseMessage.BadRequest);
+            }
+            Expression<Func<Product, bool>> filterExpression = u =>
+            (userId == null || u.UserId.Equals(userId)) &&
+            (filterBy == null || (filterBy == ProductFilter.ProductCategoryId && u.ProductCategoryId.Equals(Int32.Parse(filterQuery!))));
+
+
+            string? sortBy = sortCriteria switch
+            {
+                ProductSortBy.Name => Constants.SortCriteria.Name,
+                ProductSortBy.Origin => Constants.SortCriteria.Origin,
+                ProductSortBy.Price => Constants.SortCriteria.Price,
+                ProductSortBy.Weight => Constants.SortCriteria.Weight,
+                ProductSortBy.CreateDate => Constants.SortCriteria.CreateDate,
+                _ => null
+            };
+
+
+
+            var list = await _unitOfWork.ProductRepo.GetListAsync(
+                filter: filterExpression,
+                includes: null,
+                sortBy: sortBy!,
+                descending: descending,
+                searchTerm: search,
+                searchProperties: new Expression<Func<Product, string>>[] { p => p.Name }
+                );
+            return list;
+        }
+
+        public async Task<Pagination<ProductListDTO>> GetProductList(string search, ProductFilter? filterBy, string? filterQuery,
+                                                            ProductSortBy? sortBy, bool descending, int pageIndex, int pageSize)
+        {
+            var list = await ApplyFilterToList(search, filterBy, filterQuery, sortBy, descending);
             var result = _mapper.Map<List<ProductListDTO>>(list);
             return (await ListPagination<ProductListDTO>.PaginateList(result, pageIndex, pageSize));
         }
 
-        public async Task<Pagination<ProductListDTO>> GetProductListByEmail(int userId, int pageIndex, int pageSize)
+        public async Task<Pagination<ProductListDTO>> GetProductListById(int userId, string search, ProductFilter? filterBy, string? filterQuery,
+                                                            ProductSortBy? sortBy, bool descending, int pageIndex, int pageSize)
         {
-            var list = await _unitOfWork.ProductRepo.GetFiltered(u => u.UserId.Equals(userId));
+            var list = await ApplyFilterToList(search, filterBy, filterQuery, sortBy, descending, userId);
             var result = _mapper.Map<List<ProductListDTO>>(list);
             return (await ListPagination<ProductListDTO>.PaginateList(result, pageIndex, pageSize));
         }

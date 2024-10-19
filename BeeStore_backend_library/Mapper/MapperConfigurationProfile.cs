@@ -30,13 +30,13 @@ namespace BeeStore_Repository.Mapper
             CreateMap(typeof(UserCreateRequestDTO), typeof(User));
 
             CreateMap<UserCreateRequestDTO, User>()
-                 .ForMember(dest => dest.RoleId, opt => opt.MapFrom<CustomRoleNameReverseResolver<UserCreateRequestDTO>>())
+                 .ForMember(dest => dest.RoleId, opt => opt.MapFrom<CustomRoleNameResolver<UserCreateRequestDTO>>())
                      .ForMember(dest => dest.Password, opt => opt.MapFrom(src => BCrypt.Net.BCrypt.HashPassword(src.Password)));
             CreateMap<UserSignUpRequestDTO, User>()
-                 .ForMember(dest => dest.RoleId, opt => opt.MapFrom<CustomRoleNameReverseResolver<UserSignUpRequestDTO>>());
+                 .ForMember(dest => dest.RoleId, opt => opt.MapFrom<CustomRoleNameResolver<UserSignUpRequestDTO>>());
             CreateMap<User, UserListDTO>()
-                    .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.Role.RoleName))
-                    .ForMember(dest => dest.Picture_Link, opt => opt.MapFrom(src => src.Picture.PictureLink))
+                    .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.Role!.RoleName))
+                    .ForMember(dest => dest.Picture_Link, opt => opt.MapFrom(src => src.Picture!.PictureLink))
                     .ForMember(dest => dest.BankAccountNumber, opt => opt.MapFrom(src => src.Partners
                                                                                             .FirstOrDefault(u => u.UserId.Equals(src.Id))!
                                                                                             .BankAccountNumber))
@@ -116,7 +116,7 @@ namespace BeeStore_Repository.Mapper
 
             CreateMap<Order, OrderListDTO>()
                 .ForMember(dest => dest.user_email, opt => opt.MapFrom(src => src.User!.Email))
-                .ForMember(dest => dest.deliver_by, opt => opt.MapFrom(src => src.User!.Email))
+                .ForMember(dest => dest.deliver_by, opt => opt.MapFrom(src => src.DeliverByNavigation!.Email))
                 .ForMember(dest => dest.picture_link, opt => opt.MapFrom(src => src.Picture!.PictureLink))
                 .ForMember(dest => dest.product_name, opt => opt.MapFrom(src => src.Product!.Name))
             .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));

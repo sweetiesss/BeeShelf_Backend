@@ -20,9 +20,9 @@ namespace BeeStore_Api.Controllers
         [Authorize(Roles = "Admin,Manager")]
         [Route("get-packages")]
         [HttpGet]
-        public async Task<IActionResult> GetPackageList([FromQuery][DefaultValue(0)] PackageFilter filterBy,
+        public async Task<IActionResult> GetPackageList([FromQuery] PackageFilter? filterBy,
                                                         [FromQuery][DefaultValue(null)] string? filterQuery,
-                                                        [FromQuery][DefaultValue(0)] PackageSortBy sortBy,
+                                                        [FromQuery] PackageSortBy? sortBy,
                                                         [FromQuery][DefaultValue(false)] bool descending,
                                                         [FromQuery][DefaultValue(0)] int pageIndex,
                                                         [FromQuery][DefaultValue(10)] int pageSize)
