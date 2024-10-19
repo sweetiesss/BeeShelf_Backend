@@ -19,7 +19,7 @@ namespace BeeStore_Api.Controllers
 
         [Route("get-partners")]
         [HttpGet]
-        public async Task<IActionResult> GetPartnerList([FromQuery][DefaultValue(0)] SortBy sortBy,
+        public async Task<IActionResult> GetPartnerList([FromQuery]SortBy? sortBy,
                                                         [FromQuery][DefaultValue(false)] bool descending,
                                                         [FromQuery][DefaultValue(0)] int pageIndex,
                                                         [FromQuery][DefaultValue(10)] int pageSize)

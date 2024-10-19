@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
 using BeeStore_Repository.DTO;
 using BeeStore_Repository.DTO.WarehouseStaffDTOs;
+using BeeStore_Repository.Enums.FilterBy;
 using BeeStore_Repository.Logger.GlobalExceptionHandler.CustomException;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
+using Microsoft.AspNetCore.Http;
+using System.Linq.Expressions;
 using System.Text;
 
 namespace BeeStore_Repository.Services
@@ -87,16 +90,39 @@ namespace BeeStore_Repository.Services
 
         }
 
-        public async Task<Pagination<WarehouseStaffListDTO>> GetWarehouseStaffList(int pageIndex, int pageSize)
+        private async Task<List<WarehouseStaff>> ApplyFilterToList(string? search, WarehouseFilter? filterBy, string? filterQuery, int? warehouseId = null)
         {
-            var list = await _unitOfWork.WarehouseStaffRepo.GetAllAsync();
+            if ((!string.IsNullOrEmpty(filterQuery) && filterBy == null)
+                || (string.IsNullOrEmpty(filterQuery) && filterBy != null))
+            {
+                throw new BadHttpRequestException(ResponseMessage.BadRequest);
+            }
+            Expression<Func<WarehouseStaff, bool>> filterExpression = u =>
+            (warehouseId == null || u.WarehouseId.Equals(warehouseId)) &&
+            (filterBy == null || (filterBy == WarehouseFilter.WarehouseId && u.WarehouseId.Equals(Int32.Parse(filterQuery!))));
+
+
+            var list = await _unitOfWork.WarehouseStaffRepo.GetListAsync(
+                filter: filterExpression,
+                includes: null,
+                sortBy: null,
+                descending: false,
+                searchTerm: search,
+                searchProperties: new Expression<Func<WarehouseStaff, string>>[] { p => p.User.Email }
+                );
+            return list;
+        }
+
+        public async Task<Pagination<WarehouseStaffListDTO>> GetWarehouseStaffList(string? search, WarehouseFilter? filterBy, string? filterQuery, int pageIndex, int pageSize)
+        {
+            var list = await ApplyFilterToList(search, filterBy, filterQuery);
             var result = _mapper.Map<List<WarehouseStaffListDTO>>(list);
             return (await ListPagination<WarehouseStaffListDTO>.PaginateList(result, pageIndex, pageSize));
         }
 
-        public async Task<Pagination<WarehouseStaffListDTO>> GetWarehouseStaffList(int id, int pageIndex, int pageSize)
+        public async Task<Pagination<WarehouseStaffListDTO>> GetWarehouseStaffList(int id, string? search, WarehouseFilter? filterBy, string? filterQuery, int pageIndex, int pageSize)
         {
-            var list = await _unitOfWork.WarehouseStaffRepo.GetFiltered(u => u.WarehouseId == id);
+            var list = await ApplyFilterToList(search, filterBy, filterQuery, id);
             var result = _mapper.Map<List<WarehouseStaffListDTO>>(list);
             return (await ListPagination<WarehouseStaffListDTO>.PaginateList(result, pageIndex, pageSize));
         }
