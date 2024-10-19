@@ -1,11 +1,15 @@
 ﻿using AutoMapper;
 using BeeStore_Repository.DTO;
 using BeeStore_Repository.DTO.WarehouseDTOs;
+using BeeStore_Repository.Enums.FilterBy;
+using BeeStore_Repository.Enums.SortBy;
 using BeeStore_Repository.Logger;
 using BeeStore_Repository.Logger.GlobalExceptionHandler.CustomException;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
+using Microsoft.AspNetCore.Http;
+using System.Linq.Expressions;
 
 namespace BeeStore_Repository.Services
 {
@@ -47,9 +51,44 @@ namespace BeeStore_Repository.Services
             return ResponseMessage.Success;
         }
 
-        public async Task<Pagination<WarehouseListDTO>> GetWarehouseList(int pageIndex, int pageSize)
+        private async Task<List<Warehouse>> ApplyFilterToList(string? search, WarehouseFilter? filterBy, string? filterQuery,
+                                                         WarehouseSortBy? sortCriteria, bool descending)
         {
-            var list = await _unitOfWork.WarehouseRepo.GetAllAsync();
+            if ((!string.IsNullOrEmpty(filterQuery) && filterBy == null)
+                || (string.IsNullOrEmpty(filterQuery) && filterBy != null))
+            {
+                throw new BadHttpRequestException(ResponseMessage.BadRequest);
+            }
+            Expression<Func<Warehouse, bool>> filterExpression = u =>
+            (filterBy == null || (filterBy == WarehouseFilter.WarehouseId && u.Id.Equals(Int32.Parse(filterQuery!))));
+
+
+            string? sortBy = sortCriteria switch
+            {
+                WarehouseSortBy.Name => Constants.SortCriteria.Name,
+                WarehouseSortBy.Size => Constants.SortCriteria.Size,
+                WarehouseSortBy.Location => Constants.SortCriteria.Location,
+                WarehouseSortBy.CreateDate => Constants.SortCriteria.CreateDate,
+                _ => null
+            };
+
+
+
+            var list = await _unitOfWork.WarehouseRepo.GetListAsync(
+                filter: filterExpression,
+                includes: null,
+                sortBy: sortBy!,
+                descending: descending,
+                searchTerm: search,
+                searchProperties: new Expression<Func<Warehouse, string>>[] { p => p.Name }
+                );
+            return list;
+        }
+
+        public async Task<Pagination<WarehouseListDTO>> GetWarehouseList(string? search, WarehouseFilter? filterBy, string? filterQuery,
+                                                         WarehouseSortBy? sortCriteria, bool descending, int pageIndex, int pageSize)
+        {
+            var list = await ApplyFilterToList(search, filterBy, filterQuery, sortCriteria, descending);
             var result = _mapper.Map<List<WarehouseListDTO>>(list);
 
             return await ListPagination<WarehouseListDTO>.PaginateList(result, pageIndex, pageSize);

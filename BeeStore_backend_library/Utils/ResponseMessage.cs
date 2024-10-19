@@ -15,6 +15,7 @@
 
         //Picture response message
         public const string PictureUploadImageException = "Something wrong while attempting to upload picture.";
+        public const string ImageIdNotFound = "Image not found.";
 
         //Role responise message
         public const string RoleNotFound = "Role not found.";

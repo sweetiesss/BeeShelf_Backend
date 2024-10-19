@@ -8,7 +8,6 @@ namespace BeeStore_Repository.Enums
 {
     public enum UserRole
     {
-        None,
         Admin,
         Manager,
         Staff,

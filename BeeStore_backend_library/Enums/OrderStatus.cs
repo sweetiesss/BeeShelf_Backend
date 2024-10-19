@@ -1,10 +1,10 @@
 ﻿namespace BeeStore_Repository.Enums
 {
-    public enum OrderStatusEnums
+    public enum OrderStatus
     {
         Pending,
         Processing,
-        Shipped
-
+        Shipped,
+        Canceled
     }
 }

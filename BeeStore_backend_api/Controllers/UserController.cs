@@ -24,8 +24,8 @@ namespace BeeStore_Api.Controllers
         [HttpGet]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetUsers([FromQuery][DefaultValue(null)] string? search,
-                                                  [FromQuery][DefaultValue(0)] UserSortBy sortBy,
-                                                  [FromQuery][DefaultValue(0)] UserRole filterByRole,
+                                                  [FromQuery] UserSortBy? sortBy,
+                                                  [FromQuery] UserRole? filterByRole,
                                                   [FromQuery][DefaultValue(false)] bool descending,
                                                   [FromQuery][DefaultValue(0)] int pageIndex,
                                                   [FromQuery][DefaultValue(10)] int pageSize)

@@ -1,4 +1,6 @@
 ﻿using BeeStore_Repository.DTO.InventoryDTOs;
+using BeeStore_Repository.Enums.FilterBy;
+using BeeStore_Repository.Enums.SortBy;
 using BeeStore_Repository.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,29 +23,29 @@ namespace BeeStore_Api.Controllers
         [Route("get-inventories")]
         [HttpGet]
         [Authorize(Roles = "Admin,Manager,Staff")]
-        public async Task<IActionResult> GetInventoryList([FromQuery][DefaultValue(0)] int pageIndex,
-                                                               [FromQuery][DefaultValue(10)] int pageSize)
+        public async Task<IActionResult> GetInventoryList([FromQuery] InventoryFilter? filterBy, 
+                                                          [FromQuery][DefaultValue(null)] string? filterQuery,
+                                                          [FromQuery] InventorySortBy? sortCriteria,
+                                                          [FromQuery][DefaultValue(false)] bool descending, 
+                                                          [FromQuery][DefaultValue(0)] int pageIndex,
+                                                          [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _inventoryService.GetInventoryList(pageIndex, pageSize);
+            var result = await _inventoryService.GetInventoryList(filterBy, filterQuery, sortCriteria, descending, pageIndex, pageSize);
             return Ok(result);
         }
 
         [Route("get-inventories/{userId}")]
         [HttpGet]
         [Authorize(Roles = "Admin,Manager,Staff,Partner")]
-        public async Task<IActionResult> GetInventoryList(int userId, [FromQuery][DefaultValue(0)] int pageIndex,
-                                                               [FromQuery][DefaultValue(10)] int pageSize)
+        public async Task<IActionResult> GetInventoryList(int userId, 
+                                                          [FromQuery] InventoryFilter? filterBy,
+                                                          [FromQuery][DefaultValue(null)] string? filterQuery,
+                                                          [FromQuery] InventorySortBy? sortCriteria,
+                                                          [FromQuery][DefaultValue(false)] bool descending, 
+                                                          [FromQuery][DefaultValue(0)] int pageIndex,
+                                                          [FromQuery][DefaultValue(10)] int pageSize)
         {
-            if (!_memoryCache.TryGetValue(cacheKey, out var result)) // result here have the variable types as Pagination<InventoryListDTO>
-            {
-                result = await _inventoryService.GetInventoryList(userId, pageIndex, pageSize);
-
-                var cacheEntryOptions = new MemoryCacheEntryOptions()
-                    .SetSlidingExpiration(TimeSpan.FromMinutes(5))
-                    .SetAbsoluteExpiration(TimeSpan.FromHours(1));
-
-                _memoryCache.Set(cacheKey, result, cacheEntryOptions);
-            }
+            var result = await _inventoryService.GetInventoryList(userId, filterBy, filterQuery, sortCriteria, descending, pageIndex, pageSize);
             return Ok(result);
         }
 

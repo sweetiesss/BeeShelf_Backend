@@ -12,7 +12,8 @@
 
         public string? Phone { get; set; }
 
-        public int? PictureId { get; set; }
+        public string? picture_link { get; set;}
+        //public int? PictureId { get; set; }
 
     }
 }

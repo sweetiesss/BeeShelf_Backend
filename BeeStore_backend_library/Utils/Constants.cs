@@ -33,15 +33,33 @@
             //global
             public const string CreateDate = "CreateDate";
 
-            //user specific
+            //user
             public const string FirstName = "FirstName";
             public const string LastName = "LastName";
             public const string Email = "Email";
 
-            //package specific
+            //package
             public const string Amount = "Amount";
-            public const string ExpirationDate = "ExpirationDate";
             public const string ProductAmount = "ProductAmount";
+            public const string ExpirationDate = "ExpirationDate";
+
+            //order
+            public const string TotalPrice = "TotalPrice";
+
+            //inventory
+            public const string BoughtDate = "BoughtDate";
+            public const string ExiprationDate = "ExpirationDate";
+            public const string MaxWeight = "MaxWeight";
+            public const string Weight = "Weight";
+            public const string Name = "Name";
+
+            //Product
+            public const string Price = "Price";
+            public const string Origin = "Origin";
+
+            //warehouse
+            public const string Size = "Size";
+            public const string Location = "Location";
         }
 
         public static class FilterCriteria
