@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace BeeStore_Repository.Enums.FilterBy
 {
-    public enum PackageFilter
+    public enum InventoryFilter
     {
-        ProductId,
-        InventoryId
+        WarehouseId
     }
 }

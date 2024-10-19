@@ -1,4 +1,6 @@
 ﻿using BeeStore_Repository.DTO.OrderDTOs;
+using BeeStore_Repository.Enums.SortBy;
+using BeeStore_Repository.Enums;
 using BeeStore_Repository.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,30 +20,41 @@ namespace BeeStore_Api.Controllers
         [Route("get-orders")]
         [Authorize(Roles = "Admin,Manager,Staff")]
         [HttpGet]
-        public async Task<IActionResult> GetOrderList([FromQuery][DefaultValue(0)] int pageIndex,
-                                                               [FromQuery][DefaultValue(10)] int pageSize)
+        public async Task<IActionResult> GetOrderList([FromQuery] OrderStatus? filterByStatus,
+                                                      [FromQuery] OrderSortBy? sortBy,
+                                                      [FromQuery][DefaultValue(false)] bool descending,
+                                                      [FromQuery][DefaultValue(0)] int pageIndex,
+                                                      [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _orderService.GetOrderList(pageIndex, pageSize);
+            var result = await _orderService.GetOrderList(filterByStatus, sortBy, descending, pageIndex, pageSize);
             return Ok(result);
         }
 
         [Route("get-orders/{userId}")]
         [Authorize(Roles = "Partner")]
         [HttpGet]
-        public async Task<IActionResult> GetOrderList(int userId, [FromQuery][DefaultValue(0)] int pageIndex,
-                                                               [FromQuery][DefaultValue(10)] int pageSize)
+        public async Task<IActionResult> GetOrderList(int userId,
+                                                      [FromQuery] OrderStatus? filterByStatus,
+                                                      [FromQuery] OrderSortBy? sortBy,
+                                                      [FromQuery][DefaultValue(false)] bool descending,
+                                                      [FromQuery][DefaultValue(0)] int pageIndex,
+                                                      [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _orderService.GetOrderList(userId, pageIndex, pageSize);
+            var result = await _orderService.GetOrderList(userId, filterByStatus, sortBy, descending, pageIndex, pageSize);
             return Ok(result);
         }
 
         [Route("get-shipper-orders/{userId}")]
         [Authorize(Roles = "Admin,Manager,Shipper")]
         [HttpGet]
-        public async Task<IActionResult> GetShipperOrderList(int userId, [FromQuery][DefaultValue(0)] int pageIndex,
-                                                               [FromQuery][DefaultValue(10)] int pageSize)
+        public async Task<IActionResult> GetShipperOrderList(int userId, 
+                                                            [FromQuery] OrderStatus? filterByStatus,
+                                                            [FromQuery] OrderSortBy? sortBy,
+                                                            [FromQuery][DefaultValue(false)] bool descending,
+                                                            [FromQuery][DefaultValue(0)] int pageIndex,
+                                                            [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _orderService.GetDeliverOrderList(userId, pageIndex, pageSize);
+            var result = await _orderService.GetDeliverOrderList(userId, filterByStatus, sortBy, descending, pageIndex, pageSize);
             return Ok(result);
         }
 
@@ -64,7 +77,7 @@ namespace BeeStore_Api.Controllers
         }
 
         [Route("update-order-status/{id}")]
-        [Authorize(Roles = "Admin,Manager,Staff")]
+        [Authorize(Roles = "Admin,Manager,Staff,Shipper")]
         [HttpPut]
         public async Task<IActionResult> UpdateOrderStatus(int id, int orderStatus)
         {

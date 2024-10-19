@@ -6,12 +6,12 @@ using BeeStore_Repository.Utils;
 
 namespace BeeStore_Repository.Mapper.CustomResolver
 {
-    public class CustomRoleNameReverseResolver<TSource> : IValueResolver<TSource, User, int?>
+    public class CustomRoleNameResolver<TSource> : IValueResolver<TSource, User, int?>
         where TSource : IRoleNameProvider
     {
         private readonly BeeStoreDbContext _context;
 
-        public CustomRoleNameReverseResolver(BeeStoreDbContext context)
+        public CustomRoleNameResolver(BeeStoreDbContext context)
         {
             _context = context;
         }

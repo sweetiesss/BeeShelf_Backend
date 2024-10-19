@@ -75,22 +75,20 @@ namespace BeeStore_Repository.Services
             return result;
         }
 
-        public async Task<Pagination<PackageListDTO>> GetPackageList(PackageFilter filterBy, string? filterQuery, PackageSortBy sortBy,
+        public async Task<Pagination<PackageListDTO>> GetPackageList(PackageFilter? filterBy, string? filterQuery, PackageSortBy? sortBy,
                                                                      bool descending, int pageIndex, int pageSize)
         {
-            if ((!string.IsNullOrEmpty(filterQuery) && filterBy == PackageFilter.None)
-                || (string.IsNullOrEmpty(filterQuery) && filterBy != PackageFilter.None))
+            if ((!string.IsNullOrEmpty(filterQuery) && filterBy == null)
+                || (string.IsNullOrEmpty(filterQuery) && filterBy != null))
             {
                 throw new BadHttpRequestException(ResponseMessage.BadRequest);
             }
 
-            
-
             Expression<Func<Package, bool>> filterExpression = null;
             switch (filterBy){
-                case PackageFilter.None: filterExpression = null;  break;
                 case PackageFilter.ProductId: filterExpression = u => u.ProductId.Equals(Int32.Parse(filterQuery!)); break;
                 case PackageFilter.InventoryId: filterExpression = u => u.InventoryId.Equals(Int32.Parse(filterQuery!)); break;
+                default: filterExpression = null; break;
             }
 
 

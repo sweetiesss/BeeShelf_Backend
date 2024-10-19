@@ -7,8 +7,8 @@ namespace BeeStore_Repository.Services.Interfaces
 {
     public interface IPackageService
     {
-        Task<Pagination<PackageListDTO>> GetPackageList(PackageFilter filterBy, string? filterQuery, 
-                                                        PackageSortBy sortBy, bool descending, 
+        Task<Pagination<PackageListDTO>> GetPackageList(PackageFilter? filterBy, string? filterQuery, 
+                                                        PackageSortBy? sortBy, bool descending, 
                                                         int pageIndex, int pageSize);
         Task<PackageListDTO> GetPackageById(int id);
         Task<string> CreatePackage(PackageCreateDTO request);

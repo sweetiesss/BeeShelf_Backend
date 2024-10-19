@@ -2,6 +2,8 @@
 using BeeStore_Repository.DTO.WarehouseDTOs;
 using BeeStore_Repository.DTO.WarehouseShipperDTOs;
 using BeeStore_Repository.DTO.WarehouseStaffDTOs;
+using BeeStore_Repository.Enums.FilterBy;
+using BeeStore_Repository.Enums.SortBy;
 using BeeStore_Repository.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -37,19 +39,14 @@ namespace BeeStore_Api.Controllers
         [Route("get-warehouses")]
         [HttpGet]
         [Authorize(Roles = "Admin,Manager")]
-        public async Task<IActionResult> GetWarehouseList([FromQuery][DefaultValue(0)] int pageIndex,
-                                                               [FromQuery][DefaultValue(10)] int pageSize)
+        public async Task<IActionResult> GetWarehouseList([FromQuery][DefaultValue(null)] string? search,
+                                                          [FromQuery] WarehouseFilter? filterBy, string? filterQuery,
+                                                          [FromQuery] WarehouseSortBy? sortCriteria,
+                                                          [FromQuery][DefaultValue(false)] bool descending, 
+                                                          [FromQuery][DefaultValue(0)] int pageIndex,
+                                                          [FromQuery][DefaultValue(10)] int pageSize)
         {
-            if (!_memoryCache.TryGetValue(warehouseCacheKey, out var result))
-            {
-                result = await _warehouseService.GetWarehouseList(pageIndex, pageSize);
-
-                var cacheEntryOptions = new MemoryCacheEntryOptions()
-                    .SetSlidingExpiration(TimeSpan.FromMinutes(15))
-                    .SetAbsoluteExpiration(TimeSpan.FromHours(1));
-
-                _memoryCache.Set(warehouseCacheKey, result, cacheEntryOptions);
-            }
+            var result = await _warehouseService.GetWarehouseList(search, filterBy, filterQuery, sortCriteria, descending, pageIndex, pageSize);
             return Ok(result);
         }
 
@@ -66,20 +63,28 @@ namespace BeeStore_Api.Controllers
         [Route("get-warehouse-shippers")]
         [HttpGet]
         [Authorize(Roles = "Admin,Manager")]
-        public async Task<IActionResult> GetWarehouseShipperList([FromQuery][DefaultValue(0)] int pageIndex,
-                                                               [FromQuery][DefaultValue(10)] int pageSize)
+        public async Task<IActionResult> GetWarehouseShipperList([FromQuery][DefaultValue(null)] string? search,
+                                                                 [FromQuery] WarehouseFilter? filterBy,
+                                                                 [FromQuery][DefaultValue(null)] string? filterQuery,
+                                                                 [FromQuery][DefaultValue(0)] int pageIndex,
+                                                                 [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _warehouseShipperService.GetWarehouseShipperList(pageIndex, pageSize);
+            var result = await _warehouseShipperService.GetWarehouseShipperList(search, filterBy, filterQuery, pageIndex, pageSize);
             return Ok(result);
         }
 
+        //these are probably unecessary now that we have filter
         [Route("get-warehouse-shippers/{id}")]
         [HttpGet]
         [Authorize(Roles = "Admin,Manager")]
-        public async Task<IActionResult> GetWarehouseShipperList(int id, [FromQuery][DefaultValue(0)] int pageIndex,
-                                                               [FromQuery][DefaultValue(10)] int pageSize)
+        public async Task<IActionResult> GetWarehouseShipperList(int id,
+                                                                 [FromQuery][DefaultValue(null)] string? search,
+                                                                 [FromQuery] WarehouseFilter? filterBy,
+                                                                 [FromQuery][DefaultValue(null)] string? filterQuery, 
+                                                                 [FromQuery][DefaultValue(0)] int pageIndex,
+                                                                 [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _warehouseShipperService.GetWarehouseShipperList(id, pageIndex, pageSize);
+            var result = await _warehouseShipperService.GetWarehouseShipperList(id, search, filterBy, filterQuery, pageIndex, pageSize);
             return Ok(result);
         }
 
@@ -95,20 +100,28 @@ namespace BeeStore_Api.Controllers
         [Route("get-warehouse-staffs")]
         [HttpGet]
         [Authorize(Roles = "Admin,Manager")]
-        public async Task<IActionResult> GetWarehouseStaffList([FromQuery][DefaultValue(0)] int pageIndex,
+        public async Task<IActionResult> GetWarehouseStaffList([FromQuery][DefaultValue(null)] string? search,
+                                                               [FromQuery] WarehouseFilter? filterBy,
+                                                               [FromQuery][DefaultValue(null)] string? filterQuery,
+                                                               [FromQuery][DefaultValue(0)] int pageIndex,
                                                                [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _warehouseStaffService.GetWarehouseStaffList(pageIndex, pageSize);
+            var result = await _warehouseStaffService.GetWarehouseStaffList(search, filterBy, filterQuery, pageIndex, pageSize);
             return Ok(result);
         }
 
+        //these are probably unecessary now that we have filter
         [Route("get-warehouse-staffs/{id}")]
         [HttpGet]
         [Authorize(Roles = "Admin,Manager")]
-        public async Task<IActionResult> GetWarehouseStaffList(int id, [FromQuery][DefaultValue(0)] int pageIndex,
+        public async Task<IActionResult> GetWarehouseStaffList(int id,
+                                                              [FromQuery][DefaultValue(null)] string? search,
+                                                              [FromQuery] WarehouseFilter? filterBy,
+                                                              [FromQuery][DefaultValue(null)] string? filterQuery, 
+                                                              [FromQuery][DefaultValue(0)] int pageIndex,
                                                               [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _warehouseStaffService.GetWarehouseStaffList(id, pageIndex, pageSize);
+            var result = await _warehouseStaffService.GetWarehouseStaffList(id, search, filterBy, filterQuery, pageIndex, pageSize);
             return Ok(result);
         }
 
@@ -126,17 +139,7 @@ namespace BeeStore_Api.Controllers
         public async Task<IActionResult> GetWarehouseCategoryList([FromQuery][DefaultValue(0)] int pageIndex,
                                                                [FromQuery][DefaultValue(10)] int pageSize)
         {
-            if (!_memoryCache.TryGetValue(categoryCacheKey, out var result))
-            {
-                result = await _warehouseCategoryService.GetWarehouseCategoryList(pageIndex, pageSize);
-
-                var cacheEntryOptions = new MemoryCacheEntryOptions()
-                    .SetSlidingExpiration(TimeSpan.FromMinutes(30))
-                    .SetAbsoluteExpiration(TimeSpan.FromHours(1));
-
-                _memoryCache.Set(categoryCacheKey, result, cacheEntryOptions);
-            }
-
+            var result = await _warehouseCategoryService.GetWarehouseCategoryList(pageIndex, pageSize);
             return Ok(result);
         }
 

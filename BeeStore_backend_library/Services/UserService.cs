@@ -60,7 +60,7 @@ namespace BeeStore_Repository.Services
             return ResponseMessage.Success;
         }
 
-        public async Task<Pagination<UserListDTO>> GetAllUser(string search, UserRole role, UserSortBy sortCriteria,
+        public async Task<Pagination<UserListDTO>> GetAllUser(string search, UserRole? role, UserSortBy? sortCriteria,
                                                               bool order, int pageIndex, int pageSize)
         {
 
@@ -72,7 +72,6 @@ namespace BeeStore_Repository.Services
                 UserRole.Partner => Constants.RoleName.Partner,
                 UserRole.Shipper => Constants.RoleName.Shipper,
                 UserRole.User => Constants.RoleName.User,
-                UserRole.None => null,
                 _ => null
             };
 
@@ -85,14 +84,8 @@ namespace BeeStore_Repository.Services
                 _ => null
             };
 
-            Expression<Func<User, bool>> filterExpression = null;
-            if (!string.IsNullOrEmpty(filterQuery))
-            {
-                filterExpression = u => u.Role.RoleName.Equals(filterQuery);
-            }
-
             var list = await _unitOfWork.UserRepo.GetListAsync(
-                filter: u => filterQuery == null || u.Role.RoleName.Equals(filterQuery),
+                filter: u => filterQuery == null || u.Role!.RoleName!.Equals(filterQuery),
                 includes: query => query.Include(o => o.Role)
                                         .Include(o => o.Picture)
                                         .Include(o => o.Partners),
@@ -131,7 +124,7 @@ namespace BeeStore_Repository.Services
             {
                 if (BCrypt.Net.BCrypt.Verify(password, exist.Password))
                 {
-                    return new UserLoginResponseDTO(exist.Email, exist.Role.RoleName);
+                    return new UserLoginResponseDTO(exist.Email, exist.Role!.RoleName!);
                 }
                 else
                 {
@@ -179,10 +172,13 @@ namespace BeeStore_Repository.Services
                 {
                     throw new ApplicationException(ResponseMessage.UserPasswordError);
                 }
-                if (!user.PictureId.Equals(0))
+
+                var picture = await _unitOfWork.PictureRepo.SingleOrDefaultAsync(u => u.PictureLink.Equals(user.picture_link));
+                if (picture == null)
                 {
-                    exist.PictureId = user.PictureId;
+                    throw new KeyNotFoundException(ResponseMessage.ImageIdNotFound);
                 }
+                exist.PictureId = picture.Id;
                 if (!String.IsNullOrEmpty(user.Phone) && !user.Phone.Equals(Constants.DefaultString.String))
                 {
                     exist.Phone = user.Phone;

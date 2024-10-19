@@ -1,11 +1,16 @@
 ﻿using AutoMapper;
 using BeeStore_Repository.DTO;
 using BeeStore_Repository.DTO.InventoryDTOs;
+using BeeStore_Repository.Enums.SortBy;
+using BeeStore_Repository.Enums;
 using BeeStore_Repository.Logger;
 using BeeStore_Repository.Logger.GlobalExceptionHandler.CustomException;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
+using BeeStore_Repository.Enums.FilterBy;
+using Microsoft.AspNetCore.Http;
+using System.Linq.Expressions;
 
 namespace BeeStore_Repository.Services
 {
@@ -56,7 +61,8 @@ namespace BeeStore_Repository.Services
                 throw new KeyNotFoundException(ResponseMessage.WarehouseIdNotFound);
             }
             var dupe = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Name.Equals(request.Name,
-                                                                            StringComparison.OrdinalIgnoreCase));
+                                                                            StringComparison.OrdinalIgnoreCase)
+                                                                            && u.WarehouseId.Equals(request.WarehouseId));
             if (dupe != null)
             {
                 throw new ApplicationException(ResponseMessage.InventoryNameDuplicate);
@@ -91,10 +97,16 @@ namespace BeeStore_Repository.Services
                 throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
             }
             var dupe = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Name.Equals(request.Name,
-                                                                            StringComparison.OrdinalIgnoreCase));
-            if (dupe != null)
+                                                                            StringComparison.OrdinalIgnoreCase)
+                                                                            && u.WarehouseId.Equals(exist.WarehouseId));
+            if(dupe != null && !dupe.Id.Equals(request.Id))
+             {
+                    throw new ApplicationException(ResponseMessage.InventoryNameDuplicate);
+             }
+
+            if(request.Name != null && !request.Name.Equals(Constants.DefaultString.String))
             {
-                throw new ApplicationException(ResponseMessage.InventoryNameDuplicate);
+                exist.Name = request.Name;
             }
             if (request.Weight != null)
             {
@@ -110,16 +122,58 @@ namespace BeeStore_Repository.Services
 
         }
 
-        public async Task<Pagination<InventoryListDTO>> GetInventoryList(int pageIndex, int pageSize)
+        private async Task<List<Inventory>> ApplyFilterToList(InventoryFilter? filterBy, string? filterQuery,
+                                                          InventorySortBy? sortCriteria,
+                                                          bool descending, int? userId = null)
         {
-            var list = await _unitOfWork.InventoryRepo.GetAllAsync();
+            if ((!string.IsNullOrEmpty(filterQuery) && filterBy == null)
+                || (string.IsNullOrEmpty(filterQuery) && filterBy != null))
+            {
+                throw new BadHttpRequestException(ResponseMessage.BadRequest);
+            }
+            Expression<Func<Inventory, bool>> filterExpression = u =>
+            (userId == null || u.UserId.Equals(userId)) && 
+            (filterBy == null || (filterBy == InventoryFilter.WarehouseId && u.WarehouseId.Equals(Int32.Parse(filterQuery!))));
+
+
+            string? sortBy = sortCriteria switch
+            {
+                InventorySortBy.BoughtDate => Constants.SortCriteria.BoughtDate,
+                InventorySortBy.ExpirationDate => Constants.SortCriteria.ExpirationDate,
+                InventorySortBy.Name => Constants.SortCriteria.Name,
+                InventorySortBy.MaxWeight => Constants.SortCriteria.MaxWeight,
+                InventorySortBy.Weight => Constants.SortCriteria.Weight,
+                _ => null
+            };
+
+            
+
+            var list = await _unitOfWork.InventoryRepo.GetListAsync(
+                filter: filterExpression,
+                includes: null,
+                sortBy: sortBy!,
+                descending: descending,
+                searchTerm: null,
+                searchProperties: null
+                );
+            return list;
+        }
+
+        public async Task<Pagination<InventoryListDTO>> GetInventoryList(InventoryFilter? filterBy, string filterQuery,
+                                                          InventorySortBy? sortCriteria,
+                                                          bool descending, int pageIndex, int pageSize)
+        {
+            var list = await ApplyFilterToList(filterBy, filterQuery, sortCriteria, descending);
             var result = _mapper.Map<List<InventoryListDTO>>(list);
             return (await ListPagination<InventoryListDTO>.PaginateList(result, pageIndex, pageSize));
         }
 
-        public async Task<Pagination<InventoryListDTO>> GetInventoryList(int userId, int pageIndex, int pageSize)
+        public async Task<Pagination<InventoryListDTO>> GetInventoryList(int userId, InventoryFilter? filterBy, string filterQuery,
+                                                          InventorySortBy? sortCriteria,
+                                                          bool descending, int pageIndex, int pageSize)
         {
-            var list = await _unitOfWork.InventoryRepo.GetFiltered(u => u.UserId.Equals(userId));
+            var list = await ApplyFilterToList(filterBy, filterQuery, sortCriteria, descending, userId);
+
 
             var result = _mapper.Map<List<InventoryListDTO>>(list);
             return (await ListPagination<InventoryListDTO>.PaginateList(result, pageIndex, pageSize));

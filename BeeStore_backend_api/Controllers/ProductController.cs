@@ -1,4 +1,6 @@
 ﻿using BeeStore_Repository.DTO.ProductDTOs;
+using BeeStore_Repository.Enums.FilterBy;
+using BeeStore_Repository.Enums.SortBy;
 using BeeStore_Repository.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -18,19 +20,28 @@ namespace BeeStore_Api.Controllers
 
         [Route("get-products")]
         [HttpGet]
-        public async Task<IActionResult> GetProductList([FromQuery][DefaultValue(0)] int pageIndex,
+        public async Task<IActionResult> GetProductList([FromQuery][DefaultValue(null)] string? search,
+                                                        [FromQuery] ProductFilter? filterBy, string? filterQuery,
+                                                        [FromQuery] ProductSortBy? sortBy,
+                                                        [FromQuery][DefaultValue(false)] bool descending,
+                                                        [FromQuery][DefaultValue(0)] int pageIndex,
                                                         [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _productService.GetProductList(pageIndex, pageSize);
+            var result = await _productService.GetProductList(search, filterBy, filterQuery, sortBy, descending, pageIndex, pageSize);
             return Ok(result);
         }
 
         [Route("get-products/{userId}")]
         [HttpGet]
-        public async Task<IActionResult> GetProductListByEmail(int userId, [FromQuery][DefaultValue(0)] int pageIndex,
-                                                    [FromQuery][DefaultValue(10)] int pageSize)
+        public async Task<IActionResult> GetProductListById(int userId,
+                                                            [FromQuery][DefaultValue(null)] string? search,
+                                                            [FromQuery] ProductFilter? filterBy, string? filterQuery,
+                                                            [FromQuery] ProductSortBy? sortBy,
+                                                            [FromQuery][DefaultValue(false)] bool descending, 
+                                                            [FromQuery][DefaultValue(0)] int pageIndex,
+                                                            [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _productService.GetProductListByEmail(userId, pageIndex, pageSize);
+            var result = await _productService.GetProductListById(userId, search, filterBy, filterQuery, sortBy, descending, pageIndex, pageSize);
             return Ok(result);
         }
 
