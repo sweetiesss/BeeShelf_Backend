@@ -32,11 +32,11 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
             }
-            if (exist.UserId != null)
+            if (exist.OcopPartnerId != null)
             {
                 throw new DuplicateException(ResponseMessage.InventoryOccupied);
             }
-            var user = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Id == userId);
+            var user = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id == userId);
             if (user == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
@@ -46,7 +46,7 @@ namespace BeeStore_Repository.Services
                 throw new KeyNotFoundException(ResponseMessage.UserRoleNotPartnerError);
             }
 
-            exist.UserId = user.Id;
+            exist.OcopPartnerId = user.Id;
             _unitOfWork.InventoryRepo.Update(exist);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
@@ -60,13 +60,14 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.WarehouseIdNotFound);
             }
-            var dupe = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Name.Equals(request.Name,
-                                                                            StringComparison.OrdinalIgnoreCase)
-                                                                            && u.WarehouseId.Equals(request.WarehouseId));
-            if (dupe != null)
-            {
-                throw new ApplicationException(ResponseMessage.InventoryNameDuplicate);
-            }
+            //uncomment these after database changes
+            //var dupe = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Name.Equals(request.Name,
+            //                                                                StringComparison.OrdinalIgnoreCase)
+            //                                                                && u.WarehouseId.Equals(request.WarehouseId));
+            //if (dupe != null)
+            //{
+            //    throw new ApplicationException(ResponseMessage.InventoryNameDuplicate);
+            //}
             var result = _mapper.Map<Inventory>(request);
             result.BoughtDate = DateTime.Now;
             result.ExpirationDate = DateTime.Now;
@@ -96,21 +97,21 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
             }
-            var dupe = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Name.Equals(request.Name,
-                                                                            StringComparison.OrdinalIgnoreCase)
-                                                                            && u.WarehouseId.Equals(exist.WarehouseId));
-            if(dupe != null && !dupe.Id.Equals(request.Id))
-             {
-                    throw new ApplicationException(ResponseMessage.InventoryNameDuplicate);
-             }
+            //var dupe = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Name.Equals(request.Name,
+            //                                                                StringComparison.OrdinalIgnoreCase)
+            //                                                                && u.WarehouseId.Equals(exist.WarehouseId));
+            //if(dupe != null && !dupe.Id.Equals(request.Id))
+            // {
+            //        throw new ApplicationException(ResponseMessage.InventoryNameDuplicate);
+            // }
 
             if(request.Name != null && !request.Name.Equals(Constants.DefaultString.String))
-            {
-                exist.Name = request.Name;
+            {//uncomment these after you make changes to database
+                //exist.Name = request.Name;
             }
             if (request.Weight != null)
             {
-                exist.Weight = request.Weight;
+                //exist.Weight = request.Weight;
             }
             if (request.MaxWeight != null && request.MaxWeight != 0)
             {
@@ -132,7 +133,7 @@ namespace BeeStore_Repository.Services
                 throw new BadHttpRequestException(ResponseMessage.BadRequest);
             }
             Expression<Func<Inventory, bool>> filterExpression = u =>
-            (userId == null || u.UserId.Equals(userId)) && 
+            (userId == null || u.OcopPartnerId.Equals(userId)) && 
             (filterBy == null || (filterBy == InventoryFilter.WarehouseId && u.WarehouseId.Equals(Int32.Parse(filterQuery!))));
 
 
@@ -179,14 +180,14 @@ namespace BeeStore_Repository.Services
             return (await ListPagination<InventoryListDTO>.PaginateList(result, pageIndex, pageSize));
         }
 
-        public async Task<InventoryListPackagesDTO> GetInventoryById(int id)
+        public async Task<InventoryLotListDTO> GetInventoryById(int id)
         {
             var exist = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Id.Equals(id));
             if (exist == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
             }
-            var result = _mapper.Map<InventoryListPackagesDTO>(exist);
+            var result = _mapper.Map<InventoryLotListDTO>(exist);
             return result;
         }
     }

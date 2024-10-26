@@ -9,13 +9,18 @@ namespace BeeStore_Repository.Services.Interfaces
     {
         Task<Pagination<OrderListDTO>> GetOrderList(OrderStatus? orderStatus, OrderSortBy? sortCriteria,
                                                           bool descending,int pageIndex, int pageSize);
-        Task<Pagination<OrderListDTO>> GetOrderList(int userId, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
+
+        Task<Pagination<OrderListDTO>> GetWarehouseSentOrderList(int warehouseId, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
                                                           bool descending, int pageIndex, int pageSize);
-        Task<Pagination<OrderListDTO>> GetDeliverOrderList(int userId, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
+        Task<Pagination<OrderListDTO>> GetOrderList(int partner, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
+                                                          bool descending, int pageIndex, int pageSize);
+        Task<Pagination<OrderListDTO>> GetDeliverOrderList(int employeeId, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
                                                           bool descending, int pageIndex, int pageSize);
 
         Task<string> CreateOrder(OrderCreateDTO request);
-        Task<string> UpdateOrderStatus(int id, string orderStatus);
+        Task<string> SendOrder(int id);
+        Task<string> CancelOrder(int id);
+        Task<string> UpdateOrderStatus(int id, OrderStatus orderStatus);
         Task<string> UpdateOrder(int id, OrderCreateDTO request);
         Task<string> DeleteOrder(int id);
     }

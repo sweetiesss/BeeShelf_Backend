@@ -11,14 +11,19 @@
             public const string Shipper = "Shipper";
             public const string Partner = "Partner";
         }
-
+       
         public static class Status
         {
+            public const string Draft = "Draft";
             public const string Pending = "Pending";
             public const string Approved = "Approved";
             public const string Reject = "Reject";
             public const string Processing = "Processing";
-            public const string Shipped = "Shipped";
+            public const string Shipping = "Shipping";
+            public const string Delivered = "Delivered";
+            public const string Completed = "Completed";
+            public const string Returned = "Returned";
+            public const string Refunded = "Refunded";
             public const string Canceled = "Canceled";
         }
 

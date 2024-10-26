@@ -1,6 +1,6 @@
 ﻿namespace BeeStore_Repository.Models;
 
-public partial class User : BaseEntity
+public partial class User : BaseEntity // DELETE THIS
 {
     //public int Id { get; set; }
 

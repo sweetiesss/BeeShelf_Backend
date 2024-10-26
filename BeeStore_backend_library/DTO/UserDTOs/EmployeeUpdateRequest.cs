@@ -1,7 +1,9 @@
 ﻿namespace BeeStore_Repository.DTO.UserDTOs
 {
-    public class UserUpdateRequestDTO
+    public class EmployeeUpdateRequest
     {
+
+
         public string Email { get; set; } = null!;
 
         public string ConfirmPassword { get; set; } = null!;
@@ -12,8 +14,9 @@
 
         public string? Phone { get; set; }
 
-        public string? picture_link { get; set;}
-        //public int? PictureId { get; set; }
+        public string? Setting { get; set; }
+
+        public string? PictureLink { get; set; }
 
     }
 }

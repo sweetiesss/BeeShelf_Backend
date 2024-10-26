@@ -9,6 +9,7 @@ using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace BeeStore_Repository.Services
@@ -94,19 +95,28 @@ namespace BeeStore_Repository.Services
             return await ListPagination<WarehouseListDTO>.PaginateList(result, pageIndex, pageSize);
         }
 
+        public async Task<WarehouseDeliveryZoneDTO> GetWarehouseById(int id)
+        {
+            var warehouse = await _unitOfWork.WarehouseRepo.SingleOrDefaultAsync(w => !w.IsDeleted && w.Id == id,  
+                                                                          query => query.Include(w => w.DeliveryZones));          
+         
+            var result = _mapper.Map<WarehouseDeliveryZoneDTO>(warehouse);
+            return result;
+        }
+
         public async Task<List<WarehouseListInventoryDTO>> GetWarehouseByUserId(int userId)
         {
             var list = await _unitOfWork.WarehouseRepo.GetQueryable(wh => wh
                                                        .Where(u => u.IsDeleted.Equals(false))
-                                                       .Where(w => w.Inventories.Any(inventory => inventory.UserId == userId))
+                                                       .Where(w => w.Inventories.Any(inventory => inventory.OcopPartnerId == userId))
         .Select(warehouse => new Warehouse
         {
             Id = warehouse.Id,
             Location = warehouse.Location,
             Name = warehouse.Name,
-            Size = warehouse.Size,
+            Capacity = warehouse.Capacity,
             CreateDate = warehouse.CreateDate,
-            Inventories = warehouse.Inventories.Where(inventory => inventory.UserId == userId).ToList()
+            Inventories = warehouse.Inventories.Where(inventory => inventory.OcopPartnerId == userId).ToList()
         }));
             var result = _mapper.Map<List<WarehouseListInventoryDTO>>(list);
 
@@ -131,9 +141,9 @@ namespace BeeStore_Repository.Services
             {
                 exist.Location = request.Location;
             }
-            if (request.Size != null && request.Size != 0)
+            if (request.Capacity != null && request.Capacity != 0)
             {
-                exist.Size = request.Size;
+                exist.Capacity = request.Capacity;
             }
 
             _unitOfWork.WarehouseRepo.Update(exist);

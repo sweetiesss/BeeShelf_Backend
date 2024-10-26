@@ -6,7 +6,7 @@ using BeeStore_Repository.Utils;
 
 namespace BeeStore_Repository.Mapper.CustomResolver
 {
-    public class CustomRoleNameResolver<TSource> : IValueResolver<TSource, User, int?>
+    public class CustomRoleNameResolver<TSource> : IValueResolver<TSource, Employee, int?>
         where TSource : IRoleNameProvider
     {
         private readonly BeeStoreDbContext _context;
@@ -17,7 +17,7 @@ namespace BeeStore_Repository.Mapper.CustomResolver
         }
 
 
-        int? IValueResolver<TSource, User, int?>.Resolve(TSource source, User destination, int? destMember, ResolutionContext context)
+        int? IValueResolver<TSource, Employee, int?>.Resolve(TSource source, Employee destination, int? destMember, ResolutionContext context)
         {
             var role = _context.Roles.FirstOrDefault(r => r.RoleName == source.RoleName);
             if (role.RoleName == null)

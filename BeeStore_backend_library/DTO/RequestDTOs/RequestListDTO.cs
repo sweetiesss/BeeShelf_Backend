@@ -3,19 +3,28 @@
     public class RequestListDTO
     {
         public int Id { get; set; }
-        public string user_email { get; set; }
+
+        public string? partner_email { get; set; }
+
+        public string? Name { get; set; }
 
         public string? Description { get; set; }
 
-        public int? PackageId { get; set; }
+        public int? LotId { get; set; }
         public string ProductName { get; set; }
 
-        public int? SendToInventory { get; set; }
+        public string? RequestType { get; set; }
+
+        public int? SendToInventoryId { get; set; }
 
         public DateTime? CreateDate { get; set; }
 
-        public string? Status { get; set; }
+        public DateTime? ApporveDate { get; set; }
 
-        public string? RequestType { get; set; }
+        public DateTime? DeliverDate { get; set; }
+
+        public string? CancellationReason { get; set; }
+
+        public string? Status { get; set; }
     }
 }

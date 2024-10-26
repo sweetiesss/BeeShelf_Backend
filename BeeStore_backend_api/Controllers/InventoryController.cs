@@ -50,7 +50,7 @@ namespace BeeStore_Api.Controllers
         }
 
         [Route("get-inventory/{id}")]
-        [Authorize(Roles = "Admin,Manager,Staff")]
+        [Authorize(Roles = "Admin,Manager,Staff,Partner")]
         [HttpGet]
         public async Task<IActionResult> GetInventoryById(int id)
         {

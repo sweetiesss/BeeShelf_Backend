@@ -41,7 +41,7 @@ namespace BeeStore_Repository.Services
                 sortBy: null,
                 descending: false,
                 searchTerm: search,
-                searchProperties: new Expression<Func<WarehouseShipper, string>>[] { p => p.User.Email }
+                searchProperties: new Expression<Func<WarehouseShipper, string>>[] { p => p.Employee.Email }
                 );
             return list;
         }
@@ -67,14 +67,14 @@ namespace BeeStore_Repository.Services
 
             //check dupes in list
             var dupes = request.Select((x, i) => new { index = i, value = x })
-                   .GroupBy(x => new { x.value.UserId })
+                   .GroupBy(x => new { x.value.EmployeeId })
                    .Where(x => x.Skip(1).Any());
 
             if (dupes.Any())
             {
                 foreach (var group in dupes)
                 {
-                    var a = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Id == group.Key.UserId);
+                    var a = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id == group.Key.EmployeeId);
                     sb.Append($"{a.Email}, ");
                 }
                 error = sb.ToString();
@@ -87,11 +87,11 @@ namespace BeeStore_Repository.Services
             foreach (var item in request)
             {
                 //check user exist and is a shipper
-                var user = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Id == item.UserId);
+                var user = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id == item.EmployeeId);
 
                 if (user == null)
                 {
-                    throw new KeyNotFoundException(ResponseMessage.ProductIdNotFound + $": {item.UserId}");
+                    throw new KeyNotFoundException(ResponseMessage.ProductIdNotFound + $": {item.EmployeeId}");
                 }
 
                 var role = await _unitOfWork.RoleRepo.SingleOrDefaultAsync(u => u.Id == user.RoleId);
@@ -101,18 +101,18 @@ namespace BeeStore_Repository.Services
                 }
 
                 //check if user is arleady working at here or another place
-                var existWorking = await _unitOfWork.WarehouseShipperRepo.FirstOrDefaultAsync(u => u.UserId == item.UserId);
+                var existWorking = await _unitOfWork.WarehouseShipperRepo.FirstOrDefaultAsync(u => u.EmployeeId == item.EmployeeId);
                 if (existWorking != null)
                 {
                     if (existWorking.IsDeleted != true)
                     {
                         //throw new DuplicateException($"This user is already working at a warehouse: ID: {existWorking.User.Id}");
-                        sb.Append($"{existWorking.User.Id}, ");
+                        sb.Append($"{existWorking.EmployeeId}, ");
 
                     }
                     else
                     {
-                        existWorking.UserId = null;
+                        existWorking.EmployeeId = null;
                         _unitOfWork.WarehouseShipperRepo.Update(existWorking);
                         await _unitOfWork.SaveAsync();
                     }

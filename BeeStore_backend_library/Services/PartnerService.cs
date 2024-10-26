@@ -6,6 +6,8 @@ using BeeStore_Repository.Logger;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
+using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace BeeStore_Repository.Services
 {
@@ -21,16 +23,21 @@ namespace BeeStore_Repository.Services
             _logger = logger;
         }
 
-        public async Task<Pagination<PartnerListDTO>> GetPartnerList(SortBy? sortby, bool descending, int pageIndex, int pageSize)
+        public async Task<Pagination<PartnerListDTO>> GetAllPartners(string search, SortBy? sortby, bool descending, int pageIndex, int pageSize)
         {
             string sortCriteria = sortby.ToString()!;
 
-            var list = await _unitOfWork.PartnerRepo.GetListAsync(
+            var list = await _unitOfWork.OcopPartnerRepo.GetListAsync(
                 filter: null!,
+                includes: o => o.Include(o => o.Province)
+                                .Include(o => o.Category)
+                                .Include(o => o.OcopCategory)
+                                .Include(o => o.Role),
                 sortBy: sortCriteria!,
                 descending: descending,
-                searchTerm: null!,
-                searchProperties: null!
+                searchTerm: search!,
+                searchProperties: new Expression<Func<OcopPartner, string>>[] { p => p.Email, p => p.FirstName,
+                                                                                p => p.LastName, p => p.BusinessName}
                 );
                 
             var result = _mapper.Map<List<PartnerListDTO>>(list);
@@ -38,56 +45,68 @@ namespace BeeStore_Repository.Services
             return await ListPagination<PartnerListDTO>.PaginateList(result, pageIndex, pageSize);
         }
 
-        public async Task<string> UpgradeToPartner(PartnerUpdateRequest request)
+        public async Task<PartnerListDTO> GetPartner(string email)
         {
-            var user = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Id == request.UserId);
-            if (user == null)
+            var partner = await _unitOfWork.OcopPartnerRepo.SingleOrDefaultAsync(u => u.Email == email,
+                                                                               query => query.Include(o => o.Province)
+                                                                                             .Include(o => o.Category)
+                                                                                             .Include(o => o.OcopCategory)
+                                                                                             .Include(o => o.Role));
+            if (partner == null)
             {
-                throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
+                throw new KeyNotFoundException(ResponseMessage.UserEmailNotFound);
             }
-            if (user.RoleId != 6)
-            {
-                throw new ApplicationException(ResponseMessage.UserRoleError);
-            }
-
-            request.CreateDate = DateTime.Now;
-            request.UpdateDate = DateTime.Now;
-            var partner = _mapper.Map<Partner>(request);
-            await _unitOfWork.PartnerRepo.AddAsync(partner);
-            user.RoleId = 4;
-            await _unitOfWork.SaveAsync();
-
-
-            return ResponseMessage.Success;
+            var result = _mapper.Map<PartnerListDTO>(partner);
+            return result;
         }
 
-        public async Task<string> UpdatePartner(PartnerUpdateRequest request)
+        
+
+        public async Task<string> UpdatePartner(OCOPPartnerUpdateRequest user)
         {
-            var exist = await _unitOfWork.PartnerRepo.SingleOrDefaultAsync(u => u.UserId == request.UserId);
-            if (exist == null)
+            var exist = await _unitOfWork.OcopPartnerRepo.SingleOrDefaultAsync(u => u.Email == user.Email);
+            if (exist != null)
             {
-                throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
+                if (BCrypt.Net.BCrypt.Verify(user.ConfirmPassword, exist.Password))
+                {
+                    throw new ApplicationException(ResponseMessage.UserPasswordError);
+                }
+                if ((DateTime.Now - exist.UpdateDate.Value).TotalDays < 30)
+                {
+                    throw new ApplicationException(ResponseMessage.UpdatePartnerError);
+                }
+
+                exist.Setting = user.Setting;
+                exist.PictureLink = user.PictureLink;
+                if (!String.IsNullOrEmpty(user.Phone) && !user.Phone.Equals(Constants.DefaultString.String))
+                {
+                    exist.Phone = user.Phone;
+                }
+                if (!String.IsNullOrEmpty(user.FirstName) && !user.FirstName.Equals(Constants.DefaultString.String))
+                {
+                    exist.FirstName = user.FirstName;
+                }
+                if (!String.IsNullOrEmpty(user.LastName) && !user.LastName.Equals(Constants.DefaultString.String))
+                {
+                    exist.LastName = user.LastName;
+                }
+                exist.BankAccountNumber = user.BankAccountNumber;
+                exist.BankName = user.BankName;
+                exist.BusinessName = user.BusinessName;
+                exist.CategoryId = user.CategoryId;
+                exist.ProvinceId = user.ProvinceId;
+                exist.TaxIdentificationNumber = user.TaxIdentificationNumber;
+                exist.OcopCategoryId = user.OcopCategoryId;
+                exist.UpdateDate = DateTime.Now;
+                _unitOfWork.OcopPartnerRepo.Update(exist);
+                _unitOfWork.SaveAsync();
+                return ResponseMessage.Success;
             }
-            exist.UpdateDate = DateTime.Now;
-            if (!String.IsNullOrEmpty(request.BankAccountNumber) &&
-                !request.BankAccountNumber.Equals(Constants.DefaultString.String))
+            else
             {
-                exist.BankAccountNumber = request.BankAccountNumber;
-            }
-            if (!String.IsNullOrEmpty(request.CitizenIdentificationNumber) &&
-                !request.CitizenIdentificationNumber.Equals(Constants.DefaultString.String))
-            {
-                exist.CitizenIdentificationNumber = request.CitizenIdentificationNumber;
-            }
-            if (!String.IsNullOrEmpty(request.BankName) &&
-                !request.BankName.Equals(Constants.DefaultString.String))
-            {
-                exist.BankName = request.BankName;
+                throw new KeyNotFoundException(ResponseMessage.UserEmailNotFound);
             }
 
-            _unitOfWork.PartnerRepo.Update(exist);
-            await _unitOfWork.SaveAsync();
-            return ResponseMessage.Success;
         }
 
         public async Task<string> DeletePartner(int id)

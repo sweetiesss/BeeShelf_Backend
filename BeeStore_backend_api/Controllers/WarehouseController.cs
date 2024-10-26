@@ -50,6 +50,15 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
+        [Route("get-warehouse/{id}")]
+        [HttpGet]
+        [Authorize(Roles = "Admin, Manager")]
+        public async Task<IActionResult> GetWarehouse(int id)
+        {
+            var result = await _warehouseService.GetWarehouseById(id); 
+            return Ok(result);
+        }
+
         [Route("get-warehouse-by-user/{userId}")]
         [HttpGet]
         [Authorize(Roles = "Admin,Manager,Staff,Partner,Shipper")]
@@ -134,32 +143,7 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
-        [Route("get-warehouse-categories")]
-        [HttpGet]
-        public async Task<IActionResult> GetWarehouseCategoryList([FromQuery][DefaultValue(0)] int pageIndex,
-                                                               [FromQuery][DefaultValue(10)] int pageSize)
-        {
-            var result = await _warehouseCategoryService.GetWarehouseCategoryList(pageIndex, pageSize);
-            return Ok(result);
-        }
-
-        [Route("get-warehouse-categories/{id}")]
-        [HttpGet]
-        public async Task<IActionResult> GetWarehouseCategoryList(int id, [FromQuery][DefaultValue(0)] int pageIndex,
-                                                               [FromQuery][DefaultValue(10)] int pageSize)
-        {
-            var result = await _warehouseCategoryService.GetWarehouseCategoryList(id, pageIndex, pageSize);
-            return Ok(result);
-        }
-
-        [Route("add-categories-to-warehouse")]
-        [HttpPost]
-        [Authorize(Roles = "Admin,Manager")]
-        public async Task<IActionResult> AddWarehouseCategory(List<WarehouseCategoryCreateDTO> request)
-        {
-            var result = await _warehouseCategoryService.AddCategoryToWarehouse(request);
-            return Ok(result);
-        }
+        
 
         [Route("create-warehouse")]
         [HttpPost]

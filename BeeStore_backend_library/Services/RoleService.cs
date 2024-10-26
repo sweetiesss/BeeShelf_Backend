@@ -27,7 +27,7 @@ namespace BeeStore_Repository.Services
 
         public async Task<string> UpdateUserRole(int id, string roleName)
         {
-            var user = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Id.Equals(id));
+            var user = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id.Equals(id));
             if (user == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
