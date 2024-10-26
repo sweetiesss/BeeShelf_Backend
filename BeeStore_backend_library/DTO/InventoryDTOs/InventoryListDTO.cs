@@ -4,9 +4,9 @@
     {
         public int Id { get; set; }
 
-        public string Name { get; set; }
+        public int? OcopPartnerId { get; set; }
 
-        public int? UserId { get; set; }
+        public string? Name { get; set; }
 
         public decimal? MaxWeight { get; set; }
 
@@ -17,6 +17,5 @@
         public DateTime? ExpirationDate { get; set; }
 
         public string WarehouseName { get; set; }
-        //public int? WarehouseId { get; set; }
     }
 }

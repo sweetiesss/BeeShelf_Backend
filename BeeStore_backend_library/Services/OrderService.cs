@@ -28,13 +28,18 @@ namespace BeeStore_Repository.Services
         }
 
         private async Task<List<Order>> ApplyFilterToList(OrderStatus? orderStatus, OrderSortBy? sortCriteria,
-                                                          bool descending, int? shipperId = null, int? userId = null)
+                                                          bool descending, int? shipperId = null, int? userId = null, int? warehouseId = null)
         {
             string? filterQuery = orderStatus switch
             {
+                OrderStatus.Draft => Constants.Status.Draft,
                 OrderStatus.Pending => Constants.Status.Pending,
                 OrderStatus.Processing => Constants.Status.Processing,
-                OrderStatus.Shipped => Constants.Status.Shipped,
+                OrderStatus.Shipping => Constants.Status.Shipping,
+                OrderStatus.Delivered => Constants.Status.Delivered,
+                OrderStatus.Completed => Constants.Status.Completed,
+                OrderStatus.Returned => Constants.Status.Returned,
+                OrderStatus.Refunded => Constants.Status.Refunded,
                 OrderStatus.Canceled => Constants.Status.Canceled,
                 _ => null
             };
@@ -48,9 +53,9 @@ namespace BeeStore_Repository.Services
             };
 
             var list = await _unitOfWork.OrderRepo.GetListAsync(
-                filter: u => (filterQuery == null || u.OrderStatus.Equals(filterQuery)) 
-                             && (userId == null || u.UserId.Equals(userId))
-                             && (shipperId == null || u.DeliverBy.Equals(shipperId)),
+                filter: u => (filterQuery == null || u.Status.Equals(filterQuery))
+                             && (userId == null || u.OcopPartnerId.Equals(userId)),
+                             //&& (shipperId == null || u.Equals(shipperId)),
                 includes: null,
                 sortBy: sortBy!,
                 descending: descending,
@@ -68,6 +73,14 @@ namespace BeeStore_Repository.Services
             return await ListPagination<OrderListDTO>.PaginateList(result, pageIndex, pageSize);
         }
 
+        //this shit sucked, will have to think about later
+        public async Task<Pagination<OrderListDTO>> GetWarehouseSentOrderList(int warehouseId, OrderStatus? orderStatus, OrderSortBy? sortCriteria, bool descending, int pageIndex, int pageSize)
+        {
+            var list = await ApplyFilterToList(orderStatus, sortCriteria, descending, null, null, warehouseId);
+            var result = _mapper.Map<List<OrderListDTO>>(list);
+            return await ListPagination<OrderListDTO>.PaginateList(result, pageIndex, pageSize);
+        }
+
         public async Task<Pagination<OrderListDTO>> GetOrderList(int userId, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
                                                           bool descending, int pageIndex, int pageSize)
         {
@@ -76,10 +89,10 @@ namespace BeeStore_Repository.Services
             return await ListPagination<OrderListDTO>.PaginateList(result, pageIndex, pageSize);
         }
 
-        public async Task<Pagination<OrderListDTO>> GetDeliverOrderList(int userId, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
+        public async Task<Pagination<OrderListDTO>> GetDeliverOrderList(int shipperId, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
                                                           bool descending, int pageIndex, int pageSize)
         {
-            var list = await ApplyFilterToList(orderStatus, sortCriteria, descending, userId);
+            var list = await ApplyFilterToList(orderStatus, sortCriteria, descending, shipperId);
             var result = _mapper.Map<List<OrderListDTO>>(list);
             return await ListPagination<OrderListDTO>.PaginateList(result, pageIndex, pageSize);
         }
@@ -88,40 +101,28 @@ namespace BeeStore_Repository.Services
 
         public async Task<string> CreateOrder(OrderCreateDTO request)
         {
-            var user = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Id == request.UserId,
-                                                                       query => query.Include(o => o.Role));
-            if (user == null)
+            var user = await _unitOfWork.OcopPartnerRepo.AnyAsync(u => u.Id == request.OcopPartnerId);
+            if (user.Equals(false))
             {
                 throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
             }
 
-            if (user.RoleId != 4)
+            int? totalPrice = 0;
+            foreach(var od in request.OrderDetails)
             {
-                throw new ApplicationException(ResponseMessage.UserRoleNotPartnerError);
-            }
-
-            if (request.DeliverBy != 0)
-            {
-                var shipper = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Id == request.DeliverBy);
-
-                if (shipper == null)
+                totalPrice += od.ProductPrice;
+                var a = await _unitOfWork.LotRepo.AnyAsync(u => u.Id.Equals(od.LotId));
+                if (a.Equals(false))
                 {
-                    throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
-                }
-                if (shipper.RoleId != 5)
-                {
-                    throw new ApplicationException(ResponseMessage.UserRoleNotShipperError);
+                    throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
                 }
             }
 
-            var product = await _unitOfWork.ProductRepo.SingleOrDefaultAsync(u => u.Id == request.ProductId);
-            if (product == null)
-            {
-                throw new KeyNotFoundException(ResponseMessage.ProductIdNotFound);
-            }
+            
 
             request.CreateDate = DateTime.Now;
-            request.OrderStatus = Constants.Status.Pending;
+            request.Status = Constants.Status.Draft;
+            request.TotalPrice = totalPrice;
             var result = _mapper.Map<Order>(request);
             await _unitOfWork.OrderRepo.AddAsync(result);
             await _unitOfWork.SaveAsync();
@@ -136,7 +137,7 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.OrderIdNotFound);
             }
-            if (exist.OrderStatus != Constants.Status.Pending)
+            if (exist.Status != Constants.Status.Pending)
             {
                 throw new ApplicationException(ResponseMessage.OrderProccessedError);
             }
@@ -145,6 +146,7 @@ namespace BeeStore_Repository.Services
             return ResponseMessage.Success;
         }
 
+        //don't touch update order, im too lazy to fix it, might be later, for now just want to do create and getlist
         public async Task<string> UpdateOrder(int id, OrderCreateDTO request)
         {
             var exist = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u => u.Id == id);
@@ -152,42 +154,83 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.OrderIdNotFound);
             }
-            if (exist.OrderStatus != Constants.Status.Pending)
+            if (exist.Status != Constants.Status.Pending)
             {
                 throw new ApplicationException(ResponseMessage.OrderProccessedError);
             }
-            exist.PictureId = request.PictureId;
-            exist.TotalPrice = request.TotalPrice;
-            exist.DeliverBy = request.DeliverBy;
-            exist.ReceiverPhone = request.ReceiverPhone;
-            exist.ReceiverAddress = request.ReceiverAddress;
-            exist.CodStatus = request.CodStatus;
-            exist.CancellationReason = request.CancellationReason;
-            exist.ProductAmount = request.ProductAmount;
-            exist.ProductId = request.ProductId;
+            //exist.PictureId = request.PictureId;
+            //exist.TotalPrice = request.TotalPrice;
+            //exist.DeliverBy = request.DeliverBy;
+            //exist.ReceiverPhone = request.ReceiverPhone;
+            //exist.ReceiverAddress = request.ReceiverAddress;
+            //exist.CodStatus = request.CodStatus;
+            //exist.CancellationReason = request.CancellationReason;
+            //exist.ProductAmount = request.ProductAmount;
+            //exist.ProductId = request.ProductId;
             _unitOfWork.OrderRepo.Update(exist);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
         }
 
-        public async Task<string> UpdateOrderStatus(int id, string orderStatus)
+        //Partner use this and the one below
+        public async Task<string> SendOrder(int id)
+        {
+            var exist = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u => u.Id==id);
+            if(exist == null)
+            {
+                throw new KeyNotFoundException(ResponseMessage.OrderIdNotFound);
+            }
+            if(exist.Status != Constants.Status.Draft)
+            {
+                throw new ApplicationException(ResponseMessage.OrderSentError);
+            }
+            exist.Status = Constants.Status.Pending;
+            await _unitOfWork.SaveAsync();
+            return ResponseMessage.Success;
+        }
+
+        public async Task<string> CancelOrder(int id)
         {
             var exist = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u => u.Id == id);
             if (exist == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.OrderIdNotFound);
             }
+            if (exist.Status == Constants.Status.Pending ||
+                exist.Status == Constants.Status.Shipping)
+            {
+                exist.Status = Constants.Status.Canceled;
+                await _unitOfWork.SaveAsync();
+            }
+            else
+            {
+                throw new ApplicationException(ResponseMessage.OrderCanceledError);
+            }
+            return ResponseMessage.Success;
+        }
+
+
+        //Shipper and staff use this
+        public async Task<string> UpdateOrderStatus(int id, OrderStatus orderStatus)
+        {
+            var exist = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u => u.Id == id);
+            if (exist == null)
+            {
+                throw new KeyNotFoundException(ResponseMessage.OrderIdNotFound);
+            }
+
+            var orderStatusString = orderStatus.ToString();
             bool a = false;
             string orderStatusUpdate = null;
-            orderStatus.Trim();
-            if (orderStatus.Equals(Constants.Status.Pending, StringComparison.OrdinalIgnoreCase))        //Pending
+            if (orderStatusString.Equals(Constants.Status.Pending, StringComparison.OrdinalIgnoreCase))        //Pending
             {
                 return ResponseMessage.Success;
             }
 
-            if (orderStatus.Equals(Constants.Status.Processing, StringComparison.OrdinalIgnoreCase))        //Processing
+            //from Pending to Processing
+            if (orderStatusString.Equals(Constants.Status.Processing, StringComparison.OrdinalIgnoreCase))        //Processing
             {
-                if (exist.OrderStatus == Constants.Status.Pending)
+                if (exist.Status == Constants.Status.Pending)
                 {
                     orderStatusUpdate = Constants.Status.Processing;
                     a = true;
@@ -198,11 +241,12 @@ namespace BeeStore_Repository.Services
                 }
             }
 
-            if (orderStatus.Equals(Constants.Status.Shipped, StringComparison.OrdinalIgnoreCase))    //Shipped
+            //from processing to Shipping
+            if (orderStatusString.Equals(Constants.Status.Shipping, StringComparison.OrdinalIgnoreCase))    //Shipped
             {
-                if (exist.OrderStatus == Constants.Status.Processing)
+                if (exist.Status == Constants.Status.Processing)
                 {
-                    orderStatusUpdate = Constants.Status.Shipped;
+                    orderStatusUpdate = Constants.Status.Shipping;
                     a = true;
 
                 }
@@ -212,15 +256,37 @@ namespace BeeStore_Repository.Services
                 }
             }
 
-            if (orderStatus.Equals(Constants.Status.Canceled, StringComparison.OrdinalIgnoreCase)) //Canceled
+            //Order can be canceled from three states,
+            //Pending (Partner initiate),
+            //Proccessing (Both User and Staff can initiate), 
+            //Shipping (Partner initiate) (additional fee)
+            //the reason why there is no "Pending" below is because I want to seperate Partner cancel from this
+            if (orderStatusString.Equals(Constants.Status.Canceled, StringComparison.OrdinalIgnoreCase)) //Canceled
             {
-                if (exist.OrderStatus == Constants.Status.Shipped)
+                if (exist.Status == Constants.Status.Shipping ||
+                    exist.Status == Constants.Status.Processing)
+                {
+                    orderStatusUpdate = Constants.Status.Canceled;
+                    a = true;
+                }
+                else
                 {
                     throw new ApplicationException(ResponseMessage.OrderCanceledError);
                 }
-                orderStatusUpdate = Constants.Status.Canceled;
-                a = true;
+            }
 
+            //From Shipping to delivered
+            if(orderStatusString.Equals(Constants.Status.Delivered, StringComparison.OrdinalIgnoreCase))
+            {
+                if(exist.Status == Constants.Status.Shipping)
+                {
+                    orderStatusUpdate = Constants.Status.Delivered;
+                    a = true;
+                }
+                else
+                {
+                    throw new ApplicationException();
+                }
             }
 
             if (!a)
@@ -228,10 +294,12 @@ namespace BeeStore_Repository.Services
                 throw new BadHttpRequestException(ResponseMessage.BadRequest);
             }
 
-            exist.OrderStatus = orderStatusUpdate;
+            exist.Status = orderStatusUpdate;
             _unitOfWork.OrderRepo.Update(exist);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
         }
+
+  
     }
 }

@@ -1,9 +1,11 @@
 ﻿using BeeStore_Repository.DTO.UserDTOs.Interfaces;
+using BeeStore_Repository.Utils;
+using System.Reflection.Metadata;
 using System.Text.Json.Serialization;
 
 namespace BeeStore_Repository.DTO.UserDTOs
 {
-    public class UserCreateRequestDTO : IRoleNameProvider
+    public class EmployeeCreateRequest 
     {
 
         public string Email { get; set; } = null!;
@@ -17,14 +19,17 @@ namespace BeeStore_Repository.DTO.UserDTOs
         public string? Phone { get; set; }
 
         [JsonIgnore]
+        public string? Status { get; set; } = "Active";
+
+        [JsonIgnore]
         public DateTime? CreateDate { get; set; } = DateTime.Now;
 
         [JsonIgnore]
-        public int? PictureId { get; set; } = 1;
+        public string? Setting { get; set; }
 
         [JsonIgnore]
-        public bool? IsDeleted { get; set; } = false;
+        public string? PictureLink { get; set; } = String.Empty;
 
-        public string RoleName { get; set; }
+        public int? RoleId { get; set; }
     }
 }

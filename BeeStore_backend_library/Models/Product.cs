@@ -1,10 +1,15 @@
-﻿namespace BeeStore_Repository.Models;
+﻿using System;
+using System.Collections.Generic;
+
+namespace BeeStore_Repository.Models;
 
 public partial class Product : BaseEntity
 {
     //public int Id { get; set; }
 
-    public int? UserId { get; set; }
+    public int? OcopPartnerId { get; set; }
+
+    public string? Barcode { get; set; }
 
     public string? Name { get; set; }
 
@@ -14,21 +19,17 @@ public partial class Product : BaseEntity
 
     public DateTime? CreateDate { get; set; }
 
-    public int? PictureId { get; set; }
-
     public int? ProductCategoryId { get; set; }
+
+    public string? PictureLink { get; set; }
 
     public string? Origin { get; set; }
 
     //public ulong? IsDeleted { get; set; }
 
-    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
+    public virtual ICollection<Lot> Lots { get; set; } = new List<Lot>();
 
-    public virtual ICollection<Package> Packages { get; set; } = new List<Package>();
-
-    public virtual Picture? Picture { get; set; }
+    public virtual OcopPartner? OcopPartner { get; set; }
 
     public virtual ProductCategory? ProductCategory { get; set; }
-
-    public virtual User? User { get; set; }
 }

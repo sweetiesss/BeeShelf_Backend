@@ -1,6 +1,6 @@
 ﻿namespace BeeStore_Repository.Models;
 
-public partial class Picture : BaseEntity
+public partial class Picture : BaseEntity //DELETE THIS
 {
     //public int Id { get; set; }
 

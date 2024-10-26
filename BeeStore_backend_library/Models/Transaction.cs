@@ -1,18 +1,19 @@
-﻿namespace BeeStore_Repository.Models;
+﻿using System;
+using System.Collections.Generic;
+
+namespace BeeStore_Repository.Models;
 
 public partial class Transaction : BaseEntity
 {
     //public int Id { get; set; }
 
-    public string? TransactionCode { get; set; }
+    public string? Code { get; set; }
 
-    public int? ItemId { get; set; }
-
-    public decimal? Amount { get; set; }
+    public int? Amount { get; set; }
 
     public string? Description { get; set; }
 
-    public int? UserId { get; set; }
+    public int? OcopPartnerId { get; set; }
 
     public DateTime? CreateDate { get; set; }
 
@@ -22,7 +23,5 @@ public partial class Transaction : BaseEntity
 
     //public ulong? IsDeleted { get; set; }
 
-    public virtual Inventory? Item { get; set; }
-
-    public virtual User? User { get; set; }
+    public virtual OcopPartner? OcopPartner { get; set; }
 }

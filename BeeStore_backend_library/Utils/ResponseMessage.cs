@@ -30,6 +30,7 @@
         public const string UserRoleNotShipperError = "This user is not a shipper.";
         public const string UserRoleNotStaffError = "This user is not a staff.";
         public const string UserMismatch = "User mismatched.";
+        public const string UpdatePartnerError = "You have to wait for 30 days until you can update again.";
 
         //Partner response message
         public const string PartnerIdNotFound = "Partner Id not found.";
@@ -60,6 +61,7 @@
         public const string OrderIdNotFound = "Order Id not found.";
         public const string OrderProccessedError = "You can't edit proccessed order.";
         public const string OrderCanceledError = "You can't canceled finished order.";
+        public const string OrderSentError = "Order is already sent.";
 
         //Product category response message
         public const string ProductCategoryIdNotFound = "Product Category Id not found.";

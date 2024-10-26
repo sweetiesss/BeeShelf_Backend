@@ -2,10 +2,12 @@
 {
     public class WarehouseListDTO
     {
+
         public int Id { get; set; }
+
         public string? Name { get; set; }
 
-        public decimal? Size { get; set; }
+        public int? Capacity { get; set; }
 
         public string? Location { get; set; }
 

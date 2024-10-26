@@ -6,13 +6,11 @@ using System.Threading.Tasks;
 
 namespace BeeStore_Repository.Enums
 {
-    public enum UserRole
+    public enum EmployeeRole
     {
         Admin,
         Manager,
         Staff,
-        Partner,
-        Shipper,
-        User
+        Shipper
     }
 }

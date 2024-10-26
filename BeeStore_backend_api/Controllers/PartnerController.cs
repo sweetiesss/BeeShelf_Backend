@@ -19,26 +19,29 @@ namespace BeeStore_Api.Controllers
 
         [Route("get-partners")]
         [HttpGet]
-        public async Task<IActionResult> GetPartnerList([FromQuery]SortBy? sortBy,
+        public async Task<IActionResult> GetPartnerList([FromQuery] string? search,
+                                                        [FromQuery]SortBy? sortBy,
                                                         [FromQuery][DefaultValue(false)] bool descending,
                                                         [FromQuery][DefaultValue(0)] int pageIndex,
                                                         [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _partnerService.GetPartnerList(sortBy, descending, pageIndex, pageSize);
+            var result = await _partnerService.GetAllPartners(search, sortBy, descending, pageIndex, pageSize);
             return Ok(result);
         }
 
-        [Route("upgrade-to-partner")]
-        [HttpPost]
-        public async Task<IActionResult> UpgradeToPartner(PartnerUpdateRequest request)
+        [Route("get-partner/{email}")]
+        [HttpGet]
+        public async Task<IActionResult> GetPartner(string email)
         {
-            var result = await _partnerService.UpgradeToPartner(request);
+            var result = await _partnerService.GetPartner(email);
             return Ok(result);
         }
+
 
         [Route("update-partner")]
         [HttpPut]
-        public async Task<IActionResult> UpdatePartner(PartnerUpdateRequest request)
+        [Authorize(Roles = "Partner")]
+        public async Task<IActionResult> UpdatePartner(OCOPPartnerUpdateRequest request)
         {
             var result = await _partnerService.UpdatePartner(request);
             return Ok(result);

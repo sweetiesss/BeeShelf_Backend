@@ -76,10 +76,28 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
+        [Route("send-order/{id}")]
+        [Authorize(Roles = "Partner")]
+        [HttpPut]
+        public async Task<IActionResult> SendOrder(int id)
+        {
+            var result = await _orderService.SendOrder(id);
+            return Ok(result);
+        }
+
+        [Route("cancel-order/{id}")]
+        [Authorize(Roles = "Partner")]
+        [HttpPut]
+        public async Task<IActionResult> CancelOrder(int id)
+        {
+            var result = await _orderService.CancelOrder(id);
+            return Ok(result);
+        }
+
         [Route("update-order-status/{id}")]
         [Authorize(Roles = "Admin,Manager,Staff,Shipper")]
         [HttpPut]
-        public async Task<IActionResult> UpdateOrderStatus(int id, string orderStatus)
+        public async Task<IActionResult> UpdateOrderStatus(int id, OrderStatus orderStatus)
         {
             var result = await _orderService.UpdateOrderStatus(id, orderStatus);
             return Ok(result);

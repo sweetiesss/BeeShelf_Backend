@@ -2,7 +2,7 @@
 {
     public class WarehouseStaffCreateDTO
     {
-        public int? UserId { get; set; }
+        public int? EmployeeId { get; set; }
 
         public int? WarehouseId { get; set; }
     }

@@ -7,7 +7,10 @@ namespace BeeStore_Repository
     public class UnitOfWork : IDisposable
     {
         private BeeStoreDbContext _context;
-        private GenericRepository<User> userRepo;
+        private GenericRepository<Employee> employeeRepo;
+        private GenericRepository<OcopPartner> ocopPartnerRepo;
+        private GenericRepository<Lot> lotRepo;
+        
         private GenericRepository<Role> roleRepo;
         private GenericRepository<Picture> pictureRepo;
         private GenericRepository<Partner> partnerRepo;
@@ -15,7 +18,6 @@ namespace BeeStore_Repository
         private GenericRepository<Inventory> inventoryRepo;
         private GenericRepository<Product> productRepo;
         private GenericRepository<ProductCategory> productCategoryRepo;
-        private GenericRepository<Package> packageRepo;
         private GenericRepository<WarehouseCategory> warehouseCategoryRepo;
         private GenericRepository<WarehouseShipper> warehouseShipperRepo;
         private GenericRepository<WarehouseStaff> warehouseStaffRepo;
@@ -27,16 +29,41 @@ namespace BeeStore_Repository
             _context = context;
         }
 
-        public GenericRepository<User> UserRepo
+        public GenericRepository<Employee> EmployeeRepo
         {
             get
             {
-                if (userRepo == null)
+                if (employeeRepo == null)
                 {
-                    userRepo = new GenericRepository<User>(_context);
+                    employeeRepo = new GenericRepository<Employee>(_context);
                     _context.ChangeTracker.LazyLoadingEnabled = false;
                 }
-                return userRepo;
+                return employeeRepo;
+            }
+        }
+
+        public GenericRepository<OcopPartner> OcopPartnerRepo
+        {
+            get
+            {
+                if (ocopPartnerRepo == null)
+                {
+                    ocopPartnerRepo = new GenericRepository<OcopPartner>(_context);
+                    _context.ChangeTracker.LazyLoadingEnabled = false;
+                }
+                return ocopPartnerRepo;
+            }
+        }
+
+        public GenericRepository<Lot> LotRepo
+        {
+            get
+            {
+                if (lotRepo == null)
+                {
+                    lotRepo = new GenericRepository<Lot>(_context);
+                }
+                return lotRepo;
             }
         }
 
@@ -124,17 +151,6 @@ namespace BeeStore_Repository
             }
         }
 
-        public GenericRepository<Package> PackageRepo
-        {
-            get
-            {
-                if (packageRepo == null)
-                {
-                    packageRepo = new GenericRepository<Package>(_context);
-                }
-                return packageRepo;
-            }
-        }
 
         public GenericRepository<WarehouseCategory> WarehouseCategoryRepo
         {

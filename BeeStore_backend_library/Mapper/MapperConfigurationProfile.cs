@@ -27,30 +27,23 @@ namespace BeeStore_Repository.Mapper
             CreateMap(typeof(Pagination<>), typeof(Pagination<>));
             CreateMap(typeof(Task<>), typeof(Pagination<>));
             CreateMap(typeof(InternalDbSet<>), typeof(IQueryable<>));
-            CreateMap(typeof(UserCreateRequestDTO), typeof(User));
+            CreateMap(typeof(EmployeeCreateRequest), typeof(User));
 
-            CreateMap<UserCreateRequestDTO, User>()
-                 .ForMember(dest => dest.RoleId, opt => opt.MapFrom<CustomRoleNameResolver<UserCreateRequestDTO>>())
+            CreateMap<EmployeeCreateRequest, Employee>()
                      .ForMember(dest => dest.Password, opt => opt.MapFrom(src => BCrypt.Net.BCrypt.HashPassword(src.Password)));
-            CreateMap<UserSignUpRequestDTO, User>()
-                 .ForMember(dest => dest.RoleId, opt => opt.MapFrom<CustomRoleNameResolver<UserSignUpRequestDTO>>());
-            CreateMap<User, UserListDTO>()
+            CreateMap<UserSignUpRequestDTO, OcopPartner>();
+            CreateMap<Employee, EmployeeListDTO>()
                     .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.Role!.RoleName))
-                    .ForMember(dest => dest.Picture_Link, opt => opt.MapFrom(src => src.Picture!.PictureLink))
-                    .ForMember(dest => dest.BankAccountNumber, opt => opt.MapFrom(src => src.Partners
-                                                                                            .FirstOrDefault(u => u.UserId.Equals(src.Id))!
-                                                                                            .BankAccountNumber))
-                    .ForMember(dest => dest.BankName, opt => opt.MapFrom(src => src.Partners
-                                                                                            .FirstOrDefault(u => u.UserId.Equals(src.Id))!
-                                                                                            .BankName))
                     .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
 
             CreateMap<Role, RoleListDTO>();
 
-            CreateMap<Partner, PartnerListDTO>()
-                .ForMember(dest => dest.User_Email, opt => opt.MapFrom(src => src.User!.Email))
+            CreateMap<OcopPartner, PartnerListDTO>()
+                .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.Role!.RoleName))
+                .ForMember(dest => dest.ProvinceCode, opt => opt.MapFrom(src => src.Province.Code))
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category.Type))
+                .ForMember(dest => dest.OcopCategoryName, opt => opt.MapFrom(src => src.OcopCategory.Type))
             .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
-            CreateMap<PartnerUpdateRequest, Partner>();
 
 
             CreateMap<Warehouse, WarehouseListDTO>();
@@ -59,20 +52,22 @@ namespace BeeStore_Repository.Mapper
                 .ForMember(dest => dest.TotalInventory, opt => opt.MapFrom(src => src.Inventories.Count()))
                 .ForMember(dest => dest.Inventories, opt => opt.MapFrom(src => src.Inventories))
             .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<Warehouse, WarehouseDeliveryZoneDTO>()
+                .ForMember(dest => dest.DeliveryZones, opt => opt.MapFrom(src => src.DeliveryZones));
 
+            CreateMap<DeliveryZone, DeliveryZoneDTO>();
 
             CreateMap<Inventory, InventoryListDTO>()
                 .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom(src => src.Warehouse!.Name))
             .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<InventoryCreateDTO, Inventory>();
-            CreateMap<Inventory, InventoryListPackagesDTO>()
+            CreateMap<Inventory, InventoryLotListDTO>()
                 .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom(src => src.Warehouse!.Name))
-                .ForMember(dest => dest.Packages, opt => opt.MapFrom(src => src.Packages))
+                .ForMember(dest => dest.Lots, opt => opt.MapFrom(src => src.Lots))
                 .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
 
 
             CreateMap<Product, ProductListDTO>()
-                .ForMember(dest => dest.Picture_Link, opt => opt.MapFrom(src => src.Picture!.PictureLink))
                 .ForMember(dest => dest.ProductCategoryName, opt => opt.MapFrom(src => src.ProductCategory!.TypeName))
                 .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<ProductCreateDTO, Product>();
@@ -82,10 +77,10 @@ namespace BeeStore_Repository.Mapper
             CreateMap<ProductCategoryCreateDTO, ProductCategory>();
 
 
-            CreateMap<Package, PackageListDTO>()
+            CreateMap<Lot, LotListDTO>()
                 .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product!.Name))
                 .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
-            CreateMap<PackageCreateDTO, Package>();
+            CreateMap<LotCreateDTO, Lot>();
 
 
             CreateMap<WarehouseCategory, WarehouseCategoryListDTO>()
@@ -97,30 +92,35 @@ namespace BeeStore_Repository.Mapper
 
             CreateMap<WarehouseShipper, WarehouseShipperListDTO>()
                 .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom(src => src.Warehouse!.Name))
-                .ForMember(dest => dest.user_email, opt => opt.MapFrom(src => src.User!.Email))
+                .ForMember(dest => dest.email, opt => opt.MapFrom(src => src.Employee!.Email))
                 .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<WarehouseShipperCreateDTO, WarehouseShipper>();
 
 
             CreateMap<WarehouseStaff, WarehouseStaffListDTO>()
                 .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom(src => src.Warehouse!.Name))
-                .ForMember(dest => dest.user_email, opt => opt.MapFrom(src => src.User!.Email))
+                .ForMember(dest => dest.email, opt => opt.MapFrom(src => src.Employee!.Email))
                 .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<WarehouseStaffCreateDTO, WarehouseStaff>();
 
             CreateMap<Request, RequestListDTO>()
-                .ForMember(dest => dest.user_email, opt => opt.MapFrom(src => src.User!.Email))
-                .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Package!.Product!.Name))
+                .ForMember(dest => dest.partner_email, opt => opt.MapFrom(src => src.OcopPartner!.Email))
+                .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Lot!.Product!.Name))
             .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<RequestCreateDTO, Request>();
 
-            CreateMap<Order, OrderListDTO>()
-                .ForMember(dest => dest.user_email, opt => opt.MapFrom(src => src.User!.Email))
-                .ForMember(dest => dest.deliver_by, opt => opt.MapFrom(src => src.DeliverByNavigation!.Email))
-                .ForMember(dest => dest.picture_link, opt => opt.MapFrom(src => src.Picture!.PictureLink))
-                .ForMember(dest => dest.product_name, opt => opt.MapFrom(src => src.Product!.Name))
+            CreateMap<Order, OrderListDTO>()//this will have to be changed later
+                .ForMember(dest => dest.partner_email, opt => opt.MapFrom(src => src.OcopPartner!.Email))
+                .ForMember(dest => dest.OrderDetails, opt => opt.MapFrom(src => src.OrderDetails))
+                
+                //.ForMember(dest => dest.deliver_by, opt => opt.MapFrom(src => src.!.Email))
+                //.ForMember(dest => dest.picture_link, opt => opt.MapFrom(src => src.PictureLink))
+                //.ForMember(dest => dest.product_name, opt => opt.MapFrom(src => src.Product!.Name))
             .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<OrderDetail, OrderDetailDTO>()
+                .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Lot.Product.Name));
             CreateMap<OrderCreateDTO, Order>();
+            CreateMap<OrderDetailCreateDTO, OrderDetail>();
         }
     }
 }

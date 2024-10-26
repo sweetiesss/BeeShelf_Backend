@@ -1,6 +1,6 @@
 ﻿namespace BeeStore_Repository.Models;
 
-public partial class WarehouseCategory : BaseEntity
+public partial class WarehouseCategory : BaseEntity // DELETE THIS
 {
     //public int Id { get; set; }
 

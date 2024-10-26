@@ -13,7 +13,7 @@ namespace BeeStore_Repository.Services.Interfaces
         Task<Pagination<InventoryListDTO>> GetInventoryList(int userId, InventoryFilter? filterBy, string filterQuery,
                                                           InventorySortBy? sortCriteria,
                                                           bool descending, int pageIndex, int pageSize);
-        Task<InventoryListPackagesDTO> GetInventoryById(int id);
+        Task<InventoryLotListDTO> GetInventoryById(int id);
 
         Task<string> CreateInventory(InventoryCreateDTO request);
         Task<string> UpdateInventory(InventoryUpdateDTO request);

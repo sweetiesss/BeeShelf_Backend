@@ -1,8 +1,13 @@
-﻿namespace BeeStore_Repository.Models;
+﻿using System;
+using System.Collections.Generic;
+
+namespace BeeStore_Repository.Models;
 
 public partial class ProductCategory : BaseEntity
 {
     //public int Id { get; set; }
+
+    public int? CategoryId { get; set; }
 
     public string? TypeName { get; set; }
 
@@ -12,7 +17,7 @@ public partial class ProductCategory : BaseEntity
 
     //public ulong? IsDeleted { get; set; }
 
-    public virtual ICollection<Product> Products { get; set; } = new List<Product>();
+    public virtual Category? Category { get; set; }
 
-    public virtual ICollection<WarehouseCategory> WarehouseCategories { get; set; } = new List<WarehouseCategory>();
+    public virtual ICollection<Product> Products { get; set; } = new List<Product>();
 }
