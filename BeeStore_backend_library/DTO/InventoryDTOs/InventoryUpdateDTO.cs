@@ -4,9 +4,9 @@
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public decimal? MaxWeight { get; set; }
+        public int? MaxWeight { get; set; }
 
-        public decimal? Weight { get; set; }
+        public int? Weight { get; set; }
 
         //public DateTime? BoughtDate { get; set; }
 

@@ -184,10 +184,10 @@
       ],
       "SwaggerKey": "productCategory"
     },
-    { // package Path
-      "UpstreamPathTemplate": "/gateway/package/{everything}",
+    { // lot Path
+      "UpstreamPathTemplate": "/gateway/lot/{everything}",
       "UpstreamHttpMethod": [],
-      "DownstreamPathTemplate": "/api/package/{everything}",
+      "DownstreamPathTemplate": "/api/lot/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         //{
@@ -199,7 +199,7 @@
           "Port": 443
         }
       ],
-      "SwaggerKey": "package"
+      "SwaggerKey": "lot"
     },
     { // request Path
       "UpstreamPathTemplate": "/gateway/request/{everything}",
@@ -337,10 +337,10 @@
       ]
     },
     {
-      "Key": "package",
+      "Key": "lot",
       "Config": [
         {
-          "Name": "package gateway API",
+          "Name": "lot gateway API",
           "version": "v1",
           //"Url": "https://localhost:7092/swagger/v1/swagger.json"
           "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"

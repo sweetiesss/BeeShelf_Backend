@@ -1,4 +1,5 @@
 ﻿using BeeStore_Repository.DTO;
+using BeeStore_Repository.DTO.PartnerDTOs;
 using BeeStore_Repository.DTO.UserDTOs;
 using BeeStore_Repository.Enums;
 using BeeStore_Repository.Enums.SortBy;
@@ -9,11 +10,11 @@ namespace BeeStore_Repository.Services.Interfaces
     {
         Task<UserLoginResponseDTO> Login(string email, string password);
         Task<string> SignUp(UserSignUpRequestDTO request);
-        Task<Pagination<UserListDTO>> GetAllUser(string search, UserRole? role, UserSortBy? sortBy,
+        Task<Pagination<EmployeeListDTO>> GetAllEmployees(string search, EmployeeRole? role, UserSortBy? sortBy,
                                                  bool order, int pageIndex, int pageSize);
-        Task<UserListDTO> GetUser(string email);
-        Task<string> CreateUser(UserCreateRequestDTO user);
-        Task<string> UpdateUser(UserUpdateRequestDTO user);
-        Task<string> DeleteUser(int id);
+        Task<EmployeeListDTO> GetEmployee(string email);
+        Task<string> CreateEmployee(EmployeeCreateRequest user);
+        Task<string> UpdateEmployee(EmployeeUpdateRequest user);
+        Task<string> DeleteEmployee(int id);
     }
 }

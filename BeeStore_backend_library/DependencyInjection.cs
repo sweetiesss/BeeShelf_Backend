@@ -31,7 +31,7 @@ namespace BeeStore_Repository
             services.AddScoped<IInventoryService, InventoryService>();
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IProductCategoryService, ProductCategoryService>();
-            services.AddScoped<IPackageService, PackageService>();
+            services.AddScoped<ILotService, LotService>();
             services.AddScoped<IWarehouseCategoryService, WarehouseCategoryService>();
             services.AddScoped<IWarehouseShipperService, WarehouseShipperService>();
             services.AddScoped<IWarehouseStaffService, WarehouseStaffService>();
@@ -53,7 +53,7 @@ namespace BeeStore_Repository
 
 
             // DB context
-            services.AddDbContext<BeeStoreDbContext>(option => option.UseLazyLoadingProxies().UseMySQL(databaseConnection));
+            services.AddDbContext<BeeStoreDbContext>(option => option.UseLazyLoadingProxies().UseMySql(databaseConnection, ServerVersion.AutoDetect(databaseConnection)));
 
 
             // Singleton

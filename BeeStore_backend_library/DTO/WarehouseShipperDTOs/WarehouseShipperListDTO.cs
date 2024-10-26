@@ -3,8 +3,8 @@
     public class WarehouseShipperListDTO
     {
 
-        public int? UserId { get; set; }
-        public string user_email { get; set; }
+        public int? EmployeeId { get; set; }
+        public string email { get; set; }
         public string? Status { get; set; }
         public int? WarehouseId { get; set; }
         public string WarehouseName { get; set; }
