@@ -1,4 +1,5 @@
-﻿using BeeStore_Repository.DTO.UserDTOs;
+﻿using BeeStore_Repository.DTO.PartnerDTOs;
+using BeeStore_Repository.DTO.UserDTOs;
 using BeeStore_Repository.Enums;
 using BeeStore_Repository.Enums.SortBy;
 using BeeStore_Repository.Services.Interfaces;
@@ -20,54 +21,56 @@ namespace BeeStore_Api.Controllers
             _jwtService = jwtService;
         }
 
-        [Route("get-users")]
+        [Route("get-employees")]
         [HttpGet]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetUsers([FromQuery][DefaultValue(null)] string? search,
+        public async Task<IActionResult> GetEmployees([FromQuery][DefaultValue(null)] string? search,
                                                   [FromQuery] UserSortBy? sortBy,
-                                                  [FromQuery] UserRole? filterByRole,
+                                                  [FromQuery] EmployeeRole? filterByRole,
                                                   [FromQuery][DefaultValue(false)] bool descending,
                                                   [FromQuery][DefaultValue(0)] int pageIndex,
                                                   [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _userService.GetAllUser(search!, filterByRole, sortBy, descending, pageIndex, pageSize);
+            var result = await _userService.GetAllEmployees(search!, filterByRole, sortBy, descending, pageIndex, pageSize);
             return Ok(result);
         }
 
-        [Route("get-user/{email}")]
+        [Route("get-employee/{email}")]
         [HttpGet]
         [Authorize(Roles = "Admin,Manager,Staff,Partner,Shipper")]
-        public async Task<IActionResult> GetUser(string email)
+        public async Task<IActionResult> GetEmployee(string email)
         {
-            var result = await _userService.GetUser(email);
+            var result = await _userService.GetEmployee(email);
             return Ok(result);
         }
 
-        [Route("create-user")]
+        [Route("create-employee")]
         [HttpPost]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> CreateUser([FromBody] UserCreateRequestDTO user)
+        public async Task<IActionResult> CreateEmployee([FromBody] EmployeeCreateRequest user)
         {
-            var result = await _userService.CreateUser(user);
+            var result = await _userService.CreateEmployee(user);
             return Ok(result);
         }
 
-        [Route("update-user")]
+        [Route("update-employee")]
         [HttpPut]
-        [Authorize(Roles = "Admin,Manager,Staff,Partner,Shipper")]
-        public async Task<IActionResult> UpdateUser([FromBody] UserUpdateRequestDTO user)
+        [Authorize(Roles = "Admin,Manager,Staff,Shipper")]
+        public async Task<IActionResult> UpdateEmployee([FromBody] EmployeeUpdateRequest user)
         {
-            var result = await _userService.UpdateUser(user);
+            var result = await _userService.UpdateEmployee(user);
             return Ok(result);
         }
 
+     
 
-        [Route("delete-user/{id}")]
+
+        [Route("delete-employee/{id}")]
         [HttpDelete]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> DeleteUser(int id)
+        public async Task<IActionResult> DeleteEmployee(int id)
         {
-            var result = await _userService.DeleteUser(id);
+            var result = await _userService.DeleteEmployee(id);
             return Ok(result);
         }
     }

@@ -1,4 +1,7 @@
-﻿namespace BeeStore_Repository.Models;
+﻿using System;
+using System.Collections.Generic;
+
+namespace BeeStore_Repository.Models;
 
 public partial class Warehouse : BaseEntity
 {
@@ -6,7 +9,7 @@ public partial class Warehouse : BaseEntity
 
     public string? Name { get; set; }
 
-    public decimal? Size { get; set; }
+    public int? Capacity { get; set; }
 
     public string? Location { get; set; }
 
@@ -14,9 +17,9 @@ public partial class Warehouse : BaseEntity
 
     //public ulong? IsDeleted { get; set; }
 
-    public virtual ICollection<Inventory> Inventories { get; set; } = new List<Inventory>();
+    public virtual ICollection<DeliveryZone> DeliveryZones { get; set; } = new List<DeliveryZone>();
 
-    public virtual ICollection<WarehouseCategory> WarehouseCategories { get; set; } = new List<WarehouseCategory>();
+    public virtual ICollection<Inventory> Inventories { get; set; } = new List<Inventory>();
 
     public virtual ICollection<WarehouseShipper> WarehouseShippers { get; set; } = new List<WarehouseShipper>();
 

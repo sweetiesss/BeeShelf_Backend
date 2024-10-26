@@ -3,6 +3,7 @@ using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using BeeStore_Repository.Data;
 using BeeStore_Repository.DTO;
+using BeeStore_Repository.DTO.PartnerDTOs;
 using BeeStore_Repository.DTO.UserDTOs;
 using BeeStore_Repository.Enums;
 using BeeStore_Repository.Enums.SortBy;
@@ -32,25 +33,25 @@ namespace BeeStore_Repository.Services
             _logger = logger;
         }
 
-        public async Task<string> CreateUser(UserCreateRequestDTO user)
+        public async Task<string> CreateEmployee(EmployeeCreateRequest user)
         {
-            var exist = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Email == user.Email);
+            var exist = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Email == user.Email);
             if (exist != null)
             {
                 throw new DuplicateException(ResponseMessage.UserEmailDuplicate);
             }
-            var result = _mapper.Map<User>(user);
-            await _unitOfWork.UserRepo.AddAsync(result);
+            var result = _mapper.Map<Employee>(user);
+            await _unitOfWork.EmployeeRepo.AddAsync(result);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
         }
 
-        public async Task<string> DeleteUser(int id)
+        public async Task<string> DeleteEmployee(int id)
         {
-            var exist = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Id == id);
+            var exist = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id == id);
             if (exist != null)
             {
-                _unitOfWork.UserRepo.SoftDelete(exist);
+                _unitOfWork.EmployeeRepo.SoftDelete(exist);
                 await _unitOfWork.SaveAsync();
             }
             else
@@ -60,18 +61,16 @@ namespace BeeStore_Repository.Services
             return ResponseMessage.Success;
         }
 
-        public async Task<Pagination<UserListDTO>> GetAllUser(string search, UserRole? role, UserSortBy? sortCriteria,
+        public async Task<Pagination<EmployeeListDTO>> GetAllEmployees(string search, EmployeeRole? role, UserSortBy? sortCriteria,
                                                               bool order, int pageIndex, int pageSize)
         {
 
             string? filterQuery = role switch
             {
-                UserRole.Admin => Constants.RoleName.Admin,
-                UserRole.Manager => Constants.RoleName.Manager,
-                UserRole.Staff => Constants.RoleName.Staff,
-                UserRole.Partner => Constants.RoleName.Partner,
-                UserRole.Shipper => Constants.RoleName.Shipper,
-                UserRole.User => Constants.RoleName.User,
+                EmployeeRole.Admin => Constants.RoleName.Admin,
+                EmployeeRole.Manager => Constants.RoleName.Manager,
+                EmployeeRole.Staff => Constants.RoleName.Staff,
+                EmployeeRole.Shipper => Constants.RoleName.Shipper,
                 _ => null
             };
 
@@ -84,42 +83,49 @@ namespace BeeStore_Repository.Services
                 _ => null
             };
 
-            var list = await _unitOfWork.UserRepo.GetListAsync(
+            var list = await _unitOfWork.EmployeeRepo.GetListAsync(
                 filter: u => filterQuery == null || u.Role!.RoleName!.Equals(filterQuery),
-                includes: query => query.Include(o => o.Role)
-                                        .Include(o => o.Picture)
-                                        .Include(o => o.Partners),
+                includes: query => query.Include(o => o.Role),
                 sortBy: sortBy!,
                 descending: order,
                 searchTerm: search,
-                searchProperties: new Expression<Func<User, string>>[] { p => p.Email }
+                searchProperties: new Expression<Func<Employee, string>>[] { p => p.Email }
                 );
 
 
-            var result = _mapper.Map<List<UserListDTO>>(list);
+            var result = _mapper.Map<List<EmployeeListDTO>>(list);
 
 
-            return await ListPagination<UserListDTO>.PaginateList(result, pageIndex, pageSize);
+            return await ListPagination<EmployeeListDTO>.PaginateList(result, pageIndex, pageSize);
         }
 
-        public async Task<UserListDTO> GetUser(string email)
+        public async Task<EmployeeListDTO> GetEmployee(string email)
         {
-            var user = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Email.Equals(email),
-                                                                       query => query.Include(o => o.Role)
-                                                                                     .Include(o => o.Partners));
+            var user = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Email.Equals(email),
+                                                                       query => query.Include(o => o.Role));
             if (user == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.UserEmailNotFound);
             }
-            var result = _mapper.Map<UserListDTO>(user);
+            var result = _mapper.Map<EmployeeListDTO>(user);
 
             return result;
         }
 
         public async Task<UserLoginResponseDTO> Login(string email, string password)
         {
-            var exist = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Email == email,
+            var exist = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Email == email,
                                                                         query => query.Include(o => o.Role));
+            
+            var partner = await _unitOfWork.OcopPartnerRepo.SingleOrDefaultAsync(u => u.Email == email,
+                                                                                 query => query.Include(o => o.Role));
+
+            if (partner == null && exist == null)
+            {
+
+                throw new KeyNotFoundException(ResponseMessage.UserEmailNotFound);
+            }
+
             if (exist != null)
             {
                 if (BCrypt.Net.BCrypt.Verify(password, exist.Password))
@@ -131,30 +137,38 @@ namespace BeeStore_Repository.Services
                     throw new KeyNotFoundException(ResponseMessage.UserPasswordError);
                 }
             }
-            else
+            
+
+
+            if (partner != null)
             {
-                throw new KeyNotFoundException(ResponseMessage.UserEmailNotFound);
+                if (BCrypt.Net.BCrypt.Verify(password, partner.Password))
+                {
+                    return new UserLoginResponseDTO(partner.Email, partner.Role!.RoleName!);
+                }
+                else
+                {
+                    throw new KeyNotFoundException(ResponseMessage.UserPasswordError);
+                }
             }
+            return null;
         }
 
         public async Task<string> SignUp(UserSignUpRequestDTO request)
         {
-            var exist = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Email == request.Email);
+            var exist = await _unitOfWork.OcopPartnerRepo.SingleOrDefaultAsync(u => u.Email == request.Email);
             if (exist != null)
             {
                 throw new DuplicateException(ResponseMessage.UserEmailDuplicate);
             }
-            if (request.RoleName != Constants.RoleName.User)
-            {
-                throw new ApplicationException();
-            }
-            var result = _mapper.Map<User>(request);
-
+            
+            var result = _mapper.Map<OcopPartner>(request);
+            result.RoleId = 2;
             string generatePassword = GeneratePassword(Constants.Smtp.DEFAULT_PASSWORD_LENGTH);
 
             result.Password = BCrypt.Net.BCrypt.HashPassword(generatePassword);
 
-            await _unitOfWork.UserRepo.AddAsync(result);
+            await _unitOfWork.OcopPartnerRepo.AddAsync(result);
             await _unitOfWork.SaveAsync();
 
             PasswordMailSender(result.Email, generatePassword);
@@ -162,9 +176,9 @@ namespace BeeStore_Repository.Services
             return ResponseMessage.Success;
         }
 
-        public async Task<string> UpdateUser(UserUpdateRequestDTO user)
+        public async Task<string> UpdateEmployee(EmployeeUpdateRequest user)
         {
-            var exist = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Email == user.Email);
+            var exist = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Email == user.Email);
             if (exist != null)
             {
                 //CHECK OLD PASSWORD
@@ -173,12 +187,9 @@ namespace BeeStore_Repository.Services
                     throw new ApplicationException(ResponseMessage.UserPasswordError);
                 }
 
-                var picture = await _unitOfWork.PictureRepo.SingleOrDefaultAsync(u => u.PictureLink.Equals(user.picture_link));
-                if (picture == null)
-                {
-                    throw new KeyNotFoundException(ResponseMessage.ImageIdNotFound);
-                }
-                exist.PictureId = picture.Id;
+
+                exist.Setting = user.Setting;
+                exist.PictureLink = user.PictureLink;
                 if (!String.IsNullOrEmpty(user.Phone) && !user.Phone.Equals(Constants.DefaultString.String))
                 {
                     exist.Phone = user.Phone;
@@ -193,7 +204,7 @@ namespace BeeStore_Repository.Services
                 }
 
 
-                _unitOfWork.UserRepo.Update(exist);
+                _unitOfWork.EmployeeRepo.Update(exist);
                 await _unitOfWork.SaveAsync();
             }
             else
@@ -203,6 +214,8 @@ namespace BeeStore_Repository.Services
 
             return ResponseMessage.Success;
         }
+
+        
 
 
         private void PasswordMailSender(string targetMail, string userGeneratedPassword)

@@ -75,10 +75,10 @@ namespace BeeStore_Repository.Services
 
             var picture = await getPictureByLink(imageUrl);
 
-            var user = await _unitOfWork.UserRepo.SingleOrDefaultAsync(u => u.Id == userId);
-            user.PictureId = picture.Id;
+            var user = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id == userId);
+            //user.PictureId = picture.Id;
 
-            _unitOfWork.UserRepo.Update(user);
+            _unitOfWork.EmployeeRepo.Update(user);
             await _unitOfWork.SaveAsync();
 
             return imageUrl;
@@ -91,14 +91,15 @@ namespace BeeStore_Repository.Services
             var picture = await getPictureByLink(imageUrl);
 
             var order = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u => u.Id == orderId);
-            order.PictureId = picture.Id;
-
+            //order. = picture.Id;
+            //add picture_link to order later, I forgot
             _unitOfWork.OrderRepo.Update(order);
             await _unitOfWork.SaveAsync();
 
             return imageUrl;
         }
 
+        //fix these too, no longer use Picture Entity, change it all to picture_link
         public async Task<string> uploadImageForProduct(int productId, IFormFile file)
         {
             string imageUrl = await UploadImage(file);
@@ -106,7 +107,7 @@ namespace BeeStore_Repository.Services
             var picture = await getPictureByLink(imageUrl);
 
             var product = await _unitOfWork.ProductRepo.SingleOrDefaultAsync(u => u.Id == productId);
-            product.PictureId = picture.Id;
+            product.PictureLink = "random";
 
             _unitOfWork.ProductRepo.Update(product);
             await _unitOfWork.SaveAsync();

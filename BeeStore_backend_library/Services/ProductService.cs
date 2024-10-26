@@ -29,7 +29,7 @@ namespace BeeStore_Repository.Services
         public async Task<string> CreateProduct(ProductCreateDTO request)
         {
             var exist = await _unitOfWork.ProductRepo.FirstOrDefaultAsync(u => u.Name == request.Name &&
-                                                                          u.UserId == request.UserId);
+                                                                          u.OcopPartnerId == request.OcopPartnerId);
             if (exist != null)
             {
                 if (exist.IsDeleted == false)
@@ -43,8 +43,8 @@ namespace BeeStore_Repository.Services
                     await _unitOfWork.SaveAsync();
                 }
             }
-            var productCategpry = await _unitOfWork.ProductCategoryRepo.SingleOrDefaultAsync(u => u.Id == request.ProductCategoryId);
-            if (productCategpry == null)
+            var productCategpry = await _unitOfWork.ProductCategoryRepo.AnyAsync(u => u.Id == request.ProductCategoryId);
+            if (productCategpry == false)
             {
                 throw new KeyNotFoundException(ResponseMessage.ProductCategoryIdNotFound);
             }
@@ -82,8 +82,8 @@ namespace BeeStore_Repository.Services
             //proces request list
             foreach (var item in request)
             {
-                var exist = await _unitOfWork.ProductRepo.FirstOrDefaultAsync(u => u.Name == item.Name && u.UserId == item.UserId);
-                if (exist != null && exist.UserId == item.UserId)
+                var exist = await _unitOfWork.ProductRepo.FirstOrDefaultAsync(u => u.Name == item.Name && u.OcopPartnerId == item.OcopPartnerId);
+                if (exist != null && exist.OcopPartnerId == item.OcopPartnerId)
                 {
                     if (exist.IsDeleted == true)
                     {
@@ -130,7 +130,7 @@ namespace BeeStore_Repository.Services
                 throw new BadHttpRequestException(ResponseMessage.BadRequest);
             }
             Expression<Func<Product, bool>> filterExpression = u =>
-            (userId == null || u.UserId.Equals(userId)) &&
+            (userId == null || u.OcopPartnerId.Equals(userId)) &&
             (filterBy == null || (filterBy == ProductFilter.ProductCategoryId && u.ProductCategoryId.Equals(Int32.Parse(filterQuery!))));
 
 
@@ -184,7 +184,7 @@ namespace BeeStore_Repository.Services
 
 
             //Check if the product's user Id match with the request user Id
-            if (exist.UserId != request.UserId)
+            if (exist.OcopPartnerId != request.OcopPartnerId)
             {
                 throw new AppException(ResponseMessage.UserMismatch);
             }
@@ -197,7 +197,7 @@ namespace BeeStore_Repository.Services
             //If deleted status is true then update the name of that duplicate product to null
             //Then proceed to update
 
-            var duplicateName = await _unitOfWork.ProductRepo.SingleOrDefaultAsync(u => u.Name == request.Name && u.UserId == request.UserId);
+            var duplicateName = await _unitOfWork.ProductRepo.SingleOrDefaultAsync(u => u.Name == request.Name && u.OcopPartnerId == request.OcopPartnerId);
 
             if (duplicateName != null)
             {
@@ -220,7 +220,7 @@ namespace BeeStore_Repository.Services
             exist.Origin = request.Origin;
             exist.Weight = request.Weight;
             exist.Price = request.Price;
-            exist.PictureId = request.PictureId;
+            exist.PictureLink = "random";// fix here too
             exist.ProductCategoryId = request.ProductCategoryId;
             _unitOfWork.ProductRepo.Update(exist);
             await _unitOfWork.SaveAsync();

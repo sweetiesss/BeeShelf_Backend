@@ -13,6 +13,8 @@ namespace BeeStore_Repository.Interfaces
         Expression<Func<T, bool>> predicate,
         Func<IQueryable<T>, IQueryable<T>> includes = null);
 
+       Task<bool> AnyAsync(Expression<Func<T, bool>> filter);
+
         Task<List<T>> GetQueryable(Func<IQueryable<T>, IQueryable<T>> includes = null);
 
         Task AddAsync(T entity);

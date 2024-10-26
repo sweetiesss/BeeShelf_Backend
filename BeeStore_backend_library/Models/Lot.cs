@@ -1,8 +1,15 @@
-﻿namespace BeeStore_Repository.Models;
+﻿using System;
+using System.Collections.Generic;
 
-public partial class Package : BaseEntity
+namespace BeeStore_Repository.Models;
+
+public partial class Lot : BaseEntity
 {
     //public int Id { get; set; }
+
+    public string? LotNumber { get; set; }
+
+    public string? Name { get; set; }
 
     public DateTime? CreateDate { get; set; }
 
@@ -12,6 +19,10 @@ public partial class Package : BaseEntity
 
     public int? ProductAmount { get; set; }
 
+    public DateTime? ImportDate { get; set; }
+
+    public DateTime? ExportDate { get; set; }
+
     public DateTime? ExpirationDate { get; set; }
 
     public int? InventoryId { get; set; }
@@ -19,6 +30,8 @@ public partial class Package : BaseEntity
     //public ulong? IsDeleted { get; set; }
 
     public virtual Inventory? Inventory { get; set; }
+
+    public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 
     public virtual Product? Product { get; set; }
 

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace BeeStore_Repository.Enums.SortBy
 {
-    public enum PackageSortBy
+    public enum LotSortBy
     {
         CreateDate,
         ExpirationDate,

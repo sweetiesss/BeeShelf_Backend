@@ -31,6 +31,7 @@ namespace BeeStore_Repository.Repositories
         }
 
 
+
         public async Task<List<T>> GetQueryable(Func<IQueryable<T>, IQueryable<T>> includes = null)
         {
             IQueryable<T> query = _dbSet;
@@ -59,6 +60,11 @@ namespace BeeStore_Repository.Repositories
             }
 
             return (await query.Where(x => x.IsDeleted.Equals(false)).SingleOrDefaultAsync(predicate))!;
+        }
+
+        public async Task<bool> AnyAsync(Expression<Func<T, bool>> filter)
+        {
+            return await _dbSet.AnyAsync(filter);
         }
 
         public async Task AddAsync(T entity)

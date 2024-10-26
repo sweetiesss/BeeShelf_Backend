@@ -1,6 +1,6 @@
 ﻿namespace BeeStore_Repository.Models;
 
-public partial class Partner : BaseEntity
+public partial class Partner : BaseEntity //DELETE THIS
 {
     //public int Id { get; set; }
 

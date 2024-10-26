@@ -1,6 +1,6 @@
 ﻿namespace BeeStore_Repository.DTO.UserDTOs
 {
-    public class UserListDTO
+    public class EmployeeListDTO
     {
         public int Id { get; set; }
 
@@ -14,17 +14,18 @@
 
         public string? Phone { get; set; }
 
+        public string? Status { get; set; }
+
         public DateTime? CreateDate { get; set; }
 
-        public int? PictureId { get; set; }
-        public string? Picture_Link { get; set; }
+        public ulong? IsDeleted { get; set; }
 
-        public bool? IsDeleted { get; set; }
+        public string? Setting { get; set; }
+
+        public string? PictureLink { get; set; }
 
         public string RoleName { get; set; }
 
-        public string? BankAccountNumber { get; set; }
-        public string? BankName { get; set; }
 
     }
 }

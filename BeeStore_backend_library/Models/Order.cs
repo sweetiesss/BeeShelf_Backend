@@ -1,40 +1,51 @@
-﻿namespace BeeStore_Repository.Models;
+﻿using System;
+using System.Collections.Generic;
+
+namespace BeeStore_Repository.Models;
 
 public partial class Order : BaseEntity
 {
     //public int Id { get; set; }
 
-    public int? UserId { get; set; }
+    public int? OcopPartnerId { get; set; }
+
+    public string? Status { get; set; }
+
+    public string? CancellationReason { get; set; }
 
     public DateTime? CreateDate { get; set; }
 
-    public string? OrderStatus { get; set; }
+    public DateTime? DeliverStartDate { get; set; }
 
-    public string? CancellationReason { get; set; }
+    public DateTime? DeliverFinishDate { get; set; }
+
+    public DateTime? CompleteDate { get; set; }
 
     public string? ReceiverPhone { get; set; }
 
     public string? ReceiverAddress { get; set; }
 
-    public int? ProductAmount { get; set; }
-
     public decimal? TotalPrice { get; set; }
 
-    public string? CodStatus { get; set; }
+    public int? BatchId { get; set; }
 
-    public int? DeliverBy { get; set; }
+    public DateTime? PickDate { get; set; }
 
-    public int? PictureId { get; set; }
+    public int? PickStaffId { get; set; }
 
-    public int? ProductId { get; set; }
+    public string? PictureLink { get; set; }
 
     //public ulong? IsDeleted { get; set; }
 
-    public virtual User? DeliverByNavigation { get; set; }
+    public virtual Batch? Batch { get; set; }
 
-    public virtual Picture? Picture { get; set; }
+    public virtual OcopPartner? OcopPartner { get; set; }
 
-    public virtual Product? Product { get; set; }
+    public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 
-    public virtual User? User { get; set; }
+    public virtual ICollection<OrderFee> OrderFees { get; set; } = new List<OrderFee>();
+
+    public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
+
+    public virtual Employee? PickStaff { get; set; }
 }

@@ -1,4 +1,7 @@
-﻿namespace BeeStore_Repository.Models;
+﻿using System;
+using System.Collections.Generic;
+
+namespace BeeStore_Repository.Models;
 
 public partial class Role : BaseEntity
 {
@@ -8,5 +11,7 @@ public partial class Role : BaseEntity
 
     //public ulong? IsDeleted { get; set; }
 
-    public virtual ICollection<User> Users { get; set; } = new List<User>();
+    public virtual ICollection<Employee> Employees { get; set; } = new List<Employee>();
+
+    public virtual ICollection<OcopPartner> OcopPartners { get; set; } = new List<OcopPartner>();
 }

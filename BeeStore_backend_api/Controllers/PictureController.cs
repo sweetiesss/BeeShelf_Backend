@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BeeStore_Api.Controllers
 {
-    public class PictureController : BaseController
+    public class PictureController : BaseController //I HAVEN'T FIX THIS
     {
         private readonly IPictureService _pictureService;
 
