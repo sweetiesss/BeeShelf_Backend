@@ -1,5 +1,4 @@
-﻿using BeeStore_Repository.DTO.WarehouseCategoryDTOs;
-using BeeStore_Repository.DTO.WarehouseDTOs;
+﻿using BeeStore_Repository.DTO.WarehouseDTOs;
 using BeeStore_Repository.DTO.WarehouseShipperDTOs;
 using BeeStore_Repository.DTO.WarehouseStaffDTOs;
 using BeeStore_Repository.Enums.FilterBy;
@@ -15,7 +14,6 @@ namespace BeeStore_Api.Controllers
     public class WarehouseController : BaseController
     {
         private readonly IWarehouseService _warehouseService;
-        private readonly IWarehouseCategoryService _warehouseCategoryService;
         private readonly IWarehouseShipperService _warehouseShipperService;
         private readonly IWarehouseStaffService _warehouseStaffService;
         private readonly IMemoryCache _memoryCache;
@@ -24,13 +22,11 @@ namespace BeeStore_Api.Controllers
 
 
         public WarehouseController(IWarehouseService warehouseService,
-                                    IWarehouseCategoryService warehouseCategoryService,
                                     IWarehouseShipperService warehouseShipperService,
                                     IWarehouseStaffService warehouseStaffService,
                                     IMemoryCache memoryCache)
         {
             _warehouseService = warehouseService;
-            _warehouseCategoryService = warehouseCategoryService;
             _warehouseShipperService = warehouseShipperService;
             _warehouseStaffService = warehouseStaffService;
             _memoryCache = memoryCache;

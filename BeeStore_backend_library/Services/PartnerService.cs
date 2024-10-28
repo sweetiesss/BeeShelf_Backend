@@ -67,7 +67,7 @@ namespace BeeStore_Repository.Services
             var exist = await _unitOfWork.OcopPartnerRepo.SingleOrDefaultAsync(u => u.Email == user.Email);
             if (exist != null)
             {
-                if (BCrypt.Net.BCrypt.Verify(user.ConfirmPassword, exist.Password))
+                if (!BCrypt.Net.BCrypt.Verify(user.ConfirmPassword, exist.Password))
                 {
                     throw new ApplicationException(ResponseMessage.UserPasswordError);
                 }
