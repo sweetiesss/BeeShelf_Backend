@@ -18,7 +18,6 @@ namespace BeeStore_Repository
         private GenericRepository<Inventory> inventoryRepo;
         private GenericRepository<Product> productRepo;
         private GenericRepository<ProductCategory> productCategoryRepo;
-        private GenericRepository<WarehouseCategory> warehouseCategoryRepo;
         private GenericRepository<WarehouseShipper> warehouseShipperRepo;
         private GenericRepository<WarehouseStaff> warehouseStaffRepo;
         private GenericRepository<Request> requestRepo;
@@ -152,17 +151,6 @@ namespace BeeStore_Repository
         }
 
 
-        public GenericRepository<WarehouseCategory> WarehouseCategoryRepo
-        {
-            get
-            {
-                if (warehouseCategoryRepo == null)
-                {
-                    warehouseCategoryRepo = new GenericRepository<WarehouseCategory>(_context);
-                }
-                return warehouseCategoryRepo;
-            }
-        }
 
         public GenericRepository<WarehouseShipper> WarehouseShipperRepo
         {
