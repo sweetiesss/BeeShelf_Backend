@@ -7,7 +7,6 @@ using System.ComponentModel;
 
 namespace BeeStore_Api.Controllers
 {
-    [Authorize(Roles = "Admin,Manager")]
     public class PartnerController : BaseController
     {
         private readonly IPartnerService _partnerService;
@@ -19,6 +18,7 @@ namespace BeeStore_Api.Controllers
 
         [Route("get-partners")]
         [HttpGet]
+        [Authorize(Roles = "Admin,Manager,Staff")]
         public async Task<IActionResult> GetPartnerList([FromQuery] string? search,
                                                         [FromQuery]SortBy? sortBy,
                                                         [FromQuery][DefaultValue(false)] bool descending,
@@ -31,6 +31,7 @@ namespace BeeStore_Api.Controllers
 
         [Route("get-partner/{email}")]
         [HttpGet]
+        [Authorize(Roles = "Admin,Manager,Staff,Partner")]
         public async Task<IActionResult> GetPartner(string email)
         {
             var result = await _partnerService.GetPartner(email);
@@ -40,6 +41,7 @@ namespace BeeStore_Api.Controllers
 
         [Route("update-partner")]
         [HttpPut]
+        [Authorize(Roles = "Admin,Manager,Partner")]
         [Authorize(Roles = "Partner")]
         public async Task<IActionResult> UpdatePartner(OCOPPartnerUpdateRequest request)
         {
@@ -49,6 +51,7 @@ namespace BeeStore_Api.Controllers
 
         [Route("delete-partner/{id}")]
         [HttpDelete]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> DeletePartner(int id)
         {
             var result = await _partnerService.DeletePartner(id);
