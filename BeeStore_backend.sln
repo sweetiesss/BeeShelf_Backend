@@ -13,6 +13,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ApiGateway", "ApiGateway\Ap
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "BeeStore_Backend_Api", "BeeStore_Backend_Api", "{F4FF9641-5BDC-4146-A78E-483CFCC76B9B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeeStore_Api_Test", "BeeStore_Api_Test\BeeStore_Api_Test.csproj", "{3181DEF2-2ECB-43FE-AD74-8F04EC4EE822}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -31,6 +33,10 @@ Global
 		{3D6579CA-BC5C-4597-89A8-999362A54C0B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3D6579CA-BC5C-4597-89A8-999362A54C0B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3D6579CA-BC5C-4597-89A8-999362A54C0B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3181DEF2-2ECB-43FE-AD74-8F04EC4EE822}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3181DEF2-2ECB-43FE-AD74-8F04EC4EE822}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3181DEF2-2ECB-43FE-AD74-8F04EC4EE822}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3181DEF2-2ECB-43FE-AD74-8F04EC4EE822}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -39,6 +45,7 @@ Global
 		{CC663793-BF3C-4276-BDDB-A75E3ACEBAA6} = {F4FF9641-5BDC-4146-A78E-483CFCC76B9B}
 		{3473FA80-A181-42B7-A995-A37817997B06} = {F4FF9641-5BDC-4146-A78E-483CFCC76B9B}
 		{3D6579CA-BC5C-4597-89A8-999362A54C0B} = {F56807D9-F17B-430E-89D6-CD6A19BF4606}
+		{3181DEF2-2ECB-43FE-AD74-8F04EC4EE822} = {F4FF9641-5BDC-4146-A78E-483CFCC76B9B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {704EE766-5934-4EC7-9EE4-617783D58D59}

@@ -137,7 +137,6 @@ namespace BeeStore_Repository.Services
                     throw new KeyNotFoundException(ResponseMessage.UserPasswordError);
                 }
             }
-            
 
 
             if (partner != null)
