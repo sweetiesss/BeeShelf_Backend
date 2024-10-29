@@ -62,9 +62,6 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
-     
-
-
         [Route("delete-employee/{id}")]
         [HttpDelete]
         [Authorize(Roles = "Admin")]

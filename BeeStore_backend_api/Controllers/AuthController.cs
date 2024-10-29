@@ -23,6 +23,11 @@ namespace BeeStore_Api.Controllers
         {
             var result = await _userService.Login(request.email, request.password);
 
+            if (result == null)
+            {
+                return Unauthorized();
+            }
+
             return Ok(_jwtService.GenerateJwtToken(result.email, result.role));
         }
 

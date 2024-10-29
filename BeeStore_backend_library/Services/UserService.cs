@@ -137,7 +137,6 @@ namespace BeeStore_Repository.Services
                     throw new KeyNotFoundException(ResponseMessage.UserPasswordError);
                 }
             }
-            
 
 
             if (partner != null)
@@ -182,7 +181,7 @@ namespace BeeStore_Repository.Services
             if (exist != null)
             {
                 //CHECK OLD PASSWORD
-                if (BCrypt.Net.BCrypt.Verify(user.ConfirmPassword, exist.Password))
+                if (!BCrypt.Net.BCrypt.Verify(user.ConfirmPassword, exist.Password))
                 {
                     throw new ApplicationException(ResponseMessage.UserPasswordError);
                 }
