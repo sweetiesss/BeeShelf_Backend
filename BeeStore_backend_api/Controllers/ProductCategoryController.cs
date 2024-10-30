@@ -14,9 +14,10 @@ namespace BeeStore_Api.Controllers
         private readonly IMemoryCache _memoryCache;
         private const string cacheKey = "productCategoryCache";
 
-        public ProductCategoryController(IProductCategoryService productCategoryService)
+        public ProductCategoryController(IProductCategoryService productCategoryService, IMemoryCache memoryCache)
         {
             _productCategoryService = productCategoryService;
+            _memoryCache = memoryCache;
         }
 
         [Route("get-product-categories")]
