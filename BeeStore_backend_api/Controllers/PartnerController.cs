@@ -10,10 +10,11 @@ namespace BeeStore_Api.Controllers
     public class PartnerController : BaseController
     {
         private readonly IPartnerService _partnerService;
-
-        public PartnerController(IPartnerService partnerService)
+        private readonly IWalletService _walletService;
+        public PartnerController(IPartnerService partnerService, IWalletService walletService)
         {
             _partnerService = partnerService;
+            _walletService = walletService;
         }
 
         [Route("get-partners")]
@@ -38,6 +39,14 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
+        [Route("get-wallet/{userId}")]
+        [HttpGet]
+        [Authorize(Roles = "Admin,Manager,Staff,Partner")]
+        public async Task<IActionResult> GetWalletByUserId(int userId)
+        {
+            var result = await _walletService.GetWalletByUserId(userId);
+            return Ok(result);
+        }
 
         [Route("update-partner")]
         [HttpPut]

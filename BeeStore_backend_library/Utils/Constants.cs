@@ -25,6 +25,8 @@
             public const string Returned = "Returned";
             public const string Refunded = "Refunded";
             public const string Canceled = "Canceled";
+            public const string Failed = "Failed";
+
         }
 
         public static class DefaultString

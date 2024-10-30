@@ -25,31 +25,30 @@ namespace BeeStore_Repository.Services
             _logger = logger;
         }
 
-        public async Task<string> CreateLot(LotCreateDTO request)
-        {
-            if (request.InventoryId != null)
-            {
-                var inventory = await _unitOfWork.InventoryRepo.AnyAsync(u => u.Id == request.InventoryId);
-                if (inventory == false)
-                {
-                    throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
-                }
-            }
-            var product = await _unitOfWork.ProductRepo.AnyAsync(u => u.Id == request.ProductId);
-            if (product == false)
-            {
-                throw new KeyNotFoundException(ResponseMessage.ProductIdNotFound);
-            }
+        //public async Task<string> CreateLot(LotCreateDTO request)
+        //{
+        //    if (request.InventoryId != null)
+        //    {
+        //        var inventory = await _unitOfWork.InventoryRepo.AnyAsync(u => u.Id == request.InventoryId);
+        //        if (inventory == false)
+        //        {
+        //            throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
+        //        }
+        //    }
+        //    var product = await _unitOfWork.ProductRepo.SingleOrDefaultAsync(u => u.Id == request.ProductId);
+        //    if (product == null)
+        //    {
+        //        throw new KeyNotFoundException(ResponseMessage.ProductIdNotFound);
+        //    }
 
 
-            var result = _mapper.Map<Lot>(request);
+        //    var result = _mapper.Map<Lot>(request);
             
-            //this should be in requet (after imported start counting expiration date) or not idk
-            result.ExpirationDate = DateTime.Now.AddDays(result.Product.ProductCategory.ExpireIn!.Value);
-            await _unitOfWork.LotRepo.AddAsync(result);
-            await _unitOfWork.SaveAsync();
-            return ResponseMessage.Success;
-        }
+        //    result.ExpirationDate = DateTime.Now.AddDays(result.Product.ProductCategory.ExpireIn!.Value);
+        //    await _unitOfWork.LotRepo.AddAsync(result);
+        //    await _unitOfWork.SaveAsync();
+        //    return ResponseMessage.Success;
+        //}
 
         public async Task<string> DeleteLot(int id)
         {
@@ -131,10 +130,13 @@ namespace BeeStore_Repository.Services
             switch (filterBy)
             {
                 case LotFilter.ProductId: filterExpression = u => u.ProductId.Equals(Int32.Parse(filterQuery!))
-                                                               && u.Inventory.OcopPartnerId.Equals(partnerId); break;
+                                                               && u.Inventory.OcopPartnerId.Equals(partnerId)
+                                                               && u.Requests.Any(u => u.Status.Equals(Constants.Status.Completed)); break;
                 case LotFilter.InventoryId: filterExpression = u => u.InventoryId.Equals(Int32.Parse(filterQuery!))
-                                                               && u.Inventory.OcopPartnerId.Equals(partnerId); break;
-                default: filterExpression = u => u.Inventory.OcopPartnerId.Equals(partnerId); break;
+                                                               && u.Inventory.OcopPartnerId.Equals(partnerId)
+                                                               && u.Requests.Any(u => u.Status.Equals(Constants.Status.Completed)); break;
+                default: filterExpression = u => u.Inventory.OcopPartnerId.Equals(partnerId) 
+                                              && u.Requests.Any(u => u.Status.Equals(Constants.Status.Completed)); break;
             }
 
 
@@ -160,34 +162,34 @@ namespace BeeStore_Repository.Services
             return (await ListPagination<LotListDTO>.PaginateList(result, pageIndex, pageSize));
         }
 
-        public async Task<string> UpdateLot(int id, LotCreateDTO request)
-        {
-            var exist = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id == id);
-            if (exist == null)
-            {
-                throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
-            }
-            if (request.InventoryId != null)
-            {
-                var inventory = await _unitOfWork.InventoryRepo.AnyAsync(u => u.Id == request.InventoryId);
-                if (inventory == false)
-                {
-                    throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
-                }
-            }
-            var product = await _unitOfWork.ProductRepo.SingleOrDefaultAsync(u => u.Id == request.ProductId);
-            if (product == null)
-            {
-                throw new KeyNotFoundException(ResponseMessage.ProductIdNotFound);
-            }
-            var productCategory = await _unitOfWork.ProductCategoryRepo.SingleOrDefaultAsync(u => u.Id == product.ProductCategoryId);
-            exist.ProductAmount = request.ProductAmount;
-            exist.ProductId = request.ProductId;
-            exist.InventoryId = request.InventoryId;
-            exist.ExpirationDate = DateTime.Now.AddDays(productCategory.ExpireIn!.Value);
-            _unitOfWork.LotRepo.Update(exist);
-            await _unitOfWork.SaveAsync();
-            return ResponseMessage.Success;
-        }
+        //public async Task<string> UpdateLot(int id, LotCreateDTO request)
+        //{
+        //    var exist = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id == id);
+        //    if (exist == null)
+        //    {
+        //        throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
+        //    }
+        //    if (request.InventoryId != null)
+        //    {
+        //        var inventory = await _unitOfWork.InventoryRepo.AnyAsync(u => u.Id == request.InventoryId);
+        //        if (inventory == false)
+        //        {
+        //            throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
+        //        }
+        //    }
+        //    var product = await _unitOfWork.ProductRepo.SingleOrDefaultAsync(u => u.Id == request.ProductId);
+        //    if (product == null)
+        //    {
+        //        throw new KeyNotFoundException(ResponseMessage.ProductIdNotFound);
+        //    }
+        //    var productCategory = await _unitOfWork.ProductCategoryRepo.SingleOrDefaultAsync(u => u.Id == product.ProductCategoryId);
+        //    exist.ProductAmount = request.ProductAmount;
+        //    exist.ProductId = request.ProductId;
+        //    exist.InventoryId = request.InventoryId;
+        //    exist.ExpirationDate = DateTime.Now.AddDays(productCategory.ExpireIn!.Value);
+        //    _unitOfWork.LotRepo.Update(exist);
+        //    await _unitOfWork.SaveAsync();
+        //    return ResponseMessage.Success;
+        //}
     }
 }
