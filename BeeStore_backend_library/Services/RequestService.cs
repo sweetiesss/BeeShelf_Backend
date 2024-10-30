@@ -1,11 +1,17 @@
-﻿using AutoMapper;
+﻿using Amazon.Runtime.EventStreams.Internal;
+using AutoMapper;
 using BeeStore_Repository.DTO;
 using BeeStore_Repository.DTO.RequestDTOs;
+using BeeStore_Repository.Enums;
+using BeeStore_Repository.Enums.SortBy;
 using BeeStore_Repository.Logger;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
+using static BeeStore_Repository.Utils.Constants;
 
 namespace BeeStore_Repository.Services
 {
@@ -21,8 +27,45 @@ namespace BeeStore_Repository.Services
             _logger = logger;
         }
 
-        public async Task<string> CreateRequest(RequestCreateDTO request)
+        public async Task<string> CancelRequest(int id, string cancellationReason)
         {
+            var request = await _unitOfWork.RequestRepo.SingleOrDefaultAsync(u => u.Id == id);
+            if(request == null)
+            {
+                throw new KeyNotFoundException(ResponseMessage.RequestIdNotFound);
+            }
+            if (!request.Status.Equals(Constants.Status.Draft))
+            {
+                throw new ApplicationException(ResponseMessage.RequestStatusError);
+            }
+            request.CancellationReason = cancellationReason;
+            request.Status = Constants.Status.Canceled;
+            await _unitOfWork.SaveAsync();
+            return ResponseMessage.Success;
+        }
+
+        public async Task<string> SendRequest(int id)
+        {
+            var request = await _unitOfWork.RequestRepo.SingleOrDefaultAsync(u => u.Id == id);
+            if (request == null)
+            {
+                throw new KeyNotFoundException(ResponseMessage.RequestIdNotFound);
+            }
+            if (!request.Status.Equals(Constants.Status.Draft))
+            {
+                throw new ApplicationException(ResponseMessage.RequestStatusError);
+            }
+            request.Status = Constants.Status.Pending;
+            await _unitOfWork.SaveAsync();
+            return ResponseMessage.Success;
+        }
+
+
+        public async Task<string> CreateRequest(RequestType type, bool Send, RequestCreateDTO request)
+        {
+
+            
+
             var user = await _unitOfWork.OcopPartnerRepo.SingleOrDefaultAsync(u => u.Id == request.OcopPartnerId);
             if (user == null)
             {
@@ -33,22 +76,46 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
             }
-
-            var package = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(request.LotId),
-                                                                                query => query.Include(o => o.Product)
-                                                                                .ThenInclude(item => item.ProductCategory));
-            if (package == null)
+            var userInventory = await _unitOfWork.InventoryRepo.AnyAsync(u => u.Id.Equals(inventory.Id) 
+                                                                           && u.OcopPartner.Id.Equals(user.Id));
+            if(userInventory == false)
             {
-                throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
+                throw new KeyNotFoundException(ResponseMessage.InventoryPartnerNotMatch);
             }
-            int totalWeight = 1;
-            //var totalWeight = inventory.Weight + (package.Product.Weight * package.ProductAmount);
+
+
+            var product = await _unitOfWork.ProductRepo.SingleOrDefaultAsync(u => u.Id == request.Lot.ProductId);
+            if(product == null)
+            {
+                throw new KeyNotFoundException(ResponseMessage.ProductIdNotFound);
+            }
+            var userProduct = await _unitOfWork.ProductRepo.AnyAsync(u => u.Id.Equals(product.Id)
+                                                                       && u.OcopPartnerId.Equals(user.Id));
+            if (userProduct == false)
+            {
+                throw new KeyNotFoundException(ResponseMessage.ProductPartnerNotMatch);
+            }
+            
+            decimal? totalWeight = inventory.Weight + product.Weight*request.Lot.ProductAmount;
+
+
             if (totalWeight > inventory.MaxWeight)
             {
                 throw new ApplicationException(ResponseMessage.InventoryOverWeightError);
             }
-            request.Status = Constants.Status.Pending;
+            request.RequestType = type.ToString();
+            if (Send == true)
+            {
+                request.Status = Constants.Status.Pending;
+            }
+            else
+            {
+                request.Status = Constants.Status.Draft;
+            }
             var result = _mapper.Map<Request>(request);
+            
+            result.Lot.InventoryId = request.SendToInventoryId;
+
             await _unitOfWork.RequestRepo.AddAsync(result);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
@@ -66,20 +133,52 @@ namespace BeeStore_Repository.Services
             return ResponseMessage.Success;
         }
 
-        public async Task<Pagination<RequestListDTO>> GetRequestList(int pageIndex, int pageSize)
+        private async Task<List<Request>> ApplyFilterToList(RequestStatus? requestStatus, int? shipperId = null, 
+                                                          int? userId = null, int? warehouseId = null)
         {
-            var list = await _unitOfWork.RequestRepo.GetAllAsync();
+            string? filterQuery = requestStatus switch
+            {
+                RequestStatus.Draft => Constants.Status.Draft,
+                RequestStatus.Pending => Constants.Status.Pending,
+                RequestStatus.Canceled => Constants.Status.Canceled,
+                RequestStatus.Processing => Constants.Status.Processing,
+                RequestStatus.Delivered => Constants.Status.Delivered,
+                RequestStatus.Completed => Constants.Status.Completed,
+                RequestStatus.Failed => Constants.Status.Failed,
+                _ => string.Empty
+            };
+        
+
+    
+
+            var list = await _unitOfWork.RequestRepo.GetListAsync(
+                filter: u => (filterQuery == null || u.Status.Equals(filterQuery))
+                             && (userId == null || u.OcopPartnerId.Equals(userId))
+                             && (warehouseId == null || u.SendToInventory.WarehouseId.Equals(warehouseId)),
+                includes: null,
+                sortBy: null!,
+                descending: false,
+                searchTerm: null,
+                searchProperties: null
+                );
+            return list;
+        }
+
+        public async Task<Pagination<RequestListDTO>> GetRequestList(RequestStatus? status, int warehouseId, int pageIndex, int pageSize)
+        {
+            var list = await ApplyFilterToList(status, null, warehouseId);
             var result = _mapper.Map<List<RequestListDTO>>(list);
             return await ListPagination<RequestListDTO>.PaginateList(result, pageIndex, pageSize);
         }
 
-        public async Task<Pagination<RequestListDTO>> GetRequestList(int userId, int pageIndex, int pageSize)
+        public async Task<Pagination<RequestListDTO>> GetRequestList(int userId, RequestStatus? status, int pageIndex, int pageSize)
         {
-            var list = await _unitOfWork.RequestRepo.GetFiltered(u => u.OcopPartnerId.Equals(userId));
+            var list = await ApplyFilterToList(status, userId);
             var result = _mapper.Map<List<RequestListDTO>>(list);
             return await ListPagination<RequestListDTO>.PaginateList(result, pageIndex, pageSize);
         }
 
+        
         public async Task<string> UpdateRequest(int id, RequestCreateDTO request)
         {
             var exist = await _unitOfWork.RequestRepo.SingleOrDefaultAsync(u => u.Id == id);
@@ -87,8 +186,12 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.RequestIdNotFound);
             }
-            var user = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id == request.OcopPartnerId);
-            if (user == null)
+            if (!exist.Status.Equals(Constants.Status.Draft))
+            {
+                throw new ApplicationException(ResponseMessage.RequestStatusError);
+            }
+            var user = await _unitOfWork.OcopPartnerRepo.AnyAsync(u => u.Id == request.OcopPartnerId);
+            if (user == false)
             {
                 throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
             }
@@ -97,28 +200,27 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
             }
-            var package = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id == request.LotId);
-            if (package == null)
+            if (exist.Lot.InventoryId != request.SendToInventoryId)
             {
-                throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
+                exist.Lot.InventoryId = request.SendToInventoryId;
             }
-            if (!exist.Status.Equals(Constants.Status.Pending, StringComparison.OrdinalIgnoreCase))
-            {
-                throw new ApplicationException(ResponseMessage.RequestStatusError);
-            }
+            exist.Lot.ProductId = request.Lot.ProductId;
+            exist.Lot.Amount = request.Lot.Amount;
+            exist.Lot.LotNumber= request.Lot.LotNumber;
+            exist.Lot.Name = request.Lot.Name;
+            exist.Lot.ProductAmount = request.Lot.ProductAmount;
+
             exist.SendToInventoryId = request.SendToInventoryId;
             exist.Description = request.Description;
-            exist.LotId = request.LotId;
-            exist.RequestType = request.RequestType;
             _unitOfWork.RequestRepo.Update(exist);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
         }
 
-        //this entire function is fucked, fix it later
-        public async Task<string> UpdateRequestStatus(int id, int statusId)
+
+        public async Task<string> UpdateRequestStatus(int id, RequestStatus status)
         {
-            string status = null;
+            
             var exist = await _unitOfWork.RequestRepo.SingleOrDefaultAsync(u => u.Id == id);
             if (exist == null)
             {
@@ -128,12 +230,29 @@ namespace BeeStore_Repository.Services
             {
                 throw new ApplicationException(ResponseMessage.RequestStatusError);
             }
-            if (statusId == 1)
-            {
-                status = Constants.Status.Approved;
 
-                var package = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.LotId));
-                if (package == null)
+            string? requestStatus = status switch
+            {
+                RequestStatus.Draft => string.Empty,
+                RequestStatus.Pending => string.Empty,
+                RequestStatus.Canceled => string.Empty,
+                RequestStatus.Processing => Constants.Status.Processing,
+                RequestStatus.Delivered => Constants.Status.Delivered,
+                RequestStatus.Completed => Constants.Status.Completed,
+                RequestStatus.Failed => Constants.Status.Failed,
+                _ => string.Empty
+            };
+            if (requestStatus.Equals(string.Empty))
+            {
+                throw new BadHttpRequestException(ResponseMessage.BadRequest);
+            }
+            
+        
+
+            if (requestStatus == Constants.Status.Completed)
+            {
+                var lot = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.LotId));
+                if (lot == null)
                 {
                     throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
                 }
@@ -142,23 +261,22 @@ namespace BeeStore_Repository.Services
                 {
                     throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
                 }
-                var totalWeight = inventory.MaxWeight + (package.Product.Weight * package.ProductAmount);
+                var totalWeight = inventory.Weight + (lot.Product.Weight * lot.ProductAmount);
                 if (totalWeight > inventory.MaxWeight)
                 {
+                    exist.Status = Constants.Status.Failed;
+                    exist.CancellationReason = ResponseMessage.InventoryOverWeightError;
                     throw new ApplicationException(ResponseMessage.InventoryOverWeightError);
                 }
 
-                package.InventoryId = exist.SendToInventoryId;
-                package.ExpirationDate = DateTime.Now.AddDays(package.Product.ProductCategory!.ExpireIn!.Value);
+                lot.InventoryId = exist.SendToInventoryId;
+                lot.ExpirationDate = DateTime.Now.AddDays(lot.Product.ProductCategory!.ExpireIn!.Value);
 
-                inventory.MaxWeight = 1;
+                inventory.Weight = totalWeight;
 
             }
-            if (statusId == 2)
-            {
-                status = Constants.Status.Reject;
-            }
-            exist.Status = status;
+            
+            exist.Status = requestStatus;
             await _unitOfWork.SaveAsync();
             var result = _mapper.Map<RequestListDTO>(exist);
             return ResponseMessage.Success;

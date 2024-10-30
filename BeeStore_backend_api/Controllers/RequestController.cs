@@ -1,4 +1,5 @@
 ﻿using BeeStore_Repository.DTO.RequestDTOs;
+using BeeStore_Repository.Enums;
 using BeeStore_Repository.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,33 +15,57 @@ namespace BeeStore_Api.Controllers
         {
             _requestService = requestService;
         }
-        //haven't test a single thing about request
+        
         [Route("get-requests")]
         [HttpGet]
         [Authorize(Roles = "Admin,Manager,Staff")]
-        public async Task<IActionResult> GetRequestList([FromQuery][DefaultValue(0)] int pageIndex,
+        public async Task<IActionResult> GetRequestList([FromQuery] RequestStatus? status,
+                                                    [FromQuery] int warehouseId,
+                                                    [FromQuery][DefaultValue(0)] int pageIndex,
                                                     [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _requestService.GetRequestList(pageIndex, pageSize);
+            var result = await _requestService.GetRequestList(status, warehouseId,pageIndex, pageSize);
             return Ok(result);
         }
 
         [Route("get-requests/{userId}")]
         [HttpGet]
         [Authorize(Roles = "Admin,Manager,Staff,Partner")]
-        public async Task<IActionResult> GetRequestList(int userId, [FromQuery][DefaultValue(0)] int pageIndex,
+        public async Task<IActionResult> GetRequestList(int userId,
+                                                    [FromQuery] RequestStatus? status,
+                                                    [FromQuery][DefaultValue(0)] int pageIndex,
                                                     [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _requestService.GetRequestList(userId, pageIndex, pageSize);
+            var result = await _requestService.GetRequestList(userId, status, pageIndex, pageSize);
             return Ok(result);
         }
 
         [Route("create-request")]
         [HttpPost]
         [Authorize(Roles = "Partner")]
-        public async Task<IActionResult> CreateRequest(RequestCreateDTO request)
+        public async Task<IActionResult> CreateRequest(RequestType type,
+                                                       [DefaultValue(false)] bool send, 
+                                                       RequestCreateDTO request)
         {
-            var result = await _requestService.CreateRequest(request);
+            var result = await _requestService.CreateRequest(type,send, request);
+            return Ok(result);
+        }
+
+        [Route("send-request")]
+        [HttpPost]
+        [Authorize(Roles = "Partner")]
+        public async Task<IActionResult> SendRequest(int id)
+        {
+            var result = await _requestService.SendRequest(id);
+            return Ok(result);
+        }
+
+        [Route("cancel-request")]
+        [HttpPost]
+        [Authorize(Roles = "Partner")]
+        public async Task<IActionResult> CancelRequest(int id, [FromBody] string? cancellationReason)
+        {
+            var result = await _requestService.CancelRequest(id, cancellationReason);
             return Ok(result);
         }
 
@@ -56,9 +81,9 @@ namespace BeeStore_Api.Controllers
         [Route("update-request-status/{id}")]
         [HttpPut]
         [Authorize(Roles = "Admin,Manager,Staff")]
-        public async Task<IActionResult> UpdateRequestStatus(int id, int statusId)
+        public async Task<IActionResult> UpdateRequestStatus(int id, RequestStatus status)
         {
-            var result = await _requestService.UpdateRequestStatus(id, statusId);
+            var result = await _requestService.UpdateRequestStatus(id, status);
             return Ok(result);
         }
 

@@ -14,8 +14,8 @@ namespace BeeStore_Repository.Services.Interfaces
                                                         LotSortBy? sortBy, bool descending,
                                                         int pageIndex, int pageSize);
         Task<LotListDTO> GetLotById(int id);
-        Task<string> CreateLot(LotCreateDTO request);
-        Task<string> UpdateLot(int id, LotCreateDTO request);
+        //Task<string> CreateLot(LotCreateDTO request);
+        //Task<string> UpdateLot(int id, LotCreateDTO request);
         Task<string> DeleteLot(int id);
     }
 }

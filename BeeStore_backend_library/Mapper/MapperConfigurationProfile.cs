@@ -9,6 +9,7 @@ using BeeStore_Repository.DTO.ProductDTOs;
 using BeeStore_Repository.DTO.RequestDTOs;
 using BeeStore_Repository.DTO.RoleDTOs;
 using BeeStore_Repository.DTO.UserDTOs;
+using BeeStore_Repository.DTO.WalletDTO;
 using BeeStore_Repository.DTO.WarehouseDTOs;
 using BeeStore_Repository.DTO.WarehouseShipperDTOs;
 using BeeStore_Repository.DTO.WarehouseStaffDTOs;
@@ -35,6 +36,11 @@ namespace BeeStore_Repository.Mapper
                     .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
 
             CreateMap<Role, RoleListDTO>();
+
+            CreateMap<Wallet, WalletDTO>()
+                .ForMember(dest => dest.partner_email, opt => opt.MapFrom(src => src.OcopPartner.Email))
+                .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
+
 
             CreateMap<OcopPartner, PartnerListDTO>()
                 .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.Role!.RoleName))

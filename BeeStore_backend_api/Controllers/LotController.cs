@@ -57,24 +57,7 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
-        [Route("create-lot")]
-        [Authorize(Roles = "Partner")]
-        [HttpPost]
-        public async Task<IActionResult> CreateLot(LotCreateDTO request)
-        {
-            var result = await _lotService.CreateLot(request);
-            return Ok(result);
-        }
-
-        [Route("update-lot/{id}")]
-        [Authorize(Roles = "Partner")]
-        [HttpPut]
-        public async Task<IActionResult> UpdateLot(int id, LotCreateDTO request)
-        {
-            var result = await _lotService.UpdateLot(id, request);
-            return Ok(result);
-        }
-
+        
         [Route("delete-lot/{id}")]
         [Authorize(Roles = "Partner")]
         [HttpDelete]

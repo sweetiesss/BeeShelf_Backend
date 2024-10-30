@@ -10,6 +10,7 @@ namespace BeeStore_Repository
         private GenericRepository<Employee> employeeRepo;
         private GenericRepository<OcopPartner> ocopPartnerRepo;
         private GenericRepository<Lot> lotRepo;
+        private GenericRepository<Wallet> walletRepo;
         
         private GenericRepository<Role> roleRepo;
         private GenericRepository<Picture> pictureRepo;
@@ -65,6 +66,19 @@ namespace BeeStore_Repository
                 return lotRepo;
             }
         }
+
+        public GenericRepository<Wallet> WalletRepo
+        {
+            get
+            {
+                if (walletRepo == null)
+                {
+                    walletRepo = new GenericRepository<Wallet>(_context);
+                }
+                return walletRepo;
+            }
+        }
+
 
         public GenericRepository<Role> RoleRepo
         {

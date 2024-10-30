@@ -1,4 +1,6 @@
-﻿using System.Text.Json.Serialization;
+﻿using BeeStore_Repository.DTO.PackageDTOs;
+using BeeStore_Repository.Models;
+using System.Text.Json.Serialization;
 
 namespace BeeStore_Repository.DTO.RequestDTOs
 {
@@ -10,15 +12,15 @@ namespace BeeStore_Repository.DTO.RequestDTOs
         public string? Name { get; set; }
 
         public string? Description { get; set; }
-
-        public int? LotId { get; set; }
-
+        [JsonIgnore]
         public string? RequestType { get; set; }
 
         public int? SendToInventoryId { get; set; }
 
+        public LotCreateDTO? Lot { get; set; }
+
         [JsonIgnore]
-        public DateTime? CreateDate { get; set; }
+        public DateTime? CreateDate { get; set; } = DateTime.Now;
 
         [JsonIgnore]
         public string? Status { get; set; }
