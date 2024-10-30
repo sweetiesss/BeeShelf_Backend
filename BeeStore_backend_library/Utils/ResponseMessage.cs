@@ -35,12 +35,15 @@
         //Partner response message
         public const string PartnerIdNotFound = "Partner Id not found.";
 
+        //Wallet response message
+        public const string WalletIdNotFound = "Wallet Id not found.";
+
         //Inventory response message
         public const string InventoryIdNotFound = "Inventory Id not found.";
         public const string InventoryOccupied = "Inventory is already occupied.";
         public const string InventoryOverWeightError = "Inventory will exceed the max weight if this item is added in.";
         public const string InventoryNameDuplicate = "Inventory Name already exist.";
-
+        public const string InventoryPartnerNotMatch = "This Inventory does not belongs to this user.";
 
         //Warehouse response message
         public const string WarehouseIdNotFound = "Warehouse Id not found.";
@@ -53,6 +56,7 @@
         public const string ProductIdNotFound = "Product Id not found.";
         public const string ProductNameDuplicate = "Failed to add. Product name already exist. ";
         public const string ProductListDuplicate = "Please check your provided list, these name are duplicate: ";
+        public const string ProductPartnerNotMatch = "This product does not belongs to this user.";
 
         //Package response message
         public const string PackageIdNotFound = "Package Id not found.";
