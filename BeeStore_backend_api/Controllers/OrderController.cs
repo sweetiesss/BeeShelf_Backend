@@ -70,7 +70,7 @@ namespace BeeStore_Api.Controllers
         [Route("update-order/{id}")]
         [Authorize(Roles = "Partner")]
         [HttpPut]
-        public async Task<IActionResult> UpdateOrder(int id, OrderCreateDTO request)
+        public async Task<IActionResult> UpdateOrder(int id, OrderUpdateDTO request)
         {
             var result = await _orderService.UpdateOrder(id, request);
             return Ok(result);

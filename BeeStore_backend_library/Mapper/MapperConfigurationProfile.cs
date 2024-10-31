@@ -113,7 +113,17 @@ namespace BeeStore_Repository.Mapper
             CreateMap<OrderDetail, OrderDetailDTO>()
                 .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Lot.Product.Name));
             CreateMap<OrderCreateDTO, Order>();
+            CreateMap<OrderUpdateDTO, Order>()
+                .ForMember(dest => dest.OrderDetails, opt => opt.MapFrom(src => src.OrderDetails));
             CreateMap<OrderDetailCreateDTO, OrderDetail>();
+
+            CreateMap<OrderUpdateDTO, List<OrderDetail>>()
+           .ConvertUsing((src, dest) => src.OrderDetails.Select(od => new OrderDetail
+           {
+               LotId = od.LotId,
+               ProductPrice = od.ProductPrice,
+               ProductAmount = od.ProductAmount
+           }).ToList());
         }
     }
 }
