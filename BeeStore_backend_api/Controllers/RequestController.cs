@@ -20,11 +20,12 @@ namespace BeeStore_Api.Controllers
         [HttpGet]
         [Authorize(Roles = "Admin,Manager,Staff")]
         public async Task<IActionResult> GetRequestList([FromQuery] RequestStatus? status,
+                                                    [FromQuery][DefaultValue(false)] bool descending,
                                                     [FromQuery] int warehouseId,
                                                     [FromQuery][DefaultValue(0)] int pageIndex,
                                                     [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _requestService.GetRequestList(status, warehouseId,pageIndex, pageSize);
+            var result = await _requestService.GetRequestList(status,descending, warehouseId,pageIndex, pageSize);
             return Ok(result);
         }
 
@@ -32,11 +33,12 @@ namespace BeeStore_Api.Controllers
         [HttpGet]
         [Authorize(Roles = "Admin,Manager,Staff,Partner")]
         public async Task<IActionResult> GetRequestList(int userId,
+                                                    [FromQuery][DefaultValue(false)] bool descending,
                                                     [FromQuery] RequestStatus? status,
                                                     [FromQuery][DefaultValue(0)] int pageIndex,
                                                     [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _requestService.GetRequestList(userId, status, pageIndex, pageSize);
+            var result = await _requestService.GetRequestList(userId,status, descending, pageIndex, pageSize);
             return Ok(result);
         }
 

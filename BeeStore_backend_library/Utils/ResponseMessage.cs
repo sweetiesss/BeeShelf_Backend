@@ -1,4 +1,6 @@
-﻿namespace BeeStore_Repository.Utils
+﻿using Org.BouncyCastle.Tls;
+
+namespace BeeStore_Repository.Utils
 {
     public static class ResponseMessage
     {
@@ -66,6 +68,7 @@
         public const string OrderProccessedError = "You can't edit proccessed order.";
         public const string OrderCanceledError = "You can't canceled finished order.";
         public const string OrderSentError = "Order is already sent.";
+        public const string OrderDetailsError = "All items must be from the same warehouse.";
 
         //Product category response message
         public const string ProductCategoryIdNotFound = "Product Category Id not found.";

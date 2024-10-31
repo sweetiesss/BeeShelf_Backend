@@ -31,10 +31,10 @@ namespace BeeStore_Api_Test.Controllers
         {
             var requests = new Pagination<RequestListDTO>();
             _mockRequestService
-                .Setup(s => s.GetRequestList(null, 1, 0, 10))
+                .Setup(s => s.GetRequestList(null,false, 1, 0, 10))
                 .ReturnsAsync(requests);
 
-            var response = await _requestController.GetRequestList(null, 1, 0, 10) as OkObjectResult;
+            var response = await _requestController.GetRequestList(null,false, 1, 0, 10) as OkObjectResult;
 
             Assert.NotNull(response);
             Assert.Equal(200, response.StatusCode);
@@ -47,10 +47,10 @@ namespace BeeStore_Api_Test.Controllers
             var userId = 1;
             var requests = new Pagination<RequestListDTO>();
             _mockRequestService
-                .Setup(s => s.GetRequestList(userId, null, 0, 10))
+                .Setup(s => s.GetRequestList(userId, null,false, 0, 10))
                 .ReturnsAsync(requests);
 
-            var response = await _requestController.GetRequestList(userId, null, 0, 10) as OkObjectResult;
+            var response = await _requestController.GetRequestList(userId,false, null, 0, 10) as OkObjectResult;
 
             Assert.NotNull(response);
             Assert.Equal(200, response.StatusCode);
