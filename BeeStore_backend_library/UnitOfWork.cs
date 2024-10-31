@@ -11,7 +11,8 @@ namespace BeeStore_Repository
         private GenericRepository<OcopPartner> ocopPartnerRepo;
         private GenericRepository<Lot> lotRepo;
         private GenericRepository<Wallet> walletRepo;
-        
+        private GenericRepository<OrderDetail> orderDetailRepo;
+
         private GenericRepository<Role> roleRepo;
         private GenericRepository<Picture> pictureRepo;
         private GenericRepository<Partner> partnerRepo;
@@ -39,6 +40,19 @@ namespace BeeStore_Repository
                     _context.ChangeTracker.LazyLoadingEnabled = false;
                 }
                 return employeeRepo;
+            }
+        }
+
+        public GenericRepository<OrderDetail> OrderDetailRepo
+        {
+            get
+            {
+                if (orderDetailRepo == null)
+                {
+                    orderDetailRepo = new GenericRepository<OrderDetail>(_context);
+                    _context.ChangeTracker.LazyLoadingEnabled = false;
+                }
+                return orderDetailRepo;
             }
         }
 

@@ -17,6 +17,8 @@
 
         public DateTime? CreateDate { get; set; }
 
+        public int? ProductCategoryId { get; set; }
+
         public string? ProductCategoryName { get; set; }
 
         public string? PictureLink { get; set; }
