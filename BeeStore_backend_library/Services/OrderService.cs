@@ -106,15 +106,23 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
             }
-
+            var firstODs = await _unitOfWork.LotRepo.FirstOrDefaultAsync(u => u.Id.Equals(request.OrderDetails.First().LotId));
+            if (firstODs != null)
+            {
+                throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
+            }
             int? totalPrice = 0;
             foreach(var od in request.OrderDetails)
             {
                 totalPrice += od.ProductPrice;
-                var a = await _unitOfWork.LotRepo.AnyAsync(u => u.Id.Equals(od.LotId));
-                if (a.Equals(false))
+                var a = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(od.LotId));
+                if (a == null)
                 {
                     throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
+                }
+                if(a.Inventory.WarehouseId != firstODs.Inventory.WarehouseId)
+                {
+                    throw new ApplicationException(ResponseMessage.OrderDetailsError);
                 }
             }
 
@@ -146,27 +154,30 @@ namespace BeeStore_Repository.Services
             return ResponseMessage.Success;
         }
 
-        //don't touch update order, im too lazy to fix it, might be later, for now just want to do create and getlist
-        public async Task<string> UpdateOrder(int id, OrderCreateDTO request)
+        public async Task<string> UpdateOrder(int id, OrderUpdateDTO request)
         {
             var exist = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u => u.Id == id);
             if (exist == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.OrderIdNotFound);
             }
-            if (exist.Status != Constants.Status.Pending)
+            if (exist.Status != Constants.Status.Draft)
             {
-                throw new ApplicationException(ResponseMessage.OrderProccessedError);
+                if(request.OrderDetails != null)
+                {
+                    throw new ApplicationException(ResponseMessage.OrderProccessedError);
+                }
             }
-            //exist.PictureId = request.PictureId;
-            //exist.TotalPrice = request.TotalPrice;
-            //exist.DeliverBy = request.DeliverBy;
-            //exist.ReceiverPhone = request.ReceiverPhone;
-            //exist.ReceiverAddress = request.ReceiverAddress;
-            //exist.CodStatus = request.CodStatus;
-            //exist.CancellationReason = request.CancellationReason;
-            //exist.ProductAmount = request.ProductAmount;
-            //exist.ProductId = request.ProductId;
+
+            foreach(var x in exist.OrderDetails)
+            {
+                _unitOfWork.OrderDetailRepo.HardDelete(x);             
+            }
+
+            exist.ReceiverAddress = request.ReceiverAddress;
+            exist.ReceiverPhone = request.ReceiverPhone;
+            exist.OrderDetails = _mapper.Map<List<OrderDetail>>(request);
+                    
             _unitOfWork.OrderRepo.Update(exist);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;

@@ -133,7 +133,7 @@ namespace BeeStore_Repository.Services
             return ResponseMessage.Success;
         }
 
-        private async Task<List<Request>> ApplyFilterToList(RequestStatus? requestStatus, int? shipperId = null, 
+        private async Task<List<Request>> ApplyFilterToList(RequestStatus? requestStatus, bool descending, 
                                                           int? userId = null, int? warehouseId = null)
         {
             string? filterQuery = requestStatus switch
@@ -157,23 +157,23 @@ namespace BeeStore_Repository.Services
                              && (warehouseId == null || u.SendToInventory.WarehouseId.Equals(warehouseId)),
                 includes: null,
                 sortBy: null!,
-                descending: false,
+                descending: descending,
                 searchTerm: null,
                 searchProperties: null
                 );
             return list;
         }
 
-        public async Task<Pagination<RequestListDTO>> GetRequestList(RequestStatus? status, int warehouseId, int pageIndex, int pageSize)
+        public async Task<Pagination<RequestListDTO>> GetRequestList(RequestStatus? status,bool descending, int warehouseId, int pageIndex, int pageSize)
         {
-            var list = await ApplyFilterToList(status, null, warehouseId);
+            var list = await ApplyFilterToList(status, descending, null, warehouseId);
             var result = _mapper.Map<List<RequestListDTO>>(list);
             return await ListPagination<RequestListDTO>.PaginateList(result, pageIndex, pageSize);
         }
 
-        public async Task<Pagination<RequestListDTO>> GetRequestList(int userId, RequestStatus? status, int pageIndex, int pageSize)
+        public async Task<Pagination<RequestListDTO>> GetRequestList(int userId, RequestStatus? status, bool descending, int pageIndex, int pageSize)
         {
-            var list = await ApplyFilterToList(status, userId);
+            var list = await ApplyFilterToList(status,descending, userId);
             var result = _mapper.Map<List<RequestListDTO>>(list);
             return await ListPagination<RequestListDTO>.PaginateList(result, pageIndex, pageSize);
         }
