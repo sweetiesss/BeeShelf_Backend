@@ -12,6 +12,9 @@ namespace BeeStore_Repository
         private GenericRepository<Lot> lotRepo;
         private GenericRepository<Wallet> walletRepo;
         private GenericRepository<OrderDetail> orderDetailRepo;
+        private GenericRepository<Batch> batchRepo;
+        private GenericRepository<BatchDelivery> batchDeliveryRepo;
+        private GenericRepository<Transaction> transactionRepo;
 
         private GenericRepository<Role> roleRepo;
         private GenericRepository<Picture> pictureRepo;
@@ -28,6 +31,42 @@ namespace BeeStore_Repository
         public UnitOfWork(BeeStoreDbContext context)
         {
             _context = context;
+        }
+
+        public GenericRepository<Batch> BatchRepo
+        {
+            get
+            {
+                if (batchRepo == null)
+                {
+                    batchRepo = new GenericRepository<Batch>(_context);
+                }
+                return batchRepo;
+            }
+        }
+
+        public GenericRepository<BatchDelivery> BatchDeliveryRepo
+        {
+            get
+            {
+                if (batchDeliveryRepo == null)
+                {
+                    batchDeliveryRepo = new GenericRepository<BatchDelivery>(_context);
+                }
+                return batchDeliveryRepo;
+            }
+        }
+
+        public GenericRepository<Transaction> TransactionRepo
+        {
+            get
+            {
+                if (transactionRepo == null)
+                {
+                    transactionRepo = new GenericRepository<Transaction>(_context);
+                }
+                return transactionRepo;
+            }
         }
 
         public GenericRepository<Employee> EmployeeRepo

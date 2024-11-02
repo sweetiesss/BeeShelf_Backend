@@ -234,6 +234,40 @@
         }
       ],
       "SwaggerKey": "order"
+    },
+    { // batch Path
+      "UpstreamPathTemplate": "/gateway/batch/{everything}",
+      "UpstreamHttpMethod": [],
+      "DownstreamPathTemplate": "/api/batch/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        //{
+        //  "Host": "localhost",
+        //  "Port": 7092
+        //},
+        {
+          "Host": "{Service}",
+          "Port": 443
+        }
+      ],
+      "SwaggerKey": "batch"
+    },
+    { // payment Path
+      "UpstreamPathTemplate": "/gateway/payment/{everything}",
+      "UpstreamHttpMethod": [],
+      "DownstreamPathTemplate": "/api/payment/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        //{
+        //  "Host": "localhost",
+        //  "Port": 7092
+        //},
+        {
+          "Host": "{Service}",
+          "Port": 443
+        }
+      ],
+      "SwaggerKey": "payment"
     }
   ],
   "SwaggerEndPoints": [
@@ -249,32 +283,10 @@
       ]
     },
     {
-      "Key": "image",
+      "Key": "batch",
       "Config": [
         {
-          "Name": "image gateway API",
-          "version": "v1",
-          //"Url": "https://localhost:7092/swagger/v1/swagger.json"
-          "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
-        }
-      ]
-    },
-    {
-      "Key": "user",
-      "Config": [
-        {
-          "Name": "user gateway API",
-          "version": "v1",
-          //"Url": "https://localhost:7092/swagger/v1/swagger.json"
-          "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
-        }
-      ]
-    },
-    {
-      "Key": "role",
-      "Config": [
-        {
-          "Name": "role gateway API",
+          "Name": "batch gateway API",
           "version": "v1",
           //"Url": "https://localhost:7092/swagger/v1/swagger.json"
           "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
@@ -293,6 +305,28 @@
       ]
     },
     {
+      "Key": "lot",
+      "Config": [
+        {
+          "Name": "lot gateway API",
+          "version": "v1",
+          //"Url": "https://localhost:7092/swagger/v1/swagger.json"
+          "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "order",
+      "Config": [
+        {
+          "Name": "order gateway API",
+          "version": "v1",
+          //"Url": "https://localhost:7092/swagger/v1/swagger.json"
+          "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
       "Key": "partner",
       "Config": [
         {
@@ -304,10 +338,10 @@
       ]
     },
     {
-      "Key": "product",
+      "Key": "payment",
       "Config": [
         {
-          "Name": "product gateway API",
+          "Name": "payment gateway API",
           "version": "v1",
           //"Url": "https://localhost:7092/swagger/v1/swagger.json"
           "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
@@ -315,10 +349,10 @@
       ]
     },
     {
-      "Key": "warehouse",
+      "Key": "image",
       "Config": [
         {
-          "Name": "warehouse gateway API",
+          "Name": "image gateway API",
           "version": "v1",
           //"Url": "https://localhost:7092/swagger/v1/swagger.json"
           "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
@@ -337,10 +371,10 @@
       ]
     },
     {
-      "Key": "lot",
+      "Key": "product",
       "Config": [
         {
-          "Name": "lot gateway API",
+          "Name": "product gateway API",
           "version": "v1",
           //"Url": "https://localhost:7092/swagger/v1/swagger.json"
           "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
@@ -359,10 +393,32 @@
       ]
     },
     {
-      "Key": "order",
+      "Key": "role",
       "Config": [
         {
-          "Name": "order gateway API",
+          "Name": "role gateway API",
+          "version": "v1",
+          //"Url": "https://localhost:7092/swagger/v1/swagger.json"
+          "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "user",
+      "Config": [
+        {
+          "Name": "user gateway API",
+          "version": "v1",
+          //"Url": "https://localhost:7092/swagger/v1/swagger.json"
+          "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "warehouse",
+      "Config": [
+        {
+          "Name": "warehouse gateway API",
           "version": "v1",
           //"Url": "https://localhost:7092/swagger/v1/swagger.json"
           "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
