@@ -1,5 +1,6 @@
 ﻿using AutoMapper;
 using BeeStore_Repository.DTO;
+using BeeStore_Repository.DTO.Batch;
 using BeeStore_Repository.DTO.InventoryDTOs;
 using BeeStore_Repository.DTO.OrderDTOs;
 using BeeStore_Repository.DTO.PackageDTOs;
@@ -73,6 +74,7 @@ namespace BeeStore_Repository.Mapper
 
             CreateMap<Product, ProductListDTO>()
                 .ForMember(dest => dest.ProductCategoryName, opt => opt.MapFrom(src => src.ProductCategory!.TypeName))
+                .ForMember(dest => dest.IsInInv, opt => opt.MapFrom(src => src.Lots.Any(u => u.InventoryId.HasValue && u.IsDeleted == false)))
                 .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<ProductCreateDTO, Product>();
 
@@ -103,6 +105,8 @@ namespace BeeStore_Repository.Mapper
             CreateMap<Request, RequestListDTO>()
                 .ForMember(dest => dest.partner_email, opt => opt.MapFrom(src => src.OcopPartner!.Email))
                 .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Lot!.Product!.Name))
+                .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom(src => src.SendToInventory!.Warehouse!.Name))
+                .ForMember(dest => dest.ProductImage, opt => opt.MapFrom(src => src.Lot!.Product!.PictureLink))
             .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<RequestCreateDTO, Request>();
 
@@ -124,6 +128,11 @@ namespace BeeStore_Repository.Mapper
                ProductPrice = od.ProductPrice,
                ProductAmount = od.ProductAmount
            }).ToList());
+            CreateMap<Batch, BatchListDTO>()
+                .ForMember(dest => dest.Orders, opt => opt.MapFrom(src => src.Orders));
+            CreateMap<BatchCreateDTO, Batch>()
+                .ForMember(dest => dest.Orders, opt => opt.Ignore())
+                .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null)); ;
         }
     }
 }

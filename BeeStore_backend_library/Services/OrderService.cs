@@ -54,7 +54,8 @@ namespace BeeStore_Repository.Services
 
             var list = await _unitOfWork.OrderRepo.GetListAsync(
                 filter: u => (filterQuery == null || u.Status.Equals(filterQuery))
-                             && (userId == null || u.OcopPartnerId.Equals(userId)),
+                             && (userId == null || u.OcopPartnerId.Equals(userId))
+                             && (warehouseId == null || u.OrderDetails.Any(od => od.Lot.Inventory.WarehouseId.Equals(warehouseId))),
                              //&& (shipperId == null || u.Equals(shipperId)),
                 includes: null,
                 sortBy: sortBy!,
@@ -73,7 +74,7 @@ namespace BeeStore_Repository.Services
             return await ListPagination<OrderListDTO>.PaginateList(result, pageIndex, pageSize);
         }
 
-        //this shit sucked, will have to think about later
+        
         public async Task<Pagination<OrderListDTO>> GetWarehouseSentOrderList(int warehouseId, OrderStatus? orderStatus, OrderSortBy? sortCriteria, bool descending, int pageIndex, int pageSize)
         {
             var list = await ApplyFilterToList(orderStatus, sortCriteria, descending, null, null, warehouseId);
