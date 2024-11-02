@@ -156,7 +156,7 @@ namespace BeeStore_Repository.Services
                              && (userId == null || u.OcopPartnerId.Equals(userId))
                              && (warehouseId == null || u.SendToInventory.WarehouseId.Equals(warehouseId)),
                 includes: null,
-                sortBy: null!,
+                sortBy: Constants.SortCriteria.CreateDate,
                 descending: descending,
                 searchTerm: null,
                 searchProperties: null
