@@ -69,6 +69,7 @@ namespace BeeStore_Repository.Utils
         public const string OrderCanceledError = "You can't canceled finished order.";
         public const string OrderSentError = "Order is already sent.";
         public const string OrderDetailsError = "All items must be from the same warehouse.";
+        public const string OrderBatchError = "There are orders that has already been assign to a batch.";
 
         //Product category response message
         public const string ProductCategoryIdNotFound = "Product Category Id not found.";

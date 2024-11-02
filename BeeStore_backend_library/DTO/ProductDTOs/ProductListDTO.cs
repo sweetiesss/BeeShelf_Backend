@@ -25,6 +25,8 @@
 
         public string? Origin { get; set; }
 
+        public bool? IsInInv {  get; set; }
+
 
     }
 }

@@ -58,6 +58,20 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
+        [Route("get-warehouse-orders/{userId}")]
+        [Authorize(Roles = "Admin,Manager,Staff,Shipper")]
+        [HttpGet]
+        public async Task<IActionResult> GetWarehouseSentOrder(int warehouseId,
+                                                            [FromQuery] OrderStatus? filterByStatus,
+                                                            [FromQuery] OrderSortBy? sortBy,
+                                                            [FromQuery][DefaultValue(false)] bool descending,
+                                                            [FromQuery][DefaultValue(0)] int pageIndex,
+                                                            [FromQuery][DefaultValue(10)] int pageSize)
+        {
+            var result = await _orderService.GetWarehouseSentOrderList(warehouseId, filterByStatus, sortBy, descending, pageIndex, pageSize);
+            return Ok(result);
+        }
+
         [Route("create-order")]
         [Authorize(Roles = "Partner")]
         [HttpPost]

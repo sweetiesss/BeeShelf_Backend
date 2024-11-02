@@ -33,6 +33,8 @@ namespace BeeStore_Repository
             services.AddScoped<IProductCategoryService, ProductCategoryService>();
             services.AddScoped<ILotService, LotService>();
             services.AddScoped<IWalletService, WalletService>();
+            services.AddScoped<IBatchService, BatchService>();
+            services.AddScoped<IPaymentService, PaymentService>();
             services.AddScoped<IWarehouseShipperService, WarehouseShipperService>();
             services.AddScoped<IWarehouseStaffService, WarehouseStaffService>();
             services.AddScoped<IRequestService, RequestService>();
