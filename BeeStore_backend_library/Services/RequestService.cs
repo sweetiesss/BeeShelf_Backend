@@ -145,7 +145,7 @@ namespace BeeStore_Repository.Services
                 RequestStatus.Delivered => Constants.Status.Delivered,
                 RequestStatus.Completed => Constants.Status.Completed,
                 RequestStatus.Failed => Constants.Status.Failed,
-                _ => string.Empty
+                _ => null
             };
         
 
