@@ -67,7 +67,7 @@ namespace BeeStore_Api.Controllers
 
         [Route("get-warehouse-shippers")]
         [HttpGet]
-        [Authorize(Roles = "Admin,Manager")]
+        [Authorize(Roles = "Admin,Manager,Staff")]
         public async Task<IActionResult> GetWarehouseShipperList([FromQuery][DefaultValue(null)] string? search,
                                                                  [FromQuery] WarehouseFilter? filterBy,
                                                                  [FromQuery][DefaultValue(null)] string? filterQuery,
@@ -81,7 +81,7 @@ namespace BeeStore_Api.Controllers
         //these are probably unecessary now that we have filter
         [Route("get-warehouse-shippers/{id}")]
         [HttpGet]
-        [Authorize(Roles = "Admin,Manager")]
+        [Authorize(Roles = "Admin,Manager,Staff")]
         public async Task<IActionResult> GetWarehouseShipperList(int id,
                                                                  [FromQuery][DefaultValue(null)] string? search,
                                                                  [FromQuery] WarehouseFilter? filterBy,

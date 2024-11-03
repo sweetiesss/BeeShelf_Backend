@@ -85,7 +85,11 @@ namespace BeeStore_Repository.Services
 
             var list = await _unitOfWork.EmployeeRepo.GetListAsync(
                 filter: u => filterQuery == null || u.Role!.RoleName!.Equals(filterQuery),
-                includes: query => query.Include(o => o.Role),
+                includes: query => query.Include(o => o.Role)
+                                        .Include(o => o.WarehouseShippers)
+                                        .ThenInclude(o => o.Warehouse)
+                                        .Include(o => o.WarehouseStaffs)
+                                        .ThenInclude(o => o.Warehouse),
                 sortBy: sortBy!,
                 descending: order,
                 searchTerm: search,
@@ -102,7 +106,12 @@ namespace BeeStore_Repository.Services
         public async Task<EmployeeListDTO> GetEmployee(string email)
         {
             var user = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Email.Equals(email),
-                                                                       query => query.Include(o => o.Role));
+                                                                       query => query.Include(o => o.Role)
+                                                                                     .Include(o => o.WarehouseShippers)
+                                                                                     .ThenInclude(o => o.Warehouse)
+                                                                                     .Include(o => o.WarehouseStaffs)
+                                                                                     .ThenInclude(o => o.Warehouse))
+                                                                                     ;
             if (user == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.UserEmailNotFound);
