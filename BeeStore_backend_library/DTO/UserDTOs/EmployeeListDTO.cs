@@ -26,6 +26,9 @@
 
         public string RoleName { get; set; }
 
+        public int? WorkAtWarehouseId { get; set; }
+        public string? WorkAtWarehouseName { get; set; }
+
 
     }
 }

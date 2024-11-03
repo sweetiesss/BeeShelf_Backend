@@ -16,6 +16,7 @@ using BeeStore_Repository.DTO.WarehouseShipperDTOs;
 using BeeStore_Repository.DTO.WarehouseStaffDTOs;
 using BeeStore_Repository.Models;
 using Microsoft.EntityFrameworkCore.Internal;
+using System.Linq.Expressions;
 
 namespace BeeStore_Repository.Mapper
 {
@@ -32,8 +33,20 @@ namespace BeeStore_Repository.Mapper
             CreateMap<EmployeeCreateRequest, Employee>()
                      .ForMember(dest => dest.Password, opt => opt.MapFrom(src => BCrypt.Net.BCrypt.HashPassword(src.Password)));
             CreateMap<UserSignUpRequestDTO, OcopPartner>();
+
+
             CreateMap<Employee, EmployeeListDTO>()
                     .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.Role!.RoleName))
+                    .ForMember(dest => dest.WorkAtWarehouseId, opt => opt.MapFrom((src, dest) =>
+                                src.WarehouseShippers.FirstOrDefault(u => u.EmployeeId.Equals(src.Id)
+                                                                       && u.IsDeleted == false)?.WarehouseId ??
+                                src.WarehouseStaffs.FirstOrDefault(u => u.EmployeeId.Equals(src.Id)
+                                                                     && u.IsDeleted == false)?.WarehouseId))
+                    .ForMember(dest => dest.WorkAtWarehouseName, opt => opt.MapFrom((src, dest) =>
+                                src.WarehouseShippers.FirstOrDefault(u => u.EmployeeId.Equals(src.Id)
+                                                                       && u.IsDeleted == false)?.Warehouse.Name ??
+                                src.WarehouseStaffs.FirstOrDefault(u => u.EmployeeId.Equals(src.Id)
+                                                                     && u.IsDeleted == false)?.Warehouse.Name))
                     .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
 
             CreateMap<Role, RoleListDTO>();
