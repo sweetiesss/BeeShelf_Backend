@@ -266,6 +266,7 @@ namespace BeeStore_Repository.Services
                 {
                     exist.Status = Constants.Status.Failed;
                     exist.CancellationReason = ResponseMessage.InventoryOverWeightError;
+                    await _unitOfWork.SaveAsync();
                     throw new ApplicationException(ResponseMessage.InventoryOverWeightError);
                 }
 

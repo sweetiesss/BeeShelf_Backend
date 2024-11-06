@@ -1,4 +1,5 @@
 ﻿using BeeStore_Repository.DTO.PaymentDTOs;
+using BeeStore_Repository.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,6 @@ namespace BeeStore_Repository.Services.Interfaces
 {
     public interface IPaymentService
     {
-        Task<PaymentResponseDTO> CreateQrCode(PaymentRequestDTO request);
+        Task<PaymentResponseDTO> CreateQrCode(CoinPackValue options, string custom_amount, PaymentRequestDTO request);
     }
 }

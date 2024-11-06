@@ -25,6 +25,7 @@ namespace BeeStore_Repository.DTO.OrderDTOs
 
         public int? LotId { get; set; }
 
+        [JsonIgnore]
         public int? ProductPrice { get; set; }
 
         public int? ProductAmount { get; set; }
