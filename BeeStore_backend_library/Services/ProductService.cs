@@ -175,6 +175,7 @@ namespace BeeStore_Repository.Services
 
         public async Task<string> UpdateProduct(int id, ProductCreateDTO request)
         {
+
             //Check if the product exist or not
             var exist = await _unitOfWork.ProductRepo.SingleOrDefaultAsync(u => u.Id == id);
             if (exist == null || exist.IsDeleted == true)
@@ -188,6 +189,12 @@ namespace BeeStore_Repository.Services
             {
                 throw new AppException(ResponseMessage.UserMismatch);
             }
+
+            //check if the product is in a Lot in inventory or not
+            if(await _unitOfWork.LotRepo.AnyAsync(u => u.ProductId.Equals(id) 
+                                                    && u.InventoryId.HasValue 
+                                                    && u.IsDeleted == false) == false)
+            {
 
             //Check for duplicate name
             //If a product with duplicate name exist that has the same email as the request
@@ -219,9 +226,13 @@ namespace BeeStore_Repository.Services
             exist.Name = request.Name;
             exist.Origin = request.Origin;
             exist.Weight = request.Weight;
-            exist.Price = request.Price;
-            exist.PictureLink = "random";// fix here too
             exist.ProductCategoryId = request.ProductCategoryId;
+            exist.Barcode = request.Barcode;
+            }
+            exist.Price = request.Price;
+            //exist.PictureLink = request.PictureLink;
+
+
             _unitOfWork.ProductRepo.Update(exist);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;

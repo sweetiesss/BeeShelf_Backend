@@ -13,7 +13,7 @@ namespace BeeStore_Repository.DTO.PaymentDTOs
         //public string buyerName { get; set; }
         //public string buyerPhone { get; set; }
         //public string buyerAddress { get; set; }
-        public int Amount { get; set; }
+        //public int Amount { get; set; }
         public string CancelUrl { get; set; }
         public string ReturnUrl { get; set; }
         public string Description { get; set; }

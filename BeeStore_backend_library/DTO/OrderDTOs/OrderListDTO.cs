@@ -1,4 +1,6 @@
-﻿namespace BeeStore_Repository.DTO.OrderDTOs
+﻿using System.Text.Json.Serialization;
+
+namespace BeeStore_Repository.DTO.OrderDTOs
 {
     public class OrderListDTO
     {
@@ -32,6 +34,18 @@
 
         public string? PictureLink { get; set; }
         public List<OrderDetailDTO> OrderDetails { get; set; }
+        public List<OrderFeeDTO> OrderFees { get; set; }
+
+    }
+
+    public class OrderFeeDTO
+    {
+        public decimal? DeliveryFee { get; set; }
+
+        public decimal? StorageFee { get; set; }
+
+        public decimal? AdditionalFee { get; set; }
+
     }
 
     public class OrderDetailDTO
