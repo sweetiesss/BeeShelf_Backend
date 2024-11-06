@@ -16,6 +16,8 @@ using Microsoft.Extensions.Configuration;
 using BeeStore_Repository.Utils;
 using BeeStore_Repository.DTO.PaymentDTOs;
 using BeeStore_Repository.Data;
+using BeeStore_Repository.Enums;
+using BeeStore_Repository.Enums.SortBy;
 
 namespace BeeStore_Repository.Services
 {
@@ -33,7 +35,7 @@ namespace BeeStore_Repository.Services
             _logger = logger;
         }
 
-        public async Task<PaymentResponseDTO> CreateQrCode(PaymentRequestDTO request)
+        public async Task<PaymentResponseDTO> CreateQrCode(CoinPackValue options, string custom_amount, PaymentRequestDTO request)
         {
 
             var config = new ConfigurationBuilder()
@@ -63,7 +65,18 @@ namespace BeeStore_Repository.Services
                 throw new KeyNotFoundException(ResponseMessage.PartnerIdNotFound);
             }
 
-            int price = Decimal.ToInt32(request.Amount);
+            decimal? value = options switch
+            {
+                CoinPackValue.Ten_Thousand_VND => 10000,
+                CoinPackValue.Fifty_Thousand_VND => 50000,
+                CoinPackValue.One_Hundred_Thousand_VND => 100000,
+                CoinPackValue.Two_Hundred_Thousand_VND => 200000,
+                CoinPackValue.Custom_Amount => value = (decimal?)Int32.Parse(custom_amount),
+                _ => null
+            };
+
+
+            int price = (int)(value);
 
             var data = $"amount={price}" +
                        $"&cancelUrl={request.CancelUrl}" +
@@ -80,15 +93,15 @@ namespace BeeStore_Repository.Services
             DateTime expiredAtTime = DateTime.Now.AddMinutes(30);
             long unixTime = new DateTimeOffset(expiredAtTime).ToUnixTimeSeconds();
 
-            //var item = new[]
-            //{
-            //    new
-            //    {
-            //       name = subscription.Name,
-            //       quantity = 1,
-            //       price = subscription.Price
-            //    }
-            //};
+            var item = new[]
+            {
+                new
+                {
+                   name = $"{price} coin pack",
+                   quantity = 1,
+                   price = price
+                }
+            };
 
             var requestData = new
             {
@@ -98,8 +111,8 @@ namespace BeeStore_Repository.Services
                 buyerName = user.FirstName + " " + user.LastName,
                 buyerEmail = request.BuyerEmail,
                 buyerPhone = user.Phone,
-                buyerAddress = "Nothing here",
-                //items = item,
+                buyerAddress = "",
+                items = item,
                 cancelUrl = request.CancelUrl,
                 returnUrl = request.ReturnUrl,
                 expiredAt = unixTime,
