@@ -9,6 +9,7 @@ using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using System.Data;
 using System.Linq.Expressions;
 using static BeeStore_Repository.Utils.Constants;
@@ -102,32 +103,36 @@ namespace BeeStore_Repository.Services
 
         public async Task<string> CreateOrder(OrderCreateDTO request)
         {
+            int number = 0;
             var user = await _unitOfWork.OcopPartnerRepo.AnyAsync(u => u.Id == request.OcopPartnerId);
             if (user.Equals(false))
             {
                 throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
             }
-            var firstODs = await _unitOfWork.LotRepo.FirstOrDefaultAsync(u => u.Id.Equals(request.OrderDetails.First().LotId));
-            if (firstODs != null)
+            var firstODs = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(request.OrderDetails.First().LotId), query => query.Include(o => o.Inventory));
+            if (firstODs == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
             }
-            int? totalPrice = 0;
+            
+            decimal? totalPrice = 0;
+            decimal? totalStorageFee = 0;
+            decimal? deliveryFee = 0;
             foreach(var od in request.OrderDetails)
             {
-                totalPrice += od.ProductPrice;
-                var a = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(od.LotId));
+                var a = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(od.LotId), query => query.Include(o => o.Product).Include(o => o.Inventory));
                 if (a == null)
                 {
                     throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
                 }
+
+                totalPrice += a.Product.Price*od.ProductAmount;
+                od.ProductPrice = (int)(a.Product.Price);
                 if(a.Inventory.WarehouseId != firstODs.Inventory.WarehouseId)
                 {
                     throw new ApplicationException(ResponseMessage.OrderDetailsError);
                 }
             }
-
-            
 
             request.CreateDate = DateTime.Now;
             request.Status = Constants.Status.Draft;
@@ -135,6 +140,18 @@ namespace BeeStore_Repository.Services
             var result = _mapper.Map<Order>(request);
             await _unitOfWork.OrderRepo.AddAsync(result);
             await _unitOfWork.SaveAsync();
+
+            var orderFee = new OrderFee
+            {
+                OrderId = result.Id,
+                AdditionalFee = 0,
+                StorageFee = totalStorageFee,
+                DeliveryFee = deliveryFee,
+                IsDeleted = false
+            };
+            await _unitOfWork.OrderFeeRepo.AddAsync(orderFee);
+            await _unitOfWork.SaveAsync();
+
             return ResponseMessage.Success;
 
         }
@@ -162,22 +179,63 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.OrderIdNotFound);
             }
-            if (exist.Status != Constants.Status.Draft)
+            var firstODs = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(request.OrderDetails.First().LotId), query => query.Include(o => o.Inventory));
+            if (firstODs == null)
             {
-                if(request.OrderDetails != null)
+                throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
+            }
+
+            if (exist.Status != Constants.Status.Draft && exist.Status != Constants.Status.Shipping)
+            {
+                if (request.OrderDetails != null)
                 {
                     throw new ApplicationException(ResponseMessage.OrderProccessedError);
                 }
             }
-
-            foreach(var x in exist.OrderDetails)
+            //If status = draft update orderdetails and such
+            if (exist.Status == Constants.Status.Draft)
             {
-                _unitOfWork.OrderDetailRepo.HardDelete(x);             
+                decimal? totalPrice = 0;
+                foreach(var x in exist.OrderDetails)
+                {
+                    _unitOfWork.OrderDetailRepo.HardDelete(x);             
+                }
+
+                foreach(var x in request.OrderDetails)
+                {
+                    var a = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(x.LotId), query => query.Include(o => o.Product).Include(o => o.Inventory));
+                    if (a == null)
+                    {
+                        throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
+                    }
+
+                    totalPrice += a.Product.Price * x.ProductAmount;
+                    x.ProductPrice = (int)(a.Product.Price);
+                    if (a.Inventory.WarehouseId != firstODs.Inventory.WarehouseId)
+                    {
+                        throw new ApplicationException(ResponseMessage.OrderDetailsError);
+                    }
+                }
+                exist.TotalPrice = totalPrice;
+                exist.OrderDetails = _mapper.Map<List<OrderDetail>>(request);
             }
 
+
+            foreach (var fee in exist.OrderFees)
+            {
+                //if status = shipping ad additional fee
+                if(exist.Status == Constants.Status.Shipping)
+                {
+                    fee.AdditionalFee = 1;
+                }
+                //update delivery fee and storage fee in both situation
+                fee.DeliveryFee = 1;
+                fee.StorageFee = 1;
+            }
+
+            //update receiver address and phone in both draft and shipping
             exist.ReceiverAddress = request.ReceiverAddress;
             exist.ReceiverPhone = request.ReceiverPhone;
-            exist.OrderDetails = _mapper.Map<List<OrderDetail>>(request);
                     
             _unitOfWork.OrderRepo.Update(exist);
             await _unitOfWork.SaveAsync();
@@ -260,7 +318,11 @@ namespace BeeStore_Repository.Services
                 {
                     orderStatusUpdate = Constants.Status.Shipping;
                     a = true;
-
+                    //take away the product's amount here
+                    foreach (var od in exist.OrderDetails)
+                    {
+                        UpdateLotProductAmount(od.LotId, od.ProductAmount, false);
+                    }
                 }
                 else
                 {
@@ -280,6 +342,11 @@ namespace BeeStore_Repository.Services
                 {
                     orderStatusUpdate = Constants.Status.Canceled;
                     a = true;
+                    //return product's amount here
+                    foreach(var od in exist.OrderDetails)
+                    {
+                        UpdateLotProductAmount(od.LotId, od.ProductAmount, true);
+                    }
                 }
                 else
                 {
@@ -312,6 +379,25 @@ namespace BeeStore_Repository.Services
             return ResponseMessage.Success;
         }
 
-  
+       
+
+        private async Task UpdateLotProductAmount(int? lotId, int? amount, bool cancel)
+        {
+            var lot = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id == lotId);
+            if (lot != null)
+            {
+                throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
+            }
+
+            if(cancel == true)
+            {
+                lot.ProductAmount += amount;
+            }
+            else
+            {
+                lot.ProductAmount -= amount;
+            }
+            await _unitOfWork.SaveAsync();
+        }
     }
 }
