@@ -11,7 +11,29 @@
             public const string Shipper = "Shipper";
             public const string Partner = "Partner";
         }
-       
+
+        public static class VehicleType
+        {
+            public const string Van = "Van";
+            public const string Truck = "Truck";
+            public const string Motorcycle = "Motorcycle";
+        }
+
+        public static class VehicleStatus
+        {
+            public const string Available = "Available";
+            public const string InService = "InService";
+            public const string Repair = "Repair";
+        }
+
+        public static class PaymentStatus 
+        {
+            public const string Paid = "PAID";
+            public const string Pending = "PENDING";
+            public const string Processing = "PROCESSING";
+            public const string Cancelled = "CANCELLED";
+        }
+
         public static class Status
         {
             public const string Draft = "Draft";
@@ -67,6 +89,9 @@
             //warehouse
             public const string Size = "Size";
             public const string Location = "Location";
+
+            //Vehicle
+            public const string Capacity = "Capacity";
         }
 
         public static class FilterCriteria
@@ -74,6 +99,8 @@
             //package specific
             public const string ProductId = "ProductId";
             public const string InventoryId = "InventoryId";
+            public const string Type = "Type";
+            public const string Status = "Status";
         }
 
         public static class Smtp
