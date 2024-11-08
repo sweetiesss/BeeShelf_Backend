@@ -10,6 +10,7 @@ using BeeStore_Repository.DTO.ProductDTOs;
 using BeeStore_Repository.DTO.RequestDTOs;
 using BeeStore_Repository.DTO.RoleDTOs;
 using BeeStore_Repository.DTO.UserDTOs;
+using BeeStore_Repository.DTO.VehicleDTOs;
 using BeeStore_Repository.DTO.WalletDTO;
 using BeeStore_Repository.DTO.WarehouseDTOs;
 using BeeStore_Repository.DTO.WarehouseShipperDTOs;
@@ -100,6 +101,13 @@ namespace BeeStore_Repository.Mapper
                 .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product!.Name))
                 .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<LotCreateDTO, Lot>();
+
+            CreateMap<Vehicle, VehicleListDTO>()
+                .ForMember(dest => dest.AssignedDriverName, opt => opt.MapFrom(src => src.AssignedDriver.FirstName + " " + src.AssignedDriver.LastName))
+                .ForMember(dest => dest.AssignedDriverEmail, opt => opt.MapFrom(src => src.AssignedDriver.Email))
+                .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<VehicleCreateDTO, Vehicle>();
+            
 
 
             CreateMap<WarehouseShipper, WarehouseShipperListDTO>()

@@ -1,23 +1,15 @@
-﻿using Amazon.Runtime.Internal.Util;
-using Amazon.S3.Model;
+﻿using AutoMapper;
+using BeeStore_Repository.Data;
+using BeeStore_Repository.DTO.PaymentDTOs;
+using BeeStore_Repository.Enums;
+using BeeStore_Repository.Logger;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
-using MySqlX.XDevAPI;
-using Newtonsoft.Json.Serialization;
-using Newtonsoft.Json;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BeeStore_Repository.Logger;
-using AutoMapper;
-using Microsoft.Extensions.Configuration;
 using BeeStore_Repository.Utils;
-using BeeStore_Repository.DTO.PaymentDTOs;
-using BeeStore_Repository.Data;
-using BeeStore_Repository.Enums;
-using BeeStore_Repository.Enums.SortBy;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Serialization;
+using System.Text;
 
 namespace BeeStore_Repository.Services
 {
@@ -33,6 +25,24 @@ namespace BeeStore_Repository.Services
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
+        }
+
+        public async Task<string> ConfirmPayment(ConfirmPaymentDTO request)
+        {
+            var transaction = await _unitOfWork.TransactionRepo.SingleOrDefaultAsync(u => u.Code.Equals(request.OrderCode));
+            if(transaction == null)
+            {
+                throw new KeyNotFoundException(ResponseMessage.TransactionNotFound);
+            }
+            if(request.Status == Constants.PaymentStatus.Paid)
+            {
+                var wallet = await _unitOfWork.WalletRepo.SingleOrDefaultAsync(u => u.OcopPartnerId.Equals(transaction.OcopPartnerId));
+                wallet.TotalAmount += transaction.Amount;
+            }
+            transaction.Status = request.Status;
+            await _unitOfWork.SaveAsync();
+            return ResponseMessage.Success;
+
         }
 
         public async Task<PaymentResponseDTO> CreateQrCode(CoinPackValue options, string custom_amount, PaymentRequestDTO request)
@@ -53,8 +63,8 @@ namespace BeeStore_Repository.Services
             Random randomOrderCode = new Random();
             int _orderCode = randomOrderCode.Next(1, 10000);
 
-            var transaction = await _unitOfWork.TransactionRepo.SingleOrDefaultAsync(u => u.Code.Equals(_orderCode));
-            while (transaction != null)
+            var transaction = await _unitOfWork.TransactionRepo.AnyAsync(u => u.Code.Equals(_orderCode));
+            while (transaction != false)
             {
                 _orderCode = randomOrderCode.Next(1, 10000);
             }
@@ -141,6 +151,19 @@ namespace BeeStore_Repository.Services
 
                 if (responseData != null && responseData.Code == "00")
                 {
+                    var newTransa = new Transaction
+                    {
+                        Code = _orderCode.ToString(),
+                        Amount = price,
+                        Description = request.Description,
+                        OcopPartnerId = user.Id,
+                        CreateDate = DateTime.Now,
+                        Status = Constants.PaymentStatus.Pending,
+                        CancellationReason = null,
+                        IsDeleted = false
+                    };
+                    await _unitOfWork.TransactionRepo.AddAsync(newTransa);
+                    await _unitOfWork.SaveAsync();
                     //return await System.Threading.Tasks.Task.FromResult(jsonResult);
                     return responseData;
                 }
