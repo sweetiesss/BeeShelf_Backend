@@ -252,6 +252,23 @@
       ],
       "SwaggerKey": "batch"
     },
+    { // vehicle Path
+      "UpstreamPathTemplate": "/gateway/vehicle/{everything}",
+      "UpstreamHttpMethod": [],
+      "DownstreamPathTemplate": "/api/vehicle/{everything}",
+      "DownstreamScheme": "https",
+      "DownstreamHostAndPorts": [
+        //{
+        //  "Host": "localhost",
+        //  "Port": 7092
+        //},
+        {
+          "Host": "{Service}",
+          "Port": 443
+        }
+      ],
+      "SwaggerKey": "vehicle"
+    },
     { // payment Path
       "UpstreamPathTemplate": "/gateway/payment/{everything}",
       "UpstreamHttpMethod": [],
@@ -408,6 +425,17 @@
       "Config": [
         {
           "Name": "user gateway API",
+          "version": "v1",
+          //"Url": "https://localhost:7092/swagger/v1/swagger.json"
+          "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
+        }
+      ]
+    },
+    {
+      "Key": "vehicle",
+      "Config": [
+        {
+          "Name": "vehicle gateway API",
           "version": "v1",
           //"Url": "https://localhost:7092/swagger/v1/swagger.json"
           "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"

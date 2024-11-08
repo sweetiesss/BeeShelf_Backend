@@ -26,5 +26,14 @@ namespace BeeStore_Api.Controllers
             var result = await _paymentService.CreateQrCode(options, custom_amount, paymentRequestDTO);
             return Ok(result);
         }
+
+        [AllowAnonymous]
+        [Route("confirm-payment")]
+        [HttpPost]
+        public async Task<IActionResult> ConfirmPayment(ConfirmPaymentDTO request)
+        {
+            var result = await _paymentService.ConfirmPayment(request);
+            return Ok(result);
+        }
     }
 }
