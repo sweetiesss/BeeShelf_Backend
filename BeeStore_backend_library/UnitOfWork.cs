@@ -16,6 +16,7 @@ namespace BeeStore_Repository
         private GenericRepository<BatchDelivery> batchDeliveryRepo;
         private GenericRepository<Transaction> transactionRepo;
         private GenericRepository<OrderFee> orderFeeRepo;
+        private GenericRepository<Vehicle> vehicleRepo;
 
         private GenericRepository<Role> roleRepo;
         private GenericRepository<Picture> pictureRepo;
@@ -43,6 +44,18 @@ namespace BeeStore_Repository
                     batchRepo = new GenericRepository<Batch>(_context);
                 }
                 return batchRepo;
+            }
+        }
+
+        public GenericRepository<Vehicle> VehicleRepo
+        {
+            get
+            {
+                if (vehicleRepo == null)
+                {
+                    vehicleRepo = new GenericRepository<Vehicle>(_context);
+                }
+                return vehicleRepo;
             }
         }
 

@@ -19,6 +19,13 @@ namespace BeeStore_Repository.Utils
         public const string PictureUploadImageException = "Something wrong while attempting to upload picture.";
         public const string ImageIdNotFound = "Image not found.";
 
+        //Vehicle Response Message
+        public const string VehicleIdNotFound = "Vehicle not found.";
+        public const string VehicleLicensePlateDuplicate = "License Plate already exist.";
+
+        //Transaction response message
+        public const string TransactionNotFound = "Transaction not found.";
+
         //Role responise message
         public const string RoleNotFound = "Role not found.";
 
