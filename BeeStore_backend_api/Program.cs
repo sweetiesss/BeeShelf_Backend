@@ -40,6 +40,7 @@ if (builder.Environment.IsProduction())
     );
 
     var client = new SecretClient(new Uri(keyVaultURL.KeyVaultURL), new EnvironmentCredential());
+
     var dbConnectionSecret = client.GetSecret("DBConnection");
     var s3AccessKey = client.GetSecret("BeeStore-S3-AccessKey");
     var s3SecretKey = client.GetSecret("BeeStore-S3-SecretKey");
@@ -47,14 +48,14 @@ if (builder.Environment.IsProduction())
     var s3BucketUrl = client.GetSecret("BeeStore-S3-BucketURL");
     var gatewayUrl = client.GetSecret("BeeStore-Gateway-URL");
 
-    if (dbConnectionSecret.Value != null)
-    {
-        builder.Services.AddInfrastructuresService(dbConnectionSecret.Value.Value);
-    }
-    else
-    {
-        throw new InvalidOperationException("DBConnection secret is missing in Key Vault.");
-    }
+    if (dbConnectionSecret.Value == null) throw new InvalidOperationException("DBConnection secret is missing on Key Vault.");
+    if (s3AccessKey.Value == null) throw new InvalidOperationException("s3AccessKey secret is missing on Key Vault.");
+    if (s3SecretKey.Value == null) throw new InvalidOperationException("s3SecretKey secret is missing on Key Vault.");
+    if (s3BucketName.Value == null) throw new InvalidOperationException("s3BucketName secret is missing on Key Vault.");
+    if (s3BucketUrl.Value == null) throw new InvalidOperationException("s3BucketUrl secret is missing on Key Vault.");
+    if (gatewayUrl.Value == null) throw new InvalidOperationException("gatewayUrl secret is missing on Key Vault.");
+
+    builder.Services.AddInfrastructuresService(dbConnectionSecret.Value.Value);
 
     builder.Services.AddJwtAuthenticationProduction(client);
 
