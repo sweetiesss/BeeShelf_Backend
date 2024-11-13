@@ -8,44 +8,23 @@ namespace BeeStore_Repository.DTO.OrderDTOs
 
         public int? OcopPartnerId { get; set; }
 
-        [JsonIgnore]
-        public string? Status { get; set; }
-
-        [JsonIgnore]
-        public string? CancellationReason { get; set; }
-
-        [JsonIgnore]
-        public DateTime? CreateDate { get; set; }
-
-        [JsonIgnore]
-        public DateTime? DeliverStartDate { get; set; }
-
-        [JsonIgnore]
-        public DateTime? DeliverFinishDate { get; set; }
-
-        [JsonIgnore]
-        public DateTime? CompleteDate { get; set; }
 
         public string? ReceiverPhone { get; set; }
 
         public string? ReceiverAddress { get; set; }
 
-        [JsonIgnore]
-        public decimal? TotalPrice { get; set; }
 
-        [JsonIgnore]
-        public int? BatchId { get; set; }
 
-        [JsonIgnore]
-        public DateTime? PickDate { get; set; }
+        [JsonIgnore]        
+        public List<OrderDetailCreateDTO>? OrderDetails { get; set; } = new List<OrderDetailCreateDTO>();
+        public List<ProductDetailDTO> Products { get; set; }
 
-        [JsonIgnore]
-        public int? PickStaffId { get; set; }
+    }
 
-        [JsonIgnore]
-        public string? PictureLink { get; set; }
-
-        public List<OrderDetailCreateDTO> OrderDetails { get; set; }
+    public class ProductDetailDTO
+    {
+        public int ProductId { get; set; }
+        public int ProductAmount { get; set; }
 
 
     }
