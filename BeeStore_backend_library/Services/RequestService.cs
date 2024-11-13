@@ -34,7 +34,7 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.RequestIdNotFound);
             }
-            if (!request.Status.Equals(Constants.Status.Draft))
+            if (!request.Status.Equals(Constants.Status.Draft) || !request.Status.Equals(Constants.Status.Pending))
             {
                 throw new ApplicationException(ResponseMessage.RequestStatusError);
             }

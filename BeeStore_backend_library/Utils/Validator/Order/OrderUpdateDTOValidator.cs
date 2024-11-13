@@ -17,12 +17,12 @@ namespace BeeStore_Repository.Utils.Validator.Order
                 .WithMessage(ValidationMessage.ReceiverAddressMaxLength)
                 .When(x => !string.IsNullOrEmpty(x.ReceiverAddress));
 
-            RuleFor(x => x.OrderDetails)
-                .NotEmpty()
-                .WithMessage(ValidationMessage.OrderDetailsNotEmpty)
-                .When(x => x.OrderDetails != null && x.OrderDetails.Any());
+            //RuleFor(x => x.OrderDetails)
+            //    .NotEmpty()
+            //    .WithMessage(ValidationMessage.OrderDetailsNotEmpty)
+            //    .When(x => x.OrderDetails != null && x.OrderDetails.Any());
 
-            RuleForEach(x => x.OrderDetails).SetValidator(new OrderDetailUpdateDTOValidator());
+            //RuleForEach(x => x.OrderDetails).SetValidator(new OrderDetailUpdateDTOValidator());
         }
     }
 

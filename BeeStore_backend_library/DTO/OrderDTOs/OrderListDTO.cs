@@ -58,5 +58,6 @@ namespace BeeStore_Repository.DTO.OrderDTOs
         public int? ProductPrice { get; set; }
 
         public int? ProductAmount { get; set; }
+        public string? ProductImage {  get; set; }
     }
 }
