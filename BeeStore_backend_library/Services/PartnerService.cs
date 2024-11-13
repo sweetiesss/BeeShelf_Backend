@@ -99,7 +99,7 @@ namespace BeeStore_Repository.Services
                 exist.OcopCategoryId = user.OcopCategoryId;
                 exist.UpdateDate = DateTime.Now;
                 _unitOfWork.OcopPartnerRepo.Update(exist);
-                _unitOfWork.SaveAsync();
+                await _unitOfWork.SaveAsync();
                 return ResponseMessage.Success;
             }
             else

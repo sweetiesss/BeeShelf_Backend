@@ -8,6 +8,9 @@ using BeeStore_Repository.Data;
 using BeeStore_Repository.Logger.GlobalExceptionHandler;
 using BeeStore_Repository.Services;
 using BeeStore_Repository.Services.Interfaces;
+using BeeStore_Repository.Utils.Validator.BatchDTOs;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -80,10 +83,12 @@ if (builder.Environment.IsProduction())
                               .AllowCredentials());
     });
 }
+builder.Services.AddValidatorsFromAssemblyContaining<BatchCreateDTOValidator>();
 
 
 builder.Services.AddWebAPIService();
 builder.Services.AddControllers();
+builder.Services.AddFluentValidationAutoValidation();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
