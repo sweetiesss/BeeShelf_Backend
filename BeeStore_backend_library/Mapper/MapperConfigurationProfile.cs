@@ -137,6 +137,7 @@ namespace BeeStore_Repository.Mapper
                 .ForMember(dest => dest.OrderFees, opt => opt.MapFrom(src => src.OrderFees))
             .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<OrderDetail, OrderDetailDTO>()
+                .ForMember(dest => dest.ProductImage, opt => opt.MapFrom(src => src.Lot != null ? src.Lot.Product.PictureLink : null))
                 .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Lot.Product.Name));
             CreateMap<OrderFee, OrderFeeDTO>();
             CreateMap<OrderCreateDTO, Order>();

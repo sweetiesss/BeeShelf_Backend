@@ -31,24 +31,30 @@ namespace BeeStore_Repository.Utils.Validator.Order
                 .MaximumLength(50)
                 .WithMessage(ValidationMessage.ReceiverAddressMaxLength);
 
-            // Rule for OrderDetails: required and must contain at least one item
-            RuleFor(x => x.OrderDetails)
-                .NotEmpty()
-                .WithMessage(ValidationMessage.OrderDetailsNotEmpty);
+            //// Rule for OrderDetails: required and must contain at least one item
+            //RuleFor(x => x.OrderDetails)
+            //    .NotEmpty()
+            //    .WithMessage(ValidationMessage.OrderDetailsNotEmpty);
 
-            // Nested validation for OrderDetailCreateDTO
-            RuleForEach(x => x.OrderDetails).SetValidator(new OrderDetailCreateDTOValidator());
+            //// Nested validation for OrderDetailCreateDTO
+            //RuleForEach(x => x.OrderDetails).SetValidator(new OrderDetailCreateDTOValidator());
+
+            RuleFor(x => x.Products)
+                .NotEmpty()
+                .WithMessage(ValidationMessage.ProductDetailsNotEmpty);
+
+            RuleForEach(x => x.Products).SetValidator(new ProductDetailDTOValidator());
         }
     }
 
-    public class OrderDetailCreateDTOValidator : AbstractValidator<OrderDetailCreateDTO>
+    public class ProductDetailDTOValidator : AbstractValidator<ProductDetailDTO>
     {
-        public OrderDetailCreateDTOValidator()
+        public ProductDetailDTOValidator()
         {
             // Rule for LotId: required
-            RuleFor(x => x.LotId)
+            RuleFor(x => x.ProductId)
                 .NotNull()
-                .WithMessage(ValidationMessage.LotIdRequired);
+                .WithMessage(ValidationMessage.ProductIdRequired);
 
             // Rule for ProductAmount: required and non-negative
             RuleFor(x => x.ProductAmount)

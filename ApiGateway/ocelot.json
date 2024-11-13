@@ -36,10 +36,10 @@
       "DownstreamPathTemplate": "/api/auth/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7092
-        },
+        //{
+        //  "Host": "localhost",
+        //  "Port": 7092
+        //},
         {
           "Host": "{Service}",
           "Port": 443
@@ -53,10 +53,10 @@
       "DownstreamPathTemplate": "/api/user/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7092
-        },
+        //{
+        //  "Host": "localhost",
+        //  "Port": 7092
+        //},
         {
           "Host": "{Service}",
           "Port": 443
@@ -70,10 +70,10 @@
       "DownstreamPathTemplate": "/api/role/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7092
-        },
+        //{
+        //  "Host": "localhost",
+        //  "Port": 7092
+        //},
         {
           "Host": "{Service}",
           "Port": 443
@@ -87,10 +87,10 @@
       "DownstreamPathTemplate": "/api/inventory/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7092
-        },
+        //{
+        //  "Host": "localhost",
+        //  "Port": 7092
+        //},
         {
           "Host": "{Service}",
           "Port": 443
@@ -104,10 +104,10 @@
       "DownstreamPathTemplate": "/api/partner/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7092
-        },
+        //{
+        //  "Host": "localhost",
+        //  "Port": 7092
+        //},
         {
           "Host": "{Service}",
           "Port": 443
@@ -121,10 +121,10 @@
       "DownstreamPathTemplate": "/api/picture/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7092
-        },
+        //{
+        //  "Host": "localhost",
+        //  "Port": 7092
+        //},
         {
           "Host": "{Service}",
           "Port": 443
@@ -138,10 +138,10 @@
       "DownstreamPathTemplate": "/api/product/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7092
-        },
+        //{
+        //  "Host": "localhost",
+        //  "Port": 7092
+        //},
         {
           "Host": "{Service}",
           "Port": 443
@@ -156,10 +156,10 @@
       "DownstreamPathTemplate": "/api/warehouse/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7092
-        },
+        //{
+        //  "Host": "localhost",
+        //  "Port": 7092
+        //},
         {
           "Host": "{Service}",
           "Port": 443
@@ -173,10 +173,10 @@
       "DownstreamPathTemplate": "/api/product-category/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7092
-        },
+        //{
+        //  "Host": "localhost",
+        //  "Port": 7092
+        //},
         {
           "Host": "{Service}",
           "Port": 443
@@ -190,10 +190,10 @@
       "DownstreamPathTemplate": "/api/lot/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7092
-        },
+        //{
+        //  "Host": "localhost",
+        //  "Port": 7092
+        //},
         {
           "Host": "{Service}",
           "Port": 443
@@ -207,10 +207,10 @@
       "DownstreamPathTemplate": "/api/request/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7092
-        },
+        //{
+        //  "Host": "localhost",
+        //  "Port": 7092
+        //},
         {
           "Host": "{Service}",
           "Port": 443
@@ -224,10 +224,10 @@
       "DownstreamPathTemplate": "/api/order/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7092
-        },
+        //{
+        //  "Host": "localhost",
+        //  "Port": 7092
+        //},
         {
           "Host": "{Service}",
           "Port": 443
@@ -241,10 +241,10 @@
       "DownstreamPathTemplate": "/api/batch/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7092
-        },
+        //{
+        //  "Host": "localhost",
+        //  "Port": 7092
+        //},
         {
           "Host": "{Service}",
           "Port": 443
@@ -258,10 +258,10 @@
       "DownstreamPathTemplate": "/api/vehicle/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7092
-        },
+        //{
+        //  "Host": "localhost",
+        //  "Port": 7092
+        //},
         {
           "Host": "{Service}",
           "Port": 443
@@ -275,10 +275,10 @@
       "DownstreamPathTemplate": "/api/payment/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
-        {
-          "Host": "localhost",
-          "Port": 7092
-        },
+        //{
+        //  "Host": "localhost",
+        //  "Port": 7092
+        //},
         {
           "Host": "{Service}",
           "Port": 443
@@ -294,8 +294,8 @@
         {
           "Name": "auth gateway API",
           "version": "v1",
-          "Url": "https://localhost:7092/swagger/v1/swagger.json"
-          //"Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
+          //"Url": "https://localhost:7092/swagger/v1/swagger.json"
+          "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
         }
       ]
     },
@@ -305,8 +305,8 @@
         {
           "Name": "batch gateway API",
           "version": "v1",
-          "Url": "https://localhost:7092/swagger/v1/swagger.json"
-          //"Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
+          //"Url": "https://localhost:7092/swagger/v1/swagger.json"
+          "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
         }
       ]
     },
@@ -316,8 +316,8 @@
         {
           "Name": "inventory gateway API",
           "version": "v1",
-          "Url": "https://localhost:7092/swagger/v1/swagger.json"
-          //"Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
+          //"Url": "https://localhost:7092/swagger/v1/swagger.json"
+          "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
         }
       ]
     },
@@ -327,8 +327,8 @@
         {
           "Name": "lot gateway API",
           "version": "v1",
-          "Url": "https://localhost:7092/swagger/v1/swagger.json"
-          //"Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
+          //"Url": "https://localhost:7092/swagger/v1/swagger.json"
+          "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
         }
       ]
     },
@@ -338,8 +338,8 @@
         {
           "Name": "order gateway API",
           "version": "v1",
-          "Url": "https://localhost:7092/swagger/v1/swagger.json"
-          //"Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
+          //"Url": "https://localhost:7092/swagger/v1/swagger.json"
+          "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
         }
       ]
     },
@@ -349,8 +349,8 @@
         {
           "Name": "partner gateway API",
           "version": "v1",
-          "Url": "https://localhost:7092/swagger/v1/swagger.json"
-          //"Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
+          //"Url": "https://localhost:7092/swagger/v1/swagger.json"
+          "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
         }
       ]
     },
@@ -360,8 +360,8 @@
         {
           "Name": "payment gateway API",
           "version": "v1",
-          "Url": "https://localhost:7092/swagger/v1/swagger.json"
-          //"Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
+          //"Url": "https://localhost:7092/swagger/v1/swagger.json"
+          "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
         }
       ]
     },
@@ -371,8 +371,8 @@
         {
           "Name": "image gateway API",
           "version": "v1",
-          "Url": "https://localhost:7092/swagger/v1/swagger.json"
-          //"Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
+          //"Url": "https://localhost:7092/swagger/v1/swagger.json"
+          "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
         }
       ]
     },
@@ -382,8 +382,8 @@
         {
           "Name": "productCategory gateway API",
           "version": "v1",
-          "Url": "https://localhost:7092/swagger/v1/swagger.json"
-          //"Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
+          //"Url": "https://localhost:7092/swagger/v1/swagger.json"
+          "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
         }
       ]
     },
@@ -393,8 +393,8 @@
         {
           "Name": "product gateway API",
           "version": "v1",
-          "Url": "https://localhost:7092/swagger/v1/swagger.json"
-          //"Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
+          //"Url": "https://localhost:7092/swagger/v1/swagger.json"
+          "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
         }
       ]
     },
@@ -404,8 +404,8 @@
         {
           "Name": "request gateway API",
           "version": "v1",
-          "Url": "https://localhost:7092/swagger/v1/swagger.json"
-          //"Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
+          //"Url": "https://localhost:7092/swagger/v1/swagger.json"
+          "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
         }
       ]
     },
@@ -415,8 +415,8 @@
         {
           "Name": "role gateway API",
           "version": "v1",
-          "Url": "https://localhost:7092/swagger/v1/swagger.json"
-          //"Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
+          //"Url": "https://localhost:7092/swagger/v1/swagger.json"
+          "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
         }
       ]
     },
@@ -426,8 +426,8 @@
         {
           "Name": "user gateway API",
           "version": "v1",
-          "Url": "https://localhost:7092/swagger/v1/swagger.json"
-          //"Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
+          //"Url": "https://localhost:7092/swagger/v1/swagger.json"
+          "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
         }
       ]
     },
@@ -437,8 +437,8 @@
         {
           "Name": "vehicle gateway API",
           "version": "v1",
-          "Url": "https://localhost:7092/swagger/v1/swagger.json"
-          //"Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
+          //"Url": "https://localhost:7092/swagger/v1/swagger.json"
+          "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
         }
       ]
     },
@@ -448,8 +448,8 @@
         {
           "Name": "warehouse gateway API",
           "version": "v1",
-          "Url": "https://localhost:7092/swagger/v1/swagger.json"
-          //"Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
+          //"Url": "https://localhost:7092/swagger/v1/swagger.json"
+          "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
         }
       ]
     }
