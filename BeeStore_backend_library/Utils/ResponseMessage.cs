@@ -68,7 +68,8 @@ namespace BeeStore_Repository.Utils
         public const string ProductPartnerNotMatch = "This product does not belongs to this user.";
 
         //Package response message
-        public const string PackageIdNotFound = "Package Id not found.";
+        public const string PackageIdNotFound = "Lot Id not found.";
+        public const string NoLotWithProductFound = "No Lot with this Product found.";
 
         //Order response message
         public const string OrderIdNotFound = "Order Id not found.";

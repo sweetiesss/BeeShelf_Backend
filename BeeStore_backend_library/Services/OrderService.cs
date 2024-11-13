@@ -109,35 +109,175 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
             }
-            var firstODs = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(request.OrderDetails.First().LotId), query => query.Include(o => o.Inventory));
-            if (firstODs == null)
-            {
-                throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
-            }
-            
+            int firstProductWarehouseId = 0;
+            int index = 0;
             decimal? totalPrice = 0;
             decimal? totalStorageFee = 0;
             decimal? deliveryFee = 0;
-            foreach(var od in request.OrderDetails)
+            foreach(var product in request.Products)
             {
-                var a = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(od.LotId), query => query.Include(o => o.Product).Include(o => o.Inventory));
+                
+                var a = await _unitOfWork.ProductRepo.SingleOrDefaultAsync(u => u.Id.Equals(product.ProductId));
                 if (a == null)
                 {
-                    throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
+                    throw new KeyNotFoundException(ResponseMessage.ProductIdNotFound);
+                }
+                //get a list of Lot with product Id
+                var b = await _unitOfWork.LotRepo.GetQueryable(query => query.Where(u => u.ProductId.Equals(product.ProductId)
+                                                                && u.InventoryId.HasValue
+                                                                && u.ProductAmount > 0
+                                                                && u.IsDeleted.Equals(false))
+                                                                .OrderBy(u => u.ImportDate)
+                                                                .Include(o => o.Product)
+                                                                .Include(o => o.Inventory).ThenInclude(o => o.Warehouse));
+                if(b.Count() == 0)
+                {
+                    throw new KeyNotFoundException(ResponseMessage.NoLotWithProductFound);
                 }
 
-                totalPrice += a.Product.Price*od.ProductAmount;
-                od.ProductPrice = (int)(a.Product.Price);
-                if(a.Inventory.WarehouseId != firstODs.Inventory.WarehouseId)
+                //get first product warehouse Id
+                if (firstProductWarehouseId == 0 && b.Any())
                 {
-                    throw new ApplicationException(ResponseMessage.OrderDetailsError);
+                    firstProductWarehouseId = b[0].Inventory.WarehouseId.Value;
                 }
+
+                //if first product warehouse id already exist, check if this product is in the same warehouse or not
+                if (firstProductWarehouseId != 0)
+                {
+                    if(b[0].Inventory.WarehouseId != firstProductWarehouseId)
+                    {
+                        for(int i = 1; i<b.Count(); i++)
+                        {
+                            if (b[i].Inventory.WarehouseId == firstProductWarehouseId)
+                            {
+                                index = i; 
+                                break;
+                            }
+                        }
+                        if(index == 0)
+                        {
+                            throw new ApplicationException("All product in an order must be in the same warehouse.");
+                        }
+
+                    }
+                }
+
+                //check for product amount
+
+                //Get the next Lot if the first Lot doesnt have enough product
+                //check if the next Lot have the same warehouseId or not, if not then go to the next Lot
+                //if none of the next Lot have the same warehouseId return not enough product
+                //if there is no next Lot return not enough product
+                int productAmountNeeded = product.ProductAmount;
+
+                while (productAmountNeeded > 0)
+                {
+                    if (index >= b.Count())
+                    {
+                        throw new ApplicationException("Not enough product.");
+                    }
+
+                    var lot = b[index];
+
+                    // Check if the current lot's WarehouseId matches the first lot's WarehouseId
+                    if (lot.Inventory.WarehouseId != firstProductWarehouseId)
+                    {
+                        // If not, move to the next lot and continue the loop
+                        index++;
+                        continue;
+                    }
+
+                    int amountToTake = 0;
+
+                    if (lot.ProductAmount >= productAmountNeeded)
+                    {
+                        amountToTake = productAmountNeeded;
+                        productAmountNeeded = 0;  // Product amount is fulfilled.
+                    }
+                    else
+                    {
+                        amountToTake = lot.ProductAmount.Value;
+                        productAmountNeeded -= lot.ProductAmount.Value;
+                    }
+
+                    totalPrice += lot.Product.Price * amountToTake;
+
+                    request.OrderDetails.Add(new OrderDetailCreateDTO
+                    {
+                        LotId = lot.Id,
+                        ProductAmount = amountToTake,
+                        ProductPrice = (int)(lot.Product.Price)
+                    });
+
+                    index++; // Move to the next lot
+                }
+                if(productAmountNeeded > 0)
+                {
+                    throw new ApplicationException("Not enough products.");
+                }
+                //if (b[index].ProductAmount < product.ProductAmount)
+                //{
+                //    int i = index;
+                //    while (i <= b.Count() -1)
+                //    {
+                //        if (i == b.Count() - 1)
+                //        {
+                //            throw new ApplicationException("Not enough product");
+                //        }
+                //        if (b[i].Inventory.WarehouseId == firstProductWarehouseId)
+                //        {
+                //            int? get = 0;
+                            
+                //            if(productAmountneeded > b[i].ProductAmount)
+                //            {
+                //                get = b[i].ProductAmount;
+                //                productAmountneeded -= b[i].ProductAmount.Value;
+                //            }
+                //            else
+                //            {
+                //                get = b[i].ProductAmount - productAmountneeded;
+                //                productAmountneeded = 0;
+                //            }
+                //                request.OrderDetails.Add(new OrderDetailCreateDTO
+                //                {
+                //                    LotId = b[i].Id,
+                //                    ProductAmount = get,
+                //                    ProductPrice = (int)(b[i].Product.Price)
+                //                });
+                //            totalPrice += b[i].Product.Price * product.ProductAmount;
+                //        }
+                //        i += 1;          
+                //    }
+                //    if (productAmountneeded > 0)
+                //    {
+                //        throw new ApplicationException("Not enough product.");
+                //    }
+                //}
+                //var a = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(product.LotId), query => query.Include(o => o.Product).Include(o => o.Inventory));
+                //if (a == null)
+                //{
+                //    throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
+                //}
+                //if(productAmountNeeded > 0)
+                //{
+                //    totalPrice += b[index].Product.Price*product.ProductAmount;
+                //    request.OrderDetails.Add(new OrderDetailCreateDTO
+                //    {
+                //        LotId = b[index].Id,
+                //        ProductAmount = product.ProductAmount,
+                //        ProductPrice = (int)(b[index].Product.Price)
+                //    });
+
+                //}
+                
+                index = 0;
             }
 
-            request.CreateDate = DateTime.Now;
-            request.Status = Constants.Status.Draft;
-            request.TotalPrice = totalPrice;
+
             var result = _mapper.Map<Order>(request);
+            result.CreateDate = DateTime.Now;
+            result.Status = Constants.Status.Draft;
+            result.TotalPrice = totalPrice;
             await _unitOfWork.OrderRepo.AddAsync(result);
             await _unitOfWork.SaveAsync();
 

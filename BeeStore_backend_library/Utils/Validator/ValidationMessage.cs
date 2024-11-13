@@ -41,8 +41,10 @@ namespace BeeStore_Repository.Utils.Validator
         public const string OcopPartnerIdRequired = "OcopPartnerId is required.";
         public const string ReceiverPhoneMaxLength = "ReceiverPhone cannot exceed 11 characters.";
         public const string ReceiverAddressMaxLength = "ReceiverAddress cannot exceed 50 characters.";
-        public const string OrderDetailsNotEmpty = "OrderDetails list must contain at least one item.";
-        public const string LotIdRequired = "LotId is required.";
+        //public const string OrderDetailsNotEmpty = "OrderDetails list must contain at least one item.";
+        public const string ProductDetailsNotEmpty = "Products list must contain at least one item.";
+        //public const string LotIdRequired = "LotId is required.";
+        public const string ProductIdRequired = "ProductId is required.";
         public const string ReceiverPhoneRequired = "ReceiverPhone cannot be null or empty.";
         public const string ReceiverAddressRequired = "ReceiverAddress cannot be null or empty.";
 
