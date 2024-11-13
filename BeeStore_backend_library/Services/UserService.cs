@@ -232,54 +232,63 @@ namespace BeeStore_Repository.Services
 
         private void PasswordMailSender(string targetMail, string userGeneratedPassword)
         {
-            if (userGeneratedPassword is null)
+            try
             {
-                throw new ArgumentNullException(nameof(userGeneratedPassword));
+                var target = new MailAddress(targetMail);
+
+                if (userGeneratedPassword is null)
+                {
+                    throw new ArgumentNullException(nameof(userGeneratedPassword));
+                }
+                var config = new ConfigurationBuilder()
+                    .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                    .AddJsonFile(Constants.DefaultString.systemJsonFile).Build();
+
+                var mailConfig = config.GetSection("Mail").Get<AppConfiguration>();
+
+                var keyVault = config.GetSection("KeyVault").Get<AppConfiguration>();
+
+                var _client = new SecretClient(new Uri(keyVault.KeyVaultURL), new EnvironmentCredential());
+
+                string smtpPassword = _client.GetSecret("BeeStore-Smtp-Password").Value.Value;
+
+                MailMessage mailMessage = new MailMessage();
+                mailMessage.From = new MailAddress(mailConfig.sourceMail);
+                mailMessage.Subject = Constants.Smtp.registerMailSubject;
+                mailMessage.To.Add(target);
+                // Ignore this abomination below
+                mailMessage.Body = @"
+                                    <html>
+                                      <body style='font-family: Arial, sans-serif; color: #333; line-height: 1.6;'>
+                                        <div style='max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9; border-radius: 10px;'>
+                                          <h2 style='color: #4CAF50;'>Welcome to BeeShelf!</h2>
+                                          <p>Dear User,</p>
+                                          <p>Your account has been verified. Here is the password for your account:</p>
+                                          <p style='font-weight: bold; font-size: 18px; color: #333;'>Your Password: 
+                                            <span style='color: #d9534f;'>" + userGeneratedPassword + @"</span>
+                                          </p>
+                                          <p>For security reasons, we recommend that you change your password as soon as possible.</p>
+                                          <p>If you didn't request this password, please contact our support team immediately.</p>
+                                          <p>Thank you for using our service!</p>
+                                          <p style='margin-top: 30px; font-size: 12px; color: #888;'>This is an automated email, please do not reply.</p>
+                                        </div>
+                                      </body>
+                                    </html>";
+                mailMessage.IsBodyHtml = true;
+
+                var smtpClient = new SmtpClient(Constants.Smtp.smtp)
+                {
+                    Port = 587,
+                    Credentials = new NetworkCredential(mailConfig.sourceMail, smtpPassword),
+                    EnableSsl = true
+                };
+
+                smtpClient.Send(mailMessage);
             }
-            var config = new ConfigurationBuilder()
-                .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
-                .AddJsonFile(Constants.DefaultString.systemJsonFile).Build();
-
-            var mailConfig = config.GetSection("Mail").Get<AppConfiguration>();
-
-            var keyVault = config.GetSection("KeyVault").Get<AppConfiguration>();
-
-            var _client = new SecretClient(new Uri(keyVault.KeyVaultURL), new EnvironmentCredential());
-
-            string smtpPassword = _client.GetSecret("BeeStore-Smtp-Password").Value.Value;
-
-            MailMessage mailMessage = new MailMessage();
-            mailMessage.From = new MailAddress(mailConfig.sourceMail);
-            mailMessage.Subject = Constants.Smtp.registerMailSubject;
-            mailMessage.To.Add(new MailAddress(targetMail));
-            // Ignore this abomination below
-            mailMessage.Body = @"
-                                <html>
-                                  <body style='font-family: Arial, sans-serif; color: #333; line-height: 1.6;'>
-                                    <div style='max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9; border-radius: 10px;'>
-                                      <h2 style='color: #4CAF50;'>Welcome to BeeShelf!</h2>
-                                      <p>Dear User,</p>
-                                      <p>Your account has been verified. Here is the password for your account:</p>
-                                      <p style='font-weight: bold; font-size: 18px; color: #333;'>Your Password: 
-                                        <span style='color: #d9534f;'>" + userGeneratedPassword + @"</span>
-                                      </p>
-                                      <p>For security reasons, we recommend that you change your password as soon as possible.</p>
-                                      <p>If you didn't request this password, please contact our support team immediately.</p>
-                                      <p>Thank you for using our service!</p>
-                                      <p style='margin-top: 30px; font-size: 12px; color: #888;'>This is an automated email, please do not reply.</p>
-                                    </div>
-                                  </body>
-                                </html>";
-            mailMessage.IsBodyHtml = true;
-
-            var smtpClient = new SmtpClient(Constants.Smtp.smtp)
+            catch (Exception)
             {
-                Port = 587,
-                Credentials = new NetworkCredential(mailConfig.sourceMail, smtpPassword),
-                EnableSsl = true
-            };
-
-            smtpClient.Send(mailMessage);
+                throw;
+            }
         }
 
         private static string GeneratePassword(int length)
