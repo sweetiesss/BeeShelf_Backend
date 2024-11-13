@@ -23,8 +23,6 @@ namespace BeeStore_Repository.Utils.Validator.User
             RuleFor(x => x.password)
                 .NotEmpty()
                 .WithMessage(ValidationMessage.PasswordRequired)
-                .MinimumLength(8)
-                .WithMessage(ValidationMessage.PasswordMinLength)
                 .MaximumLength(100)
                 .WithMessage(ValidationMessage.PasswordMaxLength);
         }
