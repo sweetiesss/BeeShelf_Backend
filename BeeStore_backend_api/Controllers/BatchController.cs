@@ -1,8 +1,5 @@
-﻿using Amazon.S3.Model;
-using BeeStore_Repository.DTO.Batch;
+﻿using BeeStore_Repository.DTO.Batch;
 using BeeStore_Repository.Enums.FilterBy;
-using BeeStore_Repository.Enums.SortBy;
-using BeeStore_Repository.Services;
 using BeeStore_Repository.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -21,10 +18,35 @@ namespace BeeStore_Api.Controllers
 
         [Route("create-batch")]
         [HttpPost]
-        [Authorize(Roles ="Admin,Staff")]
+        [Authorize(Roles = "Admin,Staff")]
         public async Task<IActionResult> CreateBatch(BatchCreateDTO request)
         {
             var result = await _batchService.CreateBatch(request);
+            return Ok(result);
+        }
+        [Route("update-batch/{id}")]
+        [HttpPut]
+        [Authorize(Roles = "Admin,Staff")]
+        public async Task<IActionResult> UpdateBatch(int id, BatchCreateDTO request)
+        {
+            var result = await _batchService.UpdateBatch(id, request);
+            return Ok(result);
+        }
+        [Route("delete-batch/{id}")]
+        [HttpPost]
+        [Authorize(Roles = "Admin,Staff")]
+        public async Task<IActionResult> DeleteBatch(int id)
+        {
+            var result = await _batchService.DeleteBatch(id);
+            return Ok(result);
+        }
+
+        [Route("assign-batch/{id}/{shipperId}")]
+        [HttpPost]
+        [Authorize(Roles = "Admin,Staff")]
+        public async Task<IActionResult> AssignBatch(int id, int shipperId)
+        {
+            var result = await _batchService.AssignBatch(id, shipperId);
             return Ok(result);
         }
 
