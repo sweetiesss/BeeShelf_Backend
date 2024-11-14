@@ -60,12 +60,17 @@ namespace BeeStore_Repository.Utils
         public const string WarehouseUserDuplicateList = "Please check provided list. The following user is duplicate: ";
         public const string WarehouseUserAddListFailed = "Failed to add. These user are already working at a warehouse ";
 
+        //Batch response message
+        public const string BatchIdNotFound = "Batch Id not found.";
+        public const string BatchStatusNotPending = "Can't edit processed batch.";
 
         //Product response message
         public const string ProductIdNotFound = "Product Id not found.";
         public const string ProductNameDuplicate = "Failed to add. Product name already exist. ";
         public const string ProductListDuplicate = "Please check your provided list, these name are duplicate: ";
         public const string ProductPartnerNotMatch = "This product does not belongs to this user.";
+        public const string ProductNotEnough = "Not enough products.";
+        public const string ProductMustBeFromTheSameWarehouse = "All product in an order must be in the same warehouse.";
 
         //Package response message
         public const string PackageIdNotFound = "Lot Id not found.";

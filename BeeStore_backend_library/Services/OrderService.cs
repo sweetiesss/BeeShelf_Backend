@@ -56,8 +56,8 @@ namespace BeeStore_Repository.Services
             var list = await _unitOfWork.OrderRepo.GetListAsync(
                 filter: u => (filterQuery == null || u.Status.Equals(filterQuery))
                              && (userId == null || u.OcopPartnerId.Equals(userId))
-                             && (warehouseId == null || u.OrderDetails.Any(od => od.Lot.Inventory.WarehouseId.Equals(warehouseId))),
-                             //&& (shipperId == null || u.Equals(shipperId)),
+                             && (warehouseId == null || u.OrderDetails.Any(od => od.Lot.Inventory.WarehouseId.Equals(warehouseId)))
+                             && (shipperId == null || u.Batch.BatchDeliveries.Equals(shipperId)),
                 includes: null,
                 sortBy: sortBy!,
                 descending: descending,
@@ -99,7 +99,7 @@ namespace BeeStore_Repository.Services
             return await ListPagination<OrderListDTO>.PaginateList(result, pageIndex, pageSize);
         }
 
-
+   
 
         public async Task<string> CreateOrder(OrderCreateDTO request)
         {
@@ -156,7 +156,7 @@ namespace BeeStore_Repository.Services
                         }
                         if(index == 0)
                         {
-                            throw new ApplicationException("All product in an order must be in the same warehouse.");
+                            throw new ApplicationException(ResponseMessage.ProductMustBeFromTheSameWarehouse);
                         }
 
                     }
@@ -174,7 +174,7 @@ namespace BeeStore_Repository.Services
                 {
                     if (index >= b.Count())
                     {
-                        throw new ApplicationException("Not enough product.");
+                        throw new ApplicationException(ResponseMessage.ProductNotEnough);
                     }
 
                     var lot = b[index];
@@ -213,63 +213,8 @@ namespace BeeStore_Repository.Services
                 }
                 if(productAmountNeeded > 0)
                 {
-                    throw new ApplicationException("Not enough products.");
+                    throw new ApplicationException(ResponseMessage.ProductNotEnough);
                 }
-                //if (b[index].ProductAmount < product.ProductAmount)
-                //{
-                //    int i = index;
-                //    while (i <= b.Count() -1)
-                //    {
-                //        if (i == b.Count() - 1)
-                //        {
-                //            throw new ApplicationException("Not enough product");
-                //        }
-                //        if (b[i].Inventory.WarehouseId == firstProductWarehouseId)
-                //        {
-                //            int? get = 0;
-                            
-                //            if(productAmountneeded > b[i].ProductAmount)
-                //            {
-                //                get = b[i].ProductAmount;
-                //                productAmountneeded -= b[i].ProductAmount.Value;
-                //            }
-                //            else
-                //            {
-                //                get = b[i].ProductAmount - productAmountneeded;
-                //                productAmountneeded = 0;
-                //            }
-                //                request.OrderDetails.Add(new OrderDetailCreateDTO
-                //                {
-                //                    LotId = b[i].Id,
-                //                    ProductAmount = get,
-                //                    ProductPrice = (int)(b[i].Product.Price)
-                //                });
-                //            totalPrice += b[i].Product.Price * product.ProductAmount;
-                //        }
-                //        i += 1;          
-                //    }
-                //    if (productAmountneeded > 0)
-                //    {
-                //        throw new ApplicationException("Not enough product.");
-                //    }
-                //}
-                //var a = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(product.LotId), query => query.Include(o => o.Product).Include(o => o.Inventory));
-                //if (a == null)
-                //{
-                //    throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
-                //}
-                //if(productAmountNeeded > 0)
-                //{
-                //    totalPrice += b[index].Product.Price*product.ProductAmount;
-                //    request.OrderDetails.Add(new OrderDetailCreateDTO
-                //    {
-                //        LotId = b[index].Id,
-                //        ProductAmount = product.ProductAmount,
-                //        ProductPrice = (int)(b[index].Product.Price)
-                //    });
-
-                //}
-                
                 index = 0;
             }
 
@@ -303,7 +248,7 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.OrderIdNotFound);
             }
-            if (exist.Status != Constants.Status.Pending)
+            if (exist.Status != Constants.Status.Draft)
             {
                 throw new ApplicationException(ResponseMessage.OrderProccessedError);
             }
