@@ -42,17 +42,17 @@ namespace BeeStore_Repository.Utils.Validator.Request
                 .MaximumLength(10)
                 .WithMessage(ValidationMessage.RequestTypeMaxLength);
 
-            RuleFor(x => x.Status)
-                .NotEmpty()
-                .WithMessage(ValidationMessage.StatusRequired)
-                .MaximumLength(10)
-                .WithMessage(ValidationMessage.StatusMaxLength);
+            //RuleFor(x => x.Status)
+            //    .NotEmpty()
+            //    .WithMessage(ValidationMessage.StatusRequired)
+            //    .MaximumLength(10)
+            //    .WithMessage(ValidationMessage.StatusMaxLength);
 
-            RuleFor(x => x.CancellationReason)
-                .NotEmpty()
-                .WithMessage(ValidationMessage.CancellationReasonRequired)
-                .MaximumLength(50)
-                .WithMessage(ValidationMessage.CancellationReasonMaxLength);
+            //RuleFor(x => x.CancellationReason)
+            //    .NotEmpty()
+            //    .WithMessage(ValidationMessage.CancellationReasonRequired)
+            //    .MaximumLength(50)
+            //    .WithMessage(ValidationMessage.CancellationReasonMaxLength);
         }
     }
 
