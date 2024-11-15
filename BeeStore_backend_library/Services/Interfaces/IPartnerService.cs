@@ -10,5 +10,7 @@ namespace BeeStore_Repository.Services.Interfaces
         Task<PartnerListDTO> GetPartner(string email);
         Task<string> UpdatePartner(OCOPPartnerUpdateRequest request);
         Task<string> DeletePartner(int id);
+
+        Task<List<PartnerRevenueDTO>> GetPartnerRevenue(int id, int? day, int? month, int?  year);
     }
 }
