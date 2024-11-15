@@ -66,5 +66,14 @@ namespace BeeStore_Api.Controllers
             var result = await _partnerService.DeletePartner(id);
             return Ok(result);
         }
+
+        [Route("get-partner-revenue/{id}")]
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetPartnerRevenue(int id, int? day, int? month, int? year)
+        {
+            var result = await _partnerService.GetPartnerRevenue(id, day, month, year);
+            return Ok(result);
+        }
     }
 }

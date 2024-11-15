@@ -7,6 +7,7 @@ using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
 using Microsoft.EntityFrameworkCore;
+using Mysqlx.Crud;
 using System.Linq.Expressions;
 
 namespace BeeStore_Repository.Services
@@ -119,6 +120,73 @@ namespace BeeStore_Repository.Services
             _unitOfWork.PartnerRepo.SoftDelete(exist);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
+        }
+
+        public async Task<List<PartnerRevenueDTO>> GetPartnerRevenue(int id, int? day, int? month, int? year)
+        {
+            List<PartnerRevenueDTO> list = new List<PartnerRevenueDTO>();
+            list.Add(new PartnerRevenueDTO
+            {
+                orderStatus = Constants.Status.Canceled,
+                orderAmount = 0,
+                amount = 0,
+            });
+            list.Add(new PartnerRevenueDTO
+            {
+                orderStatus = Constants.Status.Completed,
+                orderAmount = 0,
+                amount = 0,
+            });
+            list.Add(new PartnerRevenueDTO
+            {
+                orderStatus = Constants.Status.Shipping,
+                orderAmount = 0,
+                amount = 0,
+            });
+            var partner = await _unitOfWork.OcopPartnerRepo.AnyAsync(u => u.Id == id);
+            if(partner == false)
+            {
+                throw new KeyNotFoundException(ResponseMessage.PartnerIdNotFound);
+            }
+            var ordersQuery = await _unitOfWork.OrderRepo.GetQueryable(query => query.Where(u => u.OcopPartnerId.Equals(id)
+                                                                                         && (u.Status == Constants.Status.Canceled
+                                                                                         || u.Status == Constants.Status.Completed
+                                                                                         || u.Status == Constants.Status.Shipping)
+                                                                                         && u.IsDeleted == false)
+                                                                                     .OrderBy(u => u.CreateDate));
+            if (year.HasValue)
+            {
+                ordersQuery = ordersQuery.Where(o => o.CreateDate.Value.Year == year.Value).ToList();
+                if (month.HasValue)
+                {
+                    ordersQuery = ordersQuery.Where(o => o.CreateDate.Value.Month == month.Value).ToList();
+                    if (day.HasValue)
+                    {
+                        ordersQuery = ordersQuery.Where(o => o.CreateDate.Value.Day == day.Value).ToList();
+                    }
+                }
+            }
+
+            var groupedOrders = ordersQuery
+            .GroupBy(o => o.Status)
+            .Select(g => new
+            {
+                Status = g.Key,
+                OrderAmount = g.Count(),
+                TotalAmount = g.Sum(o => o.TotalPrice ?? 0)
+            });
+
+            foreach (var group in groupedOrders)
+            {
+                var dto = list.FirstOrDefault(d => d.orderStatus == group.Status);
+                if (dto != null)
+                {
+                    dto.orderAmount = group.OrderAmount;
+                    dto.amount = (int)group.TotalAmount;
+                }
+            }
+
+            return list;
         }
     }
 }
