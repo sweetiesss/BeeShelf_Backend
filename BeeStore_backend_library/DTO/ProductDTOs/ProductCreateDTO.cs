@@ -15,7 +15,7 @@ namespace BeeStore_Repository.DTO.ProductDTOs
         public decimal? Weight { get; set; }
 
         [JsonIgnore]
-        public DateTime? CreateDate { get; set; }
+        public DateTime? CreateDate { get; set; } = DateTime.Now;
 
         public int? ProductCategoryId { get; set; }
 

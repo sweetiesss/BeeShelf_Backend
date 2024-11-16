@@ -34,7 +34,7 @@ namespace BeeStore_Api.Controllers
 
         [Route("get-warehouses")]
         [HttpGet]
-        [Authorize(Roles = "Admin,Manager")]
+        [Authorize(Roles = "Admin,Manager,Partner")]
         public async Task<IActionResult> GetWarehouseList([FromQuery][DefaultValue(null)] string? search,
                                                           [FromQuery] WarehouseFilter? filterBy, string? filterQuery,
                                                           [FromQuery] WarehouseSortBy? sortCriteria,
@@ -48,7 +48,7 @@ namespace BeeStore_Api.Controllers
 
         [Route("get-warehouse/{id}")]
         [HttpGet]
-        [Authorize(Roles = "Admin, Manager")]
+        [Authorize(Roles = "Admin, Manager,Partner")]
         public async Task<IActionResult> GetWarehouse(int id)
         {
             var result = await _warehouseService.GetWarehouseById(id); 
