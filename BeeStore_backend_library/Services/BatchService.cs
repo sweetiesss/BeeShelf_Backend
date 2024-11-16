@@ -140,6 +140,7 @@ namespace BeeStore_Repository.Services
                 DeliverBy = shipper.Id
         });
             await _unitOfWork.SaveAsync();
+            return ResponseMessage.Success;
         }
 
         public async Task<Pagination<BatchListDTO>> GetBatchList(string search, BatchFilter? filterBy, string? filterQuery, int pageIndex, int pageSize)
