@@ -40,9 +40,9 @@ namespace BeeStore_Repository.Utils.Validator.Product
                 .NotNull()
                 .WithMessage(ValidationMessage.ProductCategoryIdRequired);
 
-            RuleFor(x => x.PictureLink)
-                .NotEmpty()
-                .WithMessage(ValidationMessage.PictureLinkRequired);
+            //RuleFor(x => x.PictureLink)
+            //    .NotEmpty()
+            //    .WithMessage(ValidationMessage.PictureLinkRequired);
 
             RuleFor(x => x.Origin)
                 .NotEmpty()
