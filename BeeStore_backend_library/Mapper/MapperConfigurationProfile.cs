@@ -15,6 +15,7 @@ using BeeStore_Repository.DTO.WalletDTO;
 using BeeStore_Repository.DTO.WarehouseDTOs;
 using BeeStore_Repository.DTO.WarehouseShipperDTOs;
 using BeeStore_Repository.DTO.WarehouseStaffDTOs;
+using BeeStore_Repository.Mapper.CustomResolver;
 using BeeStore_Repository.Models;
 using Microsoft.EntityFrameworkCore.Internal;
 using System.Linq.Expressions;
@@ -78,6 +79,7 @@ namespace BeeStore_Repository.Mapper
 
             CreateMap<Inventory, InventoryListDTO>()
                 .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom(src => src.Warehouse!.Name))
+                .ForMember(dest => dest.totalProduct, opt => opt.MapFrom<CustomTotalProductInventoryResolver>())
             .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<InventoryCreateDTO, Inventory>();
             CreateMap<Inventory, InventoryLotListDTO>()
