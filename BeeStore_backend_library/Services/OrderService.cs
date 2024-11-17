@@ -57,7 +57,7 @@ namespace BeeStore_Repository.Services
                 filter: u => (filterQuery == null || u.Status.Equals(filterQuery))
                              && (userId == null || u.OcopPartnerId.Equals(userId))
                              && (warehouseId == null || u.OrderDetails.Any(od => od.Lot.Inventory.WarehouseId.Equals(warehouseId)))
-                             && (shipperId == null || u.Batch.BatchDeliveries.Equals(shipperId)),
+                             && (shipperId == null || u.Batch.BatchDeliveries.Any(u=>u.DeliverBy.Equals(shipperId) && u.IsDeleted.Equals(false))),
                 includes: null,
                 sortBy: sortBy!,
                 descending: descending,
