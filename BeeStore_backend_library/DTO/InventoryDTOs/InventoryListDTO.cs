@@ -9,7 +9,7 @@
         public string? Name { get; set; }
 
         public decimal? MaxWeight { get; set; }
-
+        public int totalProduct {  get; set; }
         public decimal? Weight { get; set; }
 
         public DateTime? BoughtDate { get; set; }
