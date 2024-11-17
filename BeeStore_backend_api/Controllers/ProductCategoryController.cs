@@ -7,7 +7,6 @@ using System.ComponentModel;
 
 namespace BeeStore_Api.Controllers
 {
-    [Authorize(Roles = "Admin,Manager")]
     public class ProductCategoryController : BaseController
     {
         private readonly IProductCategoryService _productCategoryService;
@@ -22,6 +21,7 @@ namespace BeeStore_Api.Controllers
 
         [Route("get-product-categories")]
         [HttpGet]
+        [Authorize(Roles = "Admin,Manager,Partner")]
         public async Task<IActionResult> GetProductCategoryList([FromQuery][DefaultValue(0)] int pageIndex,
                                                                 [FromQuery][DefaultValue(10)] int pageSize)
         {
@@ -42,6 +42,7 @@ namespace BeeStore_Api.Controllers
 
         [Route("create-product-category")]
         [HttpPost]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> CreateProductCategory(ProductCategoryCreateDTO request)
         {
             var result = await _productCategoryService.CreateProductCategory(request);
@@ -50,6 +51,7 @@ namespace BeeStore_Api.Controllers
 
         [Route("update-product-category/{id}")]
         [HttpPut]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> UpdateProductCategory(int id, ProductCategoryCreateDTO request)
         {
             var result = await _productCategoryService.UpdateProductCategory(id, request);
@@ -58,6 +60,7 @@ namespace BeeStore_Api.Controllers
 
         [Route("delete-product-category/{id}")]
         [HttpDelete]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> DeleteProductCategory(int id)
         {
             var result = await _productCategoryService.DeleteProductCategory(id);

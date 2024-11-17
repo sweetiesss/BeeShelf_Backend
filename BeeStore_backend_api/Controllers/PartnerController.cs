@@ -75,5 +75,14 @@ namespace BeeStore_Api.Controllers
             var result = await _partnerService.GetPartnerRevenue(id, day, month, year);
             return Ok(result);
         }
+
+        [Route("get-partner-total-products/{id}")]
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetPartnerTotalProduct(int id, int? warehouseId)
+        {
+            var result = await _partnerService.GetPartnerTotalProduct(id, warehouseId);
+            return Ok(result);
+        }
     }
 }

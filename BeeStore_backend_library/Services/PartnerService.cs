@@ -188,5 +188,39 @@ namespace BeeStore_Repository.Services
 
             return list;
         }
+
+        public async Task<PartnerProductDTO> GetPartnerTotalProduct(int id, int? warehouseId)
+        {
+            var lotsQuery = await _unitOfWork.LotRepo.GetQueryable(query => query.Where(u => u.Product.OcopPartnerId.Equals(id)
+                                                                                          && u.InventoryId.HasValue
+                                                                                          && u.IsDeleted.Equals(false)
+                                                                                          && (warehouseId == null || u.Inventory.WarehouseId.Equals(warehouseId))));
+            lotsQuery = lotsQuery.ToList();
+
+            var groupedProducts = lotsQuery
+            .GroupBy(l => new
+            {
+                ProductId = l.ProductId,
+                ProductName = l.Product.Name,
+                WarehouseId = l.Inventory.Warehouse.Id,
+                WarehouseName = l.Inventory.Warehouse.Name
+            })
+            .Select(group => new ProductDTO
+            {
+                id = (int)group.Key.ProductId,
+                ProductName = group.Key.ProductName,
+                stock = group.Sum(l => (int)l.ProductAmount), 
+                warehouseId = (int)group.Key.WarehouseId,
+                warehouseName = group.Key.WarehouseName
+            })
+            .OrderByDescending(p => p.stock)
+            .ToList();
+            int totalStock = groupedProducts.Sum(p => p.stock);
+            return new PartnerProductDTO
+            {
+                totalProductAmount = totalStock, 
+                Products = groupedProducts
+            };
+        }
     }
 }
