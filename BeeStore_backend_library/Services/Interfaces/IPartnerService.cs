@@ -12,5 +12,6 @@ namespace BeeStore_Repository.Services.Interfaces
         Task<string> DeletePartner(int id);
 
         Task<List<PartnerRevenueDTO>> GetPartnerRevenue(int id, int? day, int? month, int?  year);
+        Task<PartnerProductDTO> GetPartnerTotalProduct(int id, int? warehouseId);
     }
 }
