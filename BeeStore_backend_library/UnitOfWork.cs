@@ -1,41 +1,69 @@
 ﻿using BeeStore_Repository.Data;
+using BeeStore_Repository.Interfaces;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Repositories;
 
 namespace BeeStore_Repository
 {
-    public class UnitOfWork : IDisposable
+    public interface IUnitOfWork : IDisposable
+    {
+        IGenericRepository<Employee> EmployeeRepo { get; }
+        IGenericRepository<OcopPartner> OcopPartnerRepo { get; }
+        IGenericRepository<Lot> LotRepo { get; }
+        IGenericRepository<Wallet> WalletRepo { get; }
+        IGenericRepository<OrderDetail> OrderDetailRepo { get; }
+        IGenericRepository<Batch> BatchRepo { get; }
+        IGenericRepository<BatchDelivery> BatchDeliveryRepo { get; }
+        IGenericRepository<Transaction> TransactionRepo { get; }
+        IGenericRepository<OrderFee> OrderFeeRepo { get; }
+        IGenericRepository<Vehicle> VehicleRepo { get; }
+        IGenericRepository<Role> RoleRepo { get; }
+        IGenericRepository<Picture> PictureRepo { get; }
+        IGenericRepository<Partner> PartnerRepo { get; }
+        IGenericRepository<Warehouse> WarehouseRepo { get; }
+        IGenericRepository<Inventory> InventoryRepo { get; }
+        IGenericRepository<Product> ProductRepo { get; }
+        IGenericRepository<ProductCategory> ProductCategoryRepo { get; }
+        IGenericRepository<WarehouseShipper> WarehouseShipperRepo { get; }
+        IGenericRepository<WarehouseStaff> WarehouseStaffRepo { get; }
+        IGenericRepository<Request> RequestRepo { get; }
+        IGenericRepository<Order> OrderRepo { get; }
+
+        Task SaveAsync();
+    }
+
+    public class UnitOfWork : IUnitOfWork
     {
         private BeeStoreDbContext _context;
-        private GenericRepository<Employee> employeeRepo;
-        private GenericRepository<OcopPartner> ocopPartnerRepo;
-        private GenericRepository<Lot> lotRepo;
-        private GenericRepository<Wallet> walletRepo;
-        private GenericRepository<OrderDetail> orderDetailRepo;
-        private GenericRepository<Batch> batchRepo;
-        private GenericRepository<BatchDelivery> batchDeliveryRepo;
-        private GenericRepository<Transaction> transactionRepo;
-        private GenericRepository<OrderFee> orderFeeRepo;
-        private GenericRepository<Vehicle> vehicleRepo;
+        private IGenericRepository<Employee> employeeRepo;
+        private IGenericRepository<OcopPartner> ocopPartnerRepo;
+        private IGenericRepository<Lot> lotRepo;
+        private IGenericRepository<Wallet> walletRepo;
+        private IGenericRepository<OrderDetail> orderDetailRepo;
+        private IGenericRepository<Batch> batchRepo;
+        private IGenericRepository<BatchDelivery> batchDeliveryRepo;
+        private IGenericRepository<Transaction> transactionRepo;
+        private IGenericRepository<OrderFee> orderFeeRepo;
+        private IGenericRepository<Vehicle> vehicleRepo;
 
-        private GenericRepository<Role> roleRepo;
-        private GenericRepository<Picture> pictureRepo;
-        private GenericRepository<Partner> partnerRepo;
-        private GenericRepository<Warehouse> warehouseRepo;
-        private GenericRepository<Inventory> inventoryRepo;
-        private GenericRepository<Product> productRepo;
-        private GenericRepository<ProductCategory> productCategoryRepo;
-        private GenericRepository<WarehouseShipper> warehouseShipperRepo;
-        private GenericRepository<WarehouseStaff> warehouseStaffRepo;
-        private GenericRepository<Request> requestRepo;
-        private GenericRepository<Order> orderRepo;
+        private IGenericRepository<Role> roleRepo;
+        private IGenericRepository<Picture> pictureRepo;
+        private IGenericRepository<Partner> partnerRepo;
+        private IGenericRepository<Warehouse> warehouseRepo;
+        private IGenericRepository<Inventory> inventoryRepo;
+        private IGenericRepository<Product> productRepo;
+        private IGenericRepository<ProductCategory> productCategoryRepo;
+        private IGenericRepository<WarehouseShipper> warehouseShipperRepo;
+        private IGenericRepository<WarehouseStaff> warehouseStaffRepo;
+        private IGenericRepository<Request> requestRepo;
+        private IGenericRepository<Order> orderRepo;
 
         public UnitOfWork(BeeStoreDbContext context)
         {
             _context = context;
         }
 
-        public GenericRepository<Batch> BatchRepo
+        public IGenericRepository<Batch> BatchRepo
         {
             get
             {
@@ -47,7 +75,7 @@ namespace BeeStore_Repository
             }
         }
 
-        public GenericRepository<Vehicle> VehicleRepo
+        public IGenericRepository<Vehicle> VehicleRepo
         {
             get
             {
@@ -59,7 +87,7 @@ namespace BeeStore_Repository
             }
         }
 
-        public GenericRepository<BatchDelivery> BatchDeliveryRepo
+        public IGenericRepository<BatchDelivery> BatchDeliveryRepo
         {
             get
             {
@@ -71,7 +99,7 @@ namespace BeeStore_Repository
             }
         }
 
-        public GenericRepository<OrderFee> OrderFeeRepo
+        public IGenericRepository<OrderFee> OrderFeeRepo
         {
             get
             {
@@ -83,7 +111,7 @@ namespace BeeStore_Repository
             }
         }
 
-        public GenericRepository<Transaction> TransactionRepo
+        public IGenericRepository<Transaction> TransactionRepo
         {
             get
             {
@@ -95,7 +123,7 @@ namespace BeeStore_Repository
             }
         }
 
-        public GenericRepository<Employee> EmployeeRepo
+        public IGenericRepository<Employee> EmployeeRepo
         {
             get
             {
@@ -108,7 +136,7 @@ namespace BeeStore_Repository
             }
         }
 
-        public GenericRepository<OrderDetail> OrderDetailRepo
+        public IGenericRepository<OrderDetail> OrderDetailRepo
         {
             get
             {
@@ -121,7 +149,7 @@ namespace BeeStore_Repository
             }
         }
 
-        public GenericRepository<OcopPartner> OcopPartnerRepo
+        public IGenericRepository<OcopPartner> OcopPartnerRepo
         {
             get
             {
@@ -134,7 +162,7 @@ namespace BeeStore_Repository
             }
         }
 
-        public GenericRepository<Lot> LotRepo
+        public IGenericRepository<Lot> LotRepo
         {
             get
             {
@@ -146,7 +174,7 @@ namespace BeeStore_Repository
             }
         }
 
-        public GenericRepository<Wallet> WalletRepo
+        public IGenericRepository<Wallet> WalletRepo
         {
             get
             {
@@ -159,7 +187,7 @@ namespace BeeStore_Repository
         }
 
 
-        public GenericRepository<Role> RoleRepo
+        public IGenericRepository<Role> RoleRepo
         {
             get
             {
@@ -171,7 +199,7 @@ namespace BeeStore_Repository
             }
         }
 
-        public GenericRepository<Picture> PictureRepo
+        public IGenericRepository<Picture> PictureRepo
         {
             get
             {
@@ -183,7 +211,7 @@ namespace BeeStore_Repository
             }
         }
 
-        public GenericRepository<Partner> PartnerRepo
+        public IGenericRepository<Partner> PartnerRepo
         {
             get
             {
@@ -195,7 +223,7 @@ namespace BeeStore_Repository
             }
         }
 
-        public GenericRepository<Warehouse> WarehouseRepo
+        public IGenericRepository<Warehouse> WarehouseRepo
         {
             get
             {
@@ -207,7 +235,7 @@ namespace BeeStore_Repository
             }
         }
 
-        public GenericRepository<Inventory> InventoryRepo
+        public IGenericRepository<Inventory> InventoryRepo
         {
             get
             {
@@ -219,7 +247,7 @@ namespace BeeStore_Repository
             }
         }
 
-        public GenericRepository<Product> ProductRepo
+        public IGenericRepository<Product> ProductRepo
         {
             get
             {
@@ -231,7 +259,7 @@ namespace BeeStore_Repository
             }
         }
 
-        public GenericRepository<ProductCategory> ProductCategoryRepo
+        public IGenericRepository<ProductCategory> ProductCategoryRepo
         {
             get
             {
@@ -245,7 +273,7 @@ namespace BeeStore_Repository
 
 
 
-        public GenericRepository<WarehouseShipper> WarehouseShipperRepo
+        public IGenericRepository<WarehouseShipper> WarehouseShipperRepo
         {
             get
             {
@@ -257,7 +285,7 @@ namespace BeeStore_Repository
             }
         }
 
-        public GenericRepository<WarehouseStaff> WarehouseStaffRepo
+        public IGenericRepository<WarehouseStaff> WarehouseStaffRepo
         {
             get
             {
@@ -269,7 +297,7 @@ namespace BeeStore_Repository
             }
         }
 
-        public GenericRepository<Request> RequestRepo
+        public IGenericRepository<Request> RequestRepo
         {
             get
             {
@@ -281,7 +309,7 @@ namespace BeeStore_Repository
             }
         }
 
-        public GenericRepository<Order> OrderRepo
+        public IGenericRepository<Order> OrderRepo
         {
             get
             {

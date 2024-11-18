@@ -14,10 +14,10 @@ namespace BeeStore_Repository.Services
 {
     public class PartnerService : IPartnerService
     {
-        private readonly UnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILoggerManager _logger;
-        public PartnerService(UnitOfWork unitOfWork, IMapper mapper, ILoggerManager logger)
+        public PartnerService(IUnitOfWork unitOfWork, IMapper mapper, ILoggerManager logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;

@@ -17,10 +17,10 @@ namespace BeeStore_Repository.Services
 
     public class PaymentService : IPaymentService
     {
-        private readonly UnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILoggerManager _logger;
-        public PaymentService(UnitOfWork unitOfWork, IMapper mapper, ILoggerManager logger)
+        public PaymentService(IUnitOfWork unitOfWork, IMapper mapper, ILoggerManager logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
