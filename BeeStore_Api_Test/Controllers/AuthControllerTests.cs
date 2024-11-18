@@ -77,7 +77,7 @@ namespace BeeStore_Api_Test.Controllers
             var signUpRequest = new UserSignUpRequestDTO
             {
                 Email = "newuser@example.com",
-                Password = "NewUserPassword",
+                //Password = "NewUserPassword",
                 FirstName = "John",
                 LastName = "Doe",
                 Phone = "1234567890",

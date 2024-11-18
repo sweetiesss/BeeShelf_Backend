@@ -18,10 +18,10 @@ namespace BeeStore_Repository.Services
 {
     public class OrderService : IOrderService
     {
-        private readonly UnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILoggerManager _logger;
-        public OrderService(UnitOfWork unitOfWork, IMapper mapper, ILoggerManager logger)
+        public OrderService(IUnitOfWork unitOfWork, IMapper mapper, ILoggerManager logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;

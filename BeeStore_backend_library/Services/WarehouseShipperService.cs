@@ -15,9 +15,9 @@ namespace BeeStore_Repository.Services
 {
     public class WarehouseShipperService : IWarehouseShipperService
     {
-        private readonly UnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        public WarehouseShipperService(UnitOfWork unitOfWork, IMapper mapper)
+        public WarehouseShipperService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;

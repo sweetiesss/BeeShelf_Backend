@@ -48,7 +48,7 @@ namespace BeeStore_Repository.Repositories
         //    return await _dbSet.SingleOrDefaultAsync(predicate);
         //}
 
-        public async Task<T> SingleOrDefaultAsync(
+        public virtual async Task<T> SingleOrDefaultAsync(
         Expression<Func<T, bool>> predicate,
         Func<IQueryable<T>, IQueryable<T>> includes = null)
         {

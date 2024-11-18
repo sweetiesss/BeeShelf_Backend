@@ -20,10 +20,10 @@ namespace BeeStore_Repository.Services
 {
     public class BatchService : IBatchService
     {
-        private readonly UnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILoggerManager _logger;
-        public BatchService(UnitOfWork unitOfWork, IMapper mapper, ILoggerManager logger)
+        public BatchService(IUnitOfWork unitOfWork, IMapper mapper, ILoggerManager logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;

@@ -15,10 +15,10 @@ namespace BeeStore_Repository.Services
 {
     public class LotService : ILotService
     {
-        private readonly UnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILoggerManager _logger;
-        public LotService(UnitOfWork unitOfWork, IMapper mapper, ILoggerManager logger)
+        public LotService(IUnitOfWork unitOfWork, IMapper mapper, ILoggerManager logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
