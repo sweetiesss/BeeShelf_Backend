@@ -17,10 +17,10 @@ namespace BeeStore_Repository.Services
 {
     public class RequestService : IRequestService
     {
-        private readonly UnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILoggerManager _logger;
-        public RequestService(UnitOfWork unitOfWork, IMapper mapper, ILoggerManager logger)
+        public RequestService(IUnitOfWork unitOfWork, IMapper mapper, ILoggerManager logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;

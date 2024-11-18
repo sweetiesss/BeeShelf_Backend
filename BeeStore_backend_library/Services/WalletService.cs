@@ -13,10 +13,10 @@ namespace BeeStore_Repository.Services
 {
     public class WalletService : IWalletService
     {
-        private readonly UnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILoggerManager _logger;
-        public WalletService(UnitOfWork unitOfWork, IMapper mapper, ILoggerManager logger)
+        public WalletService(IUnitOfWork unitOfWork, IMapper mapper, ILoggerManager logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
