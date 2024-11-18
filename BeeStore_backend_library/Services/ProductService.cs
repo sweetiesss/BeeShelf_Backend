@@ -16,10 +16,10 @@ namespace BeeStore_Repository.Services
 {
     public class ProductService : IProductService
     {
-        private readonly UnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILoggerManager _logger;
-        public ProductService(UnitOfWork unitOfWork, IMapper mapper, ILoggerManager logger)
+        public ProductService(IUnitOfWork unitOfWork, IMapper mapper, ILoggerManager logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;

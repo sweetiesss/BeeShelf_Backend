@@ -14,9 +14,9 @@ namespace BeeStore_Repository.Services
 {
     public class WarehouseStaffService : IWarehouseStaffService
     {
-        private readonly UnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        public WarehouseStaffService(UnitOfWork unitOfWork, IMapper mapper)
+        public WarehouseStaffService(IUnitOfWork unitOfWork, IMapper mapper)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;

@@ -22,10 +22,10 @@ namespace BeeStore_Repository.Services
 {
     public class VehicleService : IVehicleService
     {
-        private readonly UnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILoggerManager _logger;
-        public VehicleService(UnitOfWork unitOfWork, IMapper mapper, ILoggerManager logger)
+        public VehicleService(IUnitOfWork unitOfWork, IMapper mapper, ILoggerManager logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;

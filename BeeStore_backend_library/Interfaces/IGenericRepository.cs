@@ -5,7 +5,7 @@ namespace BeeStore_Repository.Interfaces
 {
     public interface IGenericRepository<T> where T : BaseEntity
     {
-        //Task<T> GetByIdAsync(int id);
+        Task<T> GetByIdAsync(int id);
         Task<List<T>> GetAllAsync();
         Task<IEnumerable<T>> GetFiltered(Expression<Func<T, bool>> filter);
         //Task<T> SingleOrDefaultAsync(Expression<Func<T, bool>> predicate);

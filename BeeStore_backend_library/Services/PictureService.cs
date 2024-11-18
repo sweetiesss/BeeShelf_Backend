@@ -12,12 +12,12 @@ namespace BeeStore_Repository.Services
         private readonly IAmazonS3 _s3Client;
         private readonly string _bucketName;
         private readonly string _s3Url;
-        private readonly UnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
 
 
 
 
-        public PictureService(IAmazonS3 s3Client, string bucketName, string s3Url, UnitOfWork unitOfWork)
+        public PictureService(IAmazonS3 s3Client, string bucketName, string s3Url, IUnitOfWork unitOfWork)
         {
             _s3Client = s3Client;
             _bucketName = bucketName;

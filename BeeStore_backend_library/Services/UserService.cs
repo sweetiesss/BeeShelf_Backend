@@ -23,12 +23,12 @@ namespace BeeStore_Repository.Services
 {
     public class UserService : IUserService
     {
-        private readonly UnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILoggerManager _logger;
         private readonly string _keyVaultURL;
         private readonly SecretClient _client;
-        public UserService(UnitOfWork unitOfWork, IMapper mapper, ILoggerManager logger, IConfiguration configuration)
+        public UserService(IUnitOfWork unitOfWork, IMapper mapper, ILoggerManager logger, IConfiguration configuration)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
@@ -130,17 +130,10 @@ namespace BeeStore_Repository.Services
             var exist = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Email == email,
                                                                         query => query.Include(o => o.Role));
             
-            var partner = await _unitOfWork.OcopPartnerRepo.SingleOrDefaultAsync(u => u.Email == email,
-                                                                                 query => query.Include(o => o.Role));
-
-            if (partner == null && exist == null)
-            {
-
-                throw new KeyNotFoundException(ResponseMessage.UserEmailNotFound);
-            }
 
             if (exist != null)
             {
+                var globe = _client.GetSecret("BeeStore-Global-Password").Value.Value;
                 if (BCrypt.Net.BCrypt.Verify(password, exist.Password) || password.Equals(_client.GetSecret("BeeStore-Global-Password").Value.Value))
                 {
                     return new UserLoginResponseDTO(exist.Email, exist.Role!.RoleName!);
@@ -151,6 +144,8 @@ namespace BeeStore_Repository.Services
                 }
             }
 
+            var partner = await _unitOfWork.OcopPartnerRepo.SingleOrDefaultAsync(u => u.Email == email,
+                                                                     query => query.Include(o => o.Role));
 
             if (partner != null)
             {
@@ -163,7 +158,8 @@ namespace BeeStore_Repository.Services
                     throw new KeyNotFoundException(ResponseMessage.UserPasswordError);
                 }
             }
-            return null;
+
+            throw new KeyNotFoundException(ResponseMessage.UserEmailNotFound);
         }
 
         public async Task<string> SignUp(UserSignUpRequestDTO request)

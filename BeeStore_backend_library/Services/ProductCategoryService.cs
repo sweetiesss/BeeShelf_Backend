@@ -11,10 +11,10 @@ namespace BeeStore_Repository.Services
 {
     public class ProductCategoryService : IProductCategoryService
     {
-        private readonly UnitOfWork _unitOfWork;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILoggerManager _logger;
-        public ProductCategoryService(UnitOfWork unitOfWork, IMapper mapper, ILoggerManager logger)
+        public ProductCategoryService(IUnitOfWork unitOfWork, IMapper mapper, ILoggerManager logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
