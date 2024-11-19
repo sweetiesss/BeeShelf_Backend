@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BeeStore_Repository.DTO.VehicleDTOs
+﻿namespace BeeStore_Repository.DTO.VehicleDTOs
 {
     public class VehicleListDTO
     {
@@ -21,7 +15,7 @@ namespace BeeStore_Repository.DTO.VehicleDTOs
         public string? Status { get; set; }
 
         public int? AssignedDriverId { get; set; }
-        public string? AssignedDriverEmail {  get; set; }
+        public string? AssignedDriverEmail { get; set; }
         public string? AssignedDriverName { get; set; }
     }
 }

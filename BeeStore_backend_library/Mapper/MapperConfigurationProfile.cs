@@ -18,7 +18,6 @@ using BeeStore_Repository.DTO.WarehouseStaffDTOs;
 using BeeStore_Repository.Mapper.CustomResolver;
 using BeeStore_Repository.Models;
 using Microsoft.EntityFrameworkCore.Internal;
-using System.Linq.Expressions;
 
 namespace BeeStore_Repository.Mapper
 {
@@ -109,7 +108,7 @@ namespace BeeStore_Repository.Mapper
                 .ForMember(dest => dest.AssignedDriverEmail, opt => opt.MapFrom(src => src.AssignedDriver.Email))
                 .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<VehicleCreateDTO, Vehicle>();
-            
+
 
 
             CreateMap<WarehouseShipper, WarehouseShipperListDTO>()
@@ -145,7 +144,7 @@ namespace BeeStore_Repository.Mapper
             CreateMap<OrderCreateDTO, Order>();
             CreateMap<OrderUpdateDTO, Order>()
                 .ForMember(dest => dest.OrderDetails, opt => opt.MapFrom(src => src.OrderDetails));
-            
+
             CreateMap<OrderDetailCreateDTO, OrderDetail>();
 
             CreateMap<OrderUpdateDTO, List<OrderDetail>>()

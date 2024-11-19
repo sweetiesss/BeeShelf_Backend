@@ -4,9 +4,7 @@ using BeeStore_Repository.Enums.SortBy;
 using BeeStore_Repository.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Client;
 using System.ComponentModel;
-using System.Runtime.CompilerServices;
 
 namespace BeeStore_Api.Controllers
 {
@@ -21,11 +19,11 @@ namespace BeeStore_Api.Controllers
 
         [Route("get-vehicles")]
         [HttpGet]
-        [Authorize(Roles ="Admin,Manager,Staff")]
-        public async Task<IActionResult> GetVehicles([FromQuery]VehicleStatus? status,
-                                                     [FromQuery]VehicleType? type,
-                                                     [FromQuery]VehicleSortBy? sortBy,
-                                                     [FromQuery][DefaultValue(false)]bool descending,
+        [Authorize(Roles = "Admin,Manager,Staff")]
+        public async Task<IActionResult> GetVehicles([FromQuery] VehicleStatus? status,
+                                                     [FromQuery] VehicleType? type,
+                                                     [FromQuery] VehicleSortBy? sortBy,
+                                                     [FromQuery][DefaultValue(false)] bool descending,
                                                      [FromQuery][DefaultValue(0)] int pageIndex,
                                                      [FromQuery][DefaultValue(10)] int pageSize)
         {
@@ -38,14 +36,14 @@ namespace BeeStore_Api.Controllers
         [Authorize(Roles = "Admin,Manager,Staff")]
         public async Task<IActionResult> GetVehicle(int id)
         {
-            var result = await _vehicleService.GetVehicle(id); 
+            var result = await _vehicleService.GetVehicle(id);
             return Ok(result);
         }
 
         [Route("create-vehicle")]
         [HttpPost]
         [Authorize(Roles = "Admin,Manager")]
-        public async Task<IActionResult> CreateVehicle([FromQuery]VehicleType? type, VehicleCreateDTO request)
+        public async Task<IActionResult> CreateVehicle([FromQuery] VehicleType? type, VehicleCreateDTO request)
         {
             var result = await _vehicleService.CreateVehicle(type, request);
             return Ok(result);
@@ -72,7 +70,7 @@ namespace BeeStore_Api.Controllers
         [Route("update-vehicle-status/{id}")]
         [HttpPut]
         [Authorize(Roles = "Admin,Manager,Staff")]
-        public async Task<IActionResult> UpdateVehicleStatus(int id, [FromQuery]VehicleStatus? status)
+        public async Task<IActionResult> UpdateVehicleStatus(int id, [FromQuery] VehicleStatus? status)
         {
             var result = await _vehicleService.UpdateVehicleStatus(id, status);
             return Ok(result);

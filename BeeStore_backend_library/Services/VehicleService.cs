@@ -1,9 +1,7 @@
-﻿using Amazon.S3.Model.Internal.MarshallTransformations;
-using AutoMapper;
+﻿using AutoMapper;
 using BeeStore_Repository.DTO;
 using BeeStore_Repository.DTO.VehicleDTOs;
 using BeeStore_Repository.Enums;
-using BeeStore_Repository.Enums.FilterBy;
 using BeeStore_Repository.Enums.SortBy;
 using BeeStore_Repository.Logger;
 using BeeStore_Repository.Logger.GlobalExceptionHandler.CustomException;
@@ -11,12 +9,6 @@ using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ZstdSharp.Unsafe;
 
 namespace BeeStore_Repository.Services
 {
@@ -91,7 +83,7 @@ namespace BeeStore_Repository.Services
             return ResponseMessage.Success;
 
         }
-    
+
 
         public async Task<string> DeleteVehicle(int id)
         {
@@ -118,7 +110,7 @@ namespace BeeStore_Repository.Services
 
         public async Task<Pagination<VehicleListDTO>> GetVehicles(VehicleStatus? status, VehicleType? type, VehicleSortBy? sortCriteria, bool descending, int pageIndex, int pageSize)
         {
- 
+
 
             string? vestatus = status switch
             {
@@ -136,7 +128,7 @@ namespace BeeStore_Repository.Services
                 _ => null
             };
 
-            
+
 
             string? sortBy = sortCriteria switch
             {
@@ -171,7 +163,7 @@ namespace BeeStore_Repository.Services
             {
                 throw new DuplicateException(ResponseMessage.VehicleLicensePlateDuplicate);
             }
-            
+
 
             string VeType = string.Empty;
             switch (type)
@@ -216,7 +208,7 @@ namespace BeeStore_Repository.Services
                 VehicleStatus.Available => Constants.VehicleStatus.Available,
                 _ => null
             };
-            if(veStat == null)
+            if (veStat == null)
             {
                 throw new BadHttpRequestException(ResponseMessage.BadRequest);
             }

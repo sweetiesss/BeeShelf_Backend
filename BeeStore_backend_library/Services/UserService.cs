@@ -3,7 +3,6 @@ using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using BeeStore_Repository.Data;
 using BeeStore_Repository.DTO;
-using BeeStore_Repository.DTO.PartnerDTOs;
 using BeeStore_Repository.DTO.UserDTOs;
 using BeeStore_Repository.Enums;
 using BeeStore_Repository.Enums.SortBy;
@@ -129,8 +128,6 @@ namespace BeeStore_Repository.Services
         {
             var exist = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Email == email,
                                                                         query => query.Include(o => o.Role));
-            
-
             if (exist != null)
             {
                 var globe = _client.GetSecret("BeeStore-Global-Password").Value.Value;
@@ -146,7 +143,6 @@ namespace BeeStore_Repository.Services
 
             var partner = await _unitOfWork.OcopPartnerRepo.SingleOrDefaultAsync(u => u.Email == email,
                                                                      query => query.Include(o => o.Role));
-
             if (partner != null)
             {
                 if (BCrypt.Net.BCrypt.Verify(password, partner.Password))
@@ -169,7 +165,7 @@ namespace BeeStore_Repository.Services
             {
                 throw new DuplicateException(ResponseMessage.UserEmailDuplicate);
             }
-            
+
             var result = _mapper.Map<OcopPartner>(request);
             result.RoleId = 2;
             string generatePassword = GeneratePassword(Constants.Smtp.DEFAULT_PASSWORD_LENGTH);
@@ -223,7 +219,7 @@ namespace BeeStore_Repository.Services
             return ResponseMessage.Success;
         }
 
-        
+
 
 
         private void PasswordMailSender(string targetMail, string userGeneratedPassword)

@@ -26,7 +26,7 @@
             public const string Repair = "Repair";
         }
 
-        public static class PaymentStatus 
+        public static class PaymentStatus
         {
             public const string Paid = "PAID";
             public const string Pending = "PENDING";

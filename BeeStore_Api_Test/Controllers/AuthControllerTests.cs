@@ -1,16 +1,9 @@
 ﻿using BeeStore_Api.Controllers;
 using BeeStore_Repository.DTO.UserDTOs;
-using BeeStore_Repository.Logger.GlobalExceptionHandler.CustomException;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Xunit;
 
 namespace BeeStore_Api_Test.Controllers
 {

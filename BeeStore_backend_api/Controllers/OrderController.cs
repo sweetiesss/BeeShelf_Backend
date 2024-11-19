@@ -1,6 +1,6 @@
 ﻿using BeeStore_Repository.DTO.OrderDTOs;
-using BeeStore_Repository.Enums.SortBy;
 using BeeStore_Repository.Enums;
+using BeeStore_Repository.Enums.SortBy;
 using BeeStore_Repository.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -47,7 +47,7 @@ namespace BeeStore_Api.Controllers
         [Route("get-shipper-orders/{userId}")]
         [Authorize(Roles = "Admin,Manager,Shipper")]
         [HttpGet]
-        public async Task<IActionResult> GetShipperOrderList(int userId, 
+        public async Task<IActionResult> GetShipperOrderList(int userId,
                                                             [FromQuery] OrderStatus? filterByStatus,
                                                             [FromQuery] OrderSortBy? sortBy,
                                                             [FromQuery][DefaultValue(false)] bool descending,

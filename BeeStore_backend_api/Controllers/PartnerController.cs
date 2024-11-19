@@ -21,7 +21,7 @@ namespace BeeStore_Api.Controllers
         [HttpGet]
         [Authorize(Roles = "Admin,Manager,Staff")]
         public async Task<IActionResult> GetPartnerList([FromQuery] string? search,
-                                                        [FromQuery]SortBy? sortBy,
+                                                        [FromQuery] SortBy? sortBy,
                                                         [FromQuery][DefaultValue(false)] bool descending,
                                                         [FromQuery][DefaultValue(0)] int pageIndex,
                                                         [FromQuery][DefaultValue(10)] int pageSize)

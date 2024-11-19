@@ -1,14 +1,13 @@
 ﻿using AutoMapper;
 using BeeStore_Repository.DTO;
 using BeeStore_Repository.DTO.InventoryDTOs;
+using BeeStore_Repository.Enums.FilterBy;
 using BeeStore_Repository.Enums.SortBy;
-using BeeStore_Repository.Enums;
 using BeeStore_Repository.Logger;
 using BeeStore_Repository.Logger.GlobalExceptionHandler.CustomException;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
-using BeeStore_Repository.Enums.FilterBy;
 using Microsoft.AspNetCore.Http;
 using System.Linq.Expressions;
 
@@ -105,7 +104,7 @@ namespace BeeStore_Repository.Services
             //        throw new ApplicationException(ResponseMessage.InventoryNameDuplicate);
             // }
 
-            if(request.Name != null && !request.Name.Equals(Constants.DefaultString.String))
+            if (request.Name != null && !request.Name.Equals(Constants.DefaultString.String))
             {//uncomment these after you make changes to database
                 //exist.Name = request.Name;
             }
@@ -133,7 +132,7 @@ namespace BeeStore_Repository.Services
                 throw new BadHttpRequestException(ResponseMessage.BadRequest);
             }
             Expression<Func<Inventory, bool>> filterExpression = u =>
-            (userId == null || u.OcopPartnerId.Equals(userId)) && 
+            (userId == null || u.OcopPartnerId.Equals(userId)) &&
             (filterBy == null || (filterBy == InventoryFilter.WarehouseId && u.WarehouseId.Equals(Int32.Parse(filterQuery!))));
 
 
@@ -147,7 +146,7 @@ namespace BeeStore_Repository.Services
                 _ => null
             };
 
-            
+
 
             var list = await _unitOfWork.InventoryRepo.GetListAsync(
                 filter: filterExpression,

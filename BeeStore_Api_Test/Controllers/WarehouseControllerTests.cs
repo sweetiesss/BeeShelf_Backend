@@ -8,11 +8,6 @@ using BeeStore_Repository.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Caching.Memory;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BeeStore_Api_Test.Controllers
 {
@@ -97,7 +92,7 @@ namespace BeeStore_Api_Test.Controllers
         [Fact]
         public async Task AddWarehouseShipper_ShouldReturnAddedShippers()
         {
-            var newShippers = new List<WarehouseShipperCreateDTO> ();
+            var newShippers = new List<WarehouseShipperCreateDTO>();
             _mockWarehouseShipperService
                 .Setup(s => s.AddShipperToWarehouse(newShippers))
                 .ReturnsAsync(ResponseMessage.Success);

@@ -5,11 +5,6 @@ using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BeeStore_Api_Test.Controllers
 {
@@ -27,7 +22,7 @@ namespace BeeStore_Api_Test.Controllers
         [Fact]
         public async Task GetProductList_ShouldReturnProductList()
         {
-            var products = new Pagination<ProductListDTO> ();
+            var products = new Pagination<ProductListDTO>();
             _mockProductService
                 .Setup(s => s.GetProductList(null, null, null, null, false, 0, 10))
                 .ReturnsAsync(products);
@@ -43,7 +38,7 @@ namespace BeeStore_Api_Test.Controllers
         public async Task GetProductListById_ShouldReturnProductListByUserId()
         {
             var userId = 1;
-            var products = new Pagination<ProductListDTO> ();
+            var products = new Pagination<ProductListDTO>();
             _mockProductService
                 .Setup(s => s.GetProductListById(userId, null, null, null, null, false, 0, 10))
                 .ReturnsAsync(products);

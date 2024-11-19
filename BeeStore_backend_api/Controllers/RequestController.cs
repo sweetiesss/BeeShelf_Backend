@@ -15,7 +15,7 @@ namespace BeeStore_Api.Controllers
         {
             _requestService = requestService;
         }
-        
+
         [Route("get-requests")]
         [HttpGet]
         [Authorize(Roles = "Admin,Manager,Staff")]
@@ -25,7 +25,7 @@ namespace BeeStore_Api.Controllers
                                                     [FromQuery][DefaultValue(0)] int pageIndex,
                                                     [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _requestService.GetRequestList(status,descending, warehouseId,pageIndex, pageSize);
+            var result = await _requestService.GetRequestList(status, descending, warehouseId, pageIndex, pageSize);
             return Ok(result);
         }
 
@@ -38,7 +38,7 @@ namespace BeeStore_Api.Controllers
                                                     [FromQuery][DefaultValue(0)] int pageIndex,
                                                     [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _requestService.GetRequestList(userId,status, descending, pageIndex, pageSize);
+            var result = await _requestService.GetRequestList(userId, status, descending, pageIndex, pageSize);
             return Ok(result);
         }
 
@@ -46,10 +46,10 @@ namespace BeeStore_Api.Controllers
         [HttpPost]
         [Authorize(Roles = "Partner")]
         public async Task<IActionResult> CreateRequest(RequestType type,
-                                                       [DefaultValue(false)] bool send, 
+                                                       [DefaultValue(false)] bool send,
                                                        RequestCreateDTO request)
         {
-            var result = await _requestService.CreateRequest(type,send, request);
+            var result = await _requestService.CreateRequest(type, send, request);
             return Ok(result);
         }
 

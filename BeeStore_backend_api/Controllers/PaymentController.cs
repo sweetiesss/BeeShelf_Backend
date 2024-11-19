@@ -19,9 +19,9 @@ namespace BeeStore_Api.Controllers
         [AllowAnonymous]
         [Route("create-qrcode")]
         [HttpPost]
-        public async Task<IActionResult> CreatePayment([FromQuery]CoinPackValue options, 
-                                                       [FromQuery][DefaultValue(null)]string? custom_amount, 
-                                                       [FromBody]PaymentRequestDTO paymentRequestDTO)
+        public async Task<IActionResult> CreatePayment([FromQuery] CoinPackValue options,
+                                                       [FromQuery][DefaultValue(null)] string? custom_amount,
+                                                       [FromBody] PaymentRequestDTO paymentRequestDTO)
         {
             var result = await _paymentService.CreateQrCode(options, custom_amount, paymentRequestDTO);
             return Ok(result);
