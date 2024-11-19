@@ -1,5 +1,4 @@
 ﻿using BeeStore_Repository.DTO.PackageDTOs;
-using BeeStore_Repository.Models;
 using System.Text.Json.Serialization;
 
 namespace BeeStore_Repository.DTO.RequestDTOs

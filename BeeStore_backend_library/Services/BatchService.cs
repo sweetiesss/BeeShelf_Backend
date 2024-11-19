@@ -1,20 +1,13 @@
 ﻿using AutoMapper;
 using BeeStore_Repository.DTO;
 using BeeStore_Repository.DTO.Batch;
-using BeeStore_Repository.DTO.PackageDTOs;
 using BeeStore_Repository.Enums.FilterBy;
-using BeeStore_Repository.Enums.SortBy;
 using BeeStore_Repository.Logger;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
 using Microsoft.AspNetCore.Http;
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Linq.Expressions;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BeeStore_Repository.Services
 {
@@ -60,15 +53,15 @@ namespace BeeStore_Repository.Services
         public async Task<string> UpdateBatch(int id, BatchCreateDTO request)
         {
             var batch = await _unitOfWork.BatchRepo.SingleOrDefaultAsync(u => u.Id.Equals(id));
-            if(batch == null)
+            if (batch == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.BatchIdNotFound);
             }
-            if(batch.Status != Constants.Status.Pending)
+            if (batch.Status != Constants.Status.Pending)
             {
                 throw new ApplicationException(ResponseMessage.BatchStatusNotPending);
             }
-            foreach(var o in batch.Orders)
+            foreach (var o in batch.Orders)
             {
                 o.BatchId = null;
                 await _unitOfWork.SaveAsync();
@@ -122,11 +115,11 @@ namespace BeeStore_Repository.Services
                 throw new KeyNotFoundException(ResponseMessage.BatchIdNotFound);
             }
             var shipper = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id.Equals(shipperId));
-            if(shipper==null)
+            if (shipper == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
             }
-            if(shipper.RoleId != 4)
+            if (shipper.RoleId != 4)
             {
                 throw new ApplicationException(ResponseMessage.UserRoleNotShipperError);
             }
@@ -138,7 +131,7 @@ namespace BeeStore_Repository.Services
                 DeliveryStartDate = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond),
                 BatchId = batch.Id,
                 DeliverBy = shipper.Id
-        });
+            });
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
         }

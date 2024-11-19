@@ -1,12 +1,10 @@
-﻿using System.Text.Json.Serialization;
-
-namespace BeeStore_Repository.DTO.OrderDTOs
+﻿namespace BeeStore_Repository.DTO.OrderDTOs
 {
     public class OrderListDTO
     {
 
         public int Id { get; set; }
-        public string? partner_email {  get; set; }
+        public string? partner_email { get; set; }
 
         public string? Status { get; set; }
 
@@ -53,11 +51,11 @@ namespace BeeStore_Repository.DTO.OrderDTOs
         public int Id { get; set; }
 
         public int? LotId { get; set; }
-        public string ProductName {  get; set; }
+        public string ProductName { get; set; }
 
         public int? ProductPrice { get; set; }
 
         public int? ProductAmount { get; set; }
-        public string? ProductImage {  get; set; }
+        public string? ProductImage { get; set; }
     }
 }

@@ -13,7 +13,7 @@ namespace BeeStore_Repository.Interfaces
         Expression<Func<T, bool>> predicate,
         Func<IQueryable<T>, IQueryable<T>> includes = null);
 
-       Task<bool> AnyAsync(Expression<Func<T, bool>> filter);
+        Task<bool> AnyAsync(Expression<Func<T, bool>> filter);
 
         Task<List<T>> GetQueryable(Func<IQueryable<T>, IQueryable<T>> includes = null);
 
@@ -27,10 +27,10 @@ namespace BeeStore_Repository.Interfaces
         Task<int> CountAsync(Expression<Func<T, bool>> filter = null);
         Task<T> FirstOrDefaultAsync(Expression<Func<T, bool>> predicate);
 
-        Task<List<T>> GetListAsync(Expression<Func<T, bool>> filter = null, 
+        Task<List<T>> GetListAsync(Expression<Func<T, bool>> filter = null,
                                                       Func<IQueryable<T>, IQueryable<T>> includes = null,
                                                       string sortBy = null,
-                                                      bool descending = false, 
+                                                      bool descending = false,
                                                       string searchTerm = null,
                                                       params Expression<Func<T, string>>[] searchProperties);
         //use in generic only

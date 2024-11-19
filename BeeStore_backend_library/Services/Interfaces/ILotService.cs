@@ -7,8 +7,8 @@ namespace BeeStore_Repository.Services.Interfaces
 {
     public interface ILotService
     {
-        Task<Pagination<LotListDTO>> GetAllLots(string search, LotFilter? filterBy, string? filterQuery, 
-                                                        LotSortBy? sortBy, bool descending, 
+        Task<Pagination<LotListDTO>> GetAllLots(string search, LotFilter? filterBy, string? filterQuery,
+                                                        LotSortBy? sortBy, bool descending,
                                                         int pageIndex, int pageSize);
         Task<Pagination<LotListDTO>> GetLotsByUserId(int parnerId, string search, LotFilter? filterBy, string? filterQuery,
                                                         LotSortBy? sortBy, bool descending,

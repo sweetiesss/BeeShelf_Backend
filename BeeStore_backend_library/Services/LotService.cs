@@ -8,7 +8,6 @@ using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
 using System.Linq.Expressions;
 
 namespace BeeStore_Repository.Services
@@ -43,7 +42,7 @@ namespace BeeStore_Repository.Services
 
 
         //    var result = _mapper.Map<Lot>(request);
-            
+
         //    result.ExpirationDate = DateTime.Now.AddDays(result.Product.ProductCategory.ExpireIn!.Value);
         //    await _unitOfWork.LotRepo.AddAsync(result);
         //    await _unitOfWork.SaveAsync();
@@ -83,7 +82,8 @@ namespace BeeStore_Repository.Services
             }
 
             Expression<Func<Lot, bool>> filterExpression = null;
-            switch (filterBy){
+            switch (filterBy)
+            {
                 case LotFilter.ProductId: filterExpression = u => u.ProductId.Equals(Int32.Parse(filterQuery!)); break;
                 case LotFilter.InventoryId: filterExpression = u => u.InventoryId.Equals(Int32.Parse(filterQuery!)); break;
                 default: filterExpression = null; break;
@@ -107,7 +107,7 @@ namespace BeeStore_Repository.Services
                 searchTerm: search,
                 searchProperties: new Expression<Func<Lot, string>>[] { o => o.LotNumber, o => o.Name }
                 );
-         
+
             var result = _mapper.Map<List<LotListDTO>>(list);
             return (await ListPagination<LotListDTO>.PaginateList(result, pageIndex, pageSize));
         }
@@ -121,7 +121,7 @@ namespace BeeStore_Repository.Services
                 throw new BadHttpRequestException(ResponseMessage.BadRequest);
             }
 
-            if(!await _unitOfWork.OcopPartnerRepo.AnyAsync(u => u.Id.Equals(partnerId)))
+            if (!await _unitOfWork.OcopPartnerRepo.AnyAsync(u => u.Id.Equals(partnerId)))
             {
                 throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
             }
@@ -129,13 +129,16 @@ namespace BeeStore_Repository.Services
             Expression<Func<Lot, bool>> filterExpression = null;
             switch (filterBy)
             {
-                case LotFilter.ProductId: filterExpression = u => u.ProductId.Equals(Int32.Parse(filterQuery!))
+                case LotFilter.ProductId:
+                    filterExpression = u => u.ProductId.Equals(Int32.Parse(filterQuery!))
                                                                && u.Inventory.OcopPartnerId.Equals(partnerId)
                                                                && u.Requests.Any(u => u.Status.Equals(Constants.Status.Completed)); break;
-                case LotFilter.InventoryId: filterExpression = u => u.InventoryId.Equals(Int32.Parse(filterQuery!))
+                case LotFilter.InventoryId:
+                    filterExpression = u => u.InventoryId.Equals(Int32.Parse(filterQuery!))
                                                                && u.Inventory.OcopPartnerId.Equals(partnerId)
                                                                && u.Requests.Any(u => u.Status.Equals(Constants.Status.Completed)); break;
-                default: filterExpression = u => u.Inventory.OcopPartnerId.Equals(partnerId) 
+                default:
+                    filterExpression = u => u.Inventory.OcopPartnerId.Equals(partnerId)
                                               && u.Requests.Any(u => u.Status.Equals(Constants.Status.Completed)); break;
             }
 

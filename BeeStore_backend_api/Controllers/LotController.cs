@@ -1,5 +1,4 @@
-﻿using BeeStore_Repository.DTO.PackageDTOs;
-using BeeStore_Repository.Enums.FilterBy;
+﻿using BeeStore_Repository.Enums.FilterBy;
 using BeeStore_Repository.Enums.SortBy;
 using BeeStore_Repository.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -57,7 +56,7 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
-        
+
         [Route("delete-lot/{id}")]
         [Authorize(Roles = "Partner")]
         [HttpDelete]
