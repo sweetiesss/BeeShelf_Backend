@@ -19,24 +19,33 @@ namespace BeeStore_Api.Controllers
             _memoryCache = memoryCache;
         }
 
+        [Route("get-categories")]
+        [HttpGet]
+        [Authorize(Roles = "Admin,Manager,Partner")]
+        public async Task<IActionResult> GetCategoriesList([FromQuery][DefaultValue(0)] int pageIndex,
+                                                                [FromQuery][DefaultValue(10)] int pageSize)
+        {
+            var result = await _productCategoryService.GetCategoryList(pageIndex, pageSize);
+            return Ok(result);
+        }
+
+        [Route("get-ocop-categories")]
+        [HttpGet]
+        [Authorize(Roles = "Admin,Manager,Partner")]
+        public async Task<IActionResult> GetOcopCategories([FromQuery][DefaultValue(0)] int pageIndex,
+                                                                [FromQuery][DefaultValue(10)] int pageSize)
+        {
+            var result = await _productCategoryService.GetOCOPCategoryListDTO(pageIndex, pageSize);
+            return Ok(result);
+        }
+
         [Route("get-product-categories")]
         [HttpGet]
         [Authorize(Roles = "Admin,Manager,Partner")]
         public async Task<IActionResult> GetProductCategoryList([FromQuery][DefaultValue(0)] int pageIndex,
                                                                 [FromQuery][DefaultValue(10)] int pageSize)
         {
-            if (!_memoryCache.TryGetValue(cacheKey, out var result))
-            {
-                result = await _productCategoryService.GetProductCategoryList(pageIndex, pageSize);
-
-                var cacheEntryOptions = new MemoryCacheEntryOptions()
-                    .SetSlidingExpiration(TimeSpan.FromMinutes(30))
-                    .SetAbsoluteExpiration(TimeSpan.FromHours(1));
-
-                _memoryCache.Set(cacheKey, result, cacheEntryOptions);
-            }
-
-
+            var result = await _productCategoryService.GetProductCategoryList(pageIndex, pageSize);
             return Ok(result);
         }
 

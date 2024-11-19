@@ -15,5 +15,8 @@ namespace BeeStore_Repository.Services.Interfaces
         Task<string> CreateEmployee(EmployeeCreateRequest user);
         Task<string> UpdateEmployee(EmployeeUpdateRequest user);
         Task<string> DeleteEmployee(int id);
+
+        Task<string> ForgotPassword(string email);
+        Task<string> ResetPassword(string token, string newPassword);
     }
 }

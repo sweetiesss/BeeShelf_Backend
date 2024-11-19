@@ -1,4 +1,7 @@
-﻿namespace BeeStore_Repository.Models;
+﻿using System;
+using System.Collections.Generic;
+
+namespace BeeStore_Repository.Models;
 
 public partial class Order : BaseEntity
 {
@@ -21,6 +24,8 @@ public partial class Order : BaseEntity
     public string? ReceiverPhone { get; set; }
 
     public string? ReceiverAddress { get; set; }
+
+    public decimal? Distance { get; set; }
 
     public decimal? TotalPrice { get; set; }
 
