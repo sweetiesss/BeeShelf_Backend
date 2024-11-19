@@ -61,10 +61,6 @@ public partial class BeeStoreDbContext : DbContext
 
     public virtual DbSet<WarehouseStaff> WarehouseStaffs { get; set; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see http://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseMySql("server=beestoredatabase.cdciasgw89n8.ap-northeast-1.rds.amazonaws.com;port=3306;user=user;password=baijainonsoaunguqnwunqwumdoaj;database=BeestoreDb", Microsoft.EntityFrameworkCore.ServerVersion.Parse("8.0.35-mysql"));
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder
@@ -139,16 +135,23 @@ public partial class BeeStoreDbContext : DbContext
 
             entity.ToTable("Category");
 
+            entity.HasIndex(e => e.OcopCategoryId, "ocop_category_id");
+
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.IsDeleted)
                 .HasDefaultValueSql("b'0'")
                 .HasColumnType("bit(1)")
                 .HasColumnName("is_deleted");
+            entity.Property(e => e.OcopCategoryId).HasColumnName("ocop_category_id");
             entity.Property(e => e.Type)
                 .HasMaxLength(25)
                 .HasColumnName("type")
                 .UseCollation("utf8mb3_general_ci")
                 .HasCharSet("utf8mb3");
+
+            entity.HasOne(d => d.OcopCategory).WithMany(p => p.Categories)
+                .HasForeignKey(d => d.OcopCategoryId)
+                .HasConstraintName("Category_ibfk_1");
         });
 
         modelBuilder.Entity<DeliveryZone>(entity =>
@@ -190,7 +193,7 @@ public partial class BeeStoreDbContext : DbContext
                 .HasColumnType("datetime")
                 .HasColumnName("create_date");
             entity.Property(e => e.Email)
-                .HasMaxLength(25)
+                .HasMaxLength(50)
                 .HasColumnName("email");
             entity.Property(e => e.FirstName)
                 .HasMaxLength(25)
@@ -213,7 +216,7 @@ public partial class BeeStoreDbContext : DbContext
                 .HasMaxLength(11)
                 .HasColumnName("phone");
             entity.Property(e => e.PictureLink)
-                .HasMaxLength(100)
+                .HasMaxLength(255)
                 .HasColumnName("picture_link");
             entity.Property(e => e.RoleId).HasColumnName("role_id");
             entity.Property(e => e.Setting)
@@ -404,7 +407,7 @@ public partial class BeeStoreDbContext : DbContext
                 .HasColumnType("datetime")
                 .HasColumnName("create_date");
             entity.Property(e => e.Email)
-                .HasMaxLength(25)
+                .HasMaxLength(50)
                 .HasColumnName("email");
             entity.Property(e => e.FirstName)
                 .HasMaxLength(25)
@@ -428,7 +431,7 @@ public partial class BeeStoreDbContext : DbContext
                 .HasMaxLength(11)
                 .HasColumnName("phone");
             entity.Property(e => e.PictureLink)
-                .HasMaxLength(100)
+                .HasMaxLength(255)
                 .HasColumnName("picture_link");
             entity.Property(e => e.ProvinceId).HasColumnName("province_id");
             entity.Property(e => e.RoleId).HasColumnName("role_id");
@@ -492,6 +495,9 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.DeliverStartDate)
                 .HasColumnType("datetime")
                 .HasColumnName("deliver_start_date");
+            entity.Property(e => e.Distance)
+                .HasPrecision(10, 2)
+                .HasColumnName("distance");
             entity.Property(e => e.IsDeleted)
                 .HasDefaultValueSql("b'0'")
                 .HasColumnType("bit(1)")
@@ -502,7 +508,7 @@ public partial class BeeStoreDbContext : DbContext
                 .HasColumnName("pick_date");
             entity.Property(e => e.PickStaffId).HasColumnName("pick_staff_id");
             entity.Property(e => e.PictureLink)
-                .HasMaxLength(50)
+                .HasMaxLength(255)
                 .HasColumnName("picture_link");
             entity.Property(e => e.ReceiverAddress)
                 .HasMaxLength(50)
@@ -650,7 +656,7 @@ public partial class BeeStoreDbContext : DbContext
                 .UseCollation("utf8mb3_general_ci")
                 .HasCharSet("utf8mb3");
             entity.Property(e => e.PictureLink)
-                .HasMaxLength(100)
+                .HasMaxLength(255)
                 .HasColumnName("picture_link");
             entity.Property(e => e.Price)
                 .HasPrecision(10, 2)
@@ -856,6 +862,8 @@ public partial class BeeStoreDbContext : DbContext
 
             entity.HasIndex(e => e.AssignedDriverId, "assigned_driver_id");
 
+            entity.HasIndex(e => e.WarehouseId, "warehouse_id");
+
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.AssignedDriverId).HasColumnName("assigned_driver_id");
             entity.Property(e => e.Capacity).HasColumnName("capacity");
@@ -875,10 +883,15 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.Type)
                 .HasMaxLength(10)
                 .HasColumnName("type");
+            entity.Property(e => e.WarehouseId).HasColumnName("warehouse_id");
 
             entity.HasOne(d => d.AssignedDriver).WithMany(p => p.Vehicles)
                 .HasForeignKey(d => d.AssignedDriverId)
                 .HasConstraintName("Vehicle_ibfk_1");
+
+            entity.HasOne(d => d.Warehouse).WithMany(p => p.Vehicles)
+                .HasForeignKey(d => d.WarehouseId)
+                .HasConstraintName("Vehicle_ibfk_2");
         });
 
         modelBuilder.Entity<Wallet>(entity =>

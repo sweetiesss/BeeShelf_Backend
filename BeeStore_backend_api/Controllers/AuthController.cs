@@ -45,5 +45,23 @@ namespace BeeStore_Api.Controllers
         {
             return Ok(_jwtService.RefreshJWTToken(jwt));
         }
+
+        [Route("forgot-password")]
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> ForgotPassword(string email)
+        {
+            var result = await _userService.ForgotPassword(email);
+            return Ok(result);
+        }
+
+        [Route("reset-password")]
+        [HttpPost]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResetPassword(string token, string newPassword)
+        {
+            var result = await _userService.ResetPassword(token, newPassword);
+            return Ok(result);
+        }
     }
 }

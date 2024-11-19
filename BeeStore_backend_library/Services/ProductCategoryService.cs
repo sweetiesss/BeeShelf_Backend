@@ -54,6 +54,20 @@ namespace BeeStore_Repository.Services
             return ResponseMessage.Success;
         }
 
+        public async Task<Pagination<CategoryListDTO>> GetCategoryList(int pageIndex, int pageSize)
+        {
+           var list = await _unitOfWork.CategoryRepo.GetAllAsync();
+            var result = _mapper.Map<List<CategoryListDTO>>(list);
+            return (await ListPagination<CategoryListDTO>.PaginateList(result, pageIndex, pageSize));
+        }
+
+        public async Task<Pagination<OcopCategoryListDTO>> GetOCOPCategoryListDTO(int pageIndex, int pageSize)
+        {
+            var list = await _unitOfWork.OcopCategoryRepo.GetAllAsync();
+            var result = _mapper.Map<List<OcopCategoryListDTO>>(list);
+            return (await ListPagination<OcopCategoryListDTO>.PaginateList(result, pageIndex, pageSize));
+        }
+
         public async Task<Pagination<ProductCategoryListDTO>> GetProductCategoryList(int pageIndex, int pageSize)
         {
             var list = await _unitOfWork.ProductCategoryRepo.GetAllAsync();

@@ -1,4 +1,7 @@
-﻿namespace BeeStore_Repository.Models;
+﻿using System;
+using System.Collections.Generic;
+
+namespace BeeStore_Repository.Models;
 
 public partial class Vehicle : BaseEntity
 {
@@ -16,7 +19,11 @@ public partial class Vehicle : BaseEntity
 
     public int? AssignedDriverId { get; set; }
 
+    public int? WarehouseId { get; set; }
+
     //public ulong? IsDeleted { get; set; }
 
     public virtual Employee? AssignedDriver { get; set; }
+
+    public virtual Warehouse? Warehouse { get; set; }
 }

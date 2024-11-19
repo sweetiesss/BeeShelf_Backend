@@ -9,6 +9,8 @@ namespace BeeStore_Repository.DTO.VehicleDTOs
 
         public string? LicensePlate { get; set; }
 
+        public int? WarehouseId { get; set; }
+
         [JsonIgnore]
         public int? Capacity { get; set; }
 
