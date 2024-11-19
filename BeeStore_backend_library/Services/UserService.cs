@@ -17,6 +17,7 @@ using System.Linq.Expressions;
 using System.Net;
 using System.Net.Mail;
 using System.Security.Cryptography;
+using System.Text.Json;
 
 namespace BeeStore_Repository.Services
 {
@@ -26,15 +27,71 @@ namespace BeeStore_Repository.Services
         private readonly IMapper _mapper;
         private readonly ILoggerManager _logger;
         private readonly string _keyVaultURL;
+        private readonly string _encryptionKey;
         private readonly SecretClient _client;
         public UserService(IUnitOfWork unitOfWork, IMapper mapper, ILoggerManager logger, IConfiguration configuration)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
+            _encryptionKey = "HJ8qPqgqHxBkJ4n4mHXe8zGxbKrJCTrpyZzRjbL5XtU="; //add this to keyvault for me
             _keyVaultURL = configuration["KeyVault:KeyVaultURL"] ?? throw new ArgumentNullException("Key Vault URL configuration values are missing.");
             _client = new SecretClient(new Uri(_keyVaultURL), new EnvironmentCredential());
         }
+
+        public async Task<string> ForgotPassword(string email)
+        {
+            var user = await _unitOfWork.OcopPartnerRepo.FirstOrDefaultAsync(u => u.Email == email);
+            if (user == null)
+            {
+                return ResponseMessage.UserEmailNotFound;
+            }
+
+
+            var resetToken = GenerateResetToken(user.Id, user.Email);
+
+            // Send email with reset link
+            ResetPasswordEmailSender(email, resetToken);
+
+            return ResponseMessage.Success;
+        }
+
+        public async Task<string> ResetPassword(string token, string newPassword)
+        {
+            try
+            {
+                var tokenData = DecryptResetToken(token);
+                if (tokenData == null)
+                {
+                    throw new ApplicationException(ResponseMessage.InvalidResetToken);
+                }
+
+                // Check if token is expired (1 hour validity)
+                if (DateTime.UtcNow > tokenData.ExpirationTime)
+                {
+                    throw new ApplicationException(ResponseMessage.ExpiredResetToken);
+                }
+
+
+                var user = await _unitOfWork.OcopPartnerRepo.FirstOrDefaultAsync(u => u.Id.Equals(tokenData.UserId) && u.Email.Equals(tokenData.Email));
+
+                if (user == null)
+                {
+                    throw new KeyNotFoundException(ResponseMessage.UserEmailNotFound);
+                }
+
+                // Update password
+                user.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
+                await _unitOfWork.SaveAsync();
+
+                return ResponseMessage.Success;
+            }
+            catch
+            {
+                throw new ApplicationException(ResponseMessage.InvalidResetToken);
+            }
+        }
+
 
         public async Task<string> CreateEmployee(EmployeeCreateRequest user)
         {
@@ -219,6 +276,62 @@ namespace BeeStore_Repository.Services
             return ResponseMessage.Success;
         }
 
+        private void ResetPasswordEmailSender(string targetMail, string token)
+        {
+            try
+            {
+                var target = new MailAddress(targetMail);
+
+                var config = new ConfigurationBuilder()
+                    .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                    .AddJsonFile(Constants.DefaultString.systemJsonFile).Build();
+
+                var mailConfig = config.GetSection("Mail").Get<AppConfiguration>();
+
+                var keyVault = config.GetSection("KeyVault").Get<AppConfiguration>();
+
+                var _client = new SecretClient(new Uri(keyVault.KeyVaultURL), new EnvironmentCredential());
+
+                string smtpPassword = _client.GetSecret("BeeStore-Smtp-Password").Value.Value;
+                var resetUrl = $"https://www.beeshelf.com/reset-password?token={token}";
+                MailMessage mailMessage = new MailMessage();
+                mailMessage.From = new MailAddress(mailConfig.sourceMail);
+                mailMessage.Subject = Constants.Smtp.registerMailSubject;
+                mailMessage.To.Add(target);
+                // Ignore this abomination below
+                mailMessage.Body = @"
+                                    <html>
+                                      <body style='font-family: Arial, sans-serif; color: #333; line-height: 1.6;'>
+                                        <div style='max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9; border-radius: 10px;'>
+                                          <h2 style='color: #4CAF50;'>Welcome to BeeShelf!</h2>
+                                          <p>Dear User,</p>
+                                          <p>Here is the link to reset your password. The link will expired in one hour.</p>
+                                          <p style='font-weight: bold; font-size: 18px; color: #333;'>Reset password link: 
+                                            <span style='color: #d9534f;'>" + resetUrl + @"</span>
+                                          </p>
+                                          <p>If you didn't request this password reset, please contact our support team immediately.</p>
+                                          <p>Thank you for using our service!</p>
+                                          <p style='margin-top: 30px; font-size: 12px; color: #888;'>This is an automated email, please do not reply.</p>
+                                        </div>
+                                      </body>
+                                    </html>";
+                mailMessage.IsBodyHtml = true;
+
+                var smtpClient = new SmtpClient(Constants.Smtp.smtp)
+                {
+                    Port = 587,
+                    Credentials = new NetworkCredential(mailConfig.sourceMail, smtpPassword),
+                    EnableSsl = true
+                };
+
+                smtpClient.Send(mailMessage);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
+        }
+
 
 
 
@@ -299,6 +412,74 @@ namespace BeeStore_Repository.Services
             }
 
             return new string(password);
+        }
+
+        private string GenerateResetToken(int userId, string email)
+        {
+            var tokenData = new
+            {
+                UserId = userId,
+                Email = email,
+                ExpirationTime = DateTime.UtcNow.AddHours(1)
+            };
+
+            var json = JsonSerializer.Serialize(tokenData);
+            return EncryptString(json);
+        }
+
+        private string EncryptString(string text)
+        {
+            using (Aes aes = Aes.Create())
+            {
+                aes.Key = Convert.FromBase64String(_encryptionKey);
+                aes.GenerateIV();
+
+                using (var encryptor = aes.CreateEncryptor())
+                using (var msEncrypt = new MemoryStream())
+                {
+
+                    msEncrypt.Write(aes.IV, 0, aes.IV.Length);
+
+                    using (var csEncrypt = new CryptoStream(msEncrypt, encryptor, CryptoStreamMode.Write))
+                    using (var swEncrypt = new StreamWriter(csEncrypt))
+                    {
+                        swEncrypt.Write(text);
+                    }
+
+                    var encrypted = msEncrypt.ToArray();
+                    return Convert.ToBase64String(encrypted);
+                }
+            }
+        }
+
+        private TokenData DecryptResetToken(string token)
+        {
+            var json = DecryptString(token);
+            return JsonSerializer.Deserialize<TokenData>(json);
+        }
+
+        private string DecryptString(string cipherText)
+        {
+            var fullCipher = Convert.FromBase64String(cipherText);
+
+            using (Aes aes = Aes.Create())
+            {
+                aes.Key = Convert.FromBase64String(_encryptionKey);
+
+
+                byte[] iv = new byte[16];
+                Array.Copy(fullCipher, 0, iv, 0, iv.Length);
+                aes.IV = iv;
+
+
+                using (var decryptor = aes.CreateDecryptor())
+                using (var msDecrypt = new MemoryStream(fullCipher, iv.Length, fullCipher.Length - iv.Length))
+                using (var csDecrypt = new CryptoStream(msDecrypt, decryptor, CryptoStreamMode.Read))
+                using (var srDecrypt = new StreamReader(csDecrypt))
+                {
+                    return srDecrypt.ReadToEnd();
+                }
+            }
         }
 
     }

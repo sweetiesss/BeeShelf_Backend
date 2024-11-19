@@ -7,6 +7,8 @@ namespace BeeStore_Repository
 {
     public interface IUnitOfWork : IDisposable
     {
+        IGenericRepository<OcopCategory> OcopCategoryRepo { get; }
+        IGenericRepository<Category> CategoryRepo {  get; }
         IGenericRepository<Employee> EmployeeRepo { get; }
         IGenericRepository<OcopPartner> OcopPartnerRepo { get; }
         IGenericRepository<Lot> LotRepo { get; }
@@ -18,8 +20,6 @@ namespace BeeStore_Repository
         IGenericRepository<OrderFee> OrderFeeRepo { get; }
         IGenericRepository<Vehicle> VehicleRepo { get; }
         IGenericRepository<Role> RoleRepo { get; }
-        IGenericRepository<Picture> PictureRepo { get; }
-        IGenericRepository<Partner> PartnerRepo { get; }
         IGenericRepository<Warehouse> WarehouseRepo { get; }
         IGenericRepository<Inventory> InventoryRepo { get; }
         IGenericRepository<Product> ProductRepo { get; }
@@ -35,6 +35,8 @@ namespace BeeStore_Repository
     public class UnitOfWork : IUnitOfWork
     {
         private BeeStoreDbContext _context;
+        private IGenericRepository<OcopCategory> ocopCategoryRepo;
+        private IGenericRepository<Category> categoryRepo;
         private IGenericRepository<Employee> employeeRepo;
         private IGenericRepository<OcopPartner> ocopPartnerRepo;
         private IGenericRepository<Lot> lotRepo;
@@ -47,8 +49,6 @@ namespace BeeStore_Repository
         private IGenericRepository<Vehicle> vehicleRepo;
 
         private IGenericRepository<Role> roleRepo;
-        private IGenericRepository<Picture> pictureRepo;
-        private IGenericRepository<Partner> partnerRepo;
         private IGenericRepository<Warehouse> warehouseRepo;
         private IGenericRepository<Inventory> inventoryRepo;
         private IGenericRepository<Product> productRepo;
@@ -61,6 +61,30 @@ namespace BeeStore_Repository
         public UnitOfWork(BeeStoreDbContext context)
         {
             _context = context;
+        }
+
+        public IGenericRepository<Category> CategoryRepo
+        {
+            get
+            {
+                if (categoryRepo == null)
+                {
+                    categoryRepo = new GenericRepository<Category>(_context);
+                }
+                return categoryRepo;
+            }
+        }
+
+        public IGenericRepository<OcopCategory> OcopCategoryRepo
+        {
+            get
+            {
+                if (ocopCategoryRepo == null)
+                {
+                    ocopCategoryRepo = new GenericRepository<OcopCategory>(_context);
+                }
+                return ocopCategoryRepo;
+            }
         }
 
         public IGenericRepository<Batch> BatchRepo
@@ -199,29 +223,6 @@ namespace BeeStore_Repository
             }
         }
 
-        public IGenericRepository<Picture> PictureRepo
-        {
-            get
-            {
-                if (pictureRepo == null)
-                {
-                    pictureRepo = new GenericRepository<Picture>(_context);
-                }
-                return pictureRepo;
-            }
-        }
-
-        public IGenericRepository<Partner> PartnerRepo
-        {
-            get
-            {
-                if (partnerRepo == null)
-                {
-                    partnerRepo = new GenericRepository<Partner>(_context);
-                }
-                return partnerRepo;
-            }
-        }
 
         public IGenericRepository<Warehouse> WarehouseRepo
         {

@@ -21,6 +21,7 @@
         public string? ReceiverPhone { get; set; }
 
         public string? ReceiverAddress { get; set; }
+        public decimal? Distance { get; set; }
 
         public decimal? TotalPrice { get; set; }
 

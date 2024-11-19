@@ -54,13 +54,6 @@ namespace BeeStore_Repository.Services
                 }
 
 
-                Picture picture = new Picture();
-
-                picture.PictureLink = imageUrl;
-
-                await _unitOfWork.PictureRepo.AddAsync(picture);
-                await _unitOfWork.SaveAsync();
-
                 return imageUrl;
             }
             catch (Exception ex)
@@ -109,10 +102,6 @@ namespace BeeStore_Repository.Services
             return imageUrl;
         }
 
-        private async Task<Picture> getPictureByLink(string imageUrl)
-        {
-            return await _unitOfWork.PictureRepo.SingleOrDefaultAsync(u => u.PictureLink.Equals(imageUrl));
-        }
     }
 
 

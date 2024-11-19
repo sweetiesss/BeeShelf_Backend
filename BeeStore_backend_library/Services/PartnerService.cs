@@ -111,12 +111,12 @@ namespace BeeStore_Repository.Services
 
         public async Task<string> DeletePartner(int id)
         {
-            var exist = await _unitOfWork.PartnerRepo.SingleOrDefaultAsync(u => u.Id == id);
+            var exist = await _unitOfWork.OcopPartnerRepo.SingleOrDefaultAsync(u => u.Id == id);
             if (exist == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.PartnerIdNotFound);
             }
-            _unitOfWork.PartnerRepo.SoftDelete(exist);
+            _unitOfWork.OcopPartnerRepo.SoftDelete(exist);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
         }
