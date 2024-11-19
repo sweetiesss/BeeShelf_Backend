@@ -29,7 +29,6 @@ namespace BeeStore_Repository.Mapper
             CreateMap(typeof(Pagination<>), typeof(Pagination<>));
             CreateMap(typeof(Task<>), typeof(Pagination<>));
             CreateMap(typeof(InternalDbSet<>), typeof(IQueryable<>));
-            CreateMap(typeof(EmployeeCreateRequest), typeof(User));
 
             CreateMap<EmployeeCreateRequest, Employee>()
                      .ForMember(dest => dest.Password, opt => opt.MapFrom(src => BCrypt.Net.BCrypt.HashPassword(src.Password)));
@@ -93,7 +92,8 @@ namespace BeeStore_Repository.Mapper
                 .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<ProductCreateDTO, Product>();
 
-
+            CreateMap<Category, CategoryListDTO>();
+            CreateMap<OcopCategory, OcopCategoryListDTO>();
             CreateMap<ProductCategory, ProductCategoryListDTO>();
             CreateMap<ProductCategoryCreateDTO, ProductCategory>();
 
