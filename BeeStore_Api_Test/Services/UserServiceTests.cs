@@ -1,21 +1,13 @@
-﻿using BeeStore_Repository.DTO;
+﻿using AutoMapper;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
+using BeeStore_Repository;
+using BeeStore_Repository.Logger;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services;
-using Moq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Linq.Expressions;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Configuration;
-using BeeStore_Repository.Logger;
-using AutoMapper;
-using Xunit;
-using BeeStore_Repository;
-using Azure.Security.KeyVault.Secrets;
-using Azure;
-using MySqlX.XDevAPI;
-using Azure.Identity;
+using Moq;
+using System.Linq.Expressions;
 
 namespace BeeStore_Api_Test.Services
 {
@@ -82,7 +74,7 @@ namespace BeeStore_Api_Test.Services
             };
 
             _mockUnitOfWork.Setup(uow => uow.EmployeeRepo.SingleOrDefaultAsync(It.IsAny<Expression<Func<Employee, bool>>>(), It.IsAny<Func<IQueryable<Employee>, IQueryable<Employee>>>()))
-    .ReturnsAsync((Employee)null);
+                .ReturnsAsync((Employee)null);
 
             _mockUnitOfWork.Setup(uow => uow.OcopPartnerRepo.SingleOrDefaultAsync(It.IsAny<Expression<Func<OcopPartner, bool>>>(), It.IsAny<Func<IQueryable<OcopPartner>, IQueryable<OcopPartner>>>()))
                 .ReturnsAsync(partner);

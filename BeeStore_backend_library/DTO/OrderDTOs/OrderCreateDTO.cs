@@ -1,5 +1,4 @@
-﻿using BeeStore_Repository.Models;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace BeeStore_Repository.DTO.OrderDTOs
 {
@@ -15,7 +14,7 @@ namespace BeeStore_Repository.DTO.OrderDTOs
 
 
 
-        [JsonIgnore]        
+        [JsonIgnore]
         public List<OrderDetailCreateDTO>? OrderDetails { get; set; } = new List<OrderDetailCreateDTO>();
         public List<ProductDetailDTO> Products { get; set; }
 

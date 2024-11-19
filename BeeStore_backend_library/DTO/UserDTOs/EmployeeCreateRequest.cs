@@ -1,11 +1,8 @@
-﻿using BeeStore_Repository.DTO.UserDTOs.Interfaces;
-using BeeStore_Repository.Utils;
-using System.Reflection.Metadata;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace BeeStore_Repository.DTO.UserDTOs
 {
-    public class EmployeeCreateRequest 
+    public class EmployeeCreateRequest
     {
 
         public string Email { get; set; } = null!;

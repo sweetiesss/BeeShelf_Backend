@@ -7,7 +7,7 @@
 
         public int? OcopPartnerId { get; set; }
 
-        public string? OcopPartnerEmail {  get; set; }
+        public string? OcopPartnerEmail { get; set; }
 
         public string? Barcode { get; set; }
 
@@ -27,7 +27,7 @@
 
         public string? Origin { get; set; }
 
-        public bool? IsInInv {  get; set; }
+        public bool? IsInInv { get; set; }
 
 
     }

@@ -1,10 +1,5 @@
 ﻿using BeeStore_Repository.DTO.UserDTOs;
 using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace BeeStore_Repository.Utils.Validator.User
 {
@@ -26,21 +21,21 @@ namespace BeeStore_Repository.Utils.Validator.User
                 .WithMessage(ValidationMessage.ConfirmPasswordRequired)
                 .Equal(x => x.ConfirmPassword)
                 .WithMessage(ValidationMessage.PasswordMismatch)
-                .When(x => !string.IsNullOrEmpty(x.ConfirmPassword)); 
+                .When(x => !string.IsNullOrEmpty(x.ConfirmPassword));
 
             RuleFor(x => x.FirstName)
                 .NotEmpty()
                 .WithMessage(ValidationMessage.FirstNameRequired)
                 .MaximumLength(25)
                 .WithMessage(ValidationMessage.FirstNameMaxLength)
-                .When(x => !string.IsNullOrEmpty(x.FirstName)); 
+                .When(x => !string.IsNullOrEmpty(x.FirstName));
 
             RuleFor(x => x.LastName)
                 .NotEmpty()
                 .WithMessage(ValidationMessage.LastNameRequired)
                 .MaximumLength(25)
                 .WithMessage(ValidationMessage.LastNameMaxLength)
-                .When(x => !string.IsNullOrEmpty(x.LastName)); 
+                .When(x => !string.IsNullOrEmpty(x.LastName));
 
             RuleFor(x => x.Phone)
                 .NotEmpty()

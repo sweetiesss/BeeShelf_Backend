@@ -3,7 +3,6 @@ using Azure.Security.KeyVault.Secrets;
 using BeeStore_Repository.DTO.UserDTOs;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -77,7 +76,7 @@ namespace BeeStore_Repository.Services
             var token = GenerateToken(creds, claims);
 
             return new JwtSecurityTokenHandler().WriteToken(token);
-            
+
         }
         private string RetrieveJWTSecretKey()
         {

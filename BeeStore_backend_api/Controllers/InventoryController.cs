@@ -23,10 +23,10 @@ namespace BeeStore_Api.Controllers
         [Route("get-inventories")]
         [HttpGet]
         [Authorize(Roles = "Admin,Manager,Staff")]
-        public async Task<IActionResult> GetInventoryList([FromQuery] InventoryFilter? filterBy, 
+        public async Task<IActionResult> GetInventoryList([FromQuery] InventoryFilter? filterBy,
                                                           [FromQuery][DefaultValue(null)] string? filterQuery,
                                                           [FromQuery] InventorySortBy? sortCriteria,
-                                                          [FromQuery][DefaultValue(false)] bool descending, 
+                                                          [FromQuery][DefaultValue(false)] bool descending,
                                                           [FromQuery][DefaultValue(0)] int pageIndex,
                                                           [FromQuery][DefaultValue(10)] int pageSize)
         {
@@ -37,11 +37,11 @@ namespace BeeStore_Api.Controllers
         [Route("get-inventories/{userId}")]
         [HttpGet]
         [Authorize(Roles = "Admin,Manager,Staff,Partner")]
-        public async Task<IActionResult> GetInventoryList(int userId, 
+        public async Task<IActionResult> GetInventoryList(int userId,
                                                           [FromQuery] InventoryFilter? filterBy,
                                                           [FromQuery][DefaultValue(null)] string? filterQuery,
                                                           [FromQuery] InventorySortBy? sortCriteria,
-                                                          [FromQuery][DefaultValue(false)] bool descending, 
+                                                          [FromQuery][DefaultValue(false)] bool descending,
                                                           [FromQuery][DefaultValue(0)] int pageIndex,
                                                           [FromQuery][DefaultValue(10)] int pageSize)
         {

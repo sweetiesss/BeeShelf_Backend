@@ -26,7 +26,6 @@ namespace BeeStore_Repository.Repositories
 
         public async Task<IEnumerable<T>> GetFiltered(Expression<Func<T, bool>> filter)
         {
-
             return await _dbSet.Where(x => x.IsDeleted.Equals(false)).Where(filter).ToListAsync();
         }
 

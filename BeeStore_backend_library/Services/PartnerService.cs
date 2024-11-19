@@ -7,7 +7,6 @@ using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
 using Microsoft.EntityFrameworkCore;
-using Mysqlx.Crud;
 using System.Linq.Expressions;
 
 namespace BeeStore_Repository.Services
@@ -40,7 +39,7 @@ namespace BeeStore_Repository.Services
                 searchProperties: new Expression<Func<OcopPartner, string>>[] { p => p.Email, p => p.FirstName,
                                                                                 p => p.LastName, p => p.BusinessName}
                 );
-                
+
             var result = _mapper.Map<List<PartnerListDTO>>(list);
 
             return await ListPagination<PartnerListDTO>.PaginateList(result, pageIndex, pageSize);
@@ -61,7 +60,7 @@ namespace BeeStore_Repository.Services
             return result;
         }
 
-        
+
 
         public async Task<string> UpdatePartner(OCOPPartnerUpdateRequest user)
         {
@@ -144,7 +143,7 @@ namespace BeeStore_Repository.Services
                 amount = 0,
             });
             var partner = await _unitOfWork.OcopPartnerRepo.AnyAsync(u => u.Id == id);
-            if(partner == false)
+            if (partner == false)
             {
                 throw new KeyNotFoundException(ResponseMessage.PartnerIdNotFound);
             }
@@ -209,7 +208,7 @@ namespace BeeStore_Repository.Services
             {
                 id = (int)group.Key.ProductId,
                 ProductName = group.Key.ProductName,
-                stock = group.Sum(l => (int)l.ProductAmount), 
+                stock = group.Sum(l => (int)l.ProductAmount),
                 warehouseId = (int)group.Key.WarehouseId,
                 warehouseName = group.Key.WarehouseName
             })
@@ -218,7 +217,7 @@ namespace BeeStore_Repository.Services
             int totalStock = groupedProducts.Sum(p => p.stock);
             return new PartnerProductDTO
             {
-                totalProductAmount = totalStock, 
+                totalProductAmount = totalStock,
                 Products = groupedProducts
             };
         }

@@ -30,11 +30,11 @@ namespace BeeStore_Repository.Services
         public async Task<string> ConfirmPayment(ConfirmPaymentDTO request)
         {
             var transaction = await _unitOfWork.TransactionRepo.SingleOrDefaultAsync(u => u.Code.Equals(request.OrderCode));
-            if(transaction == null)
+            if (transaction == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.TransactionNotFound);
             }
-            if(request.Status == Constants.PaymentStatus.Paid)
+            if (request.Status == Constants.PaymentStatus.Paid)
             {
                 var wallet = await _unitOfWork.WalletRepo.SingleOrDefaultAsync(u => u.OcopPartnerId.Equals(transaction.OcopPartnerId));
                 wallet.TotalAmount += transaction.Amount;

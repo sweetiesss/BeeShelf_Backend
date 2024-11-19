@@ -41,6 +41,6 @@
 
         public string? CategoryName { get; set; }
 
-        public string? OcopCategoryName { get;set; }
+        public string? OcopCategoryName { get; set; }
     }
 }

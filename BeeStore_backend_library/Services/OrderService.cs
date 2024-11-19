@@ -9,10 +9,7 @@ using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using System.Data;
-using System.Linq.Expressions;
-using static BeeStore_Repository.Utils.Constants;
 
 namespace BeeStore_Repository.Services
 {
@@ -57,7 +54,7 @@ namespace BeeStore_Repository.Services
                 filter: u => (filterQuery == null || u.Status.Equals(filterQuery))
                              && (userId == null || u.OcopPartnerId.Equals(userId))
                              && (warehouseId == null || u.OrderDetails.Any(od => od.Lot.Inventory.WarehouseId.Equals(warehouseId)))
-                             && (shipperId == null || u.Batch.BatchDeliveries.Any(u=>u.DeliverBy.Equals(shipperId) && u.IsDeleted.Equals(false))),
+                             && (shipperId == null || u.Batch.BatchDeliveries.Any(u => u.DeliverBy.Equals(shipperId) && u.IsDeleted.Equals(false))),
                 includes: null,
                 sortBy: sortBy!,
                 descending: descending,
@@ -75,7 +72,7 @@ namespace BeeStore_Repository.Services
             return await ListPagination<OrderListDTO>.PaginateList(result, pageIndex, pageSize);
         }
 
-        
+
         public async Task<Pagination<OrderListDTO>> GetWarehouseSentOrderList(int warehouseId, OrderStatus? orderStatus, OrderSortBy? sortCriteria, bool descending, int pageIndex, int pageSize)
         {
             var list = await ApplyFilterToList(orderStatus, sortCriteria, descending, null, null, warehouseId);
@@ -86,7 +83,7 @@ namespace BeeStore_Repository.Services
         public async Task<Pagination<OrderListDTO>> GetOrderList(int userId, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
                                                           bool descending, int pageIndex, int pageSize)
         {
-            var list = await ApplyFilterToList(orderStatus, sortCriteria, descending, null ,userId);
+            var list = await ApplyFilterToList(orderStatus, sortCriteria, descending, null, userId);
             var result = _mapper.Map<List<OrderListDTO>>(list);
             return await ListPagination<OrderListDTO>.PaginateList(result, pageIndex, pageSize);
         }
@@ -99,7 +96,7 @@ namespace BeeStore_Repository.Services
             return await ListPagination<OrderListDTO>.PaginateList(result, pageIndex, pageSize);
         }
 
-   
+
 
         public async Task<string> CreateOrder(OrderCreateDTO request)
         {
@@ -114,9 +111,9 @@ namespace BeeStore_Repository.Services
             decimal? totalPrice = 0;
             decimal? totalStorageFee = 0;
             decimal? deliveryFee = 0;
-            foreach(var product in request.Products)
+            foreach (var product in request.Products)
             {
-                
+
                 var a = await _unitOfWork.ProductRepo.SingleOrDefaultAsync(u => u.Id.Equals(product.ProductId));
                 if (a == null)
                 {
@@ -130,7 +127,7 @@ namespace BeeStore_Repository.Services
                                                                 .OrderBy(u => u.ImportDate)
                                                                 .Include(o => o.Product)
                                                                 .Include(o => o.Inventory).ThenInclude(o => o.Warehouse));
-                if(b.Count() == 0)
+                if (b.Count() == 0)
                 {
                     throw new KeyNotFoundException(ResponseMessage.NoLotWithProductFound);
                 }
@@ -144,17 +141,17 @@ namespace BeeStore_Repository.Services
                 //if first product warehouse id already exist, check if this product is in the same warehouse or not
                 if (firstProductWarehouseId != 0)
                 {
-                    if(b[0].Inventory.WarehouseId != firstProductWarehouseId)
+                    if (b[0].Inventory.WarehouseId != firstProductWarehouseId)
                     {
-                        for(int i = 1; i<b.Count(); i++)
+                        for (int i = 1; i < b.Count(); i++)
                         {
                             if (b[i].Inventory.WarehouseId == firstProductWarehouseId)
                             {
-                                index = i; 
+                                index = i;
                                 break;
                             }
                         }
-                        if(index == 0)
+                        if (index == 0)
                         {
                             throw new ApplicationException(ResponseMessage.ProductMustBeFromTheSameWarehouse);
                         }
@@ -211,7 +208,7 @@ namespace BeeStore_Repository.Services
 
                     index++; // Move to the next lot
                 }
-                if(productAmountNeeded > 0)
+                if (productAmountNeeded > 0)
                 {
                     throw new ApplicationException(ResponseMessage.ProductNotEnough);
                 }
@@ -281,12 +278,12 @@ namespace BeeStore_Repository.Services
             if (exist.Status == Constants.Status.Draft)
             {
                 decimal? totalPrice = 0;
-                foreach(var x in exist.OrderDetails)
+                foreach (var x in exist.OrderDetails)
                 {
-                    _unitOfWork.OrderDetailRepo.HardDelete(x);             
+                    _unitOfWork.OrderDetailRepo.HardDelete(x);
                 }
 
-                foreach(var x in request.OrderDetails)
+                foreach (var x in request.OrderDetails)
                 {
                     var a = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(x.LotId), query => query.Include(o => o.Product).Include(o => o.Inventory));
                     if (a == null)
@@ -309,7 +306,7 @@ namespace BeeStore_Repository.Services
             foreach (var fee in exist.OrderFees)
             {
                 //if status = shipping ad additional fee
-                if(exist.Status == Constants.Status.Shipping)
+                if (exist.Status == Constants.Status.Shipping)
                 {
                     fee.AdditionalFee = 1;
                 }
@@ -321,7 +318,7 @@ namespace BeeStore_Repository.Services
             //update receiver address and phone in both draft and shipping
             exist.ReceiverAddress = request.ReceiverAddress;
             exist.ReceiverPhone = request.ReceiverPhone;
-                    
+
             _unitOfWork.OrderRepo.Update(exist);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
@@ -330,12 +327,12 @@ namespace BeeStore_Repository.Services
         //Partner use this and the one below
         public async Task<string> SendOrder(int id)
         {
-            var exist = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u => u.Id==id);
-            if(exist == null)
+            var exist = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u => u.Id == id);
+            if (exist == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.OrderIdNotFound);
             }
-            if(exist.Status != Constants.Status.Draft)
+            if (exist.Status != Constants.Status.Draft)
             {
                 throw new ApplicationException(ResponseMessage.OrderSentError);
             }
@@ -428,7 +425,7 @@ namespace BeeStore_Repository.Services
                     orderStatusUpdate = Constants.Status.Canceled;
                     a = true;
                     //return product's amount here
-                    foreach(var od in exist.OrderDetails)
+                    foreach (var od in exist.OrderDetails)
                     {
                         UpdateLotProductAmount(od.LotId, od.ProductAmount, true);
                     }
@@ -440,9 +437,9 @@ namespace BeeStore_Repository.Services
             }
 
             //From Shipping to delivered
-            if(orderStatusString.Equals(Constants.Status.Delivered, StringComparison.OrdinalIgnoreCase))
+            if (orderStatusString.Equals(Constants.Status.Delivered, StringComparison.OrdinalIgnoreCase))
             {
-                if(exist.Status == Constants.Status.Shipping)
+                if (exist.Status == Constants.Status.Shipping)
                 {
                     orderStatusUpdate = Constants.Status.Delivered;
                     a = true;
@@ -464,7 +461,7 @@ namespace BeeStore_Repository.Services
             return ResponseMessage.Success;
         }
 
-       
+
 
         private async Task UpdateLotProductAmount(int? lotId, int? amount, bool cancel)
         {
@@ -474,7 +471,7 @@ namespace BeeStore_Repository.Services
                 throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
             }
 
-            if(cancel == true)
+            if (cancel == true)
             {
                 lot.ProductAmount += amount;
             }
