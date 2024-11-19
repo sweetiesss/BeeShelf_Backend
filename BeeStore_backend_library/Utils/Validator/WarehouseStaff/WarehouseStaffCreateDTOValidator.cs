@@ -1,6 +1,5 @@
 ﻿using BeeStore_Repository.DTO.WarehouseStaffDTOs;
 using FluentValidation;
-using BeeStore_Repository.Utils;
 
 namespace BeeStore_Repository.Utils.Validator.WarehouseStaff
 {

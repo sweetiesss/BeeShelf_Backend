@@ -1,6 +1,4 @@
-﻿using BeeStore_Repository.DTO.UserDTOs.Interfaces;
-using BeeStore_Repository.Utils;
-using System.Text.Json.Serialization;
+﻿using System.Text.Json.Serialization;
 
 namespace BeeStore_Repository.DTO.UserDTOs
 {

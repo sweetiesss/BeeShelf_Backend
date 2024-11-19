@@ -42,7 +42,7 @@ namespace BeeStore_Repository
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<ILoggerManager, LoggerManager>();
             services.AddScoped<IJWTService, JWTService>();
-            services.AddScoped<UnitOfWork>();
+            services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<GlobalExceptionMiddleware>();
 
             //Memory Cache

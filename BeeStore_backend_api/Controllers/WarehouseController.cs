@@ -38,7 +38,7 @@ namespace BeeStore_Api.Controllers
         public async Task<IActionResult> GetWarehouseList([FromQuery][DefaultValue(null)] string? search,
                                                           [FromQuery] WarehouseFilter? filterBy, string? filterQuery,
                                                           [FromQuery] WarehouseSortBy? sortCriteria,
-                                                          [FromQuery][DefaultValue(false)] bool descending, 
+                                                          [FromQuery][DefaultValue(false)] bool descending,
                                                           [FromQuery][DefaultValue(0)] int pageIndex,
                                                           [FromQuery][DefaultValue(10)] int pageSize)
         {
@@ -51,7 +51,7 @@ namespace BeeStore_Api.Controllers
         [Authorize(Roles = "Admin, Manager,Partner")]
         public async Task<IActionResult> GetWarehouse(int id)
         {
-            var result = await _warehouseService.GetWarehouseById(id); 
+            var result = await _warehouseService.GetWarehouseById(id);
             return Ok(result);
         }
 
@@ -85,7 +85,7 @@ namespace BeeStore_Api.Controllers
         public async Task<IActionResult> GetWarehouseShipperList(int id,
                                                                  [FromQuery][DefaultValue(null)] string? search,
                                                                  [FromQuery] WarehouseFilter? filterBy,
-                                                                 [FromQuery][DefaultValue(null)] string? filterQuery, 
+                                                                 [FromQuery][DefaultValue(null)] string? filterQuery,
                                                                  [FromQuery][DefaultValue(0)] int pageIndex,
                                                                  [FromQuery][DefaultValue(10)] int pageSize)
         {
@@ -122,7 +122,7 @@ namespace BeeStore_Api.Controllers
         public async Task<IActionResult> GetWarehouseStaffList(int id,
                                                               [FromQuery][DefaultValue(null)] string? search,
                                                               [FromQuery] WarehouseFilter? filterBy,
-                                                              [FromQuery][DefaultValue(null)] string? filterQuery, 
+                                                              [FromQuery][DefaultValue(null)] string? filterQuery,
                                                               [FromQuery][DefaultValue(0)] int pageIndex,
                                                               [FromQuery][DefaultValue(10)] int pageSize)
         {
@@ -139,7 +139,7 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
-        
+
 
         [Route("create-warehouse")]
         [HttpPost]

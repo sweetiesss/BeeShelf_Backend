@@ -97,9 +97,9 @@ namespace BeeStore_Repository.Services
 
         public async Task<WarehouseDeliveryZoneDTO> GetWarehouseById(int id)
         {
-            var warehouse = await _unitOfWork.WarehouseRepo.SingleOrDefaultAsync(w => !w.IsDeleted && w.Id == id,  
-                                                                          query => query.Include(w => w.DeliveryZones));          
-         
+            var warehouse = await _unitOfWork.WarehouseRepo.SingleOrDefaultAsync(w => !w.IsDeleted && w.Id == id,
+                                                                          query => query.Include(w => w.DeliveryZones));
+
             var result = _mapper.Map<WarehouseDeliveryZoneDTO>(warehouse);
             return result;
         }

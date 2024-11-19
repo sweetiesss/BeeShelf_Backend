@@ -1,8 +1,7 @@
 ﻿using BeeStore_Repository.DTO;
 using BeeStore_Repository.DTO.ProductDTOs;
-using BeeStore_Repository.Enums.SortBy;
-using BeeStore_Repository.Enums;
 using BeeStore_Repository.Enums.FilterBy;
+using BeeStore_Repository.Enums.SortBy;
 
 namespace BeeStore_Repository.Services.Interfaces
 {

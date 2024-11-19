@@ -1,5 +1,4 @@
-﻿using BeeStore_Repository.DTO.PartnerDTOs;
-using BeeStore_Repository.DTO.UserDTOs;
+﻿using BeeStore_Repository.DTO.UserDTOs;
 using BeeStore_Repository.Enums;
 using BeeStore_Repository.Enums.SortBy;
 using BeeStore_Repository.Services.Interfaces;

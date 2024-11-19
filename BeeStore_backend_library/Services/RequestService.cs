@@ -1,17 +1,12 @@
-﻿using Amazon.Runtime.EventStreams.Internal;
-using AutoMapper;
+﻿using AutoMapper;
 using BeeStore_Repository.DTO;
 using BeeStore_Repository.DTO.RequestDTOs;
 using BeeStore_Repository.Enums;
-using BeeStore_Repository.Enums.SortBy;
 using BeeStore_Repository.Logger;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Http.HttpResults;
-using Microsoft.EntityFrameworkCore;
-using static BeeStore_Repository.Utils.Constants;
 
 namespace BeeStore_Repository.Services
 {
@@ -30,7 +25,7 @@ namespace BeeStore_Repository.Services
         public async Task<string> CancelRequest(int id, string cancellationReason)
         {
             var request = await _unitOfWork.RequestRepo.SingleOrDefaultAsync(u => u.Id == id);
-            if(request == null)
+            if (request == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.RequestIdNotFound);
             }
@@ -64,7 +59,7 @@ namespace BeeStore_Repository.Services
         public async Task<string> CreateRequest(RequestType type, bool Send, RequestCreateDTO request)
         {
 
-            
+
 
             var user = await _unitOfWork.OcopPartnerRepo.SingleOrDefaultAsync(u => u.Id == request.OcopPartnerId);
             if (user == null)
@@ -76,16 +71,16 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
             }
-            var userInventory = await _unitOfWork.InventoryRepo.AnyAsync(u => u.Id.Equals(inventory.Id) 
+            var userInventory = await _unitOfWork.InventoryRepo.AnyAsync(u => u.Id.Equals(inventory.Id)
                                                                            && u.OcopPartner.Id.Equals(user.Id));
-            if(userInventory == false)
+            if (userInventory == false)
             {
                 throw new KeyNotFoundException(ResponseMessage.InventoryPartnerNotMatch);
             }
 
 
             var product = await _unitOfWork.ProductRepo.SingleOrDefaultAsync(u => u.Id == request.Lot.ProductId);
-            if(product == null)
+            if (product == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.ProductIdNotFound);
             }
@@ -95,8 +90,8 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.ProductPartnerNotMatch);
             }
-            
-            decimal? totalWeight = inventory.Weight + product.Weight*request.Lot.ProductAmount;
+
+            decimal? totalWeight = inventory.Weight + product.Weight * request.Lot.ProductAmount;
 
 
             if (totalWeight > inventory.MaxWeight)
@@ -113,7 +108,7 @@ namespace BeeStore_Repository.Services
                 request.Status = Constants.Status.Draft;
             }
             var result = _mapper.Map<Request>(request);
-            
+
             result.Lot.InventoryId = request.SendToInventoryId;
 
             await _unitOfWork.RequestRepo.AddAsync(result);
@@ -133,7 +128,7 @@ namespace BeeStore_Repository.Services
             return ResponseMessage.Success;
         }
 
-        private async Task<List<Request>> ApplyFilterToList(RequestStatus? requestStatus, bool descending, 
+        private async Task<List<Request>> ApplyFilterToList(RequestStatus? requestStatus, bool descending,
                                                           int? userId = null, int? warehouseId = null)
         {
             string? filterQuery = requestStatus switch
@@ -147,9 +142,9 @@ namespace BeeStore_Repository.Services
                 RequestStatus.Failed => Constants.Status.Failed,
                 _ => null
             };
-        
 
-    
+
+
 
             var list = await _unitOfWork.RequestRepo.GetListAsync(
                 filter: u => (filterQuery == null || u.Status.Equals(filterQuery))
@@ -164,7 +159,7 @@ namespace BeeStore_Repository.Services
             return list;
         }
 
-        public async Task<Pagination<RequestListDTO>> GetRequestList(RequestStatus? status,bool descending, int warehouseId, int pageIndex, int pageSize)
+        public async Task<Pagination<RequestListDTO>> GetRequestList(RequestStatus? status, bool descending, int warehouseId, int pageIndex, int pageSize)
         {
             var list = await ApplyFilterToList(status, descending, null, warehouseId);
             var result = _mapper.Map<List<RequestListDTO>>(list);
@@ -173,12 +168,12 @@ namespace BeeStore_Repository.Services
 
         public async Task<Pagination<RequestListDTO>> GetRequestList(int userId, RequestStatus? status, bool descending, int pageIndex, int pageSize)
         {
-            var list = await ApplyFilterToList(status,descending, userId);
+            var list = await ApplyFilterToList(status, descending, userId);
             var result = _mapper.Map<List<RequestListDTO>>(list);
             return await ListPagination<RequestListDTO>.PaginateList(result, pageIndex, pageSize);
         }
 
-        
+
         public async Task<string> UpdateRequest(int id, RequestCreateDTO request)
         {
             var exist = await _unitOfWork.RequestRepo.SingleOrDefaultAsync(u => u.Id == id);
@@ -206,7 +201,7 @@ namespace BeeStore_Repository.Services
             }
             exist.Lot.ProductId = request.Lot.ProductId;
             exist.Lot.Amount = request.Lot.Amount;
-            exist.Lot.LotNumber= request.Lot.LotNumber;
+            exist.Lot.LotNumber = request.Lot.LotNumber;
             exist.Lot.Name = request.Lot.Name;
             exist.Lot.ProductAmount = request.Lot.ProductAmount;
 
@@ -220,7 +215,7 @@ namespace BeeStore_Repository.Services
 
         public async Task<string> UpdateRequestStatus(int id, RequestStatus status)
         {
-            
+
             var exist = await _unitOfWork.RequestRepo.SingleOrDefaultAsync(u => u.Id == id);
             if (exist == null)
             {
@@ -246,8 +241,8 @@ namespace BeeStore_Repository.Services
             {
                 throw new BadHttpRequestException(ResponseMessage.BadRequest);
             }
-            
-        
+
+
 
             if (requestStatus == Constants.Status.Completed)
             {
@@ -276,7 +271,7 @@ namespace BeeStore_Repository.Services
                 inventory.Weight = totalWeight;
 
             }
-            
+
             exist.Status = requestStatus;
             await _unitOfWork.SaveAsync();
             var result = _mapper.Map<RequestListDTO>(exist);

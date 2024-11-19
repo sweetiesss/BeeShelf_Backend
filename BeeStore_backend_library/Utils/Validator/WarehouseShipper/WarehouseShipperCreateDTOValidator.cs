@@ -1,6 +1,5 @@
 ﻿using BeeStore_Repository.DTO.WarehouseShipperDTOs;
 using FluentValidation;
-using BeeStore_Repository.Utils;
 
 namespace BeeStore_Repository.Utils.Validator.WarehouseShipper
 {

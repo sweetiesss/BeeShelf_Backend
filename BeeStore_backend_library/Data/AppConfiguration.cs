@@ -10,6 +10,6 @@
         public string APIKey { get; set; }
         public string ChecksumKey { get; set; }
         public string POSTpaymentRequest { get; set; }
-        public string GETpaymentInfo {  get; set; }
+        public string GETpaymentInfo { get; set; }
     }
 }

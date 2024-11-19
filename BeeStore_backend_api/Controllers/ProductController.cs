@@ -37,7 +37,7 @@ namespace BeeStore_Api.Controllers
                                                             [FromQuery][DefaultValue(null)] string? search,
                                                             [FromQuery] ProductFilter? filterBy, string? filterQuery,
                                                             [FromQuery] ProductSortBy? sortBy,
-                                                            [FromQuery][DefaultValue(false)] bool descending, 
+                                                            [FromQuery][DefaultValue(false)] bool descending,
                                                             [FromQuery][DefaultValue(0)] int pageIndex,
                                                             [FromQuery][DefaultValue(10)] int pageSize)
         {
