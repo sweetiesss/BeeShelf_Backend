@@ -90,6 +90,20 @@ namespace BeeStore_Repository.Services
                 {
                     exist.LastName = user.LastName;
                 }
+                var province = await _unitOfWork.OcopPartnerRepo.AnyAsync(u => u.Id.Equals(user.ProvinceId));
+                if (province == false)
+                {
+                    throw new KeyNotFoundException(ResponseMessage.ProvinceIdNotFound);
+                }
+                var OcopCategory = await _unitOfWork.OcopCategoryRepo.SingleOrDefaultAsync(u => u.Id.Equals(user.OcopCategoryId));
+                if (OcopCategory == null)
+                {
+                    throw new KeyNotFoundException(ResponseMessage.OcopCategoryIdNotFound);
+                }
+                if (OcopCategory.Categories.Any(u => u.Id == user.OcopCategoryId) == false)
+                {
+                    throw new ApplicationException(ResponseMessage.CategoryIdNotMatch);
+                }
                 exist.BankAccountNumber = user.BankAccountNumber;
                 exist.BankName = user.BankName;
                 exist.BusinessName = user.BusinessName;
