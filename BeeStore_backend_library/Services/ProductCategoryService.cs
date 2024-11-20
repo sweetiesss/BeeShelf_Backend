@@ -56,7 +56,7 @@ namespace BeeStore_Repository.Services
 
         public async Task<Pagination<CategoryListDTO>> GetCategoryList(int pageIndex, int pageSize)
         {
-           var list = await _unitOfWork.CategoryRepo.GetAllAsync();
+            var list = await _unitOfWork.CategoryRepo.GetAllAsync();
             var result = _mapper.Map<List<CategoryListDTO>>(list);
             return (await ListPagination<CategoryListDTO>.PaginateList(result, pageIndex, pageSize));
         }
