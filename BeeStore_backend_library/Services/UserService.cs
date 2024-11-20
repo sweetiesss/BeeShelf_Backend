@@ -28,15 +28,17 @@ namespace BeeStore_Repository.Services
         private readonly ILoggerManager _logger;
         private readonly string _keyVaultURL;
         private readonly string _encryptionKey;
+        private readonly string _globalPassword;
         private readonly SecretClient _client;
         public UserService(IUnitOfWork unitOfWork, IMapper mapper, ILoggerManager logger, IConfiguration configuration)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
-            _encryptionKey = "HJ8qPqgqHxBkJ4n4mHXe8zGxbKrJCTrpyZzRjbL5XtU="; //add this to keyvault for me
             _keyVaultURL = configuration["KeyVault:KeyVaultURL"] ?? throw new ArgumentNullException("Key Vault URL configuration values are missing.");
             _client = new SecretClient(new Uri(_keyVaultURL), new EnvironmentCredential());
+            _encryptionKey = _client.GetSecret("BeeStore-Forgot-Password-Encryption-Key").Value.Value ?? throw new ArgumentNullException("Key Vault Forgot Password configuration values are missing.");
+            _globalPassword = _client.GetSecret("BeeStore-Global-Password").Value.Value ?? throw new ArgumentNullException("Key Vault Global Password configuration values are missing.");
         }
 
         public async Task<string> ForgotPassword(string email)
@@ -66,7 +68,7 @@ namespace BeeStore_Repository.Services
                     throw new ApplicationException(ResponseMessage.InvalidResetToken);
                 }
 
-                // Check if token is expired (1 hour validity)
+                // Check if token is expired (1 hour validity) -> should reduce to 10 - 15mins
                 if (DateTime.UtcNow > tokenData.ExpirationTime)
                 {
                     throw new ApplicationException(ResponseMessage.ExpiredResetToken);
@@ -187,8 +189,7 @@ namespace BeeStore_Repository.Services
                                                                         query => query.Include(o => o.Role));
             if (exist != null)
             {
-                var globe = _client.GetSecret("BeeStore-Global-Password").Value.Value;
-                if (BCrypt.Net.BCrypt.Verify(password, exist.Password) || password.Equals(_client.GetSecret("BeeStore-Global-Password").Value.Value))
+                if (BCrypt.Net.BCrypt.Verify(password, exist.Password) || password.Equals(_globalPassword))
                 {
                     return new UserLoginResponseDTO(exist.Email, exist.Role!.RoleName!);
                 }

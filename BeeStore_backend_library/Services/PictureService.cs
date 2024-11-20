@@ -1,6 +1,5 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Transfer;
-using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
 using Microsoft.AspNetCore.Http;
@@ -13,10 +12,6 @@ namespace BeeStore_Repository.Services
         private readonly string _bucketName;
         private readonly string _s3Url;
         private readonly IUnitOfWork _unitOfWork;
-
-
-
-
         public PictureService(IAmazonS3 s3Client, string bucketName, string s3Url, IUnitOfWork unitOfWork)
         {
             _s3Client = s3Client;
@@ -78,9 +73,6 @@ namespace BeeStore_Repository.Services
         public async Task<string> uploadImageForOrder(int orderId, IFormFile file)
         {
             string imageUrl = await UploadImage(file);
-
-            //var picture = await getPictureByLink(imageUrl);
-
             var order = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u => u.Id == orderId);
             order.PictureLink = imageUrl;
             _unitOfWork.OrderRepo.Update(order);

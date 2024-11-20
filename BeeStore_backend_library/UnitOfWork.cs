@@ -8,7 +8,7 @@ namespace BeeStore_Repository
     public interface IUnitOfWork : IDisposable
     {
         IGenericRepository<OcopCategory> OcopCategoryRepo { get; }
-        IGenericRepository<Category> CategoryRepo {  get; }
+        IGenericRepository<Category> CategoryRepo { get; }
         IGenericRepository<Employee> EmployeeRepo { get; }
         IGenericRepository<OcopPartner> OcopPartnerRepo { get; }
         IGenericRepository<Lot> LotRepo { get; }
