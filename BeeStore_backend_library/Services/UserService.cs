@@ -56,11 +56,11 @@ namespace BeeStore_Repository.Services
             return ResponseMessage.Success;
         }
 
-        public async Task<string> ResetPassword(string token, string newPassword)
+        public async Task<string> ResetPassword(UserForgotPasswordRequest request)
         {
             try
             {
-                var tokenData = DecryptResetToken(token);
+                var tokenData = DecryptResetToken(request.token);
                 if (tokenData == null)
                 {
                     throw new ApplicationException(ResponseMessage.InvalidResetToken);
@@ -81,7 +81,7 @@ namespace BeeStore_Repository.Services
                 }
 
                 // Update password
-                user.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
+                user.Password = BCrypt.Net.BCrypt.HashPassword(request.newPassword);
                 await _unitOfWork.SaveAsync();
 
                 return ResponseMessage.Success;
