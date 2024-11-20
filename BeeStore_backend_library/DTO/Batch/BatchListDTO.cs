@@ -1,5 +1,6 @@
 ﻿using BeeStore_Repository.DTO.OrderDTOs;
 
+
 namespace BeeStore_Repository.DTO.Batch
 {
     public class BatchListDTO
