@@ -21,7 +21,8 @@ namespace BeeStore_Api.Controllers
 
         [Route("get-categories")]
         [HttpGet]
-        [Authorize(Roles = "Admin,Manager,Partner")]
+        [AllowAnonymous]
+
         public async Task<IActionResult> GetCategoriesList([FromQuery][DefaultValue(0)] int pageIndex,
                                                                 [FromQuery][DefaultValue(10)] int pageSize)
         {
@@ -31,7 +32,7 @@ namespace BeeStore_Api.Controllers
 
         [Route("get-ocop-categories")]
         [HttpGet]
-        [Authorize(Roles = "Admin,Manager,Partner")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetOcopCategories([FromQuery][DefaultValue(0)] int pageIndex,
                                                                 [FromQuery][DefaultValue(10)] int pageSize)
         {

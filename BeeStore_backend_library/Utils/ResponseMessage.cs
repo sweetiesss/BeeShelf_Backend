@@ -98,6 +98,11 @@
         public const string WarehouseCategoryAddListFailed = "Failed to add. Warehouse with these category already exist: ";
         public const string WarehouseCategoryDuplicateList = "Please check provided list. The following category is duplicate: ";
 
-
+        //Province
+        public const string ProvinceIdNotFound = "Province Id not found.";
+        //OcopCategory
+        public const string OcopCategoryIdNotFound = "OcopCategory Id not found.";
+        //Category
+        public const string CategoryIdNotMatch = "Category Id not match with OCOPCategory";
     }
 }

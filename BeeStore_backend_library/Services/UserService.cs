@@ -223,6 +223,21 @@ namespace BeeStore_Repository.Services
             {
                 throw new DuplicateException(ResponseMessage.UserEmailDuplicate);
             }
+            var province = await _unitOfWork.OcopPartnerRepo.AnyAsync(u => u.Id.Equals(request.ProvinceId));
+            if(province == false)
+            {
+                throw new KeyNotFoundException(ResponseMessage.ProvinceIdNotFound);
+            }
+            var OcopCategory = await _unitOfWork.OcopCategoryRepo.SingleOrDefaultAsync(u => u.Id.Equals(request.OcopCategoryId),
+                                                                                       query => query.Include(o => o.Categories));
+            if(OcopCategory == null)
+            {
+                throw new KeyNotFoundException(ResponseMessage.OcopCategoryIdNotFound);
+            }
+            if(OcopCategory.Categories.Any(u => u.Id == request.OcopCategoryId) == false)
+            {
+                throw new ApplicationException(ResponseMessage.CategoryIdNotMatch);
+            }
 
             var result = _mapper.Map<OcopPartner>(request);
             result.Wallets.Add(new Wallet
