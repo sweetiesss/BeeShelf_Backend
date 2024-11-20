@@ -12,7 +12,7 @@ namespace BeeStore_Repository.Utils.Validator.User
                 .WithMessage(ValidationMessage.EmailRequired)
                 .EmailAddress()
                 .WithMessage(ValidationMessage.EmailInvalid)
-                .MaximumLength(25)
+                .MaximumLength(50)
                 .WithMessage(ValidationMessage.EmailMaxLength);
 
             RuleFor(x => x.FirstName)
