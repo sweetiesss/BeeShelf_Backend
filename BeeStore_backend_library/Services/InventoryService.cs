@@ -9,6 +9,7 @@ using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace BeeStore_Repository.Services
@@ -96,13 +97,7 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
             }
-            //var dupe = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Name.Equals(request.Name,
-            //                                                                StringComparison.OrdinalIgnoreCase)
-            //                                                                && u.WarehouseId.Equals(exist.WarehouseId));
-            //if(dupe != null && !dupe.Id.Equals(request.Id))
-            // {
-            //        throw new ApplicationException(ResponseMessage.InventoryNameDuplicate);
-            // }
+
 
             if (request.Name != null && !request.Name.Equals(Constants.DefaultString.String))
             {//uncomment these after you make changes to database
@@ -188,6 +183,63 @@ namespace BeeStore_Repository.Services
             }
             var result = _mapper.Map<InventoryLotListDTO>(exist);
             return result;
+        }
+
+        public async Task<string> BuyInventory(int id, int userId)
+        {
+            var user = await _unitOfWork.OcopPartnerRepo.SingleOrDefaultAsync(u => u.Id == userId,
+                                                                              query => query.Include(o => o.Wallets));
+            if(user == null)
+            {
+                throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
+            }
+            var inv = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Id == id);
+            if(inv == null)
+            {
+                throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
+            }
+            if(inv.OcopPartnerId != null && inv.OcopPartnerId != userId)
+            {
+                throw new ApplicationException(ResponseMessage.InventoryOccupied);
+            }
+            var wallet = user.Wallets.FirstOrDefault(u => u.OcopPartnerId == userId);
+            if (wallet.TotalAmount < 30000)
+            {
+                throw new ApplicationException(ResponseMessage.NotEnoughCredit);
+            }
+            wallet.TotalAmount -= 30000;
+            inv.OcopPartnerId = userId;
+            inv.ExpirationDate = DateTime.Now.AddDays(30);
+            await _unitOfWork.SaveAsync();
+            return ResponseMessage.Success;
+        }
+
+        public async Task<string> ExtendInventory(int id, int userId)
+        {
+            var user = await _unitOfWork.OcopPartnerRepo.SingleOrDefaultAsync(u => u.Id == userId,
+                                                                              query => query.Include(o => o.Wallets));
+            if (user == null)
+            {
+                throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
+            }
+            var inv = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Id == id);
+            if (inv == null)
+            {
+                throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
+            }
+            if (inv.OcopPartnerId != userId)
+            {
+                throw new ApplicationException(ResponseMessage.InventoryPartnerNotMatch);
+            }
+            var wallet = user.Wallets.FirstOrDefault(u => u.OcopPartnerId == userId);
+            if(wallet.TotalAmount < 30000)
+            {
+                throw new ApplicationException(ResponseMessage.NotEnoughCredit);
+            }
+            inv.ExpirationDate = inv.ExpirationDate.Value.AddDays(30);
+            wallet.TotalAmount -= 30000;
+            await _unitOfWork.SaveAsync();
+            return ResponseMessage.Success;
         }
     }
 }
