@@ -19,5 +19,8 @@ namespace BeeStore_Repository.Services.Interfaces
         Task<string> UpdateInventory(InventoryUpdateDTO request);
         Task<string> DeleteInventory(int id);
         Task<string> AddPartnerToInventory(int id, int userId);
+
+        Task<string> BuyInventory(int id, int userId);
+        Task<string> ExtendInventory(int id, int userId);
     }
 }

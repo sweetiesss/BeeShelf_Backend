@@ -47,6 +47,7 @@
 
         //Wallet response message
         public const string WalletIdNotFound = "Wallet Id not found.";
+        public const string NotEnoughCredit = "Wallet doesn't have enough money.";
 
         //Inventory response message
         public const string InventoryIdNotFound = "Inventory Id not found.";
