@@ -20,6 +20,24 @@ namespace BeeStore_Api.Controllers
             _memoryCache = memoryCache;
         }
 
+        [Route("buy-inventory/{id}/{userId}")]
+        [HttpPost]
+        [Authorize(Roles = "Partner")]
+        public async Task<IActionResult> BuyInventory(int id, int userId)
+        {
+            var result = await _inventoryService.BuyInventory(id, userId);
+            return Ok(result);
+        }
+
+        [Route("extend-inventory/{id}/{userId}")]
+        [HttpPost]
+        [Authorize(Roles = "Partner")]
+        public async Task<IActionResult> ExtendInventory(int id, int userId)
+        {
+            var result = await _inventoryService.ExtendInventory(id, userId);
+            return Ok(result);
+        }
+
         [Route("get-inventories")]
         [HttpGet]
         [Authorize(Roles = "Admin,Manager,Staff")]
