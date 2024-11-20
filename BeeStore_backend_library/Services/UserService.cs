@@ -225,6 +225,11 @@ namespace BeeStore_Repository.Services
             }
 
             var result = _mapper.Map<OcopPartner>(request);
+            result.Wallets.Add(new Wallet
+            {
+                TotalAmount = 0,
+                IsDeleted = false,
+            });
             result.RoleId = 2;
             string generatePassword = GeneratePassword(Constants.Smtp.DEFAULT_PASSWORD_LENGTH);
 
