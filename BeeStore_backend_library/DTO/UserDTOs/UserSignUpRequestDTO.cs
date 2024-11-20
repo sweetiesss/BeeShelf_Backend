@@ -27,13 +27,13 @@ namespace BeeStore_Repository.DTO.UserDTOs
         [JsonIgnore]
         public int? RoleId { get; set; }
 
-        [JsonIgnore]
+        
         public int? ProvinceId { get; set; }
 
-        [JsonIgnore]
+        
         public int? CategoryId { get; set; }
 
-        [JsonIgnore]
+        
         public int? OcopCategoryId { get; set; }
 
         [JsonIgnore]
