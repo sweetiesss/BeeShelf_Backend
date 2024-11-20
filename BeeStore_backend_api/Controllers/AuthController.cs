@@ -58,9 +58,9 @@ namespace BeeStore_Api.Controllers
         [Route("reset-password")]
         [HttpPost]
         [AllowAnonymous]
-        public async Task<IActionResult> ResetPassword(string token, string newPassword)
+        public async Task<IActionResult> ResetPassword(UserForgotPasswordRequest request)
         {
-            var result = await _userService.ResetPassword(token, newPassword);
+            var result = await _userService.ResetPassword(request);
             return Ok(result);
         }
     }
