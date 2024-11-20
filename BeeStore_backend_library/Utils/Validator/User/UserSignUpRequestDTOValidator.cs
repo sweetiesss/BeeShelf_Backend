@@ -62,6 +62,12 @@ namespace BeeStore_Repository.Utils.Validator.User
                 .WithMessage(ValidationMessage.BankAccountNumberRequired)
                 .MaximumLength(50)
                 .WithMessage(ValidationMessage.BankAccountNumberMaxLength);
+            RuleFor(x => x.ProvinceId)
+                .NotEmpty();
+            RuleFor(x => x.CategoryId)
+                .NotEmpty();
+            RuleFor(x => x.OcopCategoryId) .NotEmpty();
+                
         }
     }
 
