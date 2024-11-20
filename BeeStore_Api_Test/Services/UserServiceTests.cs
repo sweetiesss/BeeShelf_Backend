@@ -2,16 +2,16 @@
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using BeeStore_Repository;
-using BeeStore_Repository.DTO.UserDTOs;
 using BeeStore_Repository.DTO;
+using BeeStore_Repository.DTO.UserDTOs;
 using BeeStore_Repository.Logger;
+using BeeStore_Repository.Logger.GlobalExceptionHandler.CustomException;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services;
+using BeeStore_Repository.Utils;
 using Microsoft.Extensions.Configuration;
 using Moq;
 using System.Linq.Expressions;
-using BeeStore_Repository.Logger.GlobalExceptionHandler.CustomException;
-using BeeStore_Repository.Utils;
 
 namespace BeeStore_Api_Test.Services
 {
