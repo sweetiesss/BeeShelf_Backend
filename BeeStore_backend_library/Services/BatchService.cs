@@ -26,12 +26,11 @@ namespace BeeStore_Repository.Services
         {
             foreach (var o in request.Orders)
             {
-
                 if (await _unitOfWork.OrderRepo.AnyAsync(u => u.Id.Equals(o.Id) && u.BatchId != null))
                 {
                     throw new ApplicationException(ResponseMessage.OrderBatchError);
                 }
-                if (await _unitOfWork.OrderRepo.AnyAsync(u => u.Id == o.Id && u.IsDeleted == false) == false)
+                if (await _unitOfWork.OrderRepo.AnyAsync(u => u.Id.Equals(o.Id) && u.IsDeleted == false) == false)
                 {
                     throw new KeyNotFoundException(ResponseMessage.OrderIdNotFound);
                 }
@@ -152,7 +151,6 @@ namespace BeeStore_Repository.Services
                 default: filterExpression = null; break;
             }
 
-
             var list = await _unitOfWork.BatchRepo.GetListAsync(
                 filter: filterExpression!,
                 includes: null,
@@ -165,5 +163,6 @@ namespace BeeStore_Repository.Services
             var result = _mapper.Map<List<BatchListDTO>>(list);
             return (await ListPagination<BatchListDTO>.PaginateList(result, pageIndex, pageSize));
         }
+
     }
 }

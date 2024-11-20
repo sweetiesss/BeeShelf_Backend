@@ -30,10 +30,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Services\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\BeeStore_backend_api\BeeStore_Api.csproj" />
     <ProjectReference Include="..\BeeStore_backend_library\BeeStore_Repository.csproj" />
   </ItemGroup>
