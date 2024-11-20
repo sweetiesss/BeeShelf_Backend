@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 using BeeStore_Repository.Data;
 using BeeStore_Repository.DTO.PaymentDTOs;
 using BeeStore_Repository.Enums;
@@ -20,11 +22,15 @@ namespace BeeStore_Repository.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILoggerManager _logger;
-        public PaymentService(IUnitOfWork unitOfWork, IMapper mapper, ILoggerManager logger)
+        private readonly SecretClient _client;
+        private readonly string _keyVaultURL;
+        public PaymentService(IUnitOfWork unitOfWork, IMapper mapper, ILoggerManager logger, IConfiguration configuration)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
+            _keyVaultURL = configuration["KeyVault:KeyVaultURL"] ?? throw new ArgumentNullException("Key Vault URL configuration values are missing.");
+            _client = new SecretClient(new Uri(_keyVaultURL), new EnvironmentCredential());
         }
 
         public async Task<string> ConfirmPayment(ConfirmPaymentDTO request)
@@ -56,9 +62,9 @@ namespace BeeStore_Repository.Services
 
             //var payOS = _configuration.GetSection("PayOS");
 
-            var clientId = payOs.ClientID;
-            var apiKey = payOs.APIKey;
-            var checksum = payOs.ChecksumKey;
+            var clientId = _client.GetSecret("BeeStore-Payment-ClientId").Value.Value;
+            var apiKey = _client.GetSecret("BeeStore-Payment-ApiKey").Value.Value;
+            var checksum = _client.GetSecret("BeeStore-Payment-CheckSumKey").Value.Value;
 
             Random randomOrderCode = new Random();
             int _orderCode = randomOrderCode.Next(1, 10000);
@@ -140,7 +146,7 @@ namespace BeeStore_Repository.Services
             client.DefaultRequestHeaders.Add("x-client-id", clientId);
             client.DefaultRequestHeaders.Add("x-api-key", apiKey);
 
-            var createPaymentLinkRes = client.PostAsync(payOs.POSTpaymentRequest, requestContent).Result;
+            var createPaymentLinkRes = client.PostAsync(payOs.PaymentRequest, requestContent).Result;
 
             if (createPaymentLinkRes.IsSuccessStatusCode)
             {
