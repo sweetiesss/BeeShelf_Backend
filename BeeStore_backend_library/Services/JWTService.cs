@@ -14,7 +14,7 @@ namespace BeeStore_Repository.Services
     public class JWTService : IJWTService
     {
         private readonly string _keyVaultURL;
-        private readonly SecretClient _client;
+        public SecretClient _client;
 
         public JWTService(IConfiguration configuration)
         {
