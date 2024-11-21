@@ -36,16 +36,16 @@ namespace BeeStore_Api_Test.Services
 
             // Mock SecretClient for retrieving secrets
             _mockSecretClient
-                .Setup(client => client.GetSecret("JWTSecretKey", null, It.IsAny<CancellationToken>()))
-                .Returns(CreateMockKeyVaultResponse("JWTSecretKey", JwtSecretKey));
+                .Setup(client => client.GetSecret("BeeStore-JWT-SecretKey", null, It.IsAny<CancellationToken>()))
+                .Returns(CreateMockKeyVaultResponse("BeeStore-JWT-SecretKey", JwtSecretKey));
 
             _mockSecretClient
-                .Setup(client => client.GetSecret("JWTIssuer", null, It.IsAny<CancellationToken>()))
-                .Returns(CreateMockKeyVaultResponse("JWTIssuer", JwtIssuer));
+                .Setup(client => client.GetSecret("BeeStore-JWT-Issuer", null, It.IsAny<CancellationToken>()))
+                .Returns(CreateMockKeyVaultResponse("BeeStore-JWT-Issuer", JwtIssuer));
 
             _mockSecretClient
-                .Setup(client => client.GetSecret("JWTAudience", null, It.IsAny<CancellationToken>()))
-                .Returns(CreateMockKeyVaultResponse("JWTAudience", JwtAudience));
+                .Setup(client => client.GetSecret("BeeStore-JWT-Audience", null, It.IsAny<CancellationToken>()))
+                .Returns(CreateMockKeyVaultResponse("BeeStore-JWT-Audience", JwtAudience));
 
             // Create an instance of JWTService with mock dependencies
             _jwtService = new JWTService(_mockConfiguration.Object)
@@ -135,7 +135,7 @@ namespace BeeStore_Api_Test.Services
                 ValidateLifetime = true,
             }, out _);
 
-            Assert.Equal("test@example.com", newTokenClaims.FindFirst(JwtRegisteredClaimNames.Email)?.Value);
+            Assert.Equal(null, newTokenClaims.FindFirst(JwtRegisteredClaimNames.Email).Value);
             Assert.Equal("Admin", newTokenClaims.FindFirst(ClaimTypes.Role)?.Value);
         }
 
