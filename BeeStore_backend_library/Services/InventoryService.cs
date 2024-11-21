@@ -99,14 +99,15 @@ namespace BeeStore_Repository.Services
             }
 
 
-            if (request.Name != null && !request.Name.Equals(Constants.DefaultString.String))
-            {//uncomment these after you make changes to database
-                //exist.Name = request.Name;
-            }
-            if (request.Weight != null)
-            {
-                //exist.Weight = request.Weight;
-            }
+            //if (request.Name != null && !request.Name.Equals(Constants.DefaultString.String))
+            //{//uncomment these after you make changes to database
+            //    //exist.Name = request.Name;
+            //}
+            //if (request.Weight != null)
+            //{
+            //    //exist.Weight = request.Weight;
+            //}
+
             if (request.MaxWeight != null && request.MaxWeight != 0)
             {
                 exist.MaxWeight = request.MaxWeight;
@@ -140,8 +141,6 @@ namespace BeeStore_Repository.Services
                 InventorySortBy.Weight => Constants.SortCriteria.Weight,
                 _ => null
             };
-
-
 
             var list = await _unitOfWork.InventoryRepo.GetListAsync(
                 filter: filterExpression,
