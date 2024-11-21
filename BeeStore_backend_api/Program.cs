@@ -1,5 +1,6 @@
 using Amazon;
 using Amazon.S3;
+using Amazon.S3.Transfer;
 using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using BeeStore_Api.Authentication;
@@ -11,6 +12,7 @@ using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils.Validator.BatchDTOs;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Swashbuckle.AspNetCore.SwaggerGen;
 
@@ -64,13 +66,15 @@ if (builder.Environment.IsProduction())
 
     builder.Services.AddTransient<IPictureService>(provider =>
     {
-        var unitOfWork = provider.GetRequiredService<UnitOfWork>();
-
+        var unitOfWork = provider.GetRequiredService<IUnitOfWork>();
+        var transferUtility = provider.GetRequiredService<ITransferUtility>();
+        var s3Client = new AmazonS3Client(s3AccessKey.Value.Value, s3SecretKey.Value.Value, RegionEndpoint.APNortheast1);
         return new PictureService(
-            new AmazonS3Client(s3AccessKey.Value.Value, s3SecretKey.Value.Value, RegionEndpoint.APNortheast1),
+            s3Client,
             s3BucketName.Value.Value,
             s3BucketUrl.Value.Value,
-            unitOfWork
+            unitOfWork,
+            transferUtility
         );
     });
 
