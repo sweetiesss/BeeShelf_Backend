@@ -3,21 +3,24 @@ using Amazon.S3.Transfer;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http.HttpResults;
 
 namespace BeeStore_Repository.Services
 {
     public class PictureService : IPictureService
     {
+        private readonly ITransferUtility _transferUtility;
         private readonly IAmazonS3 _s3Client;
         private readonly string _bucketName;
         private readonly string _s3Url;
         private readonly IUnitOfWork _unitOfWork;
-        public PictureService(IAmazonS3 s3Client, string bucketName, string s3Url, IUnitOfWork unitOfWork)
+        public PictureService(IAmazonS3 s3Client, string bucketName, string s3Url, IUnitOfWork unitOfWork, ITransferUtility transferUtility)
         {
             _s3Client = s3Client;
             _bucketName = bucketName;
             _s3Url = s3Url;
             _unitOfWork = unitOfWork;
+            _transferUtility = transferUtility;
         }
 
         public async Task<string> UploadImage(IFormFile file)
@@ -35,8 +38,6 @@ namespace BeeStore_Repository.Services
                 using (var memoryStream = new MemoryStream())
                 {
                     await file.CopyToAsync(memoryStream);
-
-                    var fileTransferUtility = new TransferUtility(_s3Client);
                     var fileTransferUtilityRequest = new TransferUtilityUploadRequest
                     {
                         BucketName = _bucketName,
@@ -45,9 +46,8 @@ namespace BeeStore_Repository.Services
                         CannedACL = S3CannedACL.PublicRead
                     };
 
-                    await fileTransferUtility.UploadAsync(fileTransferUtilityRequest);
+                    await _transferUtility.UploadAsync(fileTransferUtilityRequest);
                 }
-
 
                 return imageUrl;
             }
