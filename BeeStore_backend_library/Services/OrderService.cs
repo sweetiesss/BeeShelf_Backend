@@ -72,7 +72,6 @@ namespace BeeStore_Repository.Services
             return await ListPagination<OrderListDTO>.PaginateList(result, pageIndex, pageSize);
         }
 
-
         public async Task<Pagination<OrderListDTO>> GetWarehouseSentOrderList(int warehouseId, OrderStatus? orderStatus, OrderSortBy? sortCriteria, bool descending, int pageIndex, int pageSize)
         {
             var list = await ApplyFilterToList(orderStatus, sortCriteria, descending, null, null, warehouseId);

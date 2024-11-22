@@ -159,26 +159,26 @@ namespace BeeStore_Api_Test.Services
         {
             // Arrange
             var employees = new List<Employee>
-    {
-        new Employee
-        {
-            Id = 1,
-            Email = "admin@test.com",
-            FirstName = "John",
-            LastName = "Doe",
-            Role = new Role { RoleName = TestConstants.RoleName.Admin },
-            CreateDate = DateTime.Now
-        },
-        new Employee
-        {
-            Id = 2,
-            Email = "manager@test.com",
-            FirstName = "Jane",
-            LastName = "Smith",
-            Role = new Role { RoleName = TestConstants.RoleName.Manager },
-            CreateDate = DateTime.Now
-        }
-    };
+            {
+                new Employee
+                {
+                    Id = 1,
+                    Email = "admin@test.com",
+                    FirstName = "John",
+                    LastName = "Doe",
+                    Role = new Role { RoleName = TestConstants.RoleName.Admin },
+                    CreateDate = DateTime.Now
+                },
+                new Employee
+                {
+                    Id = 2,
+                    Email = "manager@test.com",
+                    FirstName = "Jane",
+                    LastName = "Smith",
+                    Role = new Role { RoleName = TestConstants.RoleName.Manager },
+                    CreateDate = DateTime.Now
+                }
+            };
 
             var employeeDTOs = employees.Select(e => new EmployeeListDTO
             {

@@ -1,17 +1,12 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Transfer;
+using BeeStore_Repository;
+using BeeStore_Repository.Interfaces;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services;
-using BeeStore_Repository;
-using BeeStore_Repository.Utils;
 using Microsoft.AspNetCore.Http;
 using Moq;
-using System;
-using System.IO;
 using System.Linq.Expressions;
-using System.Threading.Tasks;
-using Xunit;
-using BeeStore_Repository.Interfaces;
 
 namespace BeeStore_Api_Test.Services
 {
@@ -97,7 +92,7 @@ namespace BeeStore_Api_Test.Services
         {
             // Arrange
             var file = CreateMockFormFile("test.jpg", "image/jpeg", new byte[] { 1, 2, 3, 4 });
-            
+
             // Setup
             _mockTransferUtility
                 .Setup(tu => tu.UploadAsync(It.IsAny<TransferUtilityUploadRequest>(), It.IsAny<CancellationToken>()))
