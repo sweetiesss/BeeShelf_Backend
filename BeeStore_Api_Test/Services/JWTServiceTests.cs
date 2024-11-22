@@ -1,20 +1,15 @@
-﻿using Azure.Identity;
+﻿using Azure;
+using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
-using Azure;
 using BeeStore_Repository.DTO.UserDTOs;
 using BeeStore_Repository.Services;
 using BeeStore_Repository.Utils;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Moq;
-using System;
-using System.Collections.Generic;
 using System.IdentityModel.Tokens.Jwt;
-using System.Linq;
 using System.Security.Claims;
 using System.Text;
-using System.Threading.Tasks;
-using Microsoft.Extensions.Configuration;
-using MySqlX.XDevAPI;
 
 namespace BeeStore_Api_Test.Services
 {
@@ -134,8 +129,7 @@ namespace BeeStore_Api_Test.Services
                 ValidAudience = JwtAudience,
                 ValidateLifetime = true,
             }, out _);
-
-            Assert.Equal(null, newTokenClaims.FindFirst(JwtRegisteredClaimNames.Email).Value);
+            Assert.Equal(null, newTokenClaims.FindFirstValue(JwtRegisteredClaimNames.Email));
             Assert.Equal("Admin", newTokenClaims.FindFirst(ClaimTypes.Role)?.Value);
         }
 
