@@ -7,6 +7,7 @@ using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace BeeStore_Repository.Services
@@ -39,6 +40,20 @@ namespace BeeStore_Repository.Services
             var result = _mapper.Map<Batch>(request);
             result.Status = Constants.Status.Pending;
             await _unitOfWork.BatchRepo.AddAsync(result);
+            await _unitOfWork.SaveAsync();
+
+            if (request.ShipperId != 0)
+            {
+                DateTime now = DateTime.Now;
+                DateTime nextHour = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
+                result.BatchDeliveries.Add(new BatchDelivery
+                {
+                    NumberOfTrips = 1,
+                    DeliveryStartDate = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond),
+                    BatchId = result.Id,
+                    DeliverBy = result.Id
+                });
+            }
             await _unitOfWork.SaveAsync();
             foreach (var o in request.Orders)
             {
@@ -153,7 +168,7 @@ namespace BeeStore_Repository.Services
 
             var list = await _unitOfWork.BatchRepo.GetListAsync(
                 filter: filterExpression!,
-                includes: null,
+                includes: u => u.Include(o => o.BatchDeliveries),
                 sortBy: null,
                 descending: false,
                 searchTerm: search,

@@ -8,7 +8,7 @@ namespace BeeStore_Repository.DTO.Batch
 
         [JsonIgnore]
         public string? Status { get; set; }
-
+        public int? ShipperId { get; set; }
         public int? DeliveryZoneId { get; set; }
 
         public List<BatchOrdersCreate> Orders { get; set; }

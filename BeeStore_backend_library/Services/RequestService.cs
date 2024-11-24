@@ -109,7 +109,7 @@ namespace BeeStore_Repository.Services
             }
             var result = _mapper.Map<Request>(request);
 
-            result.Lot.InventoryId = request.SendToInventoryId;
+            //result.Lot.InventoryId = request.SendToInventoryId;
 
             await _unitOfWork.RequestRepo.AddAsync(result);
             await _unitOfWork.SaveAsync();
@@ -251,7 +251,7 @@ namespace BeeStore_Repository.Services
                 {
                     throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
                 }
-                var inventory = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.SendToInventory));
+                var inventory = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.SendToInventoryId));
                 if (inventory == null)
                 {
                     throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);

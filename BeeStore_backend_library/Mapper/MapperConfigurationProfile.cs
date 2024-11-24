@@ -162,7 +162,8 @@ namespace BeeStore_Repository.Mapper
                ProductAmount = od.ProductAmount
            }).ToList());
             CreateMap<Batch, BatchListDTO>()
-                .ForMember(dest => dest.Orders, opt => opt.MapFrom(src => src.Orders));
+                .ForMember(dest => dest.Orders, opt => opt.MapFrom(src => src.Orders))
+                .ForMember(dest => dest.AssignTo, opt => opt.MapFrom(src => src.BatchDeliveries.FirstOrDefault(u => u.BatchId.Equals(src.Id)).DeliverBy));
             CreateMap<BatchCreateDTO, Batch>()
                 .ForMember(dest => dest.Orders, opt => opt.Ignore())
                 .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null)); ;
