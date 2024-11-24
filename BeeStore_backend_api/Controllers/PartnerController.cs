@@ -39,6 +39,15 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
+        [Route("get-provinces")]
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetProvince()
+        {
+            var result = await _partnerService.GetProvince();
+            return Ok(result);
+        }
+
         [Route("get-wallet/{userId}")]
         [HttpGet]
         [Authorize(Roles = "Admin,Manager,Staff,Partner")]
