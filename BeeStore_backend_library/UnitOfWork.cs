@@ -2,11 +2,13 @@
 using BeeStore_Repository.Interfaces;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Repositories;
+using Microsoft.AspNetCore.Mvc;
 
 namespace BeeStore_Repository
 {
     public interface IUnitOfWork : IDisposable
     {
+        IGenericRepository<Province> ProvinceRepo { get; }
         IGenericRepository<OcopCategory> OcopCategoryRepo { get; }
         IGenericRepository<Category> CategoryRepo { get; }
         IGenericRepository<Employee> EmployeeRepo { get; }
@@ -35,6 +37,7 @@ namespace BeeStore_Repository
     public class UnitOfWork : IUnitOfWork
     {
         private BeeStoreDbContext _context;
+        private IGenericRepository<Province> provinceRepo;
         private IGenericRepository<OcopCategory> ocopCategoryRepo;
         private IGenericRepository<Category> categoryRepo;
         private IGenericRepository<Employee> employeeRepo;
@@ -61,6 +64,19 @@ namespace BeeStore_Repository
         public UnitOfWork(BeeStoreDbContext context)
         {
             _context = context;
+        }
+
+        public IGenericRepository<Province> ProvinceRepo
+        {
+            get
+            {
+                if (provinceRepo == null)
+                {
+                    provinceRepo = new GenericRepository<Province>(_context);
+                    _context.ChangeTracker.LazyLoadingEnabled = false;
+                }
+                return provinceRepo;
+            }
         }
 
         public IGenericRepository<Category> CategoryRepo
