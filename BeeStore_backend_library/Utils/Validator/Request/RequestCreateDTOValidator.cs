@@ -31,11 +31,11 @@ namespace BeeStore_Repository.Utils.Validator.Request
                 .NotNull()
                 .WithMessage(ValidationMessage.LotRequired);
 
-            RuleFor(x => x.RequestType)
-                .NotEmpty()
-                .WithMessage(ValidationMessage.RequestTypeRequired)
-                .MaximumLength(10)
-                .WithMessage(ValidationMessage.RequestTypeMaxLength);
+            //RuleFor(x => x.RequestType)
+            //    .NotEmpty()
+            //    .WithMessage(ValidationMessage.RequestTypeRequired)
+            //    .MaximumLength(10)
+            //    .WithMessage(ValidationMessage.RequestTypeMaxLength);
 
             //RuleFor(x => x.Status)
             //    .NotEmpty()
