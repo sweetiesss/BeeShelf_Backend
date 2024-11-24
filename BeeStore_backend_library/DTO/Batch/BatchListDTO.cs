@@ -12,6 +12,8 @@ namespace BeeStore_Repository.DTO.Batch
 
         public DateTime? CompleteDate { get; set; }
 
+        public int? AssignTo {  get; set; }
+
         public int? DeliveryZoneId { get; set; }
 
         public List<OrderListDTO> Orders { get; set; }
