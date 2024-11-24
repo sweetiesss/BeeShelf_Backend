@@ -26,6 +26,7 @@
 
         //Transaction response message
         public const string TransactionNotFound = "Transaction not found.";
+        public const string TransactionAlreadyProcessed = "Transaction already processed.";
 
         //Role responise message
         public const string RoleNotFound = "Role not found.";
