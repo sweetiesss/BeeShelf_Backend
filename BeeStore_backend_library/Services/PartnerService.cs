@@ -23,6 +23,7 @@ namespace BeeStore_Repository.Services
             _logger = logger;
         }
 
+
         public async Task<Pagination<PartnerListDTO>> GetAllPartners(string search, SortBy? sortby, bool descending, int pageIndex, int pageSize)
         {
             string sortCriteria = sortby.ToString()!;

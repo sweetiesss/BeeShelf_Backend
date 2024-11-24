@@ -42,5 +42,10 @@
         public string? CategoryName { get; set; }
 
         public string? OcopCategoryName { get; set; }
+        public int? ProvinceId { get; set; }
+
+        public int? CategoryId { get; set; }
+
+        public int? OcopCategoryId { get; set; }
     }
 }
