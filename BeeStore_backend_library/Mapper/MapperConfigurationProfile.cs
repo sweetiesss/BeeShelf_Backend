@@ -7,6 +7,7 @@ using BeeStore_Repository.DTO.PackageDTOs;
 using BeeStore_Repository.DTO.PartnerDTOs;
 using BeeStore_Repository.DTO.ProductCategoryDTOs;
 using BeeStore_Repository.DTO.ProductDTOs;
+using BeeStore_Repository.DTO.ProvinceDTOs;
 using BeeStore_Repository.DTO.RequestDTOs;
 using BeeStore_Repository.DTO.RoleDTOs;
 using BeeStore_Repository.DTO.UserDTOs;
@@ -34,6 +35,7 @@ namespace BeeStore_Repository.Mapper
                      .ForMember(dest => dest.Password, opt => opt.MapFrom(src => BCrypt.Net.BCrypt.HashPassword(src.Password)));
             CreateMap<UserSignUpRequestDTO, OcopPartner>();
 
+            CreateMap<Province, ProvinceListDTO>();
 
             CreateMap<Employee, EmployeeListDTO>()
                     .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.Role!.RoleName))

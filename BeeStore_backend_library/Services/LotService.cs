@@ -24,30 +24,7 @@ namespace BeeStore_Repository.Services
             _logger = logger;
         }
 
-        //public async Task<string> CreateLot(LotCreateDTO request)
-        //{
-        //    if (request.InventoryId != null)
-        //    {
-        //        var inventory = await _unitOfWork.InventoryRepo.AnyAsync(u => u.Id == request.InventoryId);
-        //        if (inventory == false)
-        //        {
-        //            throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
-        //        }
-        //    }
-        //    var product = await _unitOfWork.ProductRepo.SingleOrDefaultAsync(u => u.Id == request.ProductId);
-        //    if (product == null)
-        //    {
-        //        throw new KeyNotFoundException(ResponseMessage.ProductIdNotFound);
-        //    }
-
-
-        //    var result = _mapper.Map<Lot>(request);
-
-        //    result.ExpirationDate = DateTime.Now.AddDays(result.Product.ProductCategory.ExpireIn!.Value);
-        //    await _unitOfWork.LotRepo.AddAsync(result);
-        //    await _unitOfWork.SaveAsync();
-        //    return ResponseMessage.Success;
-        //}
+       
 
         public async Task<string> DeleteLot(int id)
         {

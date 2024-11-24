@@ -1,6 +1,8 @@
 ﻿using AutoMapper;
 using BeeStore_Repository.DTO;
+using BeeStore_Repository.DTO.PackageDTOs;
 using BeeStore_Repository.DTO.PartnerDTOs;
+using BeeStore_Repository.DTO.ProvinceDTOs;
 using BeeStore_Repository.Enums.SortBy;
 using BeeStore_Repository.Logger;
 using BeeStore_Repository.Models;
@@ -235,6 +237,13 @@ namespace BeeStore_Repository.Services
                 totalProductAmount = totalStock,
                 Products = groupedProducts
             };
+        }
+
+        public async Task<List<ProvinceListDTO>> GetProvince()
+        {
+            var list = await _unitOfWork.ProvinceRepo.GetAllAsync();
+            var result = _mapper.Map<List<ProvinceListDTO>>(list);
+            return result;
         }
     }
 }
