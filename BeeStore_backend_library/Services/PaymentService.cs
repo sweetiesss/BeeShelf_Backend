@@ -40,6 +40,10 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.TransactionNotFound);
             }
+            if(transaction.Status != Constants.PaymentStatus.Pending)
+            {
+                throw new ApplicationException(ResponseMessage.TransactionAlreadyProcessed);
+            }
             if (request.Status == Constants.PaymentStatus.Paid)
             {
                 var wallet = await _unitOfWork.WalletRepo.SingleOrDefaultAsync(u => u.OcopPartnerId.Equals(transaction.OcopPartnerId));
@@ -113,7 +117,7 @@ namespace BeeStore_Repository.Services
             {
                 new
                 {
-                   name = $"{price} coin pack",
+                   name = $"{price} Coin Pack",
                    quantity = 1,
                    price = price
                 }
