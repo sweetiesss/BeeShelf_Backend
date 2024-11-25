@@ -98,7 +98,7 @@ namespace BeeStore_Repository.Services
 
 
 
-        public async Task<string> CreateOrder(OrderCreateDTO request)
+        public async Task<string> CreateOrder(int warehouseId, OrderCreateDTO request)
         {
             int number = 0;
             var user = await _unitOfWork.OcopPartnerRepo.AnyAsync(u => u.Id == request.OcopPartnerId);
@@ -128,6 +128,7 @@ namespace BeeStore_Repository.Services
                                                                 && u.InventoryId.HasValue
                                                                 && u.ImportDate.HasValue
                                                                 && u.ProductAmount > 0
+                                                                && u.Inventory.WarehouseId.Equals(warehouseId)
                                                                 && u.IsDeleted.Equals(false))
                                                                 .OrderBy(u => u.ImportDate)
                                                                 .Include(o => o.Product)
