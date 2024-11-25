@@ -22,6 +22,9 @@
 
         public string? ReceiverAddress { get; set; }
         public decimal? Distance { get; set; }
+        public int? WarehouseID { get; set; }
+        public string? WarehouseName { get; set; }
+        public string? WarehouseLocation { get; set; }
 
         public decimal? TotalPrice { get; set; }
 
