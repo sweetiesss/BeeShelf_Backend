@@ -40,7 +40,7 @@ namespace BeeStore_Api.Controllers
 
         [Route("get-inventories")]
         [HttpGet]
-        [Authorize(Roles = "Admin,Manager,Staff")]
+        [Authorize(Roles = "Admin,Manager,Staff,Partner")]
         public async Task<IActionResult> GetInventoryList([FromQuery] InventoryFilter? filterBy,
                                                           [FromQuery][DefaultValue(null)] string? filterQuery,
                                                           [FromQuery] InventorySortBy? sortCriteria,
