@@ -28,6 +28,9 @@
         public const string TransactionNotFound = "Transaction not found.";
         public const string TransactionAlreadyProcessed = "Transaction already processed.";
 
+        //Payment
+        public const string PaymentNotFound = "Payment has already been processed or doesn't exist.";
+
         //Role responise message
         public const string RoleNotFound = "Role not found.";
 

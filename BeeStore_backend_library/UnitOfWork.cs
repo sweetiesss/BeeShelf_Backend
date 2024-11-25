@@ -3,11 +3,15 @@ using BeeStore_Repository.Interfaces;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Repositories;
 using Microsoft.AspNetCore.Mvc;
+using Org.BouncyCastle.Asn1.IsisMtt.X509;
+using System.Runtime.InteropServices;
 
 namespace BeeStore_Repository
 {
     public interface IUnitOfWork : IDisposable
     {
+        IGenericRepository<MoneyTransfer> MoneyTransferRepo { get; }
+        IGenericRepository<Payment> PaymentRepo {  get; }
         IGenericRepository<Province> ProvinceRepo { get; }
         IGenericRepository<OcopCategory> OcopCategoryRepo { get; }
         IGenericRepository<Category> CategoryRepo { get; }
@@ -37,6 +41,8 @@ namespace BeeStore_Repository
     public class UnitOfWork : IUnitOfWork
     {
         private BeeStoreDbContext _context;
+        private IGenericRepository<MoneyTransfer> moneyTransferRepo;
+        private IGenericRepository<Payment> paymentRepo;
         private IGenericRepository<Province> provinceRepo;
         private IGenericRepository<OcopCategory> ocopCategoryRepo;
         private IGenericRepository<Category> categoryRepo;
@@ -64,6 +70,30 @@ namespace BeeStore_Repository
         public UnitOfWork(BeeStoreDbContext context)
         {
             _context = context;
+        }
+
+        public IGenericRepository<MoneyTransfer> MoneyTransferRepo
+        {
+            get
+            {
+                if (moneyTransferRepo == null)
+                {
+                    moneyTransferRepo = new GenericRepository<MoneyTransfer>(_context);
+                }
+                return moneyTransferRepo;
+            }
+        }
+
+        public IGenericRepository<Payment> PaymentRepo
+        {
+            get
+            {
+                if (paymentRepo == null)
+                {
+                    paymentRepo = new GenericRepository<Payment>(_context);
+                }
+                return paymentRepo;
+            }
         }
 
         public IGenericRepository<Province> ProvinceRepo
