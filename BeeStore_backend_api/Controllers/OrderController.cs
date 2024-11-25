@@ -58,7 +58,7 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
-        [Route("get-warehouse-orders/{userId}")]
+        [Route("get-warehouse-orders")]
         [Authorize(Roles = "Admin,Manager,Staff,Shipper")]
         [HttpGet]
         public async Task<IActionResult> GetWarehouseSentOrder(int warehouseId,
