@@ -55,6 +55,8 @@ namespace BeeStore_Repository.Services
 
         }
 
+
+
         public async Task<PaymentResponseDTO> CreateQrCode(CoinPackValue options, string custom_amount, PaymentRequestDTO request)
         {
 
@@ -188,6 +190,34 @@ namespace BeeStore_Repository.Services
                 //return await System.Threading.Tasks.Task.FromResult(createPaymentLinkRes.StatusCode.ToString());
                 throw new Exception(createPaymentLinkRes.StatusCode.ToString());
             }
+        }
+
+        public async Task<List<PaymentListDTO>> GetPaymentList()
+        {
+            var list = await _unitOfWork.PaymentRepo.GetQueryable();
+            var a = list.ToList();
+            var result = _mapper.Map<List<PaymentListDTO>>(a);
+            return result;
+        }
+
+        public async Task<string> CreateMoneyTransfer(int paymentId)
+        {
+            var payment = await _unitOfWork.PaymentRepo.SingleOrDefaultAsync(u => u.Id.Equals(paymentId));
+            if (payment == null)
+            {
+                throw new KeyNotFoundException(ResponseMessage.PaymentNotFound);
+            }
+            
+            payment.IsDeleted = true;
+            var moneyTransfer = new MoneyTransfer{
+                Amount = payment.TotalAmount,
+                CreateDate = DateTime.Now,
+                OcopPartnerId = payment.Wallet.OcopPartnerId,
+                WalletId = payment.WalletId
+            };
+            await _unitOfWork.MoneyTransferRepo.AddAsync(moneyTransfer);
+            await _unitOfWork.SaveAsync();
+            return ResponseMessage.Success;
         }
     }
 }
