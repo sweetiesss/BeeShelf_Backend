@@ -9,6 +9,7 @@ using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Identity.Client.Extensions.Msal;
 using System.Data;
 
 namespace BeeStore_Repository.Services
@@ -110,6 +111,10 @@ namespace BeeStore_Repository.Services
             decimal? totalPrice = 0;
             decimal? totalStorageFee = 0;
             decimal? deliveryFee = 0;
+            if(request.Distance > 10)
+            {
+                deliveryFee += (request.Distance - 10) * 1000;
+            }
             foreach (var product in request.Products)
             {
 
@@ -121,6 +126,7 @@ namespace BeeStore_Repository.Services
                 //get a list of Lot with product Id
                 var b = await _unitOfWork.LotRepo.GetQueryable(query => query.Where(u => u.ProductId.Equals(product.ProductId)
                                                                 && u.InventoryId.HasValue
+                                                                && u.ImportDate.HasValue
                                                                 && u.ProductAmount > 0
                                                                 && u.IsDeleted.Equals(false))
                                                                 .OrderBy(u => u.ImportDate)
@@ -197,7 +203,13 @@ namespace BeeStore_Repository.Services
                     }
 
                     totalPrice += lot.Product.Price * amountToTake;
-
+                    totalStorageFee += CalculateStorageFee(lot.ImportDate.Value, DateTime.Now);
+                    if(lot.Product.Weight* product.ProductAmount > 5)
+                    {
+                        decimal? extraWeight = lot.Product.Weight * lot.ProductAmount - 5;
+                        decimal extraWeightUnits = Math.Ceiling((decimal)extraWeight / 0.5m); // Convert to 0.5kg units
+                        deliveryFee += extraWeightUnits * 5000;
+                    }
                     request.OrderDetails.Add(new OrderDetailCreateDTO
                     {
                         LotId = lot.Id,
@@ -402,7 +414,7 @@ namespace BeeStore_Repository.Services
                     //take away the product's amount here
                     foreach (var od in exist.OrderDetails)
                     {
-                        UpdateLotProductAmount(od.LotId, od.ProductAmount, false);
+                       await UpdateLotProductAmount(od.LotId, od.ProductAmount, false);
                     }
                 }
                 else
@@ -442,6 +454,13 @@ namespace BeeStore_Repository.Services
                 {
                     orderStatusUpdate = Constants.Status.Delivered;
                     a = true;
+                    var orderfee = exist.OrderFees.FirstOrDefault(u => u.Id.Equals(exist.Id));
+                    exist.Payments.Add(new Payment
+                    {
+                        WalletId = exist.OcopPartner.Wallets.FirstOrDefault(u => u.OcopPartnerId.Equals(exist.OcopPartnerId)).Id,
+                        OrderId = exist.Id,
+                        TotalAmount = (int)(exist.TotalPrice - (orderfee.DeliveryFee + orderfee.StorageFee + orderfee.AdditionalFee))
+                    });
                 }
                 else
                 {
@@ -455,17 +474,36 @@ namespace BeeStore_Repository.Services
             }
 
             exist.Status = orderStatusUpdate;
+            
             _unitOfWork.OrderRepo.Update(exist);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
         }
 
+        private decimal CalculateStorageFee(DateTime importDate, DateTime currentDate)
+        {
+            const decimal RATE_FIRST_WEEK = 10;    
+            const decimal RATE_AFTER_WEEK = 20;    
+            const int DAYS_IN_WEEK = 7;
+
+            TimeSpan storageDuration = currentDate - importDate;
+
+            double totalHours = storageDuration.TotalHours;
+
+            double hoursInFirstWeek = Math.Min(totalHours, DAYS_IN_WEEK * 24);
+            double hoursAfterFirstWeek = Math.Max(0, totalHours - (DAYS_IN_WEEK * 24));
+
+            decimal firstWeekFee = (decimal)hoursInFirstWeek * RATE_FIRST_WEEK;
+            decimal remainingFee = (decimal)hoursAfterFirstWeek * RATE_AFTER_WEEK;
+
+            return firstWeekFee + remainingFee;
+        }
 
 
         private async Task UpdateLotProductAmount(int? lotId, int? amount, bool cancel)
         {
             var lot = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id == lotId);
-            if (lot != null)
+            if (lot == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
             }
