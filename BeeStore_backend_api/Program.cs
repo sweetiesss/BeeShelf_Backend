@@ -67,8 +67,8 @@ if (builder.Environment.IsProduction())
     builder.Services.AddTransient<IPictureService>(provider =>
     {
         var unitOfWork = provider.GetRequiredService<IUnitOfWork>();
-        var transferUtility = provider.GetRequiredService<ITransferUtility>();
         var s3Client = new AmazonS3Client(s3AccessKey.Value.Value, s3SecretKey.Value.Value, RegionEndpoint.APNortheast1);
+        ITransferUtility transferUtility = new TransferUtility(s3Client);
         return new PictureService(
             s3Client,
             s3BucketName.Value.Value,

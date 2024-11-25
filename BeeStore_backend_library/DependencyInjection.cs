@@ -1,4 +1,5 @@
 ﻿using Amazon.S3;
+using Amazon.S3.Transfer;
 using Azure.Security.KeyVault.Secrets;
 using BeeStore_Repository.Data;
 using BeeStore_Repository.Logger;
@@ -42,6 +43,7 @@ namespace BeeStore_Repository
             services.AddScoped<ILoggerManager, LoggerManager>();
             services.AddScoped<IJWTService, JWTService>();
             services.AddScoped<IUnitOfWork, UnitOfWork>();
+            services.AddScoped<ITransferUtility, TransferUtility>();
             services.AddScoped<GlobalExceptionMiddleware>();
 
             //Memory Cache
