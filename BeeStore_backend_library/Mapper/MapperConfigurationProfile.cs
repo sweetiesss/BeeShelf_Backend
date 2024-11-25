@@ -141,6 +141,9 @@ namespace BeeStore_Repository.Mapper
 
             CreateMap<Order, OrderListDTO>()
                 .ForMember(dest => dest.partner_email, opt => opt.MapFrom(src => src.OcopPartner!.Email))
+                .ForMember(dest => dest.WarehouseID, opt => opt.MapFrom(src => src.OrderDetails.FirstOrDefault(u => u.OrderId.Equals(src.Id)).Lot.Inventory.WarehouseId))
+                .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom(src => src.OrderDetails.FirstOrDefault(u => u.OrderId.Equals(src.Id)).Lot.Inventory.Warehouse.Name))
+                .ForMember(dest => dest.WarehouseLocation, opt => opt.MapFrom(src => src.OrderDetails.FirstOrDefault(u => u.OrderId.Equals(src.Id)).Lot.Inventory.Warehouse.Location))
                 .ForMember(dest => dest.OrderDetails, opt => opt.MapFrom(src => src.OrderDetails))
                 .ForMember(dest => dest.OrderFees, opt => opt.MapFrom(src => src.OrderFees))
             .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
