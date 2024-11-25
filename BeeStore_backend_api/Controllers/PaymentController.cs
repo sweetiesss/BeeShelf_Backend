@@ -35,5 +35,23 @@ namespace BeeStore_Api.Controllers
             var result = await _paymentService.ConfirmPayment(request);
             return Ok(result);
         }
+
+        [Authorize(Roles = "Admin, Staff")]
+        [Route("get-payments")]
+        [HttpGet]
+        public async Task<IActionResult> GetPayment()
+        {
+            var result = await _paymentService.GetPaymentList();
+            return Ok(result);
+        }
+
+        [Authorize(Roles = "Admin, Staff")]
+        [Route("create-money-transfer/{paymentId}")]
+        [HttpPost]
+        public async Task<IActionResult> CreateMoneyTransfer(int paymentId)
+        {
+            var result = await _paymentService.CreateMoneyTransfer(paymentId);
+            return Ok(result);
+        }
     }
 }
