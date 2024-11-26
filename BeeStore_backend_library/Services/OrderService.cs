@@ -398,6 +398,11 @@ namespace BeeStore_Repository.Services
                 {
                     orderStatusUpdate = Constants.Status.Processing;
                     a = true;
+                    //take away the product's amount here
+                    foreach (var od in exist.OrderDetails)
+                    {
+                        await UpdateLotProductAmount(od.LotId, od.ProductAmount, false);
+                    }
                 }
                 else
                 {
@@ -412,11 +417,7 @@ namespace BeeStore_Repository.Services
                 {
                     orderStatusUpdate = Constants.Status.Shipping;
                     a = true;
-                    //take away the product's amount here
-                    foreach (var od in exist.OrderDetails)
-                    {
-                       await UpdateLotProductAmount(od.LotId, od.ProductAmount, false);
-                    }
+                    
                 }
                 else
                 {
