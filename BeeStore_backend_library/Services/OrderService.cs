@@ -536,6 +536,10 @@ namespace BeeStore_Repository.Services
             }
             else
             {
+                if (lot.ProductAmount == 0 || lot.ProductAmount < amount)
+                {
+                    throw new ApplicationException(ResponseMessage.ProductNotEnough);
+                }
                 lot.ProductAmount -= amount;
                 lot.Inventory.Weight -= amount * lot.Product.Weight;
             }
