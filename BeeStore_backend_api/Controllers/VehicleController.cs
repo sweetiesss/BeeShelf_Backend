@@ -80,7 +80,7 @@ namespace BeeStore_Api.Controllers
         [HttpPost]
         [Authorize(Roles = "Admin,Manager,Staff")]
 
-        public async Task<IActionResult> AssignDrier(int id, int driverId)
+        public async Task<IActionResult> AssignDriver(int id, int driverId)
         {
             var result = await _vehicleService.AssignVehicle(id, driverId);
             return Ok(result);
