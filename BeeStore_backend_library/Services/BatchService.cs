@@ -51,13 +51,17 @@ namespace BeeStore_Repository.Services
                     NumberOfTrips = 1,
                     DeliveryStartDate = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond),
                     BatchId = result.Id,
-                    DeliverBy = result.Id
+                    DeliverBy = request.ShipperId
                 });
             }
             await _unitOfWork.SaveAsync();
             foreach (var o in request.Orders)
             {
                 var order = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u => u.Id == o.Id);
+                if(order.Status != Constants.Status.Processing)
+                {
+                    throw new ApplicationException(ResponseMessage.BatchAssignedOrder);
+                }
                 order.BatchId = result.Id;
                 order.DeliverStartDate = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
                 await _unitOfWork.SaveAsync();
