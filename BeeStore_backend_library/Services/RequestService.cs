@@ -266,7 +266,7 @@ namespace BeeStore_Repository.Services
                     await _unitOfWork.SaveAsync();
                     throw new ApplicationException(ResponseMessage.InventoryOverWeightError);
                 }
-
+                lot.ImportDate = DateTime.Now;
                 lot.InventoryId = exist.SendToInventoryId;
                 lot.ExpirationDate = DateTime.Now.AddDays(lot.Product.ProductCategory!.ExpireIn!.Value);
 
