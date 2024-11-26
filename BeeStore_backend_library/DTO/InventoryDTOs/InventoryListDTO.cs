@@ -16,6 +16,7 @@
 
         public DateTime? ExpirationDate { get; set; }
 
+        public int? WarehouseId { get; set; }
         public string WarehouseName { get; set; }
     }
 }
