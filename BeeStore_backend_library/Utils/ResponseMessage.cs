@@ -1,4 +1,6 @@
-﻿namespace BeeStore_Repository.Utils
+﻿using Org.BouncyCastle.Tls;
+
+namespace BeeStore_Repository.Utils
 {
     public static class ResponseMessage
     {
@@ -66,9 +68,12 @@
         public const string WarehouseUserDuplicateList = "Please check provided list. The following user is duplicate: ";
         public const string WarehouseUserAddListFailed = "Failed to add. These user are already working at a warehouse ";
 
+
+
         //Batch response message
         public const string BatchIdNotFound = "Batch Id not found.";
         public const string BatchStatusNotPending = "Can't edit processed batch.";
+        public const string BatchAssignedOrder = "Can't assign unprocessed or completed orders.";
 
         //Product response message
         public const string ProductIdNotFound = "Product Id not found.";
