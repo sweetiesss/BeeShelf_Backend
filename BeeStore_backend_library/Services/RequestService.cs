@@ -221,7 +221,9 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.RequestIdNotFound);
             }
-            if (!exist.Status.Equals(Constants.Status.Pending))
+            if (exist.Status.Equals(Constants.Status.Completed)
+                || exist.Status.Equals(Constants.Status.Failed)
+                || exist.Status.Equals(Constants.Status.Canceled))
             {
                 throw new ApplicationException(ResponseMessage.RequestStatusError);
             }
@@ -243,9 +245,9 @@ namespace BeeStore_Repository.Services
             }
 
 
-
             if (requestStatus == Constants.Status.Completed)
             {
+                
                 var lot = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.LotId));
                 if (lot == null)
                 {
