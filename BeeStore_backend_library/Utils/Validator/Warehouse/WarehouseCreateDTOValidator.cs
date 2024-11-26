@@ -22,10 +22,6 @@ namespace BeeStore_Repository.Utils.Validator.Warehouse
                 .WithMessage(ValidationMessage.LocationRequired)
                 .MaximumLength(50)
                 .WithMessage(ValidationMessage.LocationMaxLength);
-
-            RuleFor(x => x.CreateDate)
-                .NotNull()
-                .WithMessage(ValidationMessage.CreateDateRequired);
         }
     }
 }
