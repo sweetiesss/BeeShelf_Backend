@@ -462,6 +462,7 @@ namespace BeeStore_Repository.Services
                         OrderId = exist.Id,
                         TotalAmount = (int)(exist.TotalPrice - (orderfee.DeliveryFee + orderfee.StorageFee + orderfee.AdditionalFee))
                     });
+                    exist.DeliverFinishDate = DateTime.Now;
                 }
                 else
                 {
@@ -512,10 +513,12 @@ namespace BeeStore_Repository.Services
             if (cancel == true)
             {
                 lot.ProductAmount += amount;
+                lot.Inventory.Weight += amount * lot.Product.Weight;
             }
             else
             {
                 lot.ProductAmount -= amount;
+                lot.Inventory.Weight -= amount * lot.Product.Weight;
             }
             await _unitOfWork.SaveAsync();
         }
