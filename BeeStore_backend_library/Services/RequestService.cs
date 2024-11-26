@@ -149,7 +149,8 @@ namespace BeeStore_Repository.Services
             var list = await _unitOfWork.RequestRepo.GetListAsync(
                 filter: u => (filterQuery == null || u.Status.Equals(filterQuery))
                              && (userId == null || u.OcopPartnerId.Equals(userId))
-                             && (warehouseId == null || u.SendToInventory.WarehouseId.Equals(warehouseId)),
+                             && (warehouseId == null || u.SendToInventory.WarehouseId.Equals(warehouseId))
+                             && u.IsDeleted.Equals(false),
                 includes: null,
                 sortBy: Constants.SortCriteria.CreateDate,
                 descending: descending,
