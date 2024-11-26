@@ -424,6 +424,24 @@ namespace BeeStore_Repository.Services
                 }
             }
 
+            if (orderStatusString.Equals(Constants.Status.Returned, StringComparison.OrdinalIgnoreCase))    //Shipped
+            {
+                if (exist.Status == Constants.Status.Delivered)
+                {
+                    orderStatusUpdate = Constants.Status.Returned;
+                    a = true;
+                    //take away the product's amount here
+                    foreach (var od in exist.OrderDetails)
+                    {
+                        await UpdateLotProductAmount(od.LotId, od.ProductAmount, true);
+                    }
+                }
+                else
+                {
+                    throw new ApplicationException(ResponseMessage.OrderProccessedError);
+                }
+            }
+
             //Order can be canceled from three states,
             //Pending (Partner initiate),
             //Proccessing (Both User and Staff can initiate), 
@@ -439,7 +457,7 @@ namespace BeeStore_Repository.Services
                     //return product's amount here
                     foreach (var od in exist.OrderDetails)
                     {
-                        UpdateLotProductAmount(od.LotId, od.ProductAmount, true);
+                        await UpdateLotProductAmount(od.LotId, od.ProductAmount, true);
                     }
                 }
                 else
