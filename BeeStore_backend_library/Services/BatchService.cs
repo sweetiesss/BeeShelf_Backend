@@ -42,10 +42,10 @@ namespace BeeStore_Repository.Services
             await _unitOfWork.BatchRepo.AddAsync(result);
             await _unitOfWork.SaveAsync();
 
+            DateTime now = DateTime.Now;
+            DateTime nextHour = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
             if (request.ShipperId != 0)
             {
-                DateTime now = DateTime.Now;
-                DateTime nextHour = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
                 result.BatchDeliveries.Add(new BatchDelivery
                 {
                     NumberOfTrips = 1,
@@ -59,6 +59,7 @@ namespace BeeStore_Repository.Services
             {
                 var order = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u => u.Id == o.Id);
                 order.BatchId = result.Id;
+                order.DeliverStartDate = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
                 await _unitOfWork.SaveAsync();
             }
             return ResponseMessage.Success;
