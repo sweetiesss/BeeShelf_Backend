@@ -24,7 +24,7 @@ namespace BeeStore_Api.Controllers
 
         [Route("get-employees")]
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> GetEmployees([FromQuery][DefaultValue(null)] string? search,
                                                   [FromQuery] UserSortBy? sortBy,
                                                   [FromQuery] EmployeeRole? filterByRole,
@@ -47,7 +47,7 @@ namespace BeeStore_Api.Controllers
 
         [Route("create-employee")]
         [HttpPost]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> CreateEmployee([FromBody] EmployeeCreateRequest user)
         {
             var result = await _userService.CreateEmployee(user);
@@ -65,7 +65,7 @@ namespace BeeStore_Api.Controllers
 
         [Route("delete-employee/{id}")]
         [HttpDelete]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin,Manager")]
         public async Task<IActionResult> DeleteEmployee(int id)
         {
             var result = await _userService.DeleteEmployee(id);

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BeeStore_Api.Controllers
 {
-    [Authorize(Roles = "Admin")]
+    [Authorize(Roles = "Admin,Manager")]
     public class RoleController : BaseController
     {
         private readonly IRoleService _roleService;
