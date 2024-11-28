@@ -79,14 +79,15 @@ namespace BeeStore_Repository.Services
                     throw new ApplicationException(ResponseMessage.ShipperBatchOrdersOverweight);
                 }
 
-
-                    result.BatchDeliveries.Add(new BatchDelivery
+                result.BatchDeliveries.Add(
+                    new BatchDelivery
                     {
                         NumberOfTrips = 1,
                         DeliveryStartDate = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond),
                         BatchId = result.Id,
                         DeliverBy = request.ShipperId
-                    });
+                    }
+                );
             }
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;

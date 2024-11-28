@@ -9,12 +9,7 @@ using BeeStore_Repository.Data;
 using BeeStore_Repository.Logger.GlobalExceptionHandler;
 using BeeStore_Repository.Services;
 using BeeStore_Repository.Services.Interfaces;
-using BeeStore_Repository.Utils.Validator.BatchDTOs;
-using FluentValidation;
 using FluentValidation.AspNetCore;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Options;
-using Swashbuckle.AspNetCore.SwaggerGen;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -87,16 +82,9 @@ if (builder.Environment.IsProduction())
                               .AllowCredentials());
     });
 }
-builder.Services.AddValidatorsFromAssemblyContaining<BatchCreateDTOValidator>();
-
 
 builder.Services.AddWebAPIService();
-builder.Services.AddControllers();
 builder.Services.AddFluentValidationAutoValidation();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-
-builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, SwaggerConfiguration>();
 
 var app = builder.Build();
 
@@ -106,16 +94,12 @@ app.UseSwaggerUI();
 app.UseHttpsRedirection();
 
 app.UseMiddleware<GlobalExceptionMiddleware>();
-if (builder.Environment.IsProduction())
-{
-    app.UseMiddleware<ApiKeyAuthMiddleware>();
-    app.UseCors("AllowSpecificOrigins");
-}
+app.UseMiddleware<ApiKeyAuthMiddleware>();
+app.UseCors("AllowSpecificOrigins");
 
 app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
-
 
 app.Run();
