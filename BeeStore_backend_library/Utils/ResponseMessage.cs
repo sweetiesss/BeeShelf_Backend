@@ -74,6 +74,7 @@ namespace BeeStore_Repository.Utils
         public const string BatchIdNotFound = "Batch Id not found.";
         public const string BatchStatusNotPending = "Can't edit processed batch.";
         public const string BatchAssignedOrder = "Can't assign unprocessed or completed orders.";
+        public const string ShipperBatchOrdersOverweight = "Shipper's vehicle doesn't have enough capacity to handle this batch of orders.";
 
         //Product response message
         public const string ProductIdNotFound = "Product Id not found.";
@@ -102,10 +103,14 @@ namespace BeeStore_Repository.Utils
         //Request response message
         public const string RequestIdNotFound = "Request Id not found.";
         public const string RequestStatusError = "Request has already been proccessed.";
+        public const string RequestDraftCancelError = "Can't cancel draft request.";
 
         //Warehouse category response message
         public const string WarehouseCategoryAddListFailed = "Failed to add. Warehouse with these category already exist: ";
         public const string WarehouseCategoryDuplicateList = "Please check provided list. The following category is duplicate: ";
+
+        //Delivery Zone
+        public const string DeliveryZoneDuplicateNameOrLocation = "Delivery zone with this name or location has already exist.";
 
         //Province
         public const string ProvinceIdNotFound = "Province Id not found.";

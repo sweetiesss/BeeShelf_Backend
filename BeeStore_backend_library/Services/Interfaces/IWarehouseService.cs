@@ -12,6 +12,7 @@ namespace BeeStore_Repository.Services.Interfaces
         Task<List<WarehouseListInventoryDTO>> GetWarehouseByUserId(int userId);
         Task<WarehouseDeliveryZoneDTO> GetWarehouseById(int id);
         Task<string> CreateWarehouse(WarehouseCreateDTO request);
+        Task<string> AddDeliveryZonesToWarehouse(int warehouseId, List<DeliveryZoneCreateDTO> request);
         Task<string> UpdateWarehouse(int id, WarehouseCreateDTO request);
         Task<string> DeleteWarehouse(int id);
     }

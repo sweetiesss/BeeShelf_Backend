@@ -51,9 +51,9 @@ namespace BeeStore_Api_Test.Controllers
         public async Task CreateOrder_ShouldReturnCreatedOrder()
         {
             var newOrder = new OrderCreateDTO();
-            _mockOrderService.Setup(s => s.CreateOrder(newOrder)).ReturnsAsync(ResponseMessage.Success);
+            _mockOrderService.Setup(s => s.CreateOrder(1, newOrder)).ReturnsAsync(ResponseMessage.Success);
 
-            var response = await _orderController.CreateOrder(newOrder) as OkObjectResult;
+            var response = await _orderController.CreateOrder(1, newOrder) as OkObjectResult;
 
             Assert.NotNull(response);
             Assert.Equal(200, response.StatusCode);

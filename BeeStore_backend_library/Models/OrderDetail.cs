@@ -8,7 +8,7 @@ public partial class OrderDetail : BaseEntity
 
     public int? LotId { get; set; }
 
-    public int? ProductPrice { get; set; }
+    public decimal? ProductPrice { get; set; }
 
     public int? ProductAmount { get; set; }
 

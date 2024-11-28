@@ -36,6 +36,44 @@ namespace BeeStore_Repository.Services
             var warehouse = _mapper.Map<Warehouse>(request);
             warehouse.CreateDate = DateTime.Now;
             await _unitOfWork.WarehouseRepo.AddAsync(warehouse);
+            foreach(var o in request.DeliveryZones)
+            {
+                o.Name = o.Name.Trim();
+                o.Location = o.Location.Trim();
+                var deliveryzomama = await _unitOfWork.DeliveryZoneRepo.AnyAsync(u => (u.Name.Equals(o.Name, StringComparison.OrdinalIgnoreCase)
+                                                                        || u.Location.Equals(o.Location, StringComparison.OrdinalIgnoreCase)) 
+                                                                        && u.WarehouseId.Equals(warehouse.Id));
+                if(deliveryzomama != false)
+                {
+                    throw new DuplicateException(ResponseMessage.DeliveryZoneDuplicateNameOrLocation);
+                }
+            }
+            await _unitOfWork.SaveAsync();
+            return ResponseMessage.Success;
+        }
+
+        public async Task<string> AddDeliveryZonesToWarehouse(int warehouseId, List<DeliveryZoneCreateDTO> request)
+        {
+            var exist = await _unitOfWork.WarehouseRepo.SingleOrDefaultAsync(u => u.Id == warehouseId);
+            if (exist == null)
+            {
+                throw new DuplicateException(ResponseMessage.WarehouseIdNotFound);
+            }
+            foreach (var o in request)
+            {
+                o.Name = o.Name.Trim();
+                o.Location = o.Location.Trim();
+                var deliveryzomama = await _unitOfWork.DeliveryZoneRepo.AnyAsync(u => (u.Name.Equals(o.Name, StringComparison.OrdinalIgnoreCase)
+                                                                        || u.Location.Equals(o.Location, StringComparison.OrdinalIgnoreCase))
+                                                                        && u.WarehouseId.Equals(warehouseId));
+                if (deliveryzomama != false)
+                {
+                    throw new DuplicateException(ResponseMessage.DeliveryZoneDuplicateNameOrLocation);
+                }
+                o.WarehouseId = warehouseId;
+            }
+            var result = _mapper.Map<List<DeliveryZone>>(request);
+            await _unitOfWork.DeliveryZoneRepo.AddRangeAsync(result);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
         }
@@ -151,5 +189,7 @@ namespace BeeStore_Repository.Services
             return ResponseMessage.Success;
 
         }
+
+     
     }
 }

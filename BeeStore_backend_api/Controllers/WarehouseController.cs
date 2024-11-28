@@ -150,6 +150,15 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
+        [Route("add-delivery-zones-to-warehouse/{warehouseId}")]
+        [HttpPost]
+        [Authorize(Roles = "Admin, Manager")]
+        public async Task<IActionResult> AddDeliveryZonesToWarehouse(int warehouseId, List<DeliveryZoneCreateDTO> request)
+        {
+            var result = await _warehouseService.AddDeliveryZonesToWarehouse(warehouseId, request);
+            return Ok(result);
+        }
+
         [Route("update-warehouse/{id}")]
         [HttpPut]
         [Authorize(Roles = "Admin,Manager")]

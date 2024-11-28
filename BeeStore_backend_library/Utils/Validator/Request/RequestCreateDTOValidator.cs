@@ -20,7 +20,7 @@ namespace BeeStore_Repository.Utils.Validator.Request
             RuleFor(x => x.Description)
                 .NotEmpty()
                 .WithMessage(ValidationMessage.RequestDescriptionRequired)
-                .MaximumLength(50)
+                .MaximumLength(100)
                 .WithMessage(ValidationMessage.RequestDescriptionMaxLength);
 
             RuleFor(x => x.SendToInventoryId)

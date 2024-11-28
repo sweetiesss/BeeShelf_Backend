@@ -8,7 +8,7 @@ public partial class Vehicle : BaseEntity
 
     public string? LicensePlate { get; set; }
 
-    public int? Capacity { get; set; }
+    public decimal? Capacity { get; set; }
 
     public string? Type { get; set; }
 

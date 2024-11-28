@@ -10,9 +10,5 @@ public partial class Wallet : BaseEntity
 
     //public ulong? IsDeleted { get; set; }
 
-    public virtual ICollection<MoneyTransfer> MoneyTransfers { get; set; } = new List<MoneyTransfer>();
-
     public virtual OcopPartner? OcopPartner { get; set; }
-
-    public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
 }

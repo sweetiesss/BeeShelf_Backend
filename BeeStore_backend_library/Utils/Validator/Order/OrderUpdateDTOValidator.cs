@@ -13,7 +13,7 @@ namespace BeeStore_Repository.Utils.Validator.Order
                 .When(x => !string.IsNullOrEmpty(x.ReceiverPhone));
 
             RuleFor(x => x.ReceiverAddress)
-                .MaximumLength(50)
+                .MaximumLength(100)
                 .WithMessage(ValidationMessage.ReceiverAddressMaxLength)
                 .When(x => !string.IsNullOrEmpty(x.ReceiverAddress));
 

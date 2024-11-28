@@ -25,47 +25,70 @@ namespace BeeStore_Repository.Services
         }
         public async Task<string> CreateBatch(BatchCreateDTO request)
         {
-            foreach (var o in request.Orders)
-            {
-                if (await _unitOfWork.OrderRepo.AnyAsync(u => u.Id.Equals(o.Id) && u.BatchId != null))
-                {
-                    throw new ApplicationException(ResponseMessage.OrderBatchError);
-                }
-                if (await _unitOfWork.OrderRepo.AnyAsync(u => u.Id.Equals(o.Id) && u.IsDeleted == false) == false)
-                {
-                    throw new KeyNotFoundException(ResponseMessage.OrderIdNotFound);
-                }
-
-            }
+            //I move the save async to the bottom so hopefully it will fix the issue of batch still added to database
+            //if an error is caught in the later check
+            decimal? totalWeight = 0;
             var result = _mapper.Map<Batch>(request);
             result.Status = Constants.Status.Pending;
             await _unitOfWork.BatchRepo.AddAsync(result);
-            await _unitOfWork.SaveAsync();
 
             DateTime now = DateTime.Now;
             DateTime nextHour = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
-            if (request.ShipperId != 0)
-            {
-                result.BatchDeliveries.Add(new BatchDelivery
-                {
-                    NumberOfTrips = 1,
-                    DeliveryStartDate = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond),
-                    BatchId = result.Id,
-                    DeliverBy = request.ShipperId
-                });
-            }
-            await _unitOfWork.SaveAsync();
+            
+            //Check Order
             foreach (var o in request.Orders)
             {
                 var order = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u => u.Id == o.Id);
-                if(order.Status != Constants.Status.Processing)
+                if(order == null)
+                {
+                    throw new KeyNotFoundException(ResponseMessage.OrderIdNotFound);
+                }
+                if(order.BatchId != null)
+                {
+                    throw new ApplicationException(ResponseMessage.OrderBatchError);
+
+                }
+                if (order.Status != Constants.Status.Processing)
                 {
                     throw new ApplicationException(ResponseMessage.BatchAssignedOrder);
                 }
+                totalWeight += order.TotalWeight;
                 order.BatchId = result.Id;
                 order.DeliverStartDate = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
-                await _unitOfWork.SaveAsync();
             }
+            //check shipper
+            if (request.ShipperId != 0)
+            {
+                var shipper = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id.Equals(request.ShipperId),
+                                                                                 query => query.Include(o => o.Role)
+                                                                                               .Include(o => o.Vehicles));
+                if (shipper == null)
+                {
+                    throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
+                }
+                if (shipper.Role.RoleName != Constants.RoleName.Shipper)
+                {
+                    throw new ApplicationException(ResponseMessage.UserRoleNotShipperError);
+                }
+
+                //this just check for this batch of orders only, it should check the total weight
+                //of all order that is currently being shipped but if I do that it will be slow
+                //as shit so you can do whatever you want.
+                if (shipper.Vehicles.FirstOrDefault(u => u.AssignedDriverId.Equals(shipper.Id)).Capacity < totalWeight)
+                {
+                    throw new ApplicationException(ResponseMessage.ShipperBatchOrdersOverweight);
+                }
+
+
+                    result.BatchDeliveries.Add(new BatchDelivery
+                    {
+                        NumberOfTrips = 1,
+                        DeliveryStartDate = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond),
+                        BatchId = result.Id,
+                        DeliverBy = request.ShipperId
+                    });
+            }
+            await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
         }
 
@@ -83,12 +106,11 @@ namespace BeeStore_Repository.Services
             foreach (var o in batch.Orders)
             {
                 o.BatchId = null;
-                await _unitOfWork.SaveAsync();
             }
+                await _unitOfWork.SaveAsync();
 
             foreach (var o in request.Orders)
             {
-
                 if (await _unitOfWork.OrderRepo.AnyAsync(u => u.Id == o.Id && u.IsDeleted == false) == false)
                 {
                     throw new KeyNotFoundException(ResponseMessage.OrderIdNotFound);
@@ -98,7 +120,6 @@ namespace BeeStore_Repository.Services
                     throw new ApplicationException(ResponseMessage.OrderBatchError);
                 }
                 o.BatchId = batch.Id;
-
             }
             batch = _mapper.Map<Batch>(request);
             await _unitOfWork.SaveAsync();

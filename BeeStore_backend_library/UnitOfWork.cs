@@ -10,6 +10,7 @@ namespace BeeStore_Repository
 {
     public interface IUnitOfWork : IDisposable
     {
+        IGenericRepository<DeliveryZone> DeliveryZoneRepo { get; }
         IGenericRepository<MoneyTransfer> MoneyTransferRepo { get; }
         IGenericRepository<Payment> PaymentRepo {  get; }
         IGenericRepository<Province> ProvinceRepo { get; }
@@ -41,6 +42,7 @@ namespace BeeStore_Repository
     public class UnitOfWork : IUnitOfWork
     {
         private BeeStoreDbContext _context;
+        private IGenericRepository<DeliveryZone> deliveryZoneRepo;
         private IGenericRepository<MoneyTransfer> moneyTransferRepo;
         private IGenericRepository<Payment> paymentRepo;
         private IGenericRepository<Province> provinceRepo;
@@ -70,6 +72,18 @@ namespace BeeStore_Repository
         public UnitOfWork(BeeStoreDbContext context)
         {
             _context = context;
+        }
+
+        public IGenericRepository<DeliveryZone> DeliveryZoneRepo
+        {
+            get
+            {
+                if (deliveryZoneRepo == null)
+                {
+                    deliveryZoneRepo = new GenericRepository<DeliveryZone>(_context);
+                }
+                return deliveryZoneRepo;
+            }
         }
 
         public IGenericRepository<MoneyTransfer> MoneyTransferRepo
