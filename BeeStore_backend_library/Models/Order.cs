@@ -4,19 +4,27 @@ public partial class Order : BaseEntity
 {
     //public int Id { get; set; }
 
+    public string? OrderCode { get; set; }
+
     public int? OcopPartnerId { get; set; }
 
     public string? Status { get; set; }
 
-    public string? CancellationReason { get; set; }
-
     public DateTime? CreateDate { get; set; }
+
+    public DateTime? ApproveDate { get; set; }
 
     public DateTime? DeliverStartDate { get; set; }
 
     public DateTime? DeliverFinishDate { get; set; }
 
     public DateTime? CompleteDate { get; set; }
+
+    public DateTime? ReturnDate { get; set; }
+
+    public DateTime? CancelDate { get; set; }
+
+    public string? CancellationReason { get; set; }
 
     public string? ReceiverPhone { get; set; }
 
@@ -25,6 +33,10 @@ public partial class Order : BaseEntity
     public decimal? Distance { get; set; }
 
     public decimal? TotalPrice { get; set; }
+
+    public decimal? TotalPriceAfterFee { get; set; }
+
+    public decimal? TotalWeight { get; set; }
 
     public int? BatchId { get; set; }
 

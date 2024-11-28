@@ -8,6 +8,7 @@ using BeeStore_Repository.Logger;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
@@ -200,20 +201,31 @@ namespace BeeStore_Repository.Services
             return result;
         }
 
-        public async Task<string> CreateMoneyTransfer(int paymentId)
+        public async Task<string> CreateMoneyTransfer(int staffId, int paymentId)
         {
             var payment = await _unitOfWork.PaymentRepo.SingleOrDefaultAsync(u => u.Id.Equals(paymentId));
             if (payment == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.PaymentNotFound);
             }
-            
-            payment.IsDeleted = true;
+
+            var employee = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id.Equals(staffId), 
+                                                                               query => query.Include(o => o.Role));
+            if (employee == null)
+            {
+                throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
+            }
+            if (employee.Role.RoleName != Constants.RoleName.Staff)
+            {
+                throw new ApplicationException(ResponseMessage.UserRoleNotStaffError);
+            }
+
+            payment.IsTransferred = 1;
             var moneyTransfer = new MoneyTransfer{
                 Amount = payment.TotalAmount,
                 CreateDate = DateTime.Now,
-                OcopPartnerId = payment.Wallet.OcopPartnerId,
-                WalletId = payment.WalletId
+                OcopPartnerId = payment.OcopPartnerId,
+                TransferBy = staffId
             };
             await _unitOfWork.MoneyTransferRepo.AddAsync(moneyTransfer);
             await _unitOfWork.SaveAsync();

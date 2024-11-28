@@ -22,8 +22,8 @@ namespace BeeStore_Repository.Utils.Validator.Order
             // Rule for ReceiverAddress: required and max length 50
             RuleFor(x => x.ReceiverAddress)
                 .NotEmpty()
-                .WithMessage(ValidationMessage.ReceiverPhoneRequired)
-                .MaximumLength(50)
+                .WithMessage(ValidationMessage.ReceiverAddressRequired)
+                .MaximumLength(100)
                 .WithMessage(ValidationMessage.ReceiverAddressMaxLength);
 
             //// Rule for OrderDetails: required and must contain at least one item

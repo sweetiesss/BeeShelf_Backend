@@ -40,6 +40,8 @@ public partial class OcopPartner : BaseEntity
 
     public int? OcopCategoryId { get; set; }
 
+    public ulong? IsVerified { get; set; }
+
     //public ulong? IsDeleted { get; set; }
 
     public virtual Category? Category { get; set; }
@@ -51,6 +53,8 @@ public partial class OcopPartner : BaseEntity
     public virtual OcopCategory? OcopCategory { get; set; }
 
     public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
+
+    public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
 
     public virtual ICollection<Product> Products { get; set; } = new List<Product>();
 

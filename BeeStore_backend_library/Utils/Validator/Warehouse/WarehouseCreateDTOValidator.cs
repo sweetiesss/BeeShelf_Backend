@@ -20,7 +20,7 @@ namespace BeeStore_Repository.Utils.Validator.Warehouse
             RuleFor(x => x.Location)
                 .NotEmpty()
                 .WithMessage(ValidationMessage.LocationRequired)
-                .MaximumLength(50)
+                .MaximumLength(100)
                 .WithMessage(ValidationMessage.LocationMaxLength);
         }
     }

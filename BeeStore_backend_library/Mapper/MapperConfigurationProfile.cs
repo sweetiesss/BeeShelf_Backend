@@ -5,6 +5,7 @@ using BeeStore_Repository.DTO.InventoryDTOs;
 using BeeStore_Repository.DTO.OrderDTOs;
 using BeeStore_Repository.DTO.PackageDTOs;
 using BeeStore_Repository.DTO.PartnerDTOs;
+using BeeStore_Repository.DTO.PaymentDTOs;
 using BeeStore_Repository.DTO.ProductCategoryDTOs;
 using BeeStore_Repository.DTO.ProductDTOs;
 using BeeStore_Repository.DTO.ProvinceDTOs;
@@ -73,6 +74,7 @@ namespace BeeStore_Repository.Mapper
 
             CreateMap<Warehouse, WarehouseListDTO>();
             CreateMap<WarehouseCreateDTO, Warehouse>();
+            CreateMap<DeliveryZoneCreateDTO, DeliveryZone>();
             CreateMap<Warehouse, WarehouseListInventoryDTO>()
                 .ForMember(dest => dest.TotalInventory, opt => opt.MapFrom(src => src.Inventories.Count()))
                 .ForMember(dest => dest.Inventories, opt => opt.MapFrom(src => src.Inventories))
@@ -156,7 +158,9 @@ namespace BeeStore_Repository.Mapper
                 .ForMember(dest => dest.OrderDetails, opt => opt.MapFrom(src => src.OrderDetails));
 
             CreateMap<OrderDetailCreateDTO, OrderDetail>();
-
+            CreateMap<Payment, PaymentListDTO>()
+                .ForMember(dest => dest.ShipperEmail, opt => opt.MapFrom(src => src.CollectedByNavigation.Email))
+                .ForMember(dest => dest.ShipperName, opt => opt.MapFrom(src => src.CollectedByNavigation.FirstName + src.CollectedByNavigation.LastName));
             CreateMap<OrderUpdateDTO, List<OrderDetail>>()
            .ConvertUsing((src, dest) => src.OrderDetails.Select(od => new OrderDetail
            {
