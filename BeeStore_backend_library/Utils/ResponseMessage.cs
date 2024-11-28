@@ -7,8 +7,10 @@ namespace BeeStore_Repository.Utils
         //token shit im tried of this shit
         public const string InvalidResetToken = "Invalid reset token.";
         public const string ExpiredResetToken = "Reset token expired.";
+
         //General message
         public const string Success = "Success.";
+        public const string Unsupported = "Unsupported Function";
         public const string InvalidPageSize = "Page size is invalid.";
         public const string BadRequest = "Bad request.";
 
