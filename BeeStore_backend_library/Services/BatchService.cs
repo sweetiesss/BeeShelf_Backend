@@ -90,27 +90,37 @@ namespace BeeStore_Repository.Services
                             tempOrder.Add(orderList[i]);
                         }
                         // Create Batch Delivery - How can i add multiple batchDelivery??
+                        //Use AddRangeAsync
                         BatchDelivery batchDelivery = new BatchDelivery
                         {
-                            BatchId = result.Id,
                             NumberOfTrips = trips,
                             DeliveryStartDate = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond)
                         };
+                        
+                        //Here I'm gonna explain to you how it work
+                        //Instead of using id from batch or batchdelivery (that hasn't been created in database yet)
+                        //You can absolutely do that but you have to SaveAsync() after each AddAsync if you want to use its ID
+                        //So instead of using the Id, we just going to use the whole entity instead, since
+                        //Batch have many Batch Delivery, we just need to add batch delivery to batch
+                        //same with order
+                        //and finally we just have to add one singular entity that is Batch, it contains all Batch deliveries and orders inside
+                        
+
+
                         // can optimize this - Change batchDeliveryId of the Order
                         for (int j = 0; j < tempOrder.Count; j++)
                         {
-                            tempOrder[j].BatchDeliveryId = batchDelivery.Id;
-                            await _unitOfWork.OrderRepo.AddAsync(tempOrder[j]);
+                            tempOrder[j].BatchDelivery = batchDelivery;
                             _unitOfWork.OrderRepo.Update(tempOrder[j]);
                         }
 
-                        await _unitOfWork.BatchDeliveryRepo.AddAsync(batchDelivery);
                         result.BatchDeliveries.Add(batchDelivery);
                         tempOrder.Clear();
                         currentWeight = 0;
                         if(trips == 1) i--;
                     }else tempOrder.Add(orderList[i]);
                 }
+                //why is there another one down here what?
                 if (tempOrder.Count > 0) {
                     BatchDelivery batchDelivery = new BatchDelivery
                     {
