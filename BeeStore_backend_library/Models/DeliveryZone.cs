@@ -6,15 +6,15 @@ public partial class DeliveryZone : BaseEntity
 
     public string? Name { get; set; }
 
-    public string? Location { get; set; }
-
-    public int? WarehouseId { get; set; }
+    public int? ProvinceId { get; set; }
 
     //public ulong? IsDeleted { get; set; }
 
     public virtual ICollection<Batch> Batches { get; set; } = new List<Batch>();
 
-    public virtual Warehouse? Warehouse { get; set; }
+    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
+
+    public virtual Province? Province { get; set; }
 
     public virtual ICollection<WarehouseShipper> WarehouseShippers { get; set; } = new List<WarehouseShipper>();
 }

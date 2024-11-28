@@ -55,7 +55,7 @@ namespace BeeStore_Repository.Services
                 filter: u => (filterQuery == null || u.Status.Equals(filterQuery))
                              && (userId == null || u.OcopPartnerId.Equals(userId))
                              && (warehouseId == null || u.OrderDetails.Any(od => od.Lot.Inventory.WarehouseId.Equals(warehouseId)))
-                             && (shipperId == null || u.Batch.BatchDeliveries.Where(u => u.DeliverBy == shipperId && !u.IsDeleted).Any()),
+                             && (shipperId == null || u.BatchDelivery.Batch.DeliverBy.Equals(shipperId) && u.IsDeleted.Equals(false)),
                 includes: null,
                 sortBy: sortBy!,
                 descending: descending,
@@ -383,9 +383,9 @@ namespace BeeStore_Repository.Services
         //Shipper and staff use this
         public async Task<string> UpdateOrderStatus(int id, OrderStatus orderStatus)
         {
-            var exist = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u => u.Id == id, 
-                                                                        query => query.Include(o => o.Batch)
-                                                                        .ThenInclude(o => o.BatchDeliveries));
+            var exist = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u => u.Id == id,
+                                                                        query => query.Include(o => o.BatchDelivery));
+                                                                        
             if (exist == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.OrderIdNotFound);
@@ -487,7 +487,7 @@ namespace BeeStore_Repository.Services
                     exist.Payments.Add(new Payment
                     {
                         OcopPartnerId = exist.OcopPartnerId,
-                        CollectedBy = exist.Batch.BatchDeliveries.FirstOrDefault(u => u.BatchId.Equals(exist.BatchId)).DeliverBy,
+                        CollectedBy = exist.BatchDelivery.Batch.DeliverBy,
                         OrderId = exist.Id,
                         TotalAmount = exist.TotalPriceAfterFee
                     //    TotalAmount = (int)(exist.TotalPrice - (orderfee.DeliveryFee + orderfee.StorageFee + orderfee.AdditionalFee))

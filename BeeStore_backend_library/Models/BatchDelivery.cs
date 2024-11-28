@@ -1,4 +1,7 @@
-﻿namespace BeeStore_Repository.Models;
+﻿using System;
+using System.Collections.Generic;
+
+namespace BeeStore_Repository.Models;
 
 public partial class BatchDelivery : BaseEntity
 {
@@ -10,11 +13,13 @@ public partial class BatchDelivery : BaseEntity
 
     public int? BatchId { get; set; }
 
-    public int? DeliverBy { get; set; }
+
 
     //public ulong? IsDeleted { get; set; }
 
     public virtual Batch? Batch { get; set; }
 
-    public virtual Employee? DeliverByNavigation { get; set; }
+
+
+    public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
 }

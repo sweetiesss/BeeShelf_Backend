@@ -75,7 +75,8 @@ public partial class BeeStoreDbContext : DbContext
             entity.ToTable("Batch");
 
             entity.HasIndex(e => e.DeliveryZoneId, "delivery_zone_id");
-
+            entity.HasIndex(e => e.DeliverBy, "deliver_by");
+            entity.Property(e => e.DeliverBy).HasColumnName("deliver_by");
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CompleteDate)
                 .HasColumnType("datetime")
@@ -97,6 +98,10 @@ public partial class BeeStoreDbContext : DbContext
             entity.HasOne(d => d.DeliveryZone).WithMany(p => p.Batches)
                 .HasForeignKey(d => d.DeliveryZoneId)
                 .HasConstraintName("Batch_ibfk_1");
+
+            entity.HasOne(d => d.DeliverByNavigation).WithMany(p => p.Batches)
+            .HasForeignKey(d => d.DeliverBy)
+    .HasConstraintName("Batch_Delivery_ibfk_2");
         });
 
         modelBuilder.Entity<BatchDelivery>(entity =>
@@ -107,11 +112,11 @@ public partial class BeeStoreDbContext : DbContext
 
             entity.HasIndex(e => e.BatchId, "batch_id");
 
-            entity.HasIndex(e => e.DeliverBy, "deliver_by");
+
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.BatchId).HasColumnName("batch_id");
-            entity.Property(e => e.DeliverBy).HasColumnName("deliver_by");
+
             entity.Property(e => e.DeliveryStartDate)
                 .HasColumnType("datetime")
                 .HasColumnName("delivery_start_date");
@@ -125,9 +130,7 @@ public partial class BeeStoreDbContext : DbContext
                 .HasForeignKey(d => d.BatchId)
                 .HasConstraintName("Batch_Delivery_ibfk_1");
 
-            entity.HasOne(d => d.DeliverByNavigation).WithMany(p => p.BatchDeliveries)
-                .HasForeignKey(d => d.DeliverBy)
-                .HasConstraintName("Batch_Delivery_ibfk_2");
+
         });
 
         modelBuilder.Entity<Category>(entity =>
@@ -161,23 +164,20 @@ public partial class BeeStoreDbContext : DbContext
 
             entity.ToTable("Delivery_Zone");
 
-            entity.HasIndex(e => e.WarehouseId, "warehouse_id");
+            entity.HasIndex(e => e.ProvinceId, "province_id");
 
             entity.Property(e => e.Id).HasColumnName("ID");
             entity.Property(e => e.IsDeleted)
                 .HasDefaultValueSql("b'0'")
                 .HasColumnType("bit(1)")
                 .HasColumnName("is_deleted");
-            entity.Property(e => e.Location)
-                .HasMaxLength(100)
-                .HasColumnName("location");
             entity.Property(e => e.Name)
                 .HasMaxLength(25)
                 .HasColumnName("name");
-            entity.Property(e => e.WarehouseId).HasColumnName("warehouse_id");
+            entity.Property(e => e.ProvinceId).HasColumnName("province_id");
 
-            entity.HasOne(d => d.Warehouse).WithMany(p => p.DeliveryZones)
-                .HasForeignKey(d => d.WarehouseId)
+            entity.HasOne(d => d.Province).WithMany(p => p.DeliveryZones)
+                .HasForeignKey(d => d.ProvinceId)
                 .HasConstraintName("Delivery_Zone_ibfk_1");
         });
 
@@ -485,7 +485,9 @@ public partial class BeeStoreDbContext : DbContext
 
             entity.ToTable("Order");
 
-            entity.HasIndex(e => e.BatchId, "batch_id");
+            entity.HasIndex(e => e.BatchDeliveryId, "batch_delivery_id");
+
+            entity.HasIndex(e => e.DeliveryZoneId, "delivery_zone_id");
 
             entity.HasIndex(e => e.OcopPartnerId, "ocop_partner_id");
 
@@ -495,7 +497,7 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.ApproveDate)
                 .HasColumnType("datetime")
                 .HasColumnName("approve_date");
-            entity.Property(e => e.BatchId).HasColumnName("batch_id");
+            entity.Property(e => e.BatchDeliveryId).HasColumnName("batch_delivery_id");
             entity.Property(e => e.CancelDate)
                 .HasColumnType("datetime")
                 .HasColumnName("cancel_date");
@@ -516,6 +518,7 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.DeliverStartDate)
                 .HasColumnType("datetime")
                 .HasColumnName("deliver_start_date");
+            entity.Property(e => e.DeliveryZoneId).HasColumnName("delivery_zone_id");
             entity.Property(e => e.Distance)
                 .HasPrecision(10, 2)
                 .HasColumnName("distance");
@@ -556,17 +559,21 @@ public partial class BeeStoreDbContext : DbContext
                 .HasPrecision(10, 2)
                 .HasColumnName("total_weight");
 
-            entity.HasOne(d => d.Batch).WithMany(p => p.Orders)
-                .HasForeignKey(d => d.BatchId)
-                .HasConstraintName("Order_ibfk_2");
+            entity.HasOne(d => d.BatchDelivery).WithMany(p => p.Orders)
+                .HasForeignKey(d => d.BatchDeliveryId)
+                .HasConstraintName("Order_ibfk_3");
+
+            entity.HasOne(d => d.DeliveryZone).WithMany(p => p.Orders)
+                .HasForeignKey(d => d.DeliveryZoneId)
+                .HasConstraintName("Order_ibfk_1");
 
             entity.HasOne(d => d.OcopPartner).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.OcopPartnerId)
-                .HasConstraintName("Order_ibfk_1");
+                .HasConstraintName("Order_ibfk_2");
 
             entity.HasOne(d => d.PickStaff).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.PickStaffId)
-                .HasConstraintName("Order_ibfk_3");
+                .HasConstraintName("Order_ibfk_4");
         });
 
         modelBuilder.Entity<OrderDetail>(entity =>
@@ -654,8 +661,8 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.OcopPartnerId).HasColumnName("ocop_partner_id");
             entity.Property(e => e.OrderId).HasColumnName("order_id");
             entity.Property(e => e.TotalAmount)
-            .HasPrecision(10, 2)
-            .HasColumnName("total_amount");
+                .HasPrecision(10, 2)
+                .HasColumnName("total_amount");
 
             entity.HasOne(d => d.CollectedByNavigation).WithMany(p => p.Payments)
                 .HasForeignKey(d => d.CollectedBy)
@@ -773,11 +780,6 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.SubDivisionName)
                 .HasMaxLength(25)
                 .HasColumnName("sub_division_name")
-                .UseCollation("utf8mb3_general_ci")
-                .HasCharSet("utf8mb3");
-            entity.Property(e => e.SubDivsisionCategory)
-                .HasMaxLength(25)
-                .HasColumnName("sub_divsision_category")
                 .UseCollation("utf8mb3_general_ci")
                 .HasCharSet("utf8mb3");
         });
@@ -918,8 +920,8 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.AssignedDriverId).HasColumnName("assigned_driver_id");
             entity.Property(e => e.Capacity)
-            .HasPrecision(10, 2)
-            .HasColumnName("capacity");
+                .HasPrecision(10, 2)
+                .HasColumnName("capacity");
             entity.Property(e => e.IsDeleted)
                 .HasDefaultValueSql("b'0'")
                 .HasColumnType("bit(1)")
@@ -976,6 +978,8 @@ public partial class BeeStoreDbContext : DbContext
 
             entity.ToTable("Warehouse");
 
+            entity.HasIndex(e => e.ProvinceId, "province_id");
+
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Capacity)
                 .HasPrecision(10, 2)
@@ -997,9 +1001,14 @@ public partial class BeeStoreDbContext : DbContext
                 .HasColumnName("name")
                 .UseCollation("utf8mb3_general_ci")
                 .HasCharSet("utf8mb3");
+            entity.Property(e => e.ProvinceId).HasColumnName("province_id");
             entity.Property(e => e.Type)
                 .HasMaxLength(50)
                 .HasColumnName("type");
+
+            entity.HasOne(d => d.Province).WithMany(p => p.Warehouses)
+                .HasForeignKey(d => d.ProvinceId)
+                .HasConstraintName("Warehouse_ibfk_1");
         });
 
         modelBuilder.Entity<WarehouseShipper>(entity =>

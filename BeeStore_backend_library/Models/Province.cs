@@ -8,9 +8,11 @@ public partial class Province : BaseEntity
 
     public string? SubDivisionName { get; set; }
 
-    public string? SubDivsisionCategory { get; set; }
-
     //public ulong? IsDeleted { get; set; }
 
+    public virtual ICollection<DeliveryZone> DeliveryZones { get; set; } = new List<DeliveryZone>();
+
     public virtual ICollection<OcopPartner> OcopPartners { get; set; } = new List<OcopPartner>();
+
+    public virtual ICollection<Warehouse> Warehouses { get; set; } = new List<Warehouse>();
 }

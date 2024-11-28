@@ -25,8 +25,7 @@ namespace BeeStore_Repository.Services
         }
         public async Task<string> CreateBatch(BatchCreateDTO request)
         {
-            //I move the save async to the bottom so hopefully it will fix the issue of batch still added to database
-            //if an error is caught in the later check
+            
             decimal? totalWeight = 0;
             var result = _mapper.Map<Batch>(request);
             result.Status = Constants.Status.Pending;
@@ -43,17 +42,20 @@ namespace BeeStore_Repository.Services
                 {
                     throw new KeyNotFoundException(ResponseMessage.OrderIdNotFound);
                 }
-                if(order.BatchId != null)
-                {
-                    throw new ApplicationException(ResponseMessage.OrderBatchError);
+                //remember to fix these 
 
-                }
+                //if(order.BatchId != null)
+                //{
+                //    throw new ApplicationException(ResponseMessage.OrderBatchError);
+
+                //}
                 if (order.Status != Constants.Status.Processing)
                 {
                     throw new ApplicationException(ResponseMessage.BatchAssignedOrder);
                 }
                 totalWeight += order.TotalWeight;
-                order.BatchId = result.Id;
+                //remember to fix these 
+                //order.BatchId = result.Id;
                 order.DeliverStartDate = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
             }
             //check shipper
@@ -85,7 +87,7 @@ namespace BeeStore_Repository.Services
                         NumberOfTrips = 1,
                         DeliveryStartDate = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond),
                         BatchId = result.Id,
-                        DeliverBy = request.ShipperId
+                        //DeliverBy = request.ShipperId
                     }
                 );
             }
@@ -104,11 +106,12 @@ namespace BeeStore_Repository.Services
             {
                 throw new ApplicationException(ResponseMessage.BatchStatusNotPending);
             }
-            foreach (var o in batch.Orders)
-            {
-                o.BatchId = null;
-            }
-                await _unitOfWork.SaveAsync();
+            //remember to fix these
+            //foreach (var o in batch.Orders)
+            //{
+            //    o.BatchId = null;
+            //}
+            //    await _unitOfWork.SaveAsync();
 
             foreach (var o in request.Orders)
             {
@@ -116,10 +119,11 @@ namespace BeeStore_Repository.Services
                 {
                     throw new KeyNotFoundException(ResponseMessage.OrderIdNotFound);
                 }
-                if (await _unitOfWork.OrderRepo.AnyAsync(u => u.Id.Equals(o.Id) && u.BatchId != null))
-                {
-                    throw new ApplicationException(ResponseMessage.OrderBatchError);
-                }
+                //remember to fix these
+                //if (await _unitOfWork.OrderRepo.AnyAsync(u => u.Id.Equals(o.Id) && u.BatchId != null))
+                //{
+                //    throw new ApplicationException(ResponseMessage.OrderBatchError);
+                //}
                 o.BatchId = batch.Id;
             }
             batch = _mapper.Map<Batch>(request);
@@ -138,11 +142,12 @@ namespace BeeStore_Repository.Services
             {
                 throw new ApplicationException(ResponseMessage.BatchStatusNotPending);
             }
-            foreach (var o in batch.Orders)
-            {
-                o.BatchId = null;
-                await _unitOfWork.SaveAsync();
-            }
+            //remember to fix these
+            //foreach (var o in batch.Orders)
+            //{
+            //    o.BatchId = null;
+            //    await _unitOfWork.SaveAsync();
+            //}
             _unitOfWork.BatchRepo.SoftDelete(batch);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
@@ -171,7 +176,7 @@ namespace BeeStore_Repository.Services
                 NumberOfTrips = 1,
                 DeliveryStartDate = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond),
                 BatchId = batch.Id,
-                DeliverBy = shipper.Id
+                //DeliverBy = shipper.Id
             });
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
