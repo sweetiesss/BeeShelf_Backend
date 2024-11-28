@@ -75,6 +75,8 @@ namespace BeeStore_Repository.Utils
         public const string BatchStatusNotPending = "Can't edit processed batch.";
         public const string BatchAssignedOrder = "Can't assign unprocessed or completed orders.";
         public const string ShipperBatchOrdersOverweight = "Shipper's vehicle doesn't have enough capacity to handle this batch of orders.";
+        public const string DeliveryZoneShipperNotMatch = "Delivery Zone of Shipper is not Match with the Delivery Zone of the Batch.";
+        public const string DeliveryZoneOrderNotMatch = "Delivery Zone of Order is not Match with the Delivery Zone of the Batch";
 
         //Product response message
         public const string ProductIdNotFound = "Product Id not found.";
