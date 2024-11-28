@@ -80,9 +80,10 @@ namespace BeeStore_Repository.Mapper
                 .ForMember(dest => dest.Inventories, opt => opt.MapFrom(src => src.Inventories))
             .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<Warehouse, WarehouseDeliveryZoneDTO>()
-                .ForMember(dest => dest.DeliveryZones, opt => opt.MapFrom(src => src.DeliveryZones));
+                .ForMember(dest => dest.DeliveryZones, opt => opt.MapFrom(src => src.Province.DeliveryZones.Where(u => u.ProvinceId.Equals(src.ProvinceId))));
 
-            CreateMap<DeliveryZone, DeliveryZoneDTO>();
+            CreateMap<DeliveryZone, DeliveryZoneDTO>()
+                .ForMember(dest => dest.ProvinceName, opt => opt.MapFrom(src => src.Province.SubDivisionName));
 
             CreateMap<Inventory, InventoryListDTO>()
                 .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom(src => src.Warehouse!.Name))
@@ -169,10 +170,9 @@ namespace BeeStore_Repository.Mapper
                ProductAmount = od.ProductAmount
            }).ToList());
             CreateMap<Batch, BatchListDTO>()
-                .ForMember(dest => dest.Orders, opt => opt.MapFrom(src => src.Orders))
-                .ForMember(dest => dest.AssignTo, opt => opt.MapFrom(src => src.BatchDeliveries.FirstOrDefault(u => u.BatchId.Equals(src.Id)).DeliverBy));
+                .ForMember(dest => dest.BatchDeliveries, opt => opt.MapFrom(src => src.BatchDeliveries));
             CreateMap<BatchCreateDTO, Batch>()
-                .ForMember(dest => dest.Orders, opt => opt.Ignore())
+                //.ForMember(dest => dest.Orders, opt => opt.Ignore())
                 .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null)); ;
         }
     }

@@ -2,7 +2,7 @@
 
 public partial class OcopCategory : BaseEntity
 {
-    //public int Id { get; set; } 
+    //public int Id { get; set; }
 
     public string? Type { get; set; }
 

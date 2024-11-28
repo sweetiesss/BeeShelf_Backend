@@ -26,7 +26,7 @@ public partial class Employee : BaseEntity
 
     public int? RoleId { get; set; }
 
-    public virtual ICollection<BatchDelivery> BatchDeliveries { get; set; } = new List<BatchDelivery>();
+    public virtual ICollection<Batch> Batches { get; set; } = new List<Batch>();
 
     public virtual ICollection<MoneyTransfer> MoneyTransfers { get; set; } = new List<MoneyTransfer>();
 
