@@ -23,41 +23,35 @@ namespace BeeStore_Repository.Services
             _mapper = mapper;
             _logger = logger;
         }
+
+        //Must assgin only 1 shipper when Create Batch - Assigned Shipper cannot be changed
         public async Task<string> CreateBatch(BatchCreateDTO request)
         {
-            
-            decimal? totalWeight = 0;
             var result = _mapper.Map<Batch>(request);
             result.Status = Constants.Status.Pending;
             await _unitOfWork.BatchRepo.AddAsync(result);
 
             DateTime now = DateTime.Now;
             DateTime nextHour = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
-            
-            //Check Order
-            foreach (var o in request.Orders)
+
+            //Sort Order by hand (fix this if you know how)
+            var orderList = new List<Order>();
+            foreach(var o in request.Orders)
             {
-                var order = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u => u.Id == o.Id);
-                if(order == null)
-                {
+                var order = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(a => a.Id.Equals(o.Id));
+                if (order == null)
                     throw new KeyNotFoundException(ResponseMessage.OrderIdNotFound);
-                }
-                //remember to fix these 
 
-                //if(order.BatchId != null)
-                //{
-                //    throw new ApplicationException(ResponseMessage.OrderBatchError);
-
-                //}
-                if (order.Status != Constants.Status.Processing)
-                {
+                if (!order.Status.Equals(Constants.Status.Processing))
                     throw new ApplicationException(ResponseMessage.BatchAssignedOrder);
-                }
-                totalWeight += order.TotalWeight;
-                //remember to fix these 
-                //order.BatchId = result.Id;
-                order.DeliverStartDate = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
+
+                if (order.BatchDeliveryId != null)
+                    throw new ApplicationException(ResponseMessage.OrderBatchError);
+
+                orderList.Add(order);
             }
+            orderList = orderList.OrderBy(o => o.TotalWeight).ToList();
+
             //check shipper
             if (request.ShipperId != 0)
             {
@@ -73,23 +67,62 @@ namespace BeeStore_Repository.Services
                     throw new ApplicationException(ResponseMessage.UserRoleNotShipperError);
                 }
 
-                //this just check for this batch of orders only, it should check the total weight
-                //of all order that is currently being shipped but if I do that it will be slow
-                //as shit so you can do whatever you want.
-                if (shipper.Vehicles.FirstOrDefault(u => u.AssignedDriverId.Equals(shipper.Id)).Capacity < totalWeight)
-                {
-                    throw new ApplicationException(ResponseMessage.ShipperBatchOrdersOverweight);
-                }
+                var vehicle = shipper.Vehicles.FirstOrDefault(u => u.AssignedDriverId.Equals(shipper.Id));
 
-                result.BatchDeliveries.Add(
-                    new BatchDelivery
+                if (shipper.Role.RoleName != Constants.RoleName.Shipper)
+                {
+                    throw new ApplicationException(ResponseMessage.UserRoleNotShipperError);
+                }
+                //NOT DONT: Check Delivery zone
+                //Check Order -> Create Batch Delivery
+                decimal? currentWeight = 0;
+                var cap = vehicle.Capacity;
+                List<Order> tempOrder = new List<Order>();
+                for(int i = 0; i < orderList.Count; i++) {
+                    currentWeight += orderList[i].TotalWeight;
+                    if (currentWeight > cap)
                     {
-                        NumberOfTrips = 1,
-                        DeliveryStartDate = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond),
+                        int trips = 1;
+                        if (tempOrder.Count == 0)
+                        {
+                            trips = (int)(currentWeight / cap);
+                            if (trips * cap != currentWeight) trips++;
+                            tempOrder.Add(orderList[i]);
+                        }
+                        // Create Batch Delivery - How can i add multiple batchDelivery??
+                        BatchDelivery batchDelivery = new BatchDelivery
+                        {
+                            BatchId = result.Id,
+                            NumberOfTrips = trips,
+                            DeliveryStartDate = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond)
+                        };
+                        // can optimize this - Change batchDeliveryId of the Order
+                        for (int j = 0; j < tempOrder.Count; j++)
+                        {
+                            tempOrder[j].BatchDeliveryId = batchDelivery.Id;
+                            await _unitOfWork.OrderRepo.AddAsync(tempOrder[j]);
+                            _unitOfWork.OrderRepo.Update(tempOrder[j]);
+                        }
+
+                        await _unitOfWork.BatchDeliveryRepo.AddAsync(batchDelivery);
+                        result.BatchDeliveries.Add(batchDelivery);
+                        tempOrder.Clear();
+                        currentWeight = 0;
+                        if(trips == 1) i--;
+                    }else tempOrder.Add(orderList[i]);
+                }
+                if (tempOrder.Count > 0) {
+                    BatchDelivery batchDelivery = new BatchDelivery
+                    {
                         BatchId = result.Id,
-                        //DeliverBy = request.ShipperId
-                    }
-                );
+                        Orders = tempOrder,
+                        NumberOfTrips = 1,
+                        DeliveryStartDate = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond)
+
+                    };
+                    await _unitOfWork.BatchDeliveryRepo.AddAsync(batchDelivery);
+                    result.BatchDeliveries.Add(batchDelivery);
+                }
             }
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
