@@ -10,15 +10,17 @@ public partial class Warehouse : BaseEntity
 
     public string? Location { get; set; }
 
+    public int? ProvinceId { get; set; }
+
     public string? Type { get; set; }
 
     public DateTime? CreateDate { get; set; }
 
     //public ulong? IsDeleted { get; set; }
 
-    public virtual ICollection<DeliveryZone> DeliveryZones { get; set; } = new List<DeliveryZone>();
-
     public virtual ICollection<Inventory> Inventories { get; set; } = new List<Inventory>();
+
+    public virtual Province? Province { get; set; }
 
     public virtual ICollection<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
 
