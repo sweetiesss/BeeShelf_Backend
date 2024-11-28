@@ -8,6 +8,7 @@ using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using MySqlX.XDevAPI.Common;
 using System.Linq.Expressions;
 
 namespace BeeStore_Repository.Services
@@ -70,20 +71,20 @@ namespace BeeStore_Repository.Services
                     throw new ApplicationException(ResponseMessage.UserRoleNotShipperError);
                 }
 
-                var shipperDeliveryZone = await _unitOfWork.WarehouseShipperRepo.SingleOrDefaultAsync(u => u.Id.Equals(shipper.Id));
+                var warehouseShipper = await _unitOfWork.WarehouseShipperRepo.SingleOrDefaultAsync(u => u.EmployeeId.Equals(shipper.Id));
 
-                if (!shipperDeliveryZone.Id.Equals(request.DeliveryZoneId))
+                if (!warehouseShipper.DeliveryZoneId.Equals(request.DeliveryZoneId))
                 {
                     throw new ApplicationException(ResponseMessage.DeliveryZoneShipperNotMatch);
                 }
-
-                var vehicle = shipper.Vehicles.FirstOrDefault(u => u.AssignedDriverId.Equals(shipper.Id));
 
                 if (shipper.Role.RoleName != Constants.RoleName.Shipper)
                 {
                     throw new ApplicationException(ResponseMessage.UserRoleNotShipperError);
                 }
 
+                result.DeliverBy = shipper.Id;
+                var vehicle = shipper.Vehicles.FirstOrDefault(u => u.AssignedDriverId.Equals(shipper.Id));
                 //Check Order -> Create Batch Delivery
                 decimal? currentWeight = 0;
                 var cap = vehicle.Capacity;
@@ -143,6 +144,7 @@ namespace BeeStore_Repository.Services
             return ResponseMessage.Success;
         }
 
+        // NOT USED
         public async Task<string> UpdateBatch(int id, BatchCreateDTO request)
         {
             var batch = await _unitOfWork.BatchRepo.SingleOrDefaultAsync(u => u.Id.Equals(id));
@@ -154,6 +156,15 @@ namespace BeeStore_Repository.Services
             {
                 throw new ApplicationException(ResponseMessage.BatchStatusNotPending);
             }
+
+
+            if(request.ShipperId != null)
+                batch.DeliverBy = request.ShipperId;
+            
+            if(request.Name != null)
+                batch.Name = request.Name;
+
+
             //remember to fix these
             //foreach (var o in batch.Orders)
             //{
@@ -174,9 +185,10 @@ namespace BeeStore_Repository.Services
                 //}
                 o.BatchId = batch.Id;
             }
+
             batch = _mapper.Map<Batch>(request);
             await _unitOfWork.SaveAsync();
-            return ResponseMessage.Success;
+            return ResponseMessage.Unsupported;
         }
 
         public async Task<string> DeleteBatch(int id)
@@ -201,6 +213,7 @@ namespace BeeStore_Repository.Services
             return ResponseMessage.Success;
         }
 
+        // NOT USED
         public async Task<string> AssignBatch(int id, int shipperId)
         {
             var batch = await _unitOfWork.BatchRepo.SingleOrDefaultAsync(u => u.Id.Equals(id));
@@ -227,7 +240,7 @@ namespace BeeStore_Repository.Services
                 //DeliverBy = shipper.Id
             });
             await _unitOfWork.SaveAsync();
-            return ResponseMessage.Success;
+            return ResponseMessage.Unsupported;
         }
 
         public async Task<Pagination<BatchListDTO>> GetBatchList(string search, BatchFilter? filterBy, string? filterQuery, int pageIndex, int pageSize)
