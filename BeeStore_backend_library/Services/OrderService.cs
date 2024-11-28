@@ -111,6 +111,7 @@ namespace BeeStore_Repository.Services
             decimal? totalPrice = 0;
             decimal? totalStorageFee = 0;
             decimal? deliveryFee = 0;
+            decimal? totalWeight = 0;
             if(request.Distance > 10)
             {
                 deliveryFee += (request.Distance - 10) * 1000;
@@ -205,6 +206,7 @@ namespace BeeStore_Repository.Services
 
                     totalPrice += lot.Product.Price * amountToTake;
                     totalStorageFee += CalculateStorageFee(lot.ImportDate.Value, DateTime.Now);
+                    totalWeight += lot.Product.Weight * product.ProductAmount;
                     if(lot.Product.Weight* product.ProductAmount > 5)
                     {
                         decimal? extraWeight = lot.Product.Weight * lot.ProductAmount - 5;
@@ -232,6 +234,8 @@ namespace BeeStore_Repository.Services
             result.CreateDate = DateTime.Now;
             result.Status = Constants.Status.Draft;
             result.TotalPrice = totalPrice;
+            result.TotalWeight = totalWeight;
+            result.TotalPriceAfterFee = totalPrice - (totalStorageFee + deliveryFee);
             await _unitOfWork.OrderRepo.AddAsync(result);
             await _unitOfWork.SaveAsync();
 
@@ -243,6 +247,7 @@ namespace BeeStore_Repository.Services
                 DeliveryFee = deliveryFee,
                 IsDeleted = false
             };
+
             await _unitOfWork.OrderFeeRepo.AddAsync(orderFee);
             await _unitOfWork.SaveAsync();
 
@@ -364,6 +369,7 @@ namespace BeeStore_Repository.Services
                 exist.Status == Constants.Status.Shipping)
             {
                 exist.Status = Constants.Status.Canceled;
+                exist.CancelDate = DateTime.Now;
                 await _unitOfWork.SaveAsync();
             }
             else
@@ -377,7 +383,9 @@ namespace BeeStore_Repository.Services
         //Shipper and staff use this
         public async Task<string> UpdateOrderStatus(int id, OrderStatus orderStatus)
         {
-            var exist = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u => u.Id == id);
+            var exist = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u => u.Id == id, 
+                                                                        query => query.Include(o => o.Batch)
+                                                                        .ThenInclude(o => o.BatchDeliveries));
             if (exist == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.OrderIdNotFound);
@@ -425,11 +433,12 @@ namespace BeeStore_Repository.Services
                 }
             }
 
-            if (orderStatusString.Equals(Constants.Status.Returned, StringComparison.OrdinalIgnoreCase))    //Shipped
+            if (orderStatusString.Equals(Constants.Status.Returned, StringComparison.OrdinalIgnoreCase))    //Returned
             {
                 if (exist.Status == Constants.Status.Delivered)
                 {
                     orderStatusUpdate = Constants.Status.Returned;
+                    exist.ReturnDate = DateTime.Now;
                     a = true;
                     //take away the product's amount here
                     foreach (var od in exist.OrderDetails)
@@ -477,9 +486,11 @@ namespace BeeStore_Repository.Services
                     var orderfee = exist.OrderFees.FirstOrDefault(u => u.Id.Equals(exist.Id));
                     exist.Payments.Add(new Payment
                     {
-                        WalletId = exist.OcopPartner.Wallets.FirstOrDefault(u => u.OcopPartnerId.Equals(exist.OcopPartnerId)).Id,
+                        OcopPartnerId = exist.OcopPartnerId,
+                        CollectedBy = exist.Batch.BatchDeliveries.FirstOrDefault(u => u.BatchId.Equals(exist.BatchId)).DeliverBy,
                         OrderId = exist.Id,
-                        TotalAmount = (int)(exist.TotalPrice - (orderfee.DeliveryFee + orderfee.StorageFee + orderfee.AdditionalFee))
+                        TotalAmount = exist.TotalPriceAfterFee
+                    //    TotalAmount = (int)(exist.TotalPrice - (orderfee.DeliveryFee + orderfee.StorageFee + orderfee.AdditionalFee))
                     });
                     exist.DeliverFinishDate = DateTime.Now;
                 }

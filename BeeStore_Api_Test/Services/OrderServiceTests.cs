@@ -456,7 +456,7 @@ namespace BeeStore_Api_Test.Services
                 .ReturnsAsync(false); // Simulating that the OcopPartner is not found
 
             // Act & Assert
-            await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _orderService.CreateOrder(orderRequest));
+            await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _orderService.CreateOrder(1, orderRequest));
         }
 
         [Fact]
@@ -479,7 +479,7 @@ namespace BeeStore_Api_Test.Services
                 .ReturnsAsync((Product)null); // Simulating product not found
 
             // Act & Assert
-            await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _orderService.CreateOrder(orderRequest));
+            await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _orderService.CreateOrder(1, orderRequest));
         }
 
         [Fact]
@@ -518,7 +518,7 @@ namespace BeeStore_Api_Test.Services
                 .ReturnsAsync(new List<Lot> { mockLot });
 
             // Act & Assert
-            await Assert.ThrowsAsync<ApplicationException>(async () => await _orderService.CreateOrder(orderRequest));
+            await Assert.ThrowsAsync<ApplicationException>(async () => await _orderService.CreateOrder(1, orderRequest));
         }
 
 
@@ -548,7 +548,7 @@ namespace BeeStore_Api_Test.Services
                 .ReturnsAsync(new List<Lot>()); // Simulating no lots available (product not enough)
 
             // Act & Assert
-            await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _orderService.CreateOrder(orderRequest));
+            await Assert.ThrowsAsync<KeyNotFoundException>(async () => await _orderService.CreateOrder(1, orderRequest));
         }
 
         [Fact]
@@ -604,7 +604,7 @@ namespace BeeStore_Api_Test.Services
             _mockUnitOfWork.Setup(u => u.SaveAsync()).Returns(Task.CompletedTask); // Simulate saving the OrderFee
 
             // Act
-            var result = await _orderService.CreateOrder(orderRequest);
+            var result = await _orderService.CreateOrder(1, orderRequest);
 
             // Assert
             Assert.Equal(ResponseMessage.Success, result); // Expecting a success message
