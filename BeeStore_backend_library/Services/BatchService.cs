@@ -48,6 +48,9 @@ namespace BeeStore_Repository.Services
                 if (order.BatchDeliveryId != null)
                     throw new ApplicationException(ResponseMessage.OrderBatchError);
 
+                if(!order.DeliveryZoneId.Equals(request.DeliveryZoneId))
+                    throw new ApplicationException(ResponseMessage.DeliveryZoneOrderNotMatch);
+
                 orderList.Add(order);
             }
             orderList = orderList.OrderBy(o => o.TotalWeight).ToList();
@@ -67,13 +70,20 @@ namespace BeeStore_Repository.Services
                     throw new ApplicationException(ResponseMessage.UserRoleNotShipperError);
                 }
 
+                var shipperDeliveryZone = await _unitOfWork.WarehouseShipperRepo.SingleOrDefaultAsync(u => u.Id.Equals(shipper.Id));
+
+                if (!shipperDeliveryZone.Id.Equals(request.DeliveryZoneId))
+                {
+                    throw new ApplicationException(ResponseMessage.DeliveryZoneShipperNotMatch);
+                }
+
                 var vehicle = shipper.Vehicles.FirstOrDefault(u => u.AssignedDriverId.Equals(shipper.Id));
 
                 if (shipper.Role.RoleName != Constants.RoleName.Shipper)
                 {
                     throw new ApplicationException(ResponseMessage.UserRoleNotShipperError);
                 }
-                //NOT DONT: Check Delivery zone
+
                 //Check Order -> Create Batch Delivery
                 decimal? currentWeight = 0;
                 var cap = vehicle.Capacity;
@@ -89,22 +99,12 @@ namespace BeeStore_Repository.Services
                             if (trips * cap != currentWeight) trips++;
                             tempOrder.Add(orderList[i]);
                         }
-                        // Create Batch Delivery - How can i add multiple batchDelivery??
-                        //Use AddRangeAsync
+
                         BatchDelivery batchDelivery = new BatchDelivery
                         {
                             NumberOfTrips = trips,
                             DeliveryStartDate = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond)
                         };
-                        
-                        //Here I'm gonna explain to you how it work
-                        //Instead of using id from batch or batchdelivery (that hasn't been created in database yet)
-                        //You can absolutely do that but you have to SaveAsync() after each AddAsync if you want to use its ID
-                        //So instead of using the Id, we just going to use the whole entity instead, since
-                        //Batch have many Batch Delivery, we just need to add batch delivery to batch
-                        //same with order
-                        //and finally we just have to add one singular entity that is Batch, it contains all Batch deliveries and orders inside
-                        
 
 
                         // can optimize this - Change batchDeliveryId of the Order
@@ -121,6 +121,7 @@ namespace BeeStore_Repository.Services
                     }else tempOrder.Add(orderList[i]);
                 }
                 //why is there another one down here what?
+                // -> It just CP techniques
                 if (tempOrder.Count > 0) {
                     BatchDelivery batchDelivery = new BatchDelivery
                     {
@@ -128,8 +129,12 @@ namespace BeeStore_Repository.Services
                         Orders = tempOrder,
                         NumberOfTrips = 1,
                         DeliveryStartDate = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond)
-
                     };
+                    for (int j = 0; j < tempOrder.Count; j++)
+                    {
+                        tempOrder[j].BatchDelivery = batchDelivery;
+                        _unitOfWork.OrderRepo.Update(tempOrder[j]);
+                    }
                     await _unitOfWork.BatchDeliveryRepo.AddAsync(batchDelivery);
                     result.BatchDeliveries.Add(batchDelivery);
                 }
