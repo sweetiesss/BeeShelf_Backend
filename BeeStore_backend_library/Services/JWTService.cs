@@ -131,7 +131,7 @@ namespace BeeStore_Repository.Services
                     issuer: RetrieveJWTIssuer(),
                     audience: RetrieveJWTAudience(),
                     claims: claims,
-                    expires: DateTime.Now.AddMinutes(60),
+                    expires: DateTime.Now.AddMinutes(24 * 60),
                     signingCredentials: creds);
         }
     }
