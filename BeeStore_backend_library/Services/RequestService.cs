@@ -29,11 +29,16 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.RequestIdNotFound);
             }
-            if (!request.Status.Equals(Constants.Status.Draft) || !request.Status.Equals(Constants.Status.Pending))
+            if (request.Status.Equals(Constants.Status.Draft))
+            {
+                throw new ApplicationException(ResponseMessage.RequestDraftCancelError);
+            }
+            if (!request.Status.Equals(Constants.Status.Pending))
             {
                 throw new ApplicationException(ResponseMessage.RequestStatusError);
             }
             request.CancellationReason = cancellationReason;
+            request.CancelDate = DateTime.Now;
             request.Status = Constants.Status.Canceled;
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
@@ -58,9 +63,6 @@ namespace BeeStore_Repository.Services
 
         public async Task<string> CreateRequest(RequestType type, bool Send, RequestCreateDTO request)
         {
-
-
-
             var user = await _unitOfWork.OcopPartnerRepo.SingleOrDefaultAsync(u => u.Id == request.OcopPartnerId);
             if (user == null)
             {
@@ -248,7 +250,7 @@ namespace BeeStore_Repository.Services
 
             if (requestStatus == Constants.Status.Completed)
             {
-                
+
                 var lot = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.LotId));
                 if (lot == null)
                 {

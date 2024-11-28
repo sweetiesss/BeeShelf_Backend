@@ -4,9 +4,11 @@ public partial class MoneyTransfer : BaseEntity
 {
     //public int Id { get; set; }
 
+    public int? PaymentId { get; set; }
+
     public int? OcopPartnerId { get; set; }
 
-    public int? WalletId { get; set; }
+    public int? TransferBy { get; set; }
 
     public decimal? Amount { get; set; }
 
@@ -16,5 +18,7 @@ public partial class MoneyTransfer : BaseEntity
 
     public virtual OcopPartner? OcopPartner { get; set; }
 
-    public virtual Wallet? Wallet { get; set; }
+    public virtual Payment? Payment { get; set; }
+
+    public virtual Employee? TransferByNavigation { get; set; }
 }

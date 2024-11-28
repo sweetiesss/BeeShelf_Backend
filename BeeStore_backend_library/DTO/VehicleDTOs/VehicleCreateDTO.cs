@@ -12,7 +12,7 @@ namespace BeeStore_Repository.DTO.VehicleDTOs
         public int? WarehouseId { get; set; }
 
         [JsonIgnore]
-        public int? Capacity { get; set; }
+        public decimal? Capacity { get; set; }
 
         [JsonIgnore]
         public string? Type { get; set; }

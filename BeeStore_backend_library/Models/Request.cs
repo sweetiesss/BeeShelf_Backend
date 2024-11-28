@@ -22,6 +22,8 @@ public partial class Request : BaseEntity
 
     public DateTime? DeliverDate { get; set; }
 
+    public DateTime? CancelDate { get; set; }
+
     public string? CancellationReason { get; set; }
 
     public string? Status { get; set; }

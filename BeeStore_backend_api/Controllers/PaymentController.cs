@@ -48,9 +48,9 @@ namespace BeeStore_Api.Controllers
         [Authorize(Roles = "Admin, Staff")]
         [Route("create-money-transfer/{paymentId}")]
         [HttpPost]
-        public async Task<IActionResult> CreateMoneyTransfer(int paymentId)
+        public async Task<IActionResult> CreateMoneyTransfer(int staffId, int paymentId)
         {
-            var result = await _paymentService.CreateMoneyTransfer(paymentId);
+            var result = await _paymentService.CreateMoneyTransfer(staffId, paymentId);
             return Ok(result);
         }
     }

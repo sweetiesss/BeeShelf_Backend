@@ -60,17 +60,11 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.WarehouseIdNotFound);
             }
-            //uncomment these after database changes
-            //var dupe = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Name.Equals(request.Name,
-            //                                                                StringComparison.OrdinalIgnoreCase)
-            //                                                                && u.WarehouseId.Equals(request.WarehouseId));
-            //if (dupe != null)
-            //{
-            //    throw new ApplicationException(ResponseMessage.InventoryNameDuplicate);
-            //}
+            
             var result = _mapper.Map<Inventory>(request);
             result.BoughtDate = DateTime.Now;
             result.ExpirationDate = DateTime.Now;
+            result.Price = request.Price;
             await _unitOfWork.InventoryRepo.AddAsync(result);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
@@ -97,16 +91,6 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
             }
-
-
-            //if (request.Name != null && !request.Name.Equals(Constants.DefaultString.String))
-            //{//uncomment these after you make changes to database
-            //    //exist.Name = request.Name;
-            //}
-            //if (request.Weight != null)
-            //{
-            //    //exist.Weight = request.Weight;
-            //}
 
             if (request.MaxWeight != null && request.MaxWeight != 0)
             {
@@ -202,12 +186,13 @@ namespace BeeStore_Repository.Services
                 throw new ApplicationException(ResponseMessage.InventoryOccupied);
             }
             var wallet = user.Wallets.FirstOrDefault(u => u.OcopPartnerId == userId);
-            if (wallet.TotalAmount < 30000)
+            if (wallet.TotalAmount < inv.Price)
             {
                 throw new ApplicationException(ResponseMessage.NotEnoughCredit);
             }
-            wallet.TotalAmount -= 30000;
+            wallet.TotalAmount -= inv.Price;
             inv.OcopPartnerId = userId;
+            inv.BoughtDate = DateTime.Now;
             inv.ExpirationDate = DateTime.Now.AddDays(30);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
@@ -236,7 +221,7 @@ namespace BeeStore_Repository.Services
                 throw new ApplicationException(ResponseMessage.NotEnoughCredit);
             }
             inv.ExpirationDate = inv.ExpirationDate.Value.AddDays(30);
-            wallet.TotalAmount -= 30000;
+            wallet.TotalAmount -= inv.Price;
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
         }
