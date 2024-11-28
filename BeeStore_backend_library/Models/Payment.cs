@@ -14,7 +14,7 @@ public partial class Payment : BaseEntity
 
     public ulong? IsTransferred { get; set; }
 
-    //public ulong? IsDeleted { get; set; } 
+    //public ulong? IsDeleted { get; set; }
 
     public virtual Employee? CollectedByNavigation { get; set; }
 

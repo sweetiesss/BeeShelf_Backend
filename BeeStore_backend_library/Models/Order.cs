@@ -30,6 +30,8 @@ public partial class Order : BaseEntity
 
     public string? ReceiverAddress { get; set; }
 
+    public int? DeliveryZoneId { get; set; }
+
     public decimal? Distance { get; set; }
 
     public decimal? TotalPrice { get; set; }
@@ -38,7 +40,7 @@ public partial class Order : BaseEntity
 
     public decimal? TotalWeight { get; set; }
 
-    public int? BatchId { get; set; }
+    public int? BatchDeliveryId { get; set; }
 
     public DateTime? PickDate { get; set; }
 
@@ -48,7 +50,9 @@ public partial class Order : BaseEntity
 
     //public ulong? IsDeleted { get; set; }
 
-    public virtual Batch? Batch { get; set; }
+    public virtual BatchDelivery? BatchDelivery { get; set; }
+
+    public virtual DeliveryZone? DeliveryZone { get; set; }
 
     public virtual OcopPartner? OcopPartner { get; set; }
 
