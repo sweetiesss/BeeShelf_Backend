@@ -247,10 +247,12 @@ namespace BeeStore_Repository.Services
                 throw new BadHttpRequestException(ResponseMessage.BadRequest);
             }
 
-
             if (requestStatus == Constants.Status.Completed)
             {
-
+                if(exist.Status != Constants.Status.Delivered)
+                {
+                    throw new ApplicationException(ResponseMessage.BadRequest);
+                }
                 var lot = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.LotId));
                 if (lot == null)
                 {
@@ -275,6 +277,21 @@ namespace BeeStore_Repository.Services
 
                 inventory.Weight = totalWeight;
 
+            }
+            if (requestStatus.Equals(Constants.Status.Failed))
+            {
+                if(!requestStatus.Equals(Constants.Status.Processing))
+                {
+                    throw new ApplicationException(ResponseMessage.RequestHasNotBeenProcessed);
+                }
+            }
+
+            if (requestStatus.Equals(Constants.Status.Delivered))
+            {
+                if(!requestStatus.Equals(Constants.Status.Processing))
+                {
+                    throw new ApplicationException(ResponseMessage.RequestHasNotBeenProcessed);
+                }
             }
 
             exist.Status = requestStatus;

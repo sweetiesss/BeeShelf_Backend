@@ -34,6 +34,7 @@ namespace BeeStore_Repository.Utils
 
         //Payment
         public const string PaymentNotFound = "Payment has already been processed or doesn't exist.";
+        public const string PaymentAlreadyMade = "Payment has already been processed.";
 
         //Role responise message
         public const string RoleNotFound = "Role not found.";
@@ -108,6 +109,8 @@ namespace BeeStore_Repository.Utils
         public const string RequestIdNotFound = "Request Id not found.";
         public const string RequestStatusError = "Request has already been proccessed.";
         public const string RequestDraftCancelError = "Can't cancel draft request.";
+        public const string RequestHasNotBeenProcessed = "Request has not been processed or have already been finished.";
+
 
         //Warehouse category response message
         public const string WarehouseCategoryAddListFailed = "Failed to add. Warehouse with these category already exist: ";

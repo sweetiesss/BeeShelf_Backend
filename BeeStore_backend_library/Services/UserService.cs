@@ -223,7 +223,7 @@ namespace BeeStore_Repository.Services
             {
                 throw new DuplicateException(ResponseMessage.UserEmailDuplicate);
             }
-            var province = await _unitOfWork.OcopPartnerRepo.AnyAsync(u => u.Id.Equals(request.ProvinceId));
+            var province = await _unitOfWork.ProvinceRepo.AnyAsync(u => u.Id.Equals(request.ProvinceId));
             if(province == false)
             {
                 throw new KeyNotFoundException(ResponseMessage.ProvinceIdNotFound);

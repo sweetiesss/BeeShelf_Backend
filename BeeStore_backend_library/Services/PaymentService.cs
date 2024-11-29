@@ -208,7 +208,9 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.PaymentNotFound);
             }
-
+            if(payment.MoneyTransfers.Any(u => u.PaymentId.Equals(payment.Id))){
+                throw new ApplicationException(ResponseMessage.PaymentAlreadyMade);
+            }
             var employee = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id.Equals(staffId), 
                                                                                query => query.Include(o => o.Role));
             if (employee == null)
