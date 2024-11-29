@@ -56,7 +56,7 @@ namespace BeeStore_Repository.Services
                              && (userId == null || u.OcopPartnerId.Equals(userId))
                              && (warehouseId == null || u.OrderDetails.Any(od => od.Lot.Inventory.WarehouseId.Equals(warehouseId)))
                              && (shipperId == null || u.BatchDelivery.Batch.DeliverBy.Equals(shipperId) && u.IsDeleted.Equals(false)),
-                includes: null,
+                includes: u => u.Include(o => o.BatchDelivery).ThenInclude(o => o.Batch),
                 sortBy: sortBy!,
                 descending: descending,
                 searchTerm: null,

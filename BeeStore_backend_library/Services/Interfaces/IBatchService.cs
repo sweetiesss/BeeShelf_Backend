@@ -7,7 +7,7 @@ namespace BeeStore_Repository.Services.Interfaces
     public interface IBatchService
     {
         Task<Pagination<BatchListDTO>> GetBatchList(string search, BatchFilter? filterBy, string? filterQuery, int pageIndex, int pageSize);
-
+        Task<Pagination<BatchListDTO>> GetShipperBatchList(int shipperId, BatchFilter? filterBy, string? filterQuery, int pageIndex, int pageSize);
         Task<string> CreateBatch(BatchCreateDTO request);
         Task<string> DeleteBatch(int id);
         Task<string> UpdateBatch(int id, BatchCreateDTO request);

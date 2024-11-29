@@ -13,10 +13,13 @@ namespace BeeStore_Repository.DTO.Batch
         public DateTime? CompleteDate { get; set; }
 
         public int? DeliverBy { get; set; }
+        public string? ShipperEmail { get; set; }
+        public string? ShipperName { get; set; }
 
         public int? DeliveryZoneId { get; set; }
+        public string? DeliveryZoneName {  get; set; }
 
-        public List<OrderListDTO> BatchDeliveries { get; set; }
+        public List<BatchDeliveriesListDTO> BatchDeliveries { get; set; }
     }
 
     public class BatchDeliveriesListDTO
