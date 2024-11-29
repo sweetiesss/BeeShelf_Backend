@@ -23,18 +23,18 @@ namespace BeeStore_Api.Controllers
         [Route("buy-inventory/{id}/{userId}")]
         [HttpPost]
         [Authorize(Roles = "Partner")]
-        public async Task<IActionResult> BuyInventory(int id, int userId)
+        public async Task<IActionResult> BuyInventory(int id, int userId, int month)
         {
-            var result = await _inventoryService.BuyInventory(id, userId);
+            var result = await _inventoryService.BuyInventory(id, userId, month);
             return Ok(result);
         }
 
         [Route("extend-inventory/{id}/{userId}")]
         [HttpPost]
         [Authorize(Roles = "Partner")]
-        public async Task<IActionResult> ExtendInventory(int id, int userId)
+        public async Task<IActionResult> ExtendInventory(int id, int userId, int month)
         {
-            var result = await _inventoryService.ExtendInventory(id, userId);
+            var result = await _inventoryService.ExtendInventory(id, userId, month);
             return Ok(result);
         }
 

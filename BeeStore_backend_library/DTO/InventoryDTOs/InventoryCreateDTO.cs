@@ -8,8 +8,6 @@ namespace BeeStore_Repository.DTO.InventoryDTOs
         //public ulong? IsDeleted { get; set; }
         public string Name { get; set; }
         public decimal? MaxWeight { get; set; }
-
-        public decimal? Weight { get; set; } = 0;
         public decimal? Price { get; set; }
 
         [JsonIgnore]

@@ -12,11 +12,18 @@
 
         public DateTime? CreateDate { get; set; }
 
+        public DateTime? ApproveDate { get; set; }
+
         public DateTime? DeliverStartDate { get; set; }
 
         public DateTime? DeliverFinishDate { get; set; }
 
         public DateTime? CompleteDate { get; set; }
+
+        public DateTime? ReturnDate { get; set; }
+
+        public DateTime? CancelDate { get; set; }
+
 
         public string? ReceiverPhone { get; set; }
 
@@ -27,8 +34,9 @@
         public string? WarehouseLocation { get; set; }
 
         public decimal? TotalPrice { get; set; }
+        public decimal? TotalPriceAfterFee { get; set; }
 
-        public int? BatchId { get; set; }
+        public int? BatchDeliveryId { get; set; }
 
         public DateTime? PickDate { get; set; }
 

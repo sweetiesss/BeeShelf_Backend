@@ -20,7 +20,7 @@ namespace BeeStore_Repository.Services.Interfaces
         Task<string> DeleteInventory(int id);
         Task<string> AddPartnerToInventory(int id, int userId);
 
-        Task<string> BuyInventory(int id, int userId);
-        Task<string> ExtendInventory(int id, int userId);
+        Task<string> BuyInventory(int id, int userId, int month);
+        Task<string> ExtendInventory(int id, int userId, int month);
     }
 }

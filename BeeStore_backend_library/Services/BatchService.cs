@@ -84,7 +84,7 @@ namespace BeeStore_Repository.Services
                 }
 
                 result.DeliverBy = shipper.Id;
-                var vehicle = shipper.Vehicles.FirstOrDefault(u => u.AssignedDriverId.Equals(shipper.Id));
+                var vehicle = shipper.Vehicles.FirstOrDefault(u => u.AssignedDriverId.Equals(shipper.Id) && u.IsDeleted.Equals(false));
                 //Check Order -> Create Batch Delivery
                 decimal? currentWeight = 0;
                 var cap = vehicle.Capacity;
@@ -121,8 +121,7 @@ namespace BeeStore_Repository.Services
                         if(trips == 1) i--;
                     }else tempOrder.Add(orderList[i]);
                 }
-                //why is there another one down here what?
-                // -> It just CP techniques
+                
                 if (tempOrder.Count > 0) {
                     BatchDelivery batchDelivery = new BatchDelivery
                     {
@@ -134,6 +133,7 @@ namespace BeeStore_Repository.Services
                     for (int j = 0; j < tempOrder.Count; j++)
                     {
                         tempOrder[j].BatchDelivery = batchDelivery;
+                        tempOrder[j].DeliverStartDate = batchDelivery.DeliveryStartDate;
                         _unitOfWork.OrderRepo.Update(tempOrder[j]);
                     }
                     await _unitOfWork.BatchDeliveryRepo.AddAsync(batchDelivery);
@@ -202,12 +202,17 @@ namespace BeeStore_Repository.Services
             {
                 throw new ApplicationException(ResponseMessage.BatchStatusNotPending);
             }
-            //remember to fix these
-            //foreach (var o in batch.Orders)
-            //{
-            //    o.BatchId = null;
-            //    await _unitOfWork.SaveAsync();
-            //}
+            foreach (var o in batch.BatchDeliveries)
+            {
+                o.BatchId = null;
+                o.IsDeleted = true;
+                var list = o.Orders.Where(u => u.BatchDeliveryId.Equals(o.Id)).ToList();
+                foreach(var i in list)
+                {
+                    i.BatchDeliveryId = null;
+                }
+            }
+            
             _unitOfWork.BatchRepo.SoftDelete(batch);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
@@ -272,5 +277,33 @@ namespace BeeStore_Repository.Services
             return (await ListPagination<BatchListDTO>.PaginateList(result, pageIndex, pageSize));
         }
 
+        public async Task<Pagination<BatchListDTO>> GetShipperBatchList(int shipperId, BatchFilter? filterBy, string? filterQuery, int pageIndex, int pageSize)
+        {
+            if ((!string.IsNullOrEmpty(filterQuery) && filterBy == null)
+                 || (string.IsNullOrEmpty(filterQuery) && filterBy != null))
+            {
+                throw new BadHttpRequestException(ResponseMessage.BadRequest);
+            }
+
+            Expression<Func<Batch, bool>> filterExpression = null;
+            switch (filterBy)
+            {
+                case BatchFilter.DeliveryZoneId: filterExpression = u => u.DeliveryZoneId.Equals(Int32.Parse(filterQuery!)) && u.DeliverBy.Equals(shipperId); break;
+                case BatchFilter.Status: filterExpression = u => u.Status.Equals(filterQuery!, StringComparison.OrdinalIgnoreCase) && u.DeliverBy.Equals(shipperId); break;
+                default: filterExpression = u => u.DeliverBy.Equals(shipperId); break;
+            }
+
+            var list = await _unitOfWork.BatchRepo.GetListAsync(
+               filter: filterExpression!,
+               includes: u => u.Include(o => o.BatchDeliveries).ThenInclude(o => o.Orders),
+               sortBy: null,
+               descending: false,
+               searchTerm: null,
+               searchProperties: null
+               );
+
+            var result = _mapper.Map<List<BatchListDTO>>(list);
+            return (await ListPagination<BatchListDTO>.PaginateList(result, pageIndex, pageSize));
+        }
     }
 }
