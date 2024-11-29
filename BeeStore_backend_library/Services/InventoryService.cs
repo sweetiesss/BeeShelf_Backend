@@ -25,6 +25,7 @@ namespace BeeStore_Repository.Services
             _mapper = mapper;
             _logger = logger;
         }
+        //NOT USED
         public async Task<string> AddPartnerToInventory(int id, int userId)
         {
             var exist = await _unitOfWork.InventoryRepo.GetByIdAsync(id);
@@ -51,8 +52,6 @@ namespace BeeStore_Repository.Services
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
         }
-
-
         public async Task<string> CreateInventory(InventoryCreateDTO request)
         {
             var exist = await _unitOfWork.WarehouseRepo.GetByIdAsync(request.WarehouseId);
@@ -60,16 +59,25 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.WarehouseIdNotFound);
             }
-            
+            //Check inv capacity with total capacity of warehouse
+            decimal? currWeight = request.MaxWeight;
+            foreach(var inv in exist.Inventories)
+            {
+                currWeight += inv.Weight;
+                if(currWeight > exist.Capacity)
+                {
+                    throw new KeyNotFoundException(ResponseMessage.WarehouseAddInventoryCapacityLimitReach);
+                }
+            }
             var result = _mapper.Map<Inventory>(request);
             result.Weight = 0;
-            result.BoughtDate = DateTime.Now;
-            result.ExpirationDate = DateTime.Now;
+            // BoughtDate and ExpirationDate shouldn't be initialize here -> initialize when Partner buy Inventory
+            //result.BoughtDate = DateTime.Now;
+            //result.ExpirationDate = DateTime.Now;
             result.Price = request.Price;
             await _unitOfWork.InventoryRepo.AddAsync(result);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
-
         }
 
         public async Task<string> DeleteInventory(int id)
@@ -92,7 +100,10 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
             }
-
+            if (DateTime.Now > exist.BoughtDate && DateTime.Now < exist.ExpirationDate)
+            {
+                throw new KeyNotFoundException(ResponseMessage.InventoryOccupied);
+            }
             if (request.MaxWeight != null && request.MaxWeight != 0)
             {
                 exist.MaxWeight = request.MaxWeight;
@@ -172,7 +183,7 @@ namespace BeeStore_Repository.Services
 
         public async Task<string> BuyInventory(int id, int userId, int month)
         {
-            if(month == 0)
+            if(month <= 0)
             {
                 throw new ApplicationException(ResponseMessage.BadRequest);
             }
@@ -187,19 +198,19 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
             }
-            if(inv.OcopPartnerId != null && inv.OcopPartnerId != userId)
+            if ((inv.OcopPartnerId != null && inv.OcopPartnerId != userId) || (DateTime.Now > inv.BoughtDate && DateTime.Now < inv.ExpirationDate))
             {
                 throw new ApplicationException(ResponseMessage.InventoryOccupied);
             }
             var wallet = user.Wallets.FirstOrDefault(u => u.OcopPartnerId == userId);
-            if (wallet.TotalAmount < inv.Price)
+            if (wallet.TotalAmount < inv.Price * month)
             {
                 throw new ApplicationException(ResponseMessage.NotEnoughCredit);
             }
             wallet.TotalAmount -= inv.Price * month;
             inv.OcopPartnerId = userId;
             inv.BoughtDate = DateTime.Now;
-            inv.ExpirationDate = DateTime.Now.AddMonths(1*month);
+            inv.ExpirationDate = DateTime.Now.AddMonths(month);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
         }
@@ -226,11 +237,11 @@ namespace BeeStore_Repository.Services
                 throw new ApplicationException(ResponseMessage.InventoryPartnerNotMatch);
             }
             var wallet = user.Wallets.FirstOrDefault(u => u.OcopPartnerId == userId);
-            if(wallet.TotalAmount < inv.Price)
+            if(wallet.TotalAmount < inv.Price * month)
             {
                 throw new ApplicationException(ResponseMessage.NotEnoughCredit);
             }
-            inv.ExpirationDate = inv.ExpirationDate.Value.AddMonths(1*month);
+            inv.ExpirationDate = inv.ExpirationDate.Value.AddMonths(month);
             wallet.TotalAmount -= inv.Price * month;
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
