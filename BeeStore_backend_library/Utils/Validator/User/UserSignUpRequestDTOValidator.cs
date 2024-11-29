@@ -66,7 +66,8 @@ namespace BeeStore_Repository.Utils.Validator.User
                 .NotEmpty();
             RuleFor(x => x.CategoryId)
                 .NotEmpty();
-            RuleFor(x => x.OcopCategoryId) .NotEmpty();
+            RuleFor(x => x.OcopCategoryId)
+                .NotEmpty();
                 
         }
     }
