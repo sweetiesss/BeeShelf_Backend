@@ -234,7 +234,7 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.OcopCategoryIdNotFound);
             }
-            if(OcopCategory.Categories.Any(u => u.OcopCategoryId.Equals(request.OcopCategoryId)) == false)
+            if(OcopCategory.Categories.FirstOrDefault(u => u.OcopCategoryId.Equals(request.OcopCategoryId)) == null)
             {
                 throw new ApplicationException(ResponseMessage.CategoryIdNotMatch);
             }
