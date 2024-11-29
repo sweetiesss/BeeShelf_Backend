@@ -16,12 +16,16 @@ namespace BeeStore_Repository.Utils.Validator.Inventory
 
             // Rule for MaxWeight: optional but must be non-negative if provided
             RuleFor(x => x.MaxWeight)
+                .NotEmpty()
+                .NotNull()
                 .GreaterThanOrEqualTo(0).When(x => x.MaxWeight.HasValue)
                 .WithMessage(ValidationMessage.MaxWeightNonNegative);
 
-            // Rule for Weight: optional but must be non-negative if provided
-            RuleFor(x => x.Weight)
-                .GreaterThanOrEqualTo(0).When(x => x.Weight.HasValue)
+
+            RuleFor(x => x.Price)
+                .NotEmpty()
+                .NotNull()
+                .GreaterThanOrEqualTo(0).When(x => x.Price.HasValue)
                 .WithMessage(ValidationMessage.WeightNonNegative);
 
             // Rule for WarehouseId: required

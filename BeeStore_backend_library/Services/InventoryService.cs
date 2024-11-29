@@ -62,6 +62,7 @@ namespace BeeStore_Repository.Services
             }
             
             var result = _mapper.Map<Inventory>(request);
+            result.Weight = 0;
             result.BoughtDate = DateTime.Now;
             result.ExpirationDate = DateTime.Now;
             result.Price = request.Price;
@@ -96,6 +97,7 @@ namespace BeeStore_Repository.Services
             {
                 exist.MaxWeight = request.MaxWeight;
             }
+            exist.Price = request.Price;
             _unitOfWork.InventoryRepo.Update(exist);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
@@ -168,8 +170,12 @@ namespace BeeStore_Repository.Services
             return result;
         }
 
-        public async Task<string> BuyInventory(int id, int userId)
+        public async Task<string> BuyInventory(int id, int userId, int month)
         {
+            if(month == 0)
+            {
+                throw new ApplicationException(ResponseMessage.BadRequest);
+            }
             var user = await _unitOfWork.OcopPartnerRepo.SingleOrDefaultAsync(u => u.Id == userId,
                                                                               query => query.Include(o => o.Wallets));
             if(user == null)
@@ -190,16 +196,20 @@ namespace BeeStore_Repository.Services
             {
                 throw new ApplicationException(ResponseMessage.NotEnoughCredit);
             }
-            wallet.TotalAmount -= inv.Price;
+            wallet.TotalAmount -= inv.Price * month;
             inv.OcopPartnerId = userId;
             inv.BoughtDate = DateTime.Now;
-            inv.ExpirationDate = DateTime.Now.AddDays(30);
+            inv.ExpirationDate = DateTime.Now.AddMonths(1*month);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
         }
 
-        public async Task<string> ExtendInventory(int id, int userId)
+        public async Task<string> ExtendInventory(int id, int userId, int month)
         {
+            if (month == 0)
+            {
+                throw new ApplicationException(ResponseMessage.BadRequest);
+            }
             var user = await _unitOfWork.OcopPartnerRepo.SingleOrDefaultAsync(u => u.Id == userId,
                                                                               query => query.Include(o => o.Wallets));
             if (user == null)
@@ -216,12 +226,12 @@ namespace BeeStore_Repository.Services
                 throw new ApplicationException(ResponseMessage.InventoryPartnerNotMatch);
             }
             var wallet = user.Wallets.FirstOrDefault(u => u.OcopPartnerId == userId);
-            if(wallet.TotalAmount < 30000)
+            if(wallet.TotalAmount < inv.Price)
             {
                 throw new ApplicationException(ResponseMessage.NotEnoughCredit);
             }
-            inv.ExpirationDate = inv.ExpirationDate.Value.AddDays(30);
-            wallet.TotalAmount -= inv.Price;
+            inv.ExpirationDate = inv.ExpirationDate.Value.AddMonths(1*month);
+            wallet.TotalAmount -= inv.Price * month;
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
         }

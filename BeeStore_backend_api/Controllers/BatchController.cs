@@ -62,5 +62,18 @@ namespace BeeStore_Api.Controllers
             var result = await _batchService.GetBatchList(search, filterBy, filterQuery, pageIndex, pageSize);
             return Ok(result);
         }
+
+        [Authorize(Roles = "Admin,Manager,Staff,Shipper")]
+        [Route("get-shipper-batches/{shipperId}")]
+        [HttpGet]
+        public async Task<IActionResult> GetAllBatches( int shipperId,
+                                                       [FromQuery] BatchFilter? filterBy,
+                                                       [FromQuery][DefaultValue(null)] string? filterQuery,
+                                                       [FromQuery][DefaultValue(0)] int pageIndex,
+                                                       [FromQuery][DefaultValue(10)] int pageSize)
+        {
+            var result = await _batchService.GetShipperBatchList(shipperId, filterBy, filterQuery, pageIndex, pageSize);
+            return Ok(result);
+        }
     }
 }
