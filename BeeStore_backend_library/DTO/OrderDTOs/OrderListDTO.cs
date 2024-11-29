@@ -24,7 +24,6 @@
 
         public DateTime? CancelDate { get; set; }
 
-
         public string? ReceiverPhone { get; set; }
 
         public string? ReceiverAddress { get; set; }
@@ -32,6 +31,8 @@
         public int? WarehouseID { get; set; }
         public string? WarehouseName { get; set; }
         public string? WarehouseLocation { get; set; }
+        public int? DeliveryZoneId { get; set; }
+        public string? DeliveryZoneName { get; set; }
 
         public decimal? TotalPrice { get; set; }
         public decimal? TotalPriceAfterFee { get; set; }
