@@ -72,14 +72,20 @@ namespace BeeStore_Repository.Mapper
             .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
 
 
-            CreateMap<Warehouse, WarehouseListDTO>();
+            CreateMap<Warehouse, WarehouseListDTO>()
+                .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Location + ", " + src.Province.SubDivisionName))
+                .ForMember(dest => dest.ProvinceName, opt => opt.MapFrom(src => src.Province.SubDivisionName));
             CreateMap<WarehouseCreateDTO, Warehouse>();
             CreateMap<DeliveryZoneCreateDTO, DeliveryZone>();
             CreateMap<Warehouse, WarehouseListInventoryDTO>()
+                .ForMember(dest => dest.ProvinceName, opt => opt.MapFrom(src => src.Province.SubDivisionName))
+                .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Location + ", "+ src.Province.SubDivisionName))
                 .ForMember(dest => dest.TotalInventory, opt => opt.MapFrom(src => src.Inventories.Count()))
                 .ForMember(dest => dest.Inventories, opt => opt.MapFrom(src => src.Inventories))
             .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<Warehouse, WarehouseDeliveryZoneDTO>()
+                .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Location + ", " + src.Province.SubDivisionName))
+                .ForMember(dest => dest.ProvinceName, opt => opt.MapFrom(src => src.Province.SubDivisionName))
                 .ForMember(dest => dest.DeliveryZones, opt => opt.MapFrom(src => src.Province.DeliveryZones.Where(u => u.ProvinceId.Equals(src.ProvinceId))));
 
             CreateMap<DeliveryZone, DeliveryZoneDTO>()
@@ -122,8 +128,10 @@ namespace BeeStore_Repository.Mapper
 
 
             CreateMap<WarehouseShipper, WarehouseShipperListDTO>()
+                .ForMember(dest => dest.ShipperName, opt => opt.MapFrom(src => $"{src.Employee.FirstName} {src.Employee.LastName}"))
                 .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom(src => src.Warehouse!.Name))
                 .ForMember(dest => dest.email, opt => opt.MapFrom(src => src.Employee!.Email))
+                .ForMember(dest => dest.DeliveryZoneName, opt => opt.MapFrom(src => src.DeliveryZone.Name))
                 .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<WarehouseShipperCreateDTO, WarehouseShipper>();
 
@@ -149,6 +157,7 @@ namespace BeeStore_Repository.Mapper
                 .ForMember(dest => dest.WarehouseLocation, opt => opt.MapFrom(src => src.OrderDetails.FirstOrDefault(u => u.OrderId.Equals(src.Id)).Lot.Inventory.Warehouse.Location))
                 .ForMember(dest => dest.OrderDetails, opt => opt.MapFrom(src => src.OrderDetails))
                 .ForMember(dest => dest.OrderFees, opt => opt.MapFrom(src => src.OrderFees))
+                .ForMember(dest => dest.DeliveryZoneName, opt => opt.MapFrom(src => src.DeliveryZone.Name))
             .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<OrderDetail, OrderDetailDTO>()
                 .ForMember(dest => dest.ProductImage, opt => opt.MapFrom(src => src.Lot != null ? src.Lot.Product.PictureLink : null))
@@ -172,7 +181,7 @@ namespace BeeStore_Repository.Mapper
             CreateMap<Batch, BatchListDTO>()
                 .ForMember(dest => dest.BatchDeliveries, opt => opt.MapFrom(src => src.BatchDeliveries))
                 .ForMember(dest => dest.ShipperEmail, opt => opt.MapFrom(src => src.DeliverByNavigation.Email))
-                .ForMember(dest => dest.ShipperEmail, opt => opt.MapFrom(src => src.DeliverByNavigation.FirstName + src.DeliverByNavigation.LastName))
+                .ForMember(dest => dest.ShipperName, opt => opt.MapFrom(src => $"{src.DeliverByNavigation.FirstName} {src.DeliverByNavigation.LastName}"))
                 .ForMember(dest => dest.DeliveryZoneName, opt => opt.MapFrom(src => src.DeliveryZone.Name));
             CreateMap<BatchDelivery, BatchDeliveriesListDTO>();
             CreateMap<BatchCreateDTO, Batch>()
