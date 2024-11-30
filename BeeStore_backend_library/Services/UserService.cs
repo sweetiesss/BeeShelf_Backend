@@ -103,8 +103,16 @@ namespace BeeStore_Repository.Services
                 throw new DuplicateException(ResponseMessage.UserEmailDuplicate);
             }
             var result = _mapper.Map<Employee>(user);
+
+            string generatePassword = GeneratePassword(Constants.Smtp.DEFAULT_PASSWORD_LENGTH);
+
+            result.Password = BCrypt.Net.BCrypt.HashPassword(generatePassword);
+
             await _unitOfWork.EmployeeRepo.AddAsync(result);
             await _unitOfWork.SaveAsync();
+
+            PasswordMailSender(result.Email, generatePassword);
+
             return ResponseMessage.Success;
         }
 

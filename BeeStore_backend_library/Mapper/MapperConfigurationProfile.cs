@@ -32,8 +32,7 @@ namespace BeeStore_Repository.Mapper
             CreateMap(typeof(Task<>), typeof(Pagination<>));
             CreateMap(typeof(InternalDbSet<>), typeof(IQueryable<>));
 
-            CreateMap<EmployeeCreateRequest, Employee>()
-                     .ForMember(dest => dest.Password, opt => opt.MapFrom(src => BCrypt.Net.BCrypt.HashPassword(src.Password)));
+            CreateMap<EmployeeCreateRequest, Employee>();
             CreateMap<UserSignUpRequestDTO, OcopPartner>();
 
             CreateMap<Province, ProvinceListDTO>();
@@ -186,7 +185,13 @@ namespace BeeStore_Repository.Mapper
             CreateMap<BatchDelivery, BatchDeliveriesListDTO>();
             CreateMap<BatchCreateDTO, Batch>()
                 //.ForMember(dest => dest.Orders, opt => opt.Ignore())
-                .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null)); ;
+                .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<MoneyTransfer, MoneyTransferListDTO>()
+                .ForMember(dest => dest.OrderId, opt => opt.MapFrom(src => src.Payment.OrderId))
+                .ForMember(dest => dest.TransferByStaffEmail, opt => opt.MapFrom(src => src.TransferByNavigation.Email))
+                .ForMember(dest => dest.TransferByStaffName, opt => opt.MapFrom(src => $"{src.TransferByNavigation.FirstName} {src.TransferByNavigation.LastName}" ))
+                .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
+
         }
     }
 }
