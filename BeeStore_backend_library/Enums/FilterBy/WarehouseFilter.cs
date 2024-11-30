@@ -2,6 +2,8 @@
 {
     public enum WarehouseFilter
     {
-        WarehouseId
+        WarehouseId,
+        DeliveryZoneId,
+        ProvinceId
     }
 }

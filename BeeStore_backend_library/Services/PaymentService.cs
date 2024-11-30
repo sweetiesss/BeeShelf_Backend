@@ -193,9 +193,9 @@ namespace BeeStore_Repository.Services
             }
         }
 
-        public async Task<List<PaymentListDTO>> GetPaymentList()
+        public async Task<List<PaymentListDTO>> GetPaymentList(int warehouseId)
         {
-            var list = await _unitOfWork.PaymentRepo.GetQueryable();
+            var list = await _unitOfWork.PaymentRepo.GetQueryable(query => query.Where(u => u.Order.OrderDetails.Any(od => od.Lot.Inventory.WarehouseId.Equals(warehouseId))));
             var a = list.ToList();
             var result = _mapper.Map<List<PaymentListDTO>>(a);
             return result;
@@ -227,11 +227,19 @@ namespace BeeStore_Repository.Services
                 Amount = payment.TotalAmount,
                 CreateDate = DateTime.Now,
                 OcopPartnerId = payment.OcopPartnerId,
+                PaymentId = payment.Id,
                 TransferBy = staffId
             };
             await _unitOfWork.MoneyTransferRepo.AddAsync(moneyTransfer);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
+        }
+
+        public async Task<List<MoneyTransferListDTO>> GetMoneyTransferList(int partnerId)
+        {
+            var list = await _unitOfWork.MoneyTransferRepo.GetFiltered(u => u.OcopPartnerId.Equals(partnerId));
+            var result = _mapper.Map<List<MoneyTransferListDTO>>(list);
+            return result;
         }
     }
 }

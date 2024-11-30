@@ -2,6 +2,7 @@
 using BeeStore_Repository.DTO;
 using BeeStore_Repository.DTO.OrderDTOs;
 using BeeStore_Repository.Enums;
+using BeeStore_Repository.Enums.FilterBy;
 using BeeStore_Repository.Enums.SortBy;
 using BeeStore_Repository.Logger;
 using BeeStore_Repository.Models;
@@ -26,10 +27,10 @@ namespace BeeStore_Repository.Services
             _logger = logger;
         }
 
-        private async Task<List<Order>> ApplyFilterToList(OrderStatus? orderStatus, OrderSortBy? sortCriteria,
+        private async Task<List<Order>> ApplyFilterToList(OrderFilterBy? orderFilterBy, string? filterQuery, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
                                                           bool descending, int? shipperId = null, int? userId = null, int? warehouseId = null)
         {
-            string? filterQuery = orderStatus switch
+            string? filterQue = orderStatus switch
             {
                 OrderStatus.Draft => Constants.Status.Draft,
                 OrderStatus.Pending => Constants.Status.Pending,
@@ -43,6 +44,14 @@ namespace BeeStore_Repository.Services
                 _ => null
             };
 
+            switch (orderFilterBy)
+            {
+                case OrderFilterBy.DeliveryZoneId:
+                    break;
+                case null: filterQuery = string.Empty; break;
+            }
+
+
             string? sortBy = sortCriteria switch
             {
                 OrderSortBy.CreateDate => Constants.SortCriteria.CreateDate,
@@ -52,7 +61,8 @@ namespace BeeStore_Repository.Services
             };
 
             var list = await _unitOfWork.OrderRepo.GetListAsync(
-                filter: u => (filterQuery == null || u.Status.Equals(filterQuery))
+                filter: u => (filterQue == null || u.Status.Equals(filterQue))
+                             && (orderFilterBy == null || u.DeliveryZoneId.Equals(Int32.Parse(filterQuery)))
                              && (userId == null || u.OcopPartnerId.Equals(userId))
                              && (warehouseId == null || u.OrderDetails.Any(od => od.Lot.Inventory.WarehouseId.Equals(warehouseId)))
                              && (shipperId == null || u.BatchDelivery.Batch.DeliverBy.Equals(shipperId) && u.IsDeleted.Equals(false)),
@@ -65,33 +75,33 @@ namespace BeeStore_Repository.Services
             return list;
         }
 
-        public async Task<Pagination<OrderListDTO>> GetOrderList(OrderStatus? orderStatus, OrderSortBy? sortCriteria,
+        public async Task<Pagination<OrderListDTO>> GetOrderList(OrderFilterBy? orderFilterBy, string? filterQuery, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
                                                           bool descending, int pageIndex, int pageSize)
         {
-            var list = await ApplyFilterToList(orderStatus, sortCriteria, descending);
+            var list = await ApplyFilterToList(orderFilterBy, filterQuery, orderStatus, sortCriteria, descending);
             var result = _mapper.Map<List<OrderListDTO>>(list);
             return await ListPagination<OrderListDTO>.PaginateList(result, pageIndex, pageSize);
         }
 
-        public async Task<Pagination<OrderListDTO>> GetWarehouseSentOrderList(int warehouseId, OrderStatus? orderStatus, OrderSortBy? sortCriteria, bool descending, int pageIndex, int pageSize)
+        public async Task<Pagination<OrderListDTO>> GetWarehouseSentOrderList(OrderFilterBy? orderFilterBy, string? filterQuery, int warehouseId, OrderStatus? orderStatus, OrderSortBy? sortCriteria, bool descending, int pageIndex, int pageSize)
         {
-            var list = await ApplyFilterToList(orderStatus, sortCriteria, descending, null, null, warehouseId);
+            var list = await ApplyFilterToList(orderFilterBy, filterQuery, orderStatus, sortCriteria, descending, null, null, warehouseId);
             var result = _mapper.Map<List<OrderListDTO>>(list);
             return await ListPagination<OrderListDTO>.PaginateList(result, pageIndex, pageSize);
         }
 
-        public async Task<Pagination<OrderListDTO>> GetOrderList(int userId, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
+        public async Task<Pagination<OrderListDTO>> GetOrderList(OrderFilterBy? orderFilterBy, string? filterQuery, int userId, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
                                                           bool descending, int pageIndex, int pageSize)
         {
-            var list = await ApplyFilterToList(orderStatus, sortCriteria, descending, null, userId);
+            var list = await ApplyFilterToList(orderFilterBy, filterQuery, orderStatus, sortCriteria, descending, null, userId);
             var result = _mapper.Map<List<OrderListDTO>>(list);
             return await ListPagination<OrderListDTO>.PaginateList(result, pageIndex, pageSize);
         }
 
-        public async Task<Pagination<OrderListDTO>> GetDeliverOrderList(int shipperId, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
+        public async Task<Pagination<OrderListDTO>> GetDeliverOrderList(OrderFilterBy? orderFilterBy, string? filterQuery, int shipperId, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
                                                           bool descending, int pageIndex, int pageSize)
         {
-            var list = await ApplyFilterToList(orderStatus, sortCriteria, descending, shipperId);
+            var list = await ApplyFilterToList(orderFilterBy, filterQuery, orderStatus, sortCriteria, descending, shipperId);
             var result = _mapper.Map<List<OrderListDTO>>(list);
             return await ListPagination<OrderListDTO>.PaginateList(result, pageIndex, pageSize);
         }

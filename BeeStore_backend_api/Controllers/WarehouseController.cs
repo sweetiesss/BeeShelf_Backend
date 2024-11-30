@@ -102,6 +102,15 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
+        [Route("assign-shipper-to-delivery-zone/{shipperId}/{deliveryzoneId}")]
+        [HttpPost]
+        [Authorize(Roles = "Admin, Manager")]
+        public async Task<IActionResult> AssingnShipperToDeliveryZone(int shipperId, int deliveryzoneId)
+        {
+            var result = await _warehouseShipperService.AssignShipperToDeliveryZone(shipperId, deliveryzoneId);
+            return Ok(result);
+        }
+
         [Route("get-warehouse-staffs")]
         [HttpGet]
         [Authorize(Roles = "Admin,Manager")]

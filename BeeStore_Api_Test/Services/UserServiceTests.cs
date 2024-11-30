@@ -359,7 +359,6 @@ namespace BeeStore_Api_Test.Services
             var request = new EmployeeCreateRequest
             {
                 Email = "test@example.com",
-                Password = "password",
                 FirstName = "John",
                 LastName = "Doe"
             };
