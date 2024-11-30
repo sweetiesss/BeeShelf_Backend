@@ -7,6 +7,7 @@ using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Text;
 
@@ -31,7 +32,9 @@ namespace BeeStore_Repository.Services
             }
             Expression<Func<WarehouseShipper, bool>> filterExpression = u =>
             (warehouseId == null || u.WarehouseId.Equals(warehouseId)) &&
-            (filterBy == null || (filterBy == WarehouseFilter.WarehouseId && u.WarehouseId.Equals(Int32.Parse(filterQuery!))));
+            (filterBy == null ||
+                (filterBy == WarehouseFilter.WarehouseId && u.WarehouseId.Equals(Int32.Parse(filterQuery!))) ||
+                (filterBy == WarehouseFilter.DeliveryZoneId && u.DeliveryZoneId.Equals(Int32.Parse(filterQuery!))));
 
 
             var list = await _unitOfWork.WarehouseShipperRepo.GetListAsync(
@@ -128,5 +131,39 @@ namespace BeeStore_Repository.Services
             return ResponseMessage.Success;
         }
 
+        public async Task<string> AssignShipperToDeliveryZone(int shipperId, int deliveryZoneId)
+        {
+            var shipper = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id.Equals(shipperId),
+                                                                              query => query
+                                                                              .Include(o => o.WarehouseShippers)
+                                                                              .ThenInclude(o => o.Warehouse));
+            if(shipper == null)
+            {
+                throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
+            }
+            if(shipper.Role.RoleName != Constants.RoleName.Shipper)
+            {
+                throw new ApplicationException(ResponseMessage.UserRoleNotShipperError);
+            }
+            var deliveryZone = await _unitOfWork.DeliveryZoneRepo.SingleOrDefaultAsync(u => u.Id.Equals(deliveryZoneId));
+            if (deliveryZoneId == null)
+            {
+                throw new KeyNotFoundException(ResponseMessage.DeliveryZoneIdNotFound);
+            }
+            if(deliveryZone.ProvinceId != 
+                shipper.WarehouseShippers.FirstOrDefault(u => u.EmployeeId.Equals(shipperId) 
+                                                        && u.IsDeleted.Equals(false))
+                                                        .Warehouse
+                                                        .ProvinceId)
+            {
+                throw new ApplicationException(ResponseMessage.DeliveryZoneProvinceIdNotMatchWithShipper);
+            }
+            var result = shipper.WarehouseShippers.FirstOrDefault(u => u.EmployeeId.Equals(shipperId)
+                                                                 && u.IsDeleted.Equals(false));
+            result.DeliveryZoneId = deliveryZoneId;
+            await _unitOfWork.SaveAsync();
+            return ResponseMessage.Success;
+            
+        }
     }
 }

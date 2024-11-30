@@ -7,7 +7,8 @@ namespace BeeStore_Repository.Services.Interfaces
     {
         Task<PaymentResponseDTO> CreateQrCode(CoinPackValue options, string custom_amount, PaymentRequestDTO request);
         Task<string> ConfirmPayment(ConfirmPaymentDTO request);
-        Task<List<PaymentListDTO>> GetPaymentList();
+        Task<List<PaymentListDTO>> GetPaymentList(int warehouseId);
         Task<string> CreateMoneyTransfer(int staffId, int paymentId);
+        Task<List<MoneyTransferListDTO>> GetMoneyTransferList(int partnerId);
     }
 }

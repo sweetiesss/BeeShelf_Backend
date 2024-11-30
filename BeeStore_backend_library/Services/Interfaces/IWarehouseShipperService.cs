@@ -9,5 +9,6 @@ namespace BeeStore_Repository.Services.Interfaces
         Task<Pagination<WarehouseShipperListDTO>> GetWarehouseShipperList(string? search, WarehouseFilter? filterBy, string? filterQuery, int pageIndex, int pageSize);
         Task<Pagination<WarehouseShipperListDTO>> GetWarehouseShipperList(int id, string? search, WarehouseFilter? filterBy, string? filterQuery, int pageIndex, int pageSize);
         Task<string> AddShipperToWarehouse(List<WarehouseShipperCreateDTO> request);
+        Task<string> AssignShipperToDeliveryZone(int shipperId, int deliveryZoneId);
     }
 }

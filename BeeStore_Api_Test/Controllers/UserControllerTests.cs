@@ -72,7 +72,6 @@ namespace BeeStore_Api_Test.Controllers
             var newEmployeeRequest = new EmployeeCreateRequest
             {
                 Email = "newemployee@example.com",
-                Password = "Password123",
                 FirstName = "New",
                 LastName = "Employee",
                 RoleId = 2

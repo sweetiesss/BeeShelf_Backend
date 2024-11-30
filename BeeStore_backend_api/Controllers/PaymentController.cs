@@ -37,11 +37,20 @@ namespace BeeStore_Api.Controllers
         }
 
         [Authorize(Roles = "Admin, Staff")]
-        [Route("get-payments")]
+        [Route("get-payments/{warehouseId}")]
         [HttpGet]
-        public async Task<IActionResult> GetPayment()
+        public async Task<IActionResult> GetPayment(int warehouseId)
         {
-            var result = await _paymentService.GetPaymentList();
+            var result = await _paymentService.GetPaymentList(warehouseId);
+            return Ok(result);
+        }
+
+        [Authorize(Roles = "Admin, Staff")]
+        [Route("get-money-transfers/{partnerId}")]
+        [HttpGet]
+        public async Task<IActionResult> GetMoneyTransfer(int partnerId)
+        {
+            var result = await _paymentService.GetMoneyTransferList(partnerId);
             return Ok(result);
         }
 
