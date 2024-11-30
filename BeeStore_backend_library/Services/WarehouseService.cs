@@ -68,7 +68,9 @@ namespace BeeStore_Repository.Services
                 throw new BadHttpRequestException(ResponseMessage.BadRequest);
             }
             Expression<Func<Warehouse, bool>> filterExpression = u =>
-            (filterBy == null || (filterBy == WarehouseFilter.WarehouseId && u.Id.Equals(Int32.Parse(filterQuery!))));
+            (filterBy == null || 
+                (filterBy == WarehouseFilter.WarehouseId && u.Id.Equals(Int32.Parse(filterQuery!)))
+             || (filterBy == WarehouseFilter.ProvinceId && u.Id.Equals(Int32.Parse(filterQuery!))));
 
 
             string? sortBy = sortCriteria switch

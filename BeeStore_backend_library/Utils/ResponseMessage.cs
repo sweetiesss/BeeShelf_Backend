@@ -118,7 +118,8 @@ namespace BeeStore_Repository.Utils
 
         //Delivery Zone
         public const string DeliveryZoneDuplicateNameOrLocation = "Delivery zone with this name or location has already exist.";
-
+        public const string DeliveryZoneProvinceIdNotMatchWithShipper = "Delivery zone may not be in the same province as the warehouse that shipper is currently working at.";
+        public const string DeliveryZoneIdNotFound = "Delivery zone Id not found.";
         //Province
         public const string ProvinceIdNotFound = "Province Id not found.";
         //OcopCategory
