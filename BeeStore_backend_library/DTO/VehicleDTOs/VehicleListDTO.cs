@@ -11,7 +11,7 @@
         public decimal? Capacity { get; set; }
 
         public string? Type { get; set; }
-
+        public ulong? IsCold { get; set; }
         public string? Status { get; set; }
         public int? WarehouseId { get; set; }
 

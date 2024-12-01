@@ -13,6 +13,9 @@ namespace BeeStore_Repository.DTO.ProductDTOs
         public decimal? Price { get; set; }
 
         public decimal? Weight { get; set; }
+        public string? Unit { get; set; }
+
+        public ulong? IsCold { get; set; } = 0;
 
         [JsonIgnore]
         public DateTime? CreateDate { get; set; } = DateTime.Now;

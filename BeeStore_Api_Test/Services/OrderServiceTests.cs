@@ -134,6 +134,8 @@ namespace BeeStore_Api_Test.Services
 
             // Act
             var result = await _orderService.GetOrderList(
+                orderFilterBy: null,
+                filterQuery: null,
                 orderStatus: null,
                 sortCriteria: null,
                 descending: false,
@@ -258,6 +260,8 @@ namespace BeeStore_Api_Test.Services
 
             // Act
             var result = await _orderService.GetWarehouseSentOrderList(
+                orderFilterBy: null,
+                filterQuery: null,
                 warehouseId: warehouseId,
                 orderStatus: orderStatus,
                 sortCriteria: sortCriteria,
@@ -343,6 +347,8 @@ namespace BeeStore_Api_Test.Services
 
             // Act
             var result = await _orderService.GetOrderList(
+                orderFilterBy: null,
+                filterQuery: null,
                 userId: userId,
                 orderStatus: orderStatus,
                 sortCriteria: sortCriteria,
@@ -428,6 +434,8 @@ namespace BeeStore_Api_Test.Services
 
             // Act
             var result = await _orderService.GetDeliverOrderList(
+                orderFilterBy: null,
+                filterQuery: null,
                 shipperId: shipperId,
                 orderStatus: orderStatus,
                 sortCriteria: sortCriteria,
@@ -501,7 +509,7 @@ namespace BeeStore_Api_Test.Services
             {
                 Id = 1,
                 ProductId = 101,
-                ProductAmount = 3, // Only 3 products available, less than the requested 5
+                ProductPerLot = 3, // Only 3 products available, less than the requested 5
                 IsDeleted = false,
                 Inventory = new Inventory { WarehouseId = 1 },
                 Product = mockProduct
@@ -569,7 +577,7 @@ namespace BeeStore_Api_Test.Services
             {
                 Id = 1,
                 ProductId = 101,
-                ProductAmount = 10,
+                ProductPerLot = 10,
                 IsDeleted = false,
                 Inventory = new Inventory { WarehouseId = 1 },
                 Product = mockProduct
@@ -753,7 +761,7 @@ namespace BeeStore_Api_Test.Services
             {
                 Id = 1,
                 ProductId = 101,
-                ProductAmount = 10,
+                ProductPerLot = 10,
                 Product = new Product { Id = 101, Price = 50 },
                 Inventory = new Inventory { WarehouseId = 1 }
             };
@@ -796,7 +804,7 @@ namespace BeeStore_Api_Test.Services
             {
                 Id = 1,
                 ProductId = 101,
-                ProductAmount = 10,
+                ProductPerLot = 10,
                 Product = new Product { Id = 101, Price = 50 },
                 Inventory = new Inventory { WarehouseId = 1 }
             };
@@ -848,7 +856,7 @@ namespace BeeStore_Api_Test.Services
             {
                 Id = 1,
                 ProductId = 101,
-                ProductAmount = 10,
+                ProductPerLot = 10,
                 Product = new Product { Id = 101, Price = 50 },
                 Inventory = new Inventory { WarehouseId = 1 }
             };

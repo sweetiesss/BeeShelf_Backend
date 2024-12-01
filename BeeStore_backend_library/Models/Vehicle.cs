@@ -12,6 +12,8 @@ public partial class Vehicle : BaseEntity
 
     public string? Type { get; set; }
 
+    public ulong? IsCold { get; set; }
+
     public string? Status { get; set; }
 
     public int? AssignedDriverId { get; set; }

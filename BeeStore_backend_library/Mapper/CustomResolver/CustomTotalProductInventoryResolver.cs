@@ -10,7 +10,7 @@ namespace BeeStore_Repository.Mapper.CustomResolver
         public int Resolve(Inventory source, InventoryListDTO destination, int destMember, ResolutionContext context)
         {
             // Sum the product amounts of all lots associated with this inventory
-            return source.Lots?.Where(lot => !lot.IsDeleted).Sum(lot => lot.ProductAmount) ?? 0;
+            return source.Lots?.Where(lot => !lot.IsDeleted).Sum(lot => lot.TotalProductAmount) ?? 0;
         }
     }
 }

@@ -124,6 +124,7 @@ namespace BeeStore_Repository.Services
             Location = warehouse.Location,
             Name = warehouse.Name,
             Capacity = warehouse.Capacity,
+            IsCold = warehouse.IsCold,
             CreateDate = warehouse.CreateDate,
             Inventories = warehouse.Inventories.Where(inventory => inventory.OcopPartnerId == userId).ToList()
         }));

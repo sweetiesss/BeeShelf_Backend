@@ -23,10 +23,10 @@ namespace BeeStore_Api_Test.Controllers
         [Fact]
         public async Task GetOrderList_ShouldReturnOrderList()
         {
-            _mockOrderService.Setup(s => s.GetOrderList(null, null, false, 0, 10))
+            _mockOrderService.Setup(s => s.GetOrderList(null, null, null, null, false, 0, 10))
                 .ReturnsAsync(new Pagination<OrderListDTO>());
 
-            var response = await _orderController.GetOrderList(null, null, false, 0, 10) as OkObjectResult;
+            var response = await _orderController.GetOrderList(null, null, null, null, false, 0, 10) as OkObjectResult;
 
             Assert.NotNull(response);
             Assert.Equal(200, response.StatusCode);
@@ -37,10 +37,9 @@ namespace BeeStore_Api_Test.Controllers
         public async Task GetOrderList_ByUserId_ShouldReturnOrderList()
         {
             var userId = 1;
-            _mockOrderService.Setup(s => s.GetOrderList(userId, null, null, false, 0, 10))
+            _mockOrderService.Setup(s => s.GetOrderList(null, null, userId, null, null, false, 0, 10))
                 .ReturnsAsync(new Pagination<OrderListDTO>());
-
-            var response = await _orderController.GetOrderList(userId, null, null, false, 0, 10) as OkObjectResult;
+            var response = await _orderController.GetOrderList(null, null, null, null, false, 0, 10) as OkObjectResult;
 
             Assert.NotNull(response);
             Assert.Equal(200, response.StatusCode);

@@ -136,7 +136,6 @@ namespace BeeStore_Api_Test.Services
             {
                 Name = "New Inventory",
                 MaxWeight = 100,
-                Weight = 50,
                 WarehouseId = 1
             };
 
@@ -149,7 +148,6 @@ namespace BeeStore_Api_Test.Services
             {
                 Name = request.Name,
                 MaxWeight = request.MaxWeight,
-                Weight = request.Weight,
                 WarehouseId = request.WarehouseId
             };
 
@@ -181,7 +179,6 @@ namespace BeeStore_Api_Test.Services
             {
                 Name = "New Inventory",
                 MaxWeight = 100,
-                Weight = 50,
                 WarehouseId = 1
             };
 
@@ -439,7 +436,7 @@ namespace BeeStore_Api_Test.Services
             _mockUnitOfWork.Setup(u => u.SaveAsync()).Returns(Task.CompletedTask);
 
             // Act
-            var result = await _inventoryService.BuyInventory(inventoryId, userId);
+            var result = await _inventoryService.BuyInventory(inventoryId, userId, 1);
 
             // Assert
             Assert.Equal(ResponseMessage.Success, result);
@@ -462,7 +459,7 @@ namespace BeeStore_Api_Test.Services
                 .ReturnsAsync((OcopPartner)null);
 
             // Act & Assert
-            var exception = await Assert.ThrowsAsync<KeyNotFoundException>(() => _inventoryService.BuyInventory(inventoryId, userId));
+            var exception = await Assert.ThrowsAsync<KeyNotFoundException>(() => _inventoryService.BuyInventory(inventoryId, userId, 1));
             Assert.Equal(ResponseMessage.UserIdNotFound, exception.Message);
         }
 
@@ -490,7 +487,7 @@ namespace BeeStore_Api_Test.Services
                 .ReturnsAsync((Inventory)null);
 
             // Act & Assert
-            var exception = await Assert.ThrowsAsync<KeyNotFoundException>(() => _inventoryService.BuyInventory(inventoryId, userId));
+            var exception = await Assert.ThrowsAsync<KeyNotFoundException>(() => _inventoryService.BuyInventory(inventoryId, userId, 1));
             Assert.Equal(ResponseMessage.InventoryIdNotFound, exception.Message);
         }
 
@@ -524,7 +521,7 @@ namespace BeeStore_Api_Test.Services
                 .ReturnsAsync(inventory);
 
             // Act & Assert
-            var exception = await Assert.ThrowsAsync<ApplicationException>(() => _inventoryService.BuyInventory(inventoryId, userId));
+            var exception = await Assert.ThrowsAsync<ApplicationException>(() => _inventoryService.BuyInventory(inventoryId, userId, 1));
             Assert.Equal(ResponseMessage.InventoryOccupied, exception.Message);
         }
 
@@ -558,7 +555,7 @@ namespace BeeStore_Api_Test.Services
                 .ReturnsAsync(inventory);
 
             // Act & Assert
-            var exception = await Assert.ThrowsAsync<ApplicationException>(() => _inventoryService.BuyInventory(inventoryId, userId));
+            var exception = await Assert.ThrowsAsync<ApplicationException>(() => _inventoryService.BuyInventory(inventoryId, userId, 1));
             Assert.Equal(ResponseMessage.NotEnoughCredit, exception.Message);
         }
         [Fact]
@@ -598,7 +595,7 @@ namespace BeeStore_Api_Test.Services
             _mockUnitOfWork.Setup(u => u.SaveAsync()).Returns(Task.CompletedTask);
 
             // Act
-            var result = await _inventoryService.ExtendInventory(inventoryId, userId);
+            var result = await _inventoryService.ExtendInventory(inventoryId, userId, 1);
 
             // Assert
             Assert.Equal(ResponseMessage.Success, result);
@@ -621,7 +618,7 @@ namespace BeeStore_Api_Test.Services
                 .ReturnsAsync((OcopPartner)null);
 
             // Act & Assert
-            var exception = await Assert.ThrowsAsync<KeyNotFoundException>(() => _inventoryService.ExtendInventory(inventoryId, userId));
+            var exception = await Assert.ThrowsAsync<KeyNotFoundException>(() => _inventoryService.ExtendInventory(inventoryId, userId, 1));
             Assert.Equal(ResponseMessage.UserIdNotFound, exception.Message);
         }
 
@@ -649,7 +646,7 @@ namespace BeeStore_Api_Test.Services
                 .ReturnsAsync((Inventory)null);
 
             // Act & Assert
-            var exception = await Assert.ThrowsAsync<KeyNotFoundException>(() => _inventoryService.ExtendInventory(inventoryId, userId));
+            var exception = await Assert.ThrowsAsync<KeyNotFoundException>(() => _inventoryService.ExtendInventory(inventoryId, userId, 1));
             Assert.Equal(ResponseMessage.InventoryIdNotFound, exception.Message);
         }
 
@@ -683,7 +680,7 @@ namespace BeeStore_Api_Test.Services
                 .ReturnsAsync(inventory);
 
             // Act & Assert
-            var exception = await Assert.ThrowsAsync<ApplicationException>(() => _inventoryService.ExtendInventory(inventoryId, userId));
+            var exception = await Assert.ThrowsAsync<ApplicationException>(() => _inventoryService.ExtendInventory(inventoryId, userId, 1));
             Assert.Equal(ResponseMessage.InventoryPartnerNotMatch, exception.Message);
         }
 
@@ -718,7 +715,7 @@ namespace BeeStore_Api_Test.Services
                 .ReturnsAsync(inventory);
 
             // Act & Assert
-            var exception = await Assert.ThrowsAsync<ApplicationException>(() => _inventoryService.ExtendInventory(inventoryId, userId));
+            var exception = await Assert.ThrowsAsync<ApplicationException>(() => _inventoryService.ExtendInventory(inventoryId, userId, 1));
             Assert.Equal(ResponseMessage.NotEnoughCredit, exception.Message);
         }
     }
