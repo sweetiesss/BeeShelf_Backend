@@ -22,7 +22,7 @@ namespace BeeStore_Repository.Utils.Validator.Lot
                 .WithMessage(ValidationMessage.NameMaxLength50);
 
             // Rule for Amount: required and non-negative
-            RuleFor(x => x.Amount)
+            RuleFor(x => x.LotAmount)
                 .NotNull()
                 .WithMessage(ValidationMessage.AmountNonNegative)
                 .GreaterThanOrEqualTo(0)
@@ -34,7 +34,7 @@ namespace BeeStore_Repository.Utils.Validator.Lot
                 .WithMessage(ValidationMessage.ProductIdRqeuired);
 
             // Rule for ProductAmount: required and non-negative
-            RuleFor(x => x.ProductAmount)
+            RuleFor(x => x.ProductPerLot)
                 .NotNull()
                 .WithMessage(ValidationMessage.ProductAmountNonNegative)
                 .GreaterThanOrEqualTo(0)

@@ -10,11 +10,13 @@ public partial class Lot : BaseEntity
 
     public DateTime? CreateDate { get; set; }
 
-    public int? Amount { get; set; }
+    public int? LotAmount { get; set; }
 
     public int? ProductId { get; set; }
 
-    public int? ProductAmount { get; set; }
+    public int? ProductPerLot { get; set; }
+
+    public int? TotalProductAmount { get; set; }
 
     public DateTime? ImportDate { get; set; }
 

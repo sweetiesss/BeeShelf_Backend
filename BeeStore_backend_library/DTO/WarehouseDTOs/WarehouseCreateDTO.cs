@@ -9,7 +9,7 @@ namespace BeeStore_Repository.DTO.WarehouseDTOs
 
         public int? Capacity { get; set; }
 
-        public string? Type { get; set; }
+        public ulong? IsCold { get; set; }
 
         public string? Location { get; set; }
         public int? ProvinceId { get; set; }

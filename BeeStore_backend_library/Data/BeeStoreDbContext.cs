@@ -74,13 +74,15 @@ public partial class BeeStoreDbContext : DbContext
 
             entity.ToTable("Batch");
 
-            entity.HasIndex(e => e.DeliveryZoneId, "delivery_zone_id");
             entity.HasIndex(e => e.DeliverBy, "deliver_by");
-            entity.Property(e => e.DeliverBy).HasColumnName("deliver_by");
+
+            entity.HasIndex(e => e.DeliveryZoneId, "delivery_zone_id");
+
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CompleteDate)
                 .HasColumnType("datetime")
                 .HasColumnName("complete_date");
+            entity.Property(e => e.DeliverBy).HasColumnName("deliver_by");
             entity.Property(e => e.DeliveryZoneId).HasColumnName("delivery_zone_id");
             entity.Property(e => e.IsDeleted)
                 .HasDefaultValueSql("b'0'")
@@ -95,13 +97,13 @@ public partial class BeeStoreDbContext : DbContext
                 .HasMaxLength(10)
                 .HasColumnName("status");
 
-            entity.HasOne(d => d.DeliveryZone).WithMany(p => p.Batches)
-                .HasForeignKey(d => d.DeliveryZoneId)
+            entity.HasOne(d => d.DeliverByNavigation).WithMany(p => p.Batches)
+                .HasForeignKey(d => d.DeliverBy)
                 .HasConstraintName("Batch_ibfk_1");
 
-            entity.HasOne(d => d.DeliverByNavigation).WithMany(p => p.Batches)
-            .HasForeignKey(d => d.DeliverBy)
-    .HasConstraintName("Batch_Delivery_ibfk_2");
+            entity.HasOne(d => d.DeliveryZone).WithMany(p => p.Batches)
+                .HasForeignKey(d => d.DeliveryZoneId)
+                .HasConstraintName("Batch_ibfk_2");
         });
 
         modelBuilder.Entity<BatchDelivery>(entity =>
@@ -112,11 +114,8 @@ public partial class BeeStoreDbContext : DbContext
 
             entity.HasIndex(e => e.BatchId, "batch_id");
 
-
-
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.BatchId).HasColumnName("batch_id");
-
             entity.Property(e => e.DeliveryStartDate)
                 .HasColumnType("datetime")
                 .HasColumnName("delivery_start_date");
@@ -129,8 +128,6 @@ public partial class BeeStoreDbContext : DbContext
             entity.HasOne(d => d.Batch).WithMany(p => p.BatchDeliveries)
                 .HasForeignKey(d => d.BatchId)
                 .HasConstraintName("Batch_Delivery_ibfk_1");
-
-
         });
 
         modelBuilder.Entity<Category>(entity =>
@@ -290,7 +287,6 @@ public partial class BeeStoreDbContext : DbContext
             entity.HasIndex(e => e.ProductId, "product_id");
 
             entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Amount).HasColumnName("amount");
             entity.Property(e => e.CreateDate)
                 .HasColumnType("datetime")
                 .HasColumnName("create_date");
@@ -308,6 +304,7 @@ public partial class BeeStoreDbContext : DbContext
                 .HasDefaultValueSql("b'0'")
                 .HasColumnType("bit(1)")
                 .HasColumnName("is_deleted");
+            entity.Property(e => e.LotAmount).HasColumnName("lot_amount");
             entity.Property(e => e.LotNumber)
                 .HasMaxLength(25)
                 .HasColumnName("lot_number");
@@ -316,8 +313,9 @@ public partial class BeeStoreDbContext : DbContext
                 .HasColumnName("name")
                 .UseCollation("utf8mb3_general_ci")
                 .HasCharSet("utf8mb3");
-            entity.Property(e => e.ProductAmount).HasColumnName("product_amount");
             entity.Property(e => e.ProductId).HasColumnName("product_id");
+            entity.Property(e => e.ProductPerLot).HasColumnName("product_per_lot");
+            entity.Property(e => e.TotalProductAmount).HasColumnName("total_product_amount");
 
             entity.HasOne(d => d.Inventory).WithMany(p => p.Lots)
                 .HasForeignKey(d => d.InventoryId)
@@ -336,14 +334,17 @@ public partial class BeeStoreDbContext : DbContext
 
             entity.HasIndex(e => e.OcopPartnerId, "ocop_partner_id");
 
-            entity.HasIndex(e => e.PaymentId, "payment_id");
-
             entity.HasIndex(e => e.TransferBy, "transfer_by");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Amount)
                 .HasPrecision(10, 2)
                 .HasColumnName("amount");
+            entity.Property(e => e.CancellationReason)
+                .HasMaxLength(100)
+                .HasColumnName("cancellation_reason")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
             entity.Property(e => e.CreateDate)
                 .HasColumnType("datetime")
                 .HasColumnName("create_date");
@@ -351,16 +352,15 @@ public partial class BeeStoreDbContext : DbContext
                 .HasDefaultValueSql("b'0'")
                 .HasColumnType("bit(1)")
                 .HasColumnName("is_deleted");
+            entity.Property(e => e.IsTransferred)
+                .HasDefaultValueSql("b'0'")
+                .HasColumnType("bit(1)")
+                .HasColumnName("is_transferred");
             entity.Property(e => e.OcopPartnerId).HasColumnName("ocop_partner_id");
-            entity.Property(e => e.PaymentId).HasColumnName("payment_id");
             entity.Property(e => e.TransferBy).HasColumnName("transfer_by");
 
             entity.HasOne(d => d.OcopPartner).WithMany(p => p.MoneyTransfers)
                 .HasForeignKey(d => d.OcopPartnerId)
-                .HasConstraintName("Money_Transfer_ibfk_3");
-
-            entity.HasOne(d => d.Payment).WithMany(p => p.MoneyTransfers)
-                .HasForeignKey(d => d.PaymentId)
                 .HasConstraintName("Money_Transfer_ibfk_2");
 
             entity.HasOne(d => d.TransferByNavigation).WithMany(p => p.MoneyTransfers)
@@ -650,14 +650,14 @@ public partial class BeeStoreDbContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CollectedBy).HasColumnName("collected_by");
+            entity.Property(e => e.IsConfirmed)
+                .HasDefaultValueSql("b'0'")
+                .HasColumnType("bit(1)")
+                .HasColumnName("is_confirmed");
             entity.Property(e => e.IsDeleted)
                 .HasDefaultValueSql("b'0'")
                 .HasColumnType("bit(1)")
                 .HasColumnName("is_deleted");
-            entity.Property(e => e.IsTransferred)
-                .HasDefaultValueSql("b'0'")
-                .HasColumnType("bit(1)")
-                .HasColumnName("is_transferred");
             entity.Property(e => e.OcopPartnerId).HasColumnName("ocop_partner_id");
             entity.Property(e => e.OrderId).HasColumnName("order_id");
             entity.Property(e => e.TotalAmount)
@@ -695,6 +695,10 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.CreateDate)
                 .HasColumnType("datetime")
                 .HasColumnName("create_date");
+            entity.Property(e => e.IsCold)
+                .HasDefaultValueSql("b'0'")
+                .HasColumnType("bit(1)")
+                .HasColumnName("is_cold");
             entity.Property(e => e.IsDeleted)
                 .HasDefaultValueSql("b'0'")
                 .HasColumnType("bit(1)")
@@ -717,6 +721,11 @@ public partial class BeeStoreDbContext : DbContext
                 .HasPrecision(10, 2)
                 .HasColumnName("price");
             entity.Property(e => e.ProductCategoryId).HasColumnName("product_category_id");
+            entity.Property(e => e.Unit)
+                .HasMaxLength(25)
+                .HasColumnName("unit")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
             entity.Property(e => e.Weight)
                 .HasPrecision(10, 2)
                 .HasColumnName("weight");
@@ -922,6 +931,10 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.Capacity)
                 .HasPrecision(10, 2)
                 .HasColumnName("capacity");
+            entity.Property(e => e.IsCold)
+                .HasDefaultValueSql("b'0'")
+                .HasColumnType("bit(1)")
+                .HasColumnName("is_cold");
             entity.Property(e => e.IsDeleted)
                 .HasDefaultValueSql("b'0'")
                 .HasColumnType("bit(1)")
@@ -987,6 +1000,10 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.CreateDate)
                 .HasColumnType("datetime")
                 .HasColumnName("create_date");
+            entity.Property(e => e.IsCold)
+                .HasDefaultValueSql("b'0'")
+                .HasColumnType("bit(1)")
+                .HasColumnName("is_cold");
             entity.Property(e => e.IsDeleted)
                 .HasDefaultValueSql("b'0'")
                 .HasColumnType("bit(1)")
@@ -1002,9 +1019,6 @@ public partial class BeeStoreDbContext : DbContext
                 .UseCollation("utf8mb3_general_ci")
                 .HasCharSet("utf8mb3");
             entity.Property(e => e.ProvinceId).HasColumnName("province_id");
-            entity.Property(e => e.Type)
-                .HasMaxLength(50)
-                .HasColumnName("type");
 
             entity.HasOne(d => d.Province).WithMany(p => p.Warehouses)
                 .HasForeignKey(d => d.ProvinceId)
@@ -1080,3 +1094,4 @@ public partial class BeeStoreDbContext : DbContext
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }
+

@@ -225,7 +225,7 @@ namespace BeeStore_Repository.Services
             {
                 id = (int)group.Key.ProductId,
                 ProductName = group.Key.ProductName,
-                stock = group.Sum(l => (int)l.ProductAmount),
+                stock = group.Sum(l => (int)l.TotalProductAmount),
                 warehouseId = (int)group.Key.WarehouseId,
                 warehouseName = group.Key.WarehouseName
             })

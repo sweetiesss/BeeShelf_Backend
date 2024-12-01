@@ -12,7 +12,7 @@ public partial class Warehouse : BaseEntity
 
     public int? ProvinceId { get; set; }
 
-    public string? Type { get; set; }
+    public ulong? IsCold { get; set; }
 
     public DateTime? CreateDate { get; set; }
 
