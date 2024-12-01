@@ -27,6 +27,7 @@ namespace BeeStore_Repository.Utils
         //Vehicle Response Message
         public const string VehicleIdNotFound = "Vehicle not found.";
         public const string VehicleLicensePlateDuplicate = "License Plate already exist.";
+        public const string VehicleTypeNotMatchWarehouse = "Vehicle type(cold/warm) not match";
 
         //Transaction response message
         public const string TransactionNotFound = "Transaction not found.";

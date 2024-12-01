@@ -85,6 +85,7 @@ namespace BeeStore_Repository.Services
                 }
                 //I was going to check here but wouldn't a cold warehouse have all cold vehicles? 
                 // why would you have any other vehicle in an all cold product warehouse?
+                // -> I would agree to you if the database have no abnormality and secure when assign vehicle to warehouse
                 //if(shipper.Vehicles.FirstOrDefault(u => u.AssignedDriverId.Equals(shipper.Id)).IsCold 
                 //    != orderList[0].OrderDetails.First().Lot.Product.IsCold)
                 //{
