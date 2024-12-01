@@ -138,7 +138,7 @@ namespace BeeStore_Repository.Services
                 var b = await _unitOfWork.LotRepo.GetQueryable(query => query.Where(u => u.ProductId.Equals(product.ProductId)
                                                                 && u.InventoryId.HasValue
                                                                 && u.ImportDate.HasValue
-                                                                && u.ProductAmount > 0
+                                                                && u.TotalProductAmount > 0
                                                                 && u.Inventory.WarehouseId.Equals(warehouseId)
                                                                 && u.IsDeleted.Equals(false))
                                                                 .OrderBy(u => u.ImportDate)
@@ -203,15 +203,15 @@ namespace BeeStore_Repository.Services
 
                     int amountToTake = 0;
 
-                    if (lot.ProductAmount >= productAmountNeeded)
+                    if (lot.TotalProductAmount >= productAmountNeeded)
                     {
                         amountToTake = productAmountNeeded;
                         productAmountNeeded = 0;  // Product amount is fulfilled.
                     }
                     else
                     {
-                        amountToTake = lot.ProductAmount.Value;
-                        productAmountNeeded -= lot.ProductAmount.Value;
+                        amountToTake = lot.TotalProductAmount.Value;
+                        productAmountNeeded -= lot.TotalProductAmount.Value;
                     }
 
                     totalPrice += lot.Product.Price * amountToTake;
@@ -219,7 +219,7 @@ namespace BeeStore_Repository.Services
                     totalWeight += lot.Product.Weight * product.ProductAmount;
                     if(lot.Product.Weight* product.ProductAmount > 5)
                     {
-                        decimal? extraWeight = lot.Product.Weight * lot.ProductAmount - 5;
+                        decimal? extraWeight = lot.Product.Weight * lot.TotalProductAmount - 5;
                         decimal extraWeightUnits = Math.Ceiling((decimal)extraWeight / 0.5m); // Convert to 0.5kg units
                         deliveryFee += extraWeightUnits * 5000;
                     }
@@ -503,6 +503,8 @@ namespace BeeStore_Repository.Services
                     //    TotalAmount = (int)(exist.TotalPrice - (orderfee.DeliveryFee + orderfee.StorageFee + orderfee.AdditionalFee))
                     });
                     exist.DeliverFinishDate = DateTime.Now;
+                    //add money directly after order is delivered.
+                    exist.OcopPartner.Wallets.FirstOrDefault(u => u.Id.Equals(exist.OcopPartnerId)).TotalAmount += exist.TotalPriceAfterFee;
                 }
                 else
                 {
@@ -552,16 +554,16 @@ namespace BeeStore_Repository.Services
 
             if (cancel == true)
             {
-                lot.ProductAmount += amount;
+                lot.TotalProductAmount += amount;
                 lot.Inventory.Weight += amount * lot.Product.Weight;
             }
             else
             {
-                if (lot.ProductAmount == 0 || lot.ProductAmount < amount)
+                if (lot.TotalProductAmount == 0 || lot.TotalProductAmount < amount)
                 {
                     throw new ApplicationException(ResponseMessage.ProductNotEnough);
                 }
-                lot.ProductAmount -= amount;
+                lot.TotalProductAmount -= amount;
                 lot.Inventory.Weight -= amount * lot.Product.Weight;
             }
             await _unitOfWork.SaveAsync();

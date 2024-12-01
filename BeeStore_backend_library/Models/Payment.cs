@@ -12,13 +12,11 @@ public partial class Payment : BaseEntity
 
     public decimal? TotalAmount { get; set; }
 
-    public ulong? IsTransferred { get; set; }
+    public ulong? IsConfirmed { get; set; }
 
     //public ulong? IsDeleted { get; set; }
 
     public virtual Employee? CollectedByNavigation { get; set; }
-
-    public virtual ICollection<MoneyTransfer> MoneyTransfers { get; set; } = new List<MoneyTransfer>();
 
     public virtual OcopPartner? OcopPartner { get; set; }
 

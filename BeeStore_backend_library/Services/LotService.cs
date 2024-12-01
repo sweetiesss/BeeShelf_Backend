@@ -24,8 +24,6 @@ namespace BeeStore_Repository.Services
             _logger = logger;
         }
 
-       
-
         public async Task<string> DeleteLot(int id)
         {
             var exist = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id == id);

@@ -41,7 +41,8 @@ namespace BeeStore_Api_Test.Services
                 }
             };
 
-            var order1 = new Order { Id = 1, BatchId = null, IsDeleted = false };
+            var batchDelivery = new BatchDelivery { Id = 1, BatchId = null, IsDeleted = false };
+            var order1 = new Order { Id = 1, BatchDeliveryId = 1, IsDeleted = false };
 
             var mappedBatch = new Batch
             {
@@ -50,16 +51,16 @@ namespace BeeStore_Api_Test.Services
                 DeliveryZoneId = 1,
                 Status = Constants.Status.Pending,
                 IsDeleted = false,
-                Orders = new List<Order>()
+                BatchDeliveries = new List<BatchDelivery>()
                 {
-                    order1
+                    batchDelivery
                 }
             };
 
             foreach (var o in batchCreateDto.Orders)
             {
                 _mockUnitOfWork
-                    .Setup(u => u.OrderRepo.AnyAsync(u => u.Id.Equals(o.Id) && u.BatchId != null))
+                    .Setup(u => u.OrderRepo.AnyAsync(u => u.Id.Equals(o.Id) && u.BatchDeliveryId != null))
                     .ReturnsAsync(false);
 
                 _mockUnitOfWork
@@ -156,19 +157,22 @@ namespace BeeStore_Api_Test.Services
                     new BatchOrdersCreate { Id = 2 }
                 }
             };
+            var order1 = new Order { Id = 1, BatchDeliveryId = 1, IsDeleted = false };
+            var batchDelivery = new BatchDelivery { Id = 1, BatchId = null, IsDeleted = false };
 
             var existingBatch = new Batch
             {
                 Id = batchId,
                 Name = "Test Batch",
                 Status = Constants.Status.Pending,
-                Orders = new List<Order>
+                BatchDeliveries = new List<BatchDelivery>()
                 {
-                    new Order { Id = 1, BatchId = batchId }
+                    batchDelivery
                 }
-            };
 
-            var newOrder = new Order { Id = 2, BatchId = null, IsDeleted = false };
+        };
+
+            var newOrder = new Order { Id = 2, BatchDeliveryId = null, IsDeleted = false };
 
             _mockUnitOfWork
                 .Setup(u => u.BatchRepo.SingleOrDefaultAsync(It.IsAny<Expression<Func<Batch, bool>>>(), It.IsAny<Func<IQueryable<Batch>, IQueryable<Batch>>>()))
@@ -192,7 +196,7 @@ namespace BeeStore_Api_Test.Services
 
             // Assert
             Assert.Equal(ResponseMessage.Success, result);
-            _mockUnitOfWork.Verify(u => u.SaveAsync(), Times.Exactly(existingBatch.Orders.Count + 1)); // Clearing old orders + saving new orders
+            _mockUnitOfWork.Verify(u => u.SaveAsync(), Times.Exactly(existingBatch.BatchDeliveries.Count + 1)); // Clearing old orders + saving new orders
             _mockUnitOfWork.Verify(u => u.BatchRepo.SingleOrDefaultAsync(It.IsAny<Expression<Func<Batch, bool>>>(), It.IsAny<Func<IQueryable<Batch>, IQueryable<Batch>>>()), Times.Once);
         }
 
@@ -317,10 +321,10 @@ namespace BeeStore_Api_Test.Services
             {
                 Id = batchId,
                 Status = Constants.Status.Pending,
-                Orders = new List<Order>
+                BatchDeliveries = new List<BatchDelivery>
         {
-            new Order { Id = 1, BatchId = batchId },
-            new Order { Id = 2, BatchId = batchId }
+            new BatchDelivery { Id = 1, BatchId = batchId },
+            new BatchDelivery { Id = 2, BatchId = batchId }
         }
             };
 
@@ -338,7 +342,7 @@ namespace BeeStore_Api_Test.Services
             // Assert
             Assert.Equal(ResponseMessage.Success, result);
             _mockUnitOfWork.Verify(u => u.BatchRepo.SoftDelete(It.Is<Batch>(b => b.Id == batchId)), Times.Once);
-            _mockUnitOfWork.Verify(u => u.SaveAsync(), Times.Exactly(batchToDelete.Orders.Count + 1)); // Once for clearing BatchId and once for batch soft delete
+            _mockUnitOfWork.Verify(u => u.SaveAsync(), Times.Exactly(batchToDelete.BatchDeliveries.Count + 1)); // Once for clearing BatchId and once for batch soft delete
         }
 
         [Fact]
@@ -368,9 +372,9 @@ namespace BeeStore_Api_Test.Services
             {
                 Id = batchId,
                 Status = Constants.Status.Completed, // Not pending
-                Orders = new List<Order>
+                BatchDeliveries = new List<BatchDelivery>
         {
-            new Order { Id = 1, BatchId = batchId }
+            new BatchDelivery { Id = 1, BatchId = batchId }
         }
             };
 

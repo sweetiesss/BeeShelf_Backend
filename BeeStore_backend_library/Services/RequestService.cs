@@ -7,6 +7,7 @@ using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 
 namespace BeeStore_Repository.Services
 {
@@ -68,7 +69,7 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
             }
-            var inventory = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Id == request.SendToInventoryId);
+            var inventory = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Id == request.SendToInventoryId, query => query.Include(o => o.Warehouse));
             if (inventory == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
@@ -86,14 +87,20 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.ProductIdNotFound);
             }
+            //check for cold shit
+            if(product.IsCold.Value != inventory.Warehouse.IsCold.Value)
+            {
+                throw new ApplicationException(ResponseMessage.ProductAndWarehouseTypeNotMatch);
+            }
+
             var userProduct = await _unitOfWork.ProductRepo.AnyAsync(u => u.Id.Equals(product.Id)
                                                                        && u.OcopPartnerId.Equals(user.Id));
             if (userProduct == false)
             {
                 throw new KeyNotFoundException(ResponseMessage.ProductPartnerNotMatch);
             }
-
-            decimal? totalWeight = inventory.Weight + product.Weight * request.Lot.ProductAmount;
+            int totalProductAmount = (int)(request.Lot.ProductPerLot * request.Lot.LotAmount);
+            decimal? totalWeight = inventory.Weight + product.Weight * totalProductAmount;
 
 
             if (totalWeight > inventory.MaxWeight)
@@ -110,7 +117,7 @@ namespace BeeStore_Repository.Services
                 request.Status = Constants.Status.Draft;
             }
             var result = _mapper.Map<Request>(request);
-
+            result.Lot.TotalProductAmount = totalProductAmount;
             //result.Lot.InventoryId = request.SendToInventoryId;
 
             await _unitOfWork.RequestRepo.AddAsync(result);
@@ -198,15 +205,29 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
             }
+
+            var product = await _unitOfWork.ProductRepo.SingleOrDefaultAsync(u => u.Id == request.Lot.ProductId);
+            if (product == null)
+            {
+                throw new KeyNotFoundException(ResponseMessage.ProductIdNotFound);
+            }
+
+            //check for cold shit
+            if (product.IsCold.Value != inventory.Warehouse.IsCold.Value)
+            {
+                throw new ApplicationException(ResponseMessage.ProductAndWarehouseTypeNotMatch);
+            }
+
             if (exist.Lot.InventoryId != request.SendToInventoryId)
             {
                 exist.Lot.InventoryId = request.SendToInventoryId;
             }
             exist.Lot.ProductId = request.Lot.ProductId;
-            exist.Lot.Amount = request.Lot.Amount;
+            exist.Lot.LotAmount = request.Lot.LotAmount;
             exist.Lot.LotNumber = request.Lot.LotNumber;
             exist.Lot.Name = request.Lot.Name;
-            exist.Lot.ProductAmount = request.Lot.ProductAmount;
+            exist.Lot.ProductPerLot = request.Lot.ProductPerLot;
+            exist.Lot.TotalProductAmount = request.Lot.ProductPerLot * request.Lot.LotAmount;
 
             exist.SendToInventoryId = request.SendToInventoryId;
             exist.Description = request.Description;
@@ -263,7 +284,7 @@ namespace BeeStore_Repository.Services
                 {
                     throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
                 }
-                var totalWeight = inventory.Weight + (lot.Product.Weight * lot.ProductAmount);
+                var totalWeight = inventory.Weight + (lot.Product.Weight * lot.TotalProductAmount);
                 if (totalWeight > inventory.MaxWeight)
                 {
                     exist.Status = Constants.Status.Failed;
@@ -280,7 +301,7 @@ namespace BeeStore_Repository.Services
             }
             if (requestStatus.Equals(Constants.Status.Failed))
             {
-                if(!requestStatus.Equals(Constants.Status.Processing))
+                if(!exist.Status.Equals(Constants.Status.Processing))
                 {
                     throw new ApplicationException(ResponseMessage.RequestHasNotBeenProcessed);
                 }
@@ -288,7 +309,7 @@ namespace BeeStore_Repository.Services
 
             if (requestStatus.Equals(Constants.Status.Delivered))
             {
-                if(!requestStatus.Equals(Constants.Status.Processing))
+                if(!exist.Status.Equals(Constants.Status.Processing))
                 {
                     throw new ApplicationException(ResponseMessage.RequestHasNotBeenProcessed);
                 }

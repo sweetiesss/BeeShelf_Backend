@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Amazon.S3.Model;
+using AutoMapper;
 using BeeStore_Repository.DTO;
 using BeeStore_Repository.DTO.Batch;
 using BeeStore_Repository.Enums.FilterBy;
@@ -82,6 +83,13 @@ namespace BeeStore_Repository.Services
                 {
                     throw new ApplicationException(ResponseMessage.UserRoleNotShipperError);
                 }
+                //I was going to check here but wouldn't a cold warehouse have all cold vehicles? 
+                // why would you have any other vehicle in an all cold product warehouse?
+                //if(shipper.Vehicles.FirstOrDefault(u => u.AssignedDriverId.Equals(shipper.Id)).IsCold 
+                //    != orderList[0].OrderDetails.First().Lot.Product.IsCold)
+                //{
+                //    throw new ApplicationException(ResponseMessage.ShipperDeliverColdProduct);
+                //}
 
                 result.DeliverBy = shipper.Id;
                 var vehicle = shipper.Vehicles.FirstOrDefault(u => u.AssignedDriverId.Equals(shipper.Id) && u.IsDeleted.Equals(false));
@@ -259,6 +267,7 @@ namespace BeeStore_Repository.Services
             Expression<Func<Batch, bool>> filterExpression = null;
             switch (filterBy)
             {
+                case BatchFilter.WarehouseId: filterExpression = u => u.DeliveryZone.WarehouseShippers.Any(u => u.WarehouseId.Equals(Int32.Parse(filterQuery!))); break;
                 case BatchFilter.DeliveryZoneId: filterExpression = u => u.DeliveryZoneId.Equals(Int32.Parse(filterQuery!)); break;
                 case BatchFilter.Status: filterExpression = u => u.Status.Equals(filterQuery!, StringComparison.OrdinalIgnoreCase); break;
                 default: filterExpression = null; break;
@@ -266,7 +275,7 @@ namespace BeeStore_Repository.Services
 
             var list = await _unitOfWork.BatchRepo.GetListAsync(
                 filter: filterExpression!,
-                includes: u => u.Include(o => o.BatchDeliveries),
+                includes: u => u.Include(o => o.BatchDeliveries).Include(o => o.DeliveryZone),
                 sortBy: null,
                 descending: false,
                 searchTerm: search,
