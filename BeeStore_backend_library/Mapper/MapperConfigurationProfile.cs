@@ -72,6 +72,12 @@ namespace BeeStore_Repository.Mapper
 
 
             CreateMap<Warehouse, WarehouseListDTO>()
+                .ForMember(dest => dest.AvailableCapacity, opt => opt.MapFrom(src =>
+    src.Inventories == null
+        ? 0
+        : src.Inventories
+            .Where(u => string.IsNullOrEmpty(u.OcopPartnerId.ToString()) || u.OcopPartnerId == null)
+            .Sum(u => u.MaxWeight)))
                 .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Location + ", " + src.Province.SubDivisionName))
                 .ForMember(dest => dest.ProvinceName, opt => opt.MapFrom(src => src.Province.SubDivisionName));
             CreateMap<WarehouseCreateDTO, Warehouse>();
@@ -83,6 +89,7 @@ namespace BeeStore_Repository.Mapper
                 .ForMember(dest => dest.Inventories, opt => opt.MapFrom(src => src.Inventories))
             .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<Warehouse, WarehouseDeliveryZoneDTO>()
+                .ForMember(dest => dest.AvailableCapacity, opt => opt.MapFrom(src => src.Inventories.Where(u => u.OcopPartnerId.Value.Equals("") || u.OcopPartnerId == null).Sum(u => u.MaxWeight)))
                 .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Location + ", " + src.Province.SubDivisionName))
                 .ForMember(dest => dest.ProvinceName, opt => opt.MapFrom(src => src.Province.SubDivisionName))
                 .ForMember(dest => dest.DeliveryZones, opt => opt.MapFrom(src => src.Province.DeliveryZones.Where(u => u.ProvinceId.Equals(src.ProvinceId))));
