@@ -36,7 +36,7 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = "Admin, Staff")]
+        [Authorize(Roles = "Admin,Staff")]
         [Route("get-payments/{warehouseId}")]
         [HttpGet]
         public async Task<IActionResult> GetPayment(int warehouseId)
@@ -45,12 +45,21 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = "Admin, Staff")]
-        [Route("get-money-transfers/{partnerId}")]
+        [Authorize(Roles = "Admin,Staff")]
+        [Route("get-money-transfers/{warehouseId}")]
         [HttpGet]
-        public async Task<IActionResult> GetMoneyTransfer(int? partnerId)
+        public async Task<IActionResult> GetMoneyTransfer(int? warehouseId)
         {
-            var result = await _paymentService.GetMoneyTransferList();
+            var result = await _paymentService.GetMoneyTransferList(warehouseId);
+            return Ok(result);
+        }
+
+        [Authorize(Roles = "Admin,Staff,Partner")]
+        [Route("get-partner-money-transfers/{partnerId}")]
+        [HttpGet]
+        public async Task<IActionResult> GetPartnerMoneyTransfer(int? partnerId)
+        {
+            var result = await _paymentService.GetPartnerMoneyTransferList(partnerId);
             return Ok(result);
         }
 
@@ -63,7 +72,7 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = "Admin, Staff")]
+        [Authorize(Roles = "Admin,Staff")]
         [Route("confirm-money-transfer-request/{staffId}/{moneyTransferId}")]
         [HttpPost]
         public async Task<IActionResult> ConfirmMoneyTransferRequest(int staffId, int moneyTransferId)

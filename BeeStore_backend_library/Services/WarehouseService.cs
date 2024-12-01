@@ -118,16 +118,17 @@ namespace BeeStore_Repository.Services
             var list = await _unitOfWork.WarehouseRepo.GetQueryable(wh => wh
                                                        .Where(u => u.IsDeleted.Equals(false))
                                                        .Where(w => w.Inventories.Any(inventory => inventory.OcopPartnerId == userId))
-        .Select(warehouse => new Warehouse
-        {
-            Id = warehouse.Id,
-            Location = warehouse.Location,
-            Name = warehouse.Name,
-            Capacity = warehouse.Capacity,
-            IsCold = warehouse.IsCold,
-            CreateDate = warehouse.CreateDate,
-            Inventories = warehouse.Inventories.Where(inventory => inventory.OcopPartnerId == userId).ToList()
-        }));
+            .Select(warehouse => new Warehouse
+             {
+                 Id = warehouse.Id,
+                 Location = warehouse.Location,
+                 Name = warehouse.Name,
+                 Capacity = warehouse.Capacity,
+                 IsCold = warehouse.IsCold,
+                 Province = warehouse.Province,
+                 CreateDate = warehouse.CreateDate,
+                 Inventories = warehouse.Inventories.Where(inventory => inventory.OcopPartnerId == userId).ToList()
+             }));
             var result = _mapper.Map<List<WarehouseListInventoryDTO>>(list);
 
             return result;

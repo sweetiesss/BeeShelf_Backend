@@ -235,9 +235,18 @@ namespace BeeStore_Repository.Services
             return ResponseMessage.Success;
         }
 
-        public async Task<List<MoneyTransferListDTO>> GetMoneyTransferList()
+        public async Task<List<MoneyTransferListDTO>> GetMoneyTransferList(int? warehouseId)
         {
-            var list = await _unitOfWork.MoneyTransferRepo.GetAllAsync();
+            var list = await _unitOfWork.MoneyTransferRepo.GetQueryable(u => u.Where(u => u.OcopPartner.Inventories.Any(x => x.WarehouseId.Equals(warehouseId))));
+            list = list.ToList();
+            var result = _mapper.Map<List<MoneyTransferListDTO>>(list);
+            return result;
+        }
+
+        public async Task<List<MoneyTransferListDTO>> GetPartnerMoneyTransferList(int? partnerId)
+        {
+            var list = await _unitOfWork.MoneyTransferRepo.GetQueryable(u => u.Where(u => u.OcopPartnerId.Equals(partnerId)));
+            list = list.ToList();
             var result = _mapper.Map<List<MoneyTransferListDTO>>(list);
             return result;
         }
@@ -245,6 +254,10 @@ namespace BeeStore_Repository.Services
         public async Task<string> CreateMoneyTransferRequest(int ocopPartnerId, decimal amount)
         {
             var partnerWallet = await _unitOfWork.WalletRepo.SingleOrDefaultAsync(u => u.OcopPartnerId.Equals(ocopPartnerId));
+            if(partnerWallet == null)
+            {
+                throw new ApplicationException(ResponseMessage.WalletIdNotFound);
+            }
             if (partnerWallet.TotalAmount < amount)
             {
                 throw new ApplicationException(ResponseMessage.NotEnoughCredit);
