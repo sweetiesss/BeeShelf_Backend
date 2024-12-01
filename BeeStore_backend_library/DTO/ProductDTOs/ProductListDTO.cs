@@ -17,6 +17,10 @@
 
         public decimal? Weight { get; set; }
 
+        public string? Unit { get; set; }
+
+        public ulong? IsCold { get; set; }
+
         public DateTime? CreateDate { get; set; }
 
         public int? ProductCategoryId { get; set; }

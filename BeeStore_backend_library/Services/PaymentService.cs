@@ -201,15 +201,16 @@ namespace BeeStore_Repository.Services
             return result;
         }
 
-        public async Task<string> CreateMoneyTransfer(int staffId, int paymentId)
+        public async Task<string> ConfirmMoneyTransferRequest(int staffId, int moneyTransferId)
         {
-            var payment = await _unitOfWork.PaymentRepo.SingleOrDefaultAsync(u => u.Id.Equals(paymentId));
-            if (payment == null)
+            var moneyTransfer = await _unitOfWork.MoneyTransferRepo.SingleOrDefaultAsync(u => u.Id.Equals(moneyTransferId));
+            if (moneyTransfer == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.PaymentNotFound);
             }
-            if(payment.MoneyTransfers.Any(u => u.PaymentId.Equals(payment.Id))){
-                throw new ApplicationException(ResponseMessage.PaymentAlreadyMade);
+            if(moneyTransfer.IsTransferred == 1)
+            {
+                throw new ApplicationException(ResponseMessage.MoneyTransferAlreadyMade);
             }
             var employee = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id.Equals(staffId), 
                                                                                query => query.Include(o => o.Role));
@@ -221,25 +222,43 @@ namespace BeeStore_Repository.Services
             {
                 throw new ApplicationException(ResponseMessage.UserRoleNotStaffError);
             }
+            var partnerWallet = await _unitOfWork.WalletRepo.SingleOrDefaultAsync(u => u.OcopPartnerId.Equals(moneyTransfer.OcopPartnerId));
+            if (partnerWallet.TotalAmount < moneyTransfer.Amount)
+            {
+                throw new ApplicationException(ResponseMessage.NotEnoughCredit);
+            }
 
-            payment.IsTransferred = 1;
-            var moneyTransfer = new MoneyTransfer{
-                Amount = payment.TotalAmount,
-                CreateDate = DateTime.Now,
-                OcopPartnerId = payment.OcopPartnerId,
-                PaymentId = payment.Id,
-                TransferBy = staffId
-            };
-            await _unitOfWork.MoneyTransferRepo.AddAsync(moneyTransfer);
+            moneyTransfer.IsTransferred = 1;
+            partnerWallet.TotalAmount -= moneyTransfer.Amount;
+            
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
         }
 
-        public async Task<List<MoneyTransferListDTO>> GetMoneyTransferList(int partnerId)
+        public async Task<List<MoneyTransferListDTO>> GetMoneyTransferList()
         {
-            var list = await _unitOfWork.MoneyTransferRepo.GetFiltered(u => u.OcopPartnerId.Equals(partnerId));
+            var list = await _unitOfWork.MoneyTransferRepo.GetAllAsync();
             var result = _mapper.Map<List<MoneyTransferListDTO>>(list);
             return result;
+        }
+
+        public async Task<string> CreateMoneyTransferRequest(int ocopPartnerId, decimal amount)
+        {
+            var partnerWallet = await _unitOfWork.WalletRepo.SingleOrDefaultAsync(u => u.OcopPartnerId.Equals(ocopPartnerId));
+            if (partnerWallet.TotalAmount < amount)
+            {
+                throw new ApplicationException(ResponseMessage.NotEnoughCredit);
+            }
+            var moneyTransfer = new MoneyTransfer{
+                Amount = amount,
+                OcopPartnerId = ocopPartnerId,
+                IsDeleted = false,
+                IsTransferred = 0,
+                CreateDate = DateTime.Now
+            };
+            await _unitOfWork.MoneyTransferRepo.AddAsync(moneyTransfer);
+            await _unitOfWork.SaveAsync();
+            return ResponseMessage.Success;
         }
     }
 }

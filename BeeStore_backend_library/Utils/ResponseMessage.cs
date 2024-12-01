@@ -34,7 +34,7 @@ namespace BeeStore_Repository.Utils
 
         //Payment
         public const string PaymentNotFound = "Payment has already been processed or doesn't exist.";
-        public const string PaymentAlreadyMade = "Payment has already been processed.";
+        public const string MoneyTransferAlreadyMade = "Money Transfer request has already been processed.";
 
         //Role responise message
         public const string RoleNotFound = "Role not found.";
@@ -80,7 +80,7 @@ namespace BeeStore_Repository.Utils
         public const string ShipperBatchOrdersOverweight = "Shipper's vehicle doesn't have enough capacity to handle this batch of orders.";
         public const string DeliveryZoneShipperNotMatch = "Delivery Zone of Shipper is not Match with the Delivery Zone of the Batch.";
         public const string DeliveryZoneOrderNotMatch = "Delivery Zone of Order is not Match with the Delivery Zone of the Batch";
-
+        public const string ShipperDeliverColdProduct = "Shipper's assigned vehicle may not match with the type of product.";
         //Product response message
         public const string ProductIdNotFound = "Product Id not found.";
         public const string ProductNameDuplicate = "Failed to add. Product name already exist. ";
@@ -88,6 +88,7 @@ namespace BeeStore_Repository.Utils
         public const string ProductPartnerNotMatch = "This product does not belongs to this user.";
         public const string ProductNotEnough = "Not enough products.";
         public const string ProductMustBeFromTheSameWarehouse = "All product in an order must be in the same warehouse.";
+        public const string ProductAndWarehouseTypeNotMatch = "Product and warehouse type does not match";
 
         //Package response message
         public const string PackageIdNotFound = "Lot Id not found.";
