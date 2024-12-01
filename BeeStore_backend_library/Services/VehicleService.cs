@@ -49,6 +49,14 @@ namespace BeeStore_Repository.Services
         public async Task<string> CreateVehicle(VehicleType? type, VehicleCreateDTO request)
         {
             var vehicle = await _unitOfWork.VehicleRepo.AnyAsync(u => u.LicensePlate == request.LicensePlate);
+            var warehouse = _unitOfWork.WarehouseRepo.SingleOrDefaultAsync(o => o.Id.Equals(request.WarehouseId));
+            if (warehouse == null) {
+                throw new KeyNotFoundException(ResponseMessage.WarehouseIdNotFound);
+            }
+            if (request.IsCold.Value != warehouse.Result.IsCold)
+            {
+                throw new ApplicationException(ResponseMessage.VehicleTypeNotMatchWarehouse);
+            }
             if (vehicle != false)
             {
                 throw new DuplicateException(ResponseMessage.VehicleLicensePlateDuplicate);
