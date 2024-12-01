@@ -10,7 +10,6 @@ using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Identity.Client.Extensions.Msal;
 using System.Data;
 
 namespace BeeStore_Repository.Services
@@ -116,7 +115,7 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
             }
-            int firstProductWarehouseId = 0;
+            //int firstProductWarehouseId = 0;
             int index = 0;
             decimal? totalPrice = 0;
             decimal? totalStorageFee = 0;
@@ -150,31 +149,31 @@ namespace BeeStore_Repository.Services
                 }
 
                 //get first product warehouse Id
-                if (firstProductWarehouseId == 0 && b.Any())
-                {
-                    firstProductWarehouseId = b[0].Inventory.WarehouseId.Value;
-                }
+                //if (firstProductWarehouseId == 0 && b.Any())
+                //{
+                //    firstProductWarehouseId = b[0].Inventory.WarehouseId.Value;
+                //}
 
-                //if first product warehouse id already exist, check if this product is in the same warehouse or not
-                if (firstProductWarehouseId != 0)
-                {
-                    if (b[0].Inventory.WarehouseId != firstProductWarehouseId)
-                    {
-                        for (int i = 1; i < b.Count(); i++)
-                        {
-                            if (b[i].Inventory.WarehouseId == firstProductWarehouseId)
-                            {
-                                index = i;
-                                break;
-                            }
-                        }
-                        if (index == 0)
-                        {
-                            throw new ApplicationException(ResponseMessage.ProductMustBeFromTheSameWarehouse);
-                        }
+                ////if first product warehouse id already exist, check if this product is in the same warehouse or not
+                //if (firstProductWarehouseId != 0)
+                //{
+                //    if (b[0].Inventory.WarehouseId != firstProductWarehouseId)
+                //    {
+                //        for (int i = 1; i < b.Count(); i++)
+                //        {
+                //            if (b[i].Inventory.WarehouseId == firstProductWarehouseId)
+                //            {
+                //                index = i;
+                //                break;
+                //            }
+                //        }
+                //        if (index == 0)
+                //        {
+                //            throw new ApplicationException(ResponseMessage.ProductMustBeFromTheSameWarehouse);
+                //        }
 
-                    }
-                }
+                //    }
+                //}
 
                 //check for product amount
 
@@ -194,12 +193,12 @@ namespace BeeStore_Repository.Services
                     var lot = b[index];
 
                     // Check if the current lot's WarehouseId matches the first lot's WarehouseId
-                    if (lot.Inventory.WarehouseId != firstProductWarehouseId)
-                    {
-                        // If not, move to the next lot and continue the loop
-                        index++;
-                        continue;
-                    }
+                    //if (lot.Inventory.WarehouseId != firstProductWarehouseId)
+                    //{
+                    //    // If not, move to the next lot and continue the loop
+                    //    index++;
+                    //    continue;
+                    //}
 
                     int amountToTake = 0;
 
@@ -217,9 +216,9 @@ namespace BeeStore_Repository.Services
                     totalPrice += lot.Product.Price * amountToTake;
                     totalStorageFee += CalculateStorageFee(lot.ImportDate.Value, DateTime.Now);
                     totalWeight += lot.Product.Weight * product.ProductAmount;
-                    if(lot.Product.Weight* product.ProductAmount > 5)
+                    if(lot.Product.Weight * product.ProductAmount > 5)
                     {
-                        decimal? extraWeight = lot.Product.Weight * lot.TotalProductAmount - 5;
+                        decimal? extraWeight = lot.Product.Weight * product.ProductAmount - 5;
                         decimal extraWeightUnits = Math.Ceiling((decimal)extraWeight / 0.5m); // Convert to 0.5kg units
                         deliveryFee += extraWeightUnits * 5000;
                     }
