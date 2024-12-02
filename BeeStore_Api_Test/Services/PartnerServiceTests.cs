@@ -584,7 +584,7 @@ namespace BeeStore_Api_Test.Services
                 {
                     ProductId = 1,
                     Product = new Product { Id = 1, Name = "Product A", OcopPartnerId = mockPartnerId },
-                    ProductAmount = 10,
+                    TotalProductAmount = 10,
                     IsDeleted = false,
                     Inventory = new Inventory { WarehouseId = 1, Warehouse = new Warehouse { Id = 1, Name = "Warehouse 1" } }
                 },
@@ -592,7 +592,7 @@ namespace BeeStore_Api_Test.Services
                 {
                     ProductId = 2,
                     Product = new Product { Id = 2, Name = "Product B", OcopPartnerId = mockPartnerId },
-                    ProductAmount = 5,
+                    TotalProductAmount = 5,
                     IsDeleted = false,
                     Inventory = new Inventory { WarehouseId = 1, Warehouse = new Warehouse { Id = 1, Name = "Warehouse 1" } }
                 },
@@ -600,7 +600,7 @@ namespace BeeStore_Api_Test.Services
                 {
                     ProductId = 1,
                     Product = new Product { Id = 1, Name = "Product A", OcopPartnerId = mockPartnerId },
-                    ProductAmount = 15,
+                    TotalProductAmount = 15,
                     IsDeleted = false,
                     Inventory = new Inventory { WarehouseId = 2, Warehouse = new Warehouse { Id = 2, Name = "Warehouse 2" } }
                 }
@@ -641,7 +641,7 @@ namespace BeeStore_Api_Test.Services
         {
             ProductId = 1,
             Product = new Product { Id = 1, Name = "Product A", OcopPartnerId = mockPartnerId },
-            ProductAmount = 10,
+            TotalProductAmount = 10,
             IsDeleted = false,
             Inventory = new Inventory { WarehouseId = 1, Warehouse = new Warehouse { Id = 1, Name = "Warehouse 1" } }
         },
@@ -649,7 +649,7 @@ namespace BeeStore_Api_Test.Services
         {
             ProductId = 2,
             Product = new Product { Id = 2, Name = "Product B", OcopPartnerId = mockPartnerId },
-            ProductAmount = 5,
+            TotalProductAmount = 5,
             IsDeleted = false,
             Inventory = new Inventory { WarehouseId = 2, Warehouse = new Warehouse { Id = 2, Name = "Warehouse 2" } }
         },
@@ -657,7 +657,7 @@ namespace BeeStore_Api_Test.Services
         {
             ProductId = 1,
             Product = new Product { Id = 1, Name = "Product A", OcopPartnerId = mockPartnerId },
-            ProductAmount = 15,
+            TotalProductAmount = 15,
             IsDeleted = false,
             Inventory = new Inventory { WarehouseId = 1, Warehouse = new Warehouse { Id = 1, Name = "Warehouse 1" } }
         }

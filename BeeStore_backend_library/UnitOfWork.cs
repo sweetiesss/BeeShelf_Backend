@@ -22,7 +22,6 @@ namespace BeeStore_Repository
         IGenericRepository<Wallet> WalletRepo { get; }
         IGenericRepository<OrderDetail> OrderDetailRepo { get; }
         IGenericRepository<Batch> BatchRepo { get; }
-        IGenericRepository<BatchDelivery> BatchDeliveryRepo { get; }
         IGenericRepository<Transaction> TransactionRepo { get; }
         IGenericRepository<OrderFee> OrderFeeRepo { get; }
         IGenericRepository<Vehicle> VehicleRepo { get; }
@@ -54,7 +53,6 @@ namespace BeeStore_Repository
         private IGenericRepository<Wallet> walletRepo;
         private IGenericRepository<OrderDetail> orderDetailRepo;
         private IGenericRepository<Batch> batchRepo;
-        private IGenericRepository<BatchDelivery> batchDeliveryRepo;
         private IGenericRepository<Transaction> transactionRepo;
         private IGenericRepository<OrderFee> orderFeeRepo;
         private IGenericRepository<Vehicle> vehicleRepo;
@@ -171,17 +169,6 @@ namespace BeeStore_Repository
             }
         }
 
-        public IGenericRepository<BatchDelivery> BatchDeliveryRepo
-        {
-            get
-            {
-                if (batchDeliveryRepo == null)
-                {
-                    batchDeliveryRepo = new GenericRepository<BatchDelivery>(_context);
-                }
-                return batchDeliveryRepo;
-            }
-        }
 
         public IGenericRepository<OrderFee> OrderFeeRepo
         {

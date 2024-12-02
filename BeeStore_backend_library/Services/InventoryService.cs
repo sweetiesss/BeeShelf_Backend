@@ -198,7 +198,8 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
             }
-            if ((inv.OcopPartnerId != null && inv.OcopPartnerId != userId) || (DateTime.Now > inv.BoughtDate && DateTime.Now < inv.ExpirationDate))
+            //m them cai || (DateTime.Now > inv.BoughtDate && DateTime.Now < inv.ExpirationDate) nay do no bi loi nen t xoa di r.
+            if (inv.OcopPartnerId != null && inv.OcopPartnerId != userId)
             {
                 throw new ApplicationException(ResponseMessage.InventoryOccupied);
             }
