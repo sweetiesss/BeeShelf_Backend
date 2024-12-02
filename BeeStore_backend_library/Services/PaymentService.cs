@@ -229,6 +229,7 @@ namespace BeeStore_Repository.Services
             }
 
             moneyTransfer.IsTransferred = 1;
+            moneyTransfer.TransferBy = staffId;
             partnerWallet.TotalAmount -= moneyTransfer.Amount;
             
             await _unitOfWork.SaveAsync();
