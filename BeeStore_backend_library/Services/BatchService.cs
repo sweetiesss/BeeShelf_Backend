@@ -47,7 +47,7 @@ namespace BeeStore_Repository.Services
                 if (!order.Status.Equals(Constants.Status.Processing))
                     throw new ApplicationException(ResponseMessage.BatchAssignedOrder);
 
-                if (order.BatchDeliveryId != null)
+                if (order.BatchId != null)
                     throw new ApplicationException(ResponseMessage.OrderBatchError);
 
                 if(!order.DeliveryZoneId.Equals(request.DeliveryZoneId))
@@ -97,57 +97,60 @@ namespace BeeStore_Repository.Services
                 //Check Order -> Create Batch Delivery
                 decimal? currentWeight = 0;
                 var cap = vehicle.Capacity;
-                List<Order> tempOrder = new List<Order>();
-                for(int i = 0; i < orderList.Count; i++) {
-                    currentWeight += orderList[i].TotalWeight;
-                    if (currentWeight > cap)
-                    {
-                        int trips = 1;
-                        if (tempOrder.Count == 0)
-                        {
-                            trips = (int)(currentWeight / cap);
-                            if (trips * cap != currentWeight) trips++;
-                            tempOrder.Add(orderList[i]);
-                        }
 
-                        BatchDelivery batchDelivery = new BatchDelivery
-                        {
-                            NumberOfTrips = trips,
-                            DeliveryStartDate = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond)
-                        };
+                result.Orders = orderList;
+                result.DeliveryStartDate = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
+                //List<Order> tempOrder = new List<Order>();
+                //for(int i = 0; i < orderList.Count; i++) {
+                //    currentWeight += orderList[i].TotalWeight;
+                //    if (currentWeight > cap)
+                //    {
+                //        int trips = 1;
+                //        if (tempOrder.Count == 0)
+                //        {
+                //            trips = (int)(currentWeight / cap);
+                //            if (trips * cap != currentWeight) trips++;
+                //            tempOrder.Add(orderList[i]);
+                //        }
+
+                //        BatchDelivery batchDelivery = new BatchDelivery
+                //        {
+                //            NumberOfTrips = trips,
+                //            DeliveryStartDate = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond)
+                //        };
 
 
-                        // can optimize this - Change batchDeliveryId of the Order
-                        for (int j = 0; j < tempOrder.Count; j++)
-                        {
-                            tempOrder[j].BatchDelivery = batchDelivery;
-                            _unitOfWork.OrderRepo.Update(tempOrder[j]);
-                        }
+                //        // can optimize this - Change batchDeliveryId of the Order
+                //        for (int j = 0; j < tempOrder.Count; j++)
+                //        {
+                //            tempOrder[j].BatchDelivery = batchDelivery;
+                //            _unitOfWork.OrderRepo.Update(tempOrder[j]);
+                //        }
 
-                        result.BatchDeliveries.Add(batchDelivery);
-                        tempOrder.Clear();
-                        currentWeight = 0;
-                        if(trips == 1) i--;
-                    }else tempOrder.Add(orderList[i]);
-                }
-                
-                if (tempOrder.Count > 0) {
-                    BatchDelivery batchDelivery = new BatchDelivery
-                    {
-                        BatchId = result.Id,
-                        Orders = tempOrder,
-                        NumberOfTrips = 1,
-                        DeliveryStartDate = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond)
-                    };
-                    for (int j = 0; j < tempOrder.Count; j++)
-                    {
-                        tempOrder[j].BatchDelivery = batchDelivery;
-                        tempOrder[j].DeliverStartDate = batchDelivery.DeliveryStartDate;
-                        _unitOfWork.OrderRepo.Update(tempOrder[j]);
-                    }
-                    await _unitOfWork.BatchDeliveryRepo.AddAsync(batchDelivery);
-                    result.BatchDeliveries.Add(batchDelivery);
-                }
+                //        result.BatchDeliveries.Add(batchDelivery);
+                //        tempOrder.Clear();
+                //        currentWeight = 0;
+                //        if(trips == 1) i--;
+                //    }else tempOrder.Add(orderList[i]);
+                //}
+
+                //if (tempOrder.Count > 0) {
+                //    BatchDelivery batchDelivery = new BatchDelivery
+                //    {
+                //        BatchId = result.Id,
+                //        Orders = tempOrder,
+                //        NumberOfTrips = 1,
+                //        DeliveryStartDate = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond)
+                //    };
+                //    for (int j = 0; j < tempOrder.Count; j++)
+                //    {
+                //        tempOrder[j].BatchDelivery = batchDelivery;
+                //        tempOrder[j].DeliverStartDate = batchDelivery.DeliveryStartDate;
+                //        _unitOfWork.OrderRepo.Update(tempOrder[j]);
+                //    }
+                //    await _unitOfWork.BatchDeliveryRepo.AddAsync(batchDelivery);
+                //    result.BatchDeliveries.Add(batchDelivery);
+                //}
             }
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
@@ -211,15 +214,9 @@ namespace BeeStore_Repository.Services
             {
                 throw new ApplicationException(ResponseMessage.BatchStatusNotPending);
             }
-            foreach (var o in batch.BatchDeliveries)
+            foreach (var o in batch.Orders)
             {
                 o.BatchId = null;
-                o.IsDeleted = true;
-                var list = o.Orders.Where(u => u.BatchDeliveryId.Equals(o.Id)).ToList();
-                foreach(var i in list)
-                {
-                    i.BatchDeliveryId = null;
-                }
             }
             
             _unitOfWork.BatchRepo.SoftDelete(batch);
@@ -246,13 +243,15 @@ namespace BeeStore_Repository.Services
             }
             DateTime now = DateTime.Now;
             DateTime nextHour = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
-            batch.BatchDeliveries.Add(new BatchDelivery
+            batch.Orders.Add(new Order
             {
                 NumberOfTrips = 1,
-                DeliveryStartDate = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond),
                 BatchId = batch.Id,
                 //DeliverBy = shipper.Id
             });
+            batch.DeliveryStartDate = now.AddHours(1).AddMinutes(-now.Minute)
+                                         .AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
+
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Unsupported;
         }
@@ -276,7 +275,7 @@ namespace BeeStore_Repository.Services
 
             var list = await _unitOfWork.BatchRepo.GetListAsync(
                 filter: filterExpression!,
-                includes: u => u.Include(o => o.BatchDeliveries).Include(o => o.DeliveryZone),
+                includes: u => u.Include(o => o.DeliveryZone),
                 sortBy: null,
                 descending: false,
                 searchTerm: search,
@@ -305,7 +304,7 @@ namespace BeeStore_Repository.Services
 
             var list = await _unitOfWork.BatchRepo.GetListAsync(
                filter: filterExpression!,
-               includes: u => u.Include(o => o.BatchDeliveries).ThenInclude(o => o.Orders),
+               includes: u => u.Include(o => o.Orders),
                sortBy: null,
                descending: false,
                searchTerm: null,

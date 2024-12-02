@@ -179,13 +179,12 @@ namespace BeeStore_Repository.Mapper
                ProductAmount = od.ProductAmount
            }).ToList());
             CreateMap<Batch, BatchListDTO>()
-                .ForMember(dest => dest.BatchDeliveries, opt => opt.MapFrom(src => src.BatchDeliveries))
+                .ForMember(dest => dest.Orders, opt => opt.MapFrom(src => src.Orders))
                 .ForMember(dest => dest.ShipperEmail, opt => opt.MapFrom(src => src.DeliverByNavigation.Email))
                 .ForMember(dest => dest.ShipperName, opt => opt.MapFrom(src => $"{src.DeliverByNavigation.FirstName} {src.DeliverByNavigation.LastName}"))
                 .ForMember(dest => dest.DeliveryZoneName, opt => opt.MapFrom(src => src.DeliveryZone.Name));
-            CreateMap<BatchDelivery, BatchDeliveriesListDTO>();
             CreateMap<BatchCreateDTO, Batch>()
-                //.ForMember(dest => dest.Orders, opt => opt.Ignore())
+                .ForMember(dest => dest.Orders, opt => opt.Ignore())
                 .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<MoneyTransfer, MoneyTransferListDTO>()
                 .ForMember(dest => dest.TransferByStaffEmail, opt => opt.MapFrom(src => src.TransferByNavigation.Email))
