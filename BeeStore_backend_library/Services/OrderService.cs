@@ -64,8 +64,8 @@ namespace BeeStore_Repository.Services
                              && (orderFilterBy == null || u.DeliveryZoneId.Equals(Int32.Parse(filterQuery)))
                              && (userId == null || u.OcopPartnerId.Equals(userId))
                              && (warehouseId == null || u.OrderDetails.Any(od => od.Lot.Inventory.WarehouseId.Equals(warehouseId)))
-                             && (shipperId == null || u.BatchDelivery.Batch.DeliverBy.Equals(shipperId) && u.IsDeleted.Equals(false)),
-                includes: u => u.Include(o => o.BatchDelivery).ThenInclude(o => o.Batch),
+                             && (shipperId == null || u.Batch.DeliverBy.Equals(shipperId) && u.IsDeleted.Equals(false)),
+                includes: u => u.Include(o => o.Batch),
                 sortBy: sortBy!,
                 descending: descending,
                 searchTerm: null,
@@ -390,10 +390,10 @@ namespace BeeStore_Repository.Services
 
 
         //Shipper and staff use this
-        public async Task<string> UpdateOrderStatus(int id, OrderStatus orderStatus)
+        public async Task<string> UpdateOrderStatus(int id, OrderStatus orderStatus, string? cancellationReason)
         {
             var exist = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u => u.Id == id,
-                                                                        query => query.Include(o => o.BatchDelivery));
+                                                                        query => query.Include(o => o.Batch));
                                                                         
             if (exist == null)
             {
@@ -426,6 +426,7 @@ namespace BeeStore_Repository.Services
                     throw new ApplicationException(ResponseMessage.OrderProccessedError);
                 }
             }
+
 
             //from processing to Shipping
             if (orderStatusString.Equals(Constants.Status.Shipping, StringComparison.OrdinalIgnoreCase))    //Shipped
@@ -461,11 +462,7 @@ namespace BeeStore_Repository.Services
                 }
             }
 
-            //Order can be canceled from three states,
-            //Pending (Partner initiate),
-            //Proccessing (Both User and Staff can initiate), 
-            //Shipping (Partner initiate) (additional fee)
-            //the reason why there is no "Pending" below is because I want to seperate Partner cancel from this
+            
             if (orderStatusString.Equals(Constants.Status.Canceled, StringComparison.OrdinalIgnoreCase)) //Canceled
             {
                 if (exist.Status == Constants.Status.Shipping ||
@@ -473,6 +470,7 @@ namespace BeeStore_Repository.Services
                 {
                     orderStatusUpdate = Constants.Status.Canceled;
                     a = true;
+                    exist.CancellationReason = cancellationReason;
                     //return product's amount here
                     foreach (var od in exist.OrderDetails)
                     {
@@ -496,7 +494,7 @@ namespace BeeStore_Repository.Services
                     exist.Payments.Add(new Payment
                     {
                         OcopPartnerId = exist.OcopPartnerId,
-                        CollectedBy = exist.BatchDelivery.Batch.DeliverBy,
+                        CollectedBy = exist.Batch.DeliverBy,
                         OrderId = exist.Id,
                         TotalAmount = exist.TotalPriceAfterFee
                     //    TotalAmount = (int)(exist.TotalPrice - (orderfee.DeliveryFee + orderfee.StorageFee + orderfee.AdditionalFee))
@@ -517,7 +515,6 @@ namespace BeeStore_Repository.Services
             }
 
             exist.Status = orderStatusUpdate;
-            
             _unitOfWork.OrderRepo.Update(exist);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;

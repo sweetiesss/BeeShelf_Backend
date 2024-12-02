@@ -11,6 +11,7 @@ namespace BeeStore_Repository.DTO.Batch
         public string? Status { get; set; }
 
         public DateTime? CompleteDate { get; set; }
+        public DateTime? DeliveryStartDate {  get; set; }
 
         public int? DeliverBy { get; set; }
         public string? ShipperEmail { get; set; }
@@ -19,19 +20,7 @@ namespace BeeStore_Repository.DTO.Batch
         public int? DeliveryZoneId { get; set; }
         public string? DeliveryZoneName {  get; set; }
 
-        public List<BatchDeliveriesListDTO> BatchDeliveries { get; set; }
+        public List<OrderListDTO> Orders { get; set; }
     }
 
-    public class BatchDeliveriesListDTO
-    {
-        public int Id { get; set; }
-
-        public int? NumberOfTrips { get; set; }
-
-        public DateTime? DeliveryStartDate { get; set; }
-
-        public int? BatchId { get; set; }
-        public virtual List<OrderListDTO> Orders { get; set; } = new List<OrderListDTO>();
-
-    }
 }
