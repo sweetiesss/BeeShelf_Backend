@@ -83,14 +83,6 @@ namespace BeeStore_Repository.Services
                 {
                     throw new ApplicationException(ResponseMessage.UserRoleNotShipperError);
                 }
-                //I was going to check here but wouldn't a cold warehouse have all cold vehicles? 
-                // why would you have any other vehicle in an all cold product warehouse?
-                // -> I would agree to you if the database have no abnormality and secure when assign vehicle to warehouse
-                //if(shipper.Vehicles.FirstOrDefault(u => u.AssignedDriverId.Equals(shipper.Id)).IsCold 
-                //    != orderList[0].OrderDetails.First().Lot.Product.IsCold)
-                //{
-                //    throw new ApplicationException(ResponseMessage.ShipperDeliverColdProduct);
-                //}
 
                 result.DeliverBy = shipper.Id;
                 var vehicle = shipper.Vehicles.FirstOrDefault(u => u.AssignedDriverId.Equals(shipper.Id) && u.IsDeleted.Equals(false));
@@ -100,57 +92,40 @@ namespace BeeStore_Repository.Services
 
                 result.Orders = orderList;
                 result.DeliveryStartDate = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
-                //List<Order> tempOrder = new List<Order>();
-                //for(int i = 0; i < orderList.Count; i++) {
-                //    currentWeight += orderList[i].TotalWeight;
-                //    if (currentWeight > cap)
-                //    {
-                //        int trips = 1;
-                //        if (tempOrder.Count == 0)
-                //        {
-                //            trips = (int)(currentWeight / cap);
-                //            if (trips * cap != currentWeight) trips++;
-                //            tempOrder.Add(orderList[i]);
-                //        }
+                List<Order> tempOrder = new List<Order>();
+                for (int i = 0; i < orderList.Count; i++)
+                {
+                    currentWeight += orderList[i].TotalWeight;
+                    if (currentWeight > cap)
+                    {
+                        int trips = 1;
+                        if (tempOrder.Count == 0)
+                        {
+                            trips = (int)(currentWeight / cap);
+                            if (trips * cap != currentWeight) trips++;
+                            tempOrder.Add(orderList[i]);
+                        }
 
-                //        BatchDelivery batchDelivery = new BatchDelivery
-                //        {
-                //            NumberOfTrips = trips,
-                //            DeliveryStartDate = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond)
-                //        };
+                        for (int j = 0; j < tempOrder.Count; j++)
+                        {
+                            tempOrder[j].NumberOfTrips = trips;
+                            _unitOfWork.OrderRepo.Update(tempOrder[j]);
+                        }
+                        tempOrder.Clear();
+                        currentWeight = 0;
+                        if (trips == 1) i--;
+                    }
+                    else tempOrder.Add(orderList[i]);
+                }
 
-
-                //        // can optimize this - Change batchDeliveryId of the Order
-                //        for (int j = 0; j < tempOrder.Count; j++)
-                //        {
-                //            tempOrder[j].BatchDelivery = batchDelivery;
-                //            _unitOfWork.OrderRepo.Update(tempOrder[j]);
-                //        }
-
-                //        result.BatchDeliveries.Add(batchDelivery);
-                //        tempOrder.Clear();
-                //        currentWeight = 0;
-                //        if(trips == 1) i--;
-                //    }else tempOrder.Add(orderList[i]);
-                //}
-
-                //if (tempOrder.Count > 0) {
-                //    BatchDelivery batchDelivery = new BatchDelivery
-                //    {
-                //        BatchId = result.Id,
-                //        Orders = tempOrder,
-                //        NumberOfTrips = 1,
-                //        DeliveryStartDate = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond)
-                //    };
-                //    for (int j = 0; j < tempOrder.Count; j++)
-                //    {
-                //        tempOrder[j].BatchDelivery = batchDelivery;
-                //        tempOrder[j].DeliverStartDate = batchDelivery.DeliveryStartDate;
-                //        _unitOfWork.OrderRepo.Update(tempOrder[j]);
-                //    }
-                //    await _unitOfWork.BatchDeliveryRepo.AddAsync(batchDelivery);
-                //    result.BatchDeliveries.Add(batchDelivery);
-                //}
+                if (tempOrder.Count > 0)
+                {
+                    for (int j = 0; j < tempOrder.Count; j++)
+                    {
+                        tempOrder[j].NumberOfTrips = 1;
+                        _unitOfWork.OrderRepo.Update(tempOrder[j]);
+                    }
+                }
             }
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
