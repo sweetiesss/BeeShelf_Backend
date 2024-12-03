@@ -37,7 +37,9 @@
         public decimal? TotalPrice { get; set; }
         public decimal? TotalPriceAfterFee { get; set; }
 
-        public int? BatchDeliveryId { get; set; }
+        public int? BatchId { get; set; }
+        public int? NumberOfTrips { get; set; }
+
 
         public DateTime? PickDate { get; set; }
 

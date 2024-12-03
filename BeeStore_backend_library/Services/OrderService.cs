@@ -11,6 +11,7 @@ using BeeStore_Repository.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
+using System.Linq.Expressions;
 
 namespace BeeStore_Repository.Services
 {
@@ -43,13 +44,24 @@ namespace BeeStore_Repository.Services
                 _ => null
             };
 
-            switch (orderFilterBy)
-            {
-                case OrderFilterBy.DeliveryZoneId:
-                    break;
-                case null: filterQuery = string.Empty; break;
-            }
+            //Expression<Func<Order, bool>> filterExpression = null;
+            //switch (orderFilterBy)
+            //{
+            //    case OrderFilterBy.DeliveryZoneId:
+            //        break;
+            //    case OrderFilterBy.BatchId: 
+            //        if (filterQuery.Equals("false", StringComparison.OrdinalIgnoreCase)){
+            //            filterExpression = u => u.BatchId == null;
+            //        }
+            //        else
+            //        {
+            //            filterExpression = u => u.BatchId != null;
+            //        }
+            //            break;
+            //    case null: filterQuery = string.Empty; break;
+            //}
 
+            
 
             string? sortBy = sortCriteria switch
             {
@@ -59,18 +71,29 @@ namespace BeeStore_Repository.Services
                 _ => null
             };
 
-            var list = await _unitOfWork.OrderRepo.GetListAsync(
-                filter: u => (filterQue == null || u.Status.Equals(filterQue))
-                             && (orderFilterBy == null || u.DeliveryZoneId.Equals(Int32.Parse(filterQuery)))
+            Expression<Func<Order, bool>> combinedFilter = u => (filterQue == null || u.Status.Equals(filterQue))
                              && (userId == null || u.OcopPartnerId.Equals(userId))
                              && (warehouseId == null || u.OrderDetails.Any(od => od.Lot.Inventory.WarehouseId.Equals(warehouseId)))
-                             && (shipperId == null || u.Batch.DeliverBy.Equals(shipperId) && u.IsDeleted.Equals(false)),
+                             && (shipperId == null || u.Batch.DeliverBy.Equals(shipperId) && u.IsDeleted.Equals(false))
+                             && (orderFilterBy == OrderFilterBy.DeliveryZoneId
+                                    ? u.DeliveryZoneId.Equals(Int32.Parse(filterQuery))
+                                    : orderFilterBy == OrderFilterBy.BatchId
+                                    ? (filterQuery.Equals("false", StringComparison.OrdinalIgnoreCase)
+                                       ? u.BatchId == null
+                                       : u.BatchId != null)
+                                            : true);
+
+
+            var list = await _unitOfWork.OrderRepo.GetListAsync(
+                filter: combinedFilter,
                 includes: u => u.Include(o => o.Batch),
                 sortBy: sortBy!,
                 descending: descending,
                 searchTerm: null,
                 searchProperties: null
                 );
+
+           
             return list;
         }
 
