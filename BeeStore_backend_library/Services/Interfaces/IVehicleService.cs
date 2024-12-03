@@ -8,7 +8,7 @@ namespace BeeStore_Repository.Services.Interfaces
     public interface IVehicleService
     {
         Task<Pagination<VehicleListDTO>> GetVehicles(VehicleStatus? status, VehicleType? type,
-                                                     VehicleSortBy? sortCriteria, bool descending, int pageIndex, int pageSize);
+                                                     VehicleSortBy? sortCriteria, bool descending, int pageIndex, int pageSize, int? warehouseId);
         Task<VehicleListDTO> GetVehicle(int id);
         Task<string> CreateVehicle(VehicleType? type, VehicleCreateDTO request);
         Task<string> UpdateVehicle(int id, VehicleType? type, VehicleCreateDTO request);
