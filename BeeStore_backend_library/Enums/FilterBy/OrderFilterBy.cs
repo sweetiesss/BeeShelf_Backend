@@ -8,6 +8,7 @@ namespace BeeStore_Repository.Enums.FilterBy
 {
     public enum OrderFilterBy
     {
+        BatchId,
         DeliveryZoneId
     }
 }
