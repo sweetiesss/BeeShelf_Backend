@@ -27,7 +27,7 @@ namespace BeeStore_Repository.Services
             _logger = logger;
         }
 
-        private async Task<List<Order>> ApplyFilterToList(OrderFilterBy? orderFilterBy, string? filterQuery, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
+        private async Task<List<Order>> ApplyFilterToList(bool? hasBatch, OrderFilterBy? orderFilterBy, string? filterQuery, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
                                                           bool descending, int? shipperId = null, int? userId = null, int? warehouseId = null)
         {
             string? filterQue = orderStatus switch
@@ -75,13 +75,10 @@ namespace BeeStore_Repository.Services
                              && (userId == null || u.OcopPartnerId.Equals(userId))
                              && (warehouseId == null || u.OrderDetails.Any(od => od.Lot.Inventory.WarehouseId.Equals(warehouseId)))
                              && (shipperId == null || u.Batch.DeliverBy.Equals(shipperId) && u.IsDeleted.Equals(false))
-                             && (orderFilterBy == OrderFilterBy.DeliveryZoneId
-                                    ? u.DeliveryZoneId.Equals(Int32.Parse(filterQuery))
-                                    : orderFilterBy == OrderFilterBy.BatchId
-                                    ? (filterQuery.Equals("false", StringComparison.OrdinalIgnoreCase)
-                                       ? u.BatchId == null
-                                       : u.BatchId != null)
-                                            : true);
+                             && (orderFilterBy == null || u.DeliveryZoneId.Equals(Int32.Parse(filterQuery)))
+                             && (hasBatch == null ||
+        (hasBatch == true && u.BatchId != null) ||
+        (hasBatch == false && u.BatchId == null));
 
 
             var list = await _unitOfWork.OrderRepo.GetListAsync(
@@ -97,33 +94,33 @@ namespace BeeStore_Repository.Services
             return list;
         }
 
-        public async Task<Pagination<OrderListDTO>> GetOrderList(OrderFilterBy? orderFilterBy, string? filterQuery, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
+        public async Task<Pagination<OrderListDTO>> GetOrderList(bool? hasBatch,OrderFilterBy? orderFilterBy, string? filterQuery, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
                                                           bool descending, int pageIndex, int pageSize)
         {
-            var list = await ApplyFilterToList(orderFilterBy, filterQuery, orderStatus, sortCriteria, descending);
+            var list = await ApplyFilterToList(hasBatch, orderFilterBy, filterQuery, orderStatus, sortCriteria, descending);
             var result = _mapper.Map<List<OrderListDTO>>(list);
             return await ListPagination<OrderListDTO>.PaginateList(result, pageIndex, pageSize);
         }
 
-        public async Task<Pagination<OrderListDTO>> GetWarehouseSentOrderList(OrderFilterBy? orderFilterBy, string? filterQuery, int warehouseId, OrderStatus? orderStatus, OrderSortBy? sortCriteria, bool descending, int pageIndex, int pageSize)
+        public async Task<Pagination<OrderListDTO>> GetWarehouseSentOrderList(bool? hasBatch, OrderFilterBy? orderFilterBy, string? filterQuery, int warehouseId, OrderStatus? orderStatus, OrderSortBy? sortCriteria, bool descending, int pageIndex, int pageSize)
         {
-            var list = await ApplyFilterToList(orderFilterBy, filterQuery, orderStatus, sortCriteria, descending, null, null, warehouseId);
+            var list = await ApplyFilterToList(hasBatch, orderFilterBy, filterQuery, orderStatus, sortCriteria, descending, null, null, warehouseId);
             var result = _mapper.Map<List<OrderListDTO>>(list);
             return await ListPagination<OrderListDTO>.PaginateList(result, pageIndex, pageSize);
         }
 
-        public async Task<Pagination<OrderListDTO>> GetOrderList(OrderFilterBy? orderFilterBy, string? filterQuery, int userId, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
+        public async Task<Pagination<OrderListDTO>> GetOrderList(bool? hasBatch, OrderFilterBy? orderFilterBy, string? filterQuery, int userId, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
                                                           bool descending, int pageIndex, int pageSize)
         {
-            var list = await ApplyFilterToList(orderFilterBy, filterQuery, orderStatus, sortCriteria, descending, null, userId);
+            var list = await ApplyFilterToList(hasBatch, orderFilterBy, filterQuery, orderStatus, sortCriteria, descending, null, userId);
             var result = _mapper.Map<List<OrderListDTO>>(list);
             return await ListPagination<OrderListDTO>.PaginateList(result, pageIndex, pageSize);
         }
 
-        public async Task<Pagination<OrderListDTO>> GetDeliverOrderList(OrderFilterBy? orderFilterBy, string? filterQuery, int shipperId, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
+        public async Task<Pagination<OrderListDTO>> GetDeliverOrderList(bool? hasBatch, OrderFilterBy? orderFilterBy, string? filterQuery, int shipperId, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
                                                           bool descending, int pageIndex, int pageSize)
         {
-            var list = await ApplyFilterToList(orderFilterBy, filterQuery, orderStatus, sortCriteria, descending, shipperId);
+            var list = await ApplyFilterToList(hasBatch, orderFilterBy, filterQuery, orderStatus, sortCriteria, descending, shipperId);
             var result = _mapper.Map<List<OrderListDTO>>(list);
             return await ListPagination<OrderListDTO>.PaginateList(result, pageIndex, pageSize);
         }
@@ -443,6 +440,7 @@ namespace BeeStore_Repository.Services
                     {
                         await UpdateLotProductAmount(od.LotId, od.ProductAmount, false);
                     }
+                    exist.ApproveDate = DateTime.Now;
                 }
                 else
                 {
@@ -473,6 +471,7 @@ namespace BeeStore_Repository.Services
                     orderStatusUpdate = Constants.Status.Returned;
                     exist.ReturnDate = DateTime.Now;
                     a = true;
+                    exist.CancellationReason = cancellationReason;
                     //take away the product's amount here
                     foreach (var od in exist.OrderDetails)
                     {
@@ -493,6 +492,7 @@ namespace BeeStore_Repository.Services
                 {
                     orderStatusUpdate = Constants.Status.Canceled;
                     a = true;
+                    exist.CancelDate = DateTime.Now;
                     exist.CancellationReason = cancellationReason;
                     //return product's amount here
                     foreach (var od in exist.OrderDetails)
@@ -525,6 +525,32 @@ namespace BeeStore_Repository.Services
                     exist.DeliverFinishDate = DateTime.Now;
                     //add money directly after order is delivered.
                     exist.OcopPartner.Wallets.FirstOrDefault(u => u.Id.Equals(exist.OcopPartnerId)).TotalAmount += exist.TotalPriceAfterFee;
+                }
+                else
+                {
+                    throw new ApplicationException();
+                }
+            }
+
+            if(orderStatusString.Equals(Constants.Status.Refunded, StringComparison.OrdinalIgnoreCase))
+            {
+                if(exist.Status == Constants.Status.Returned)
+                {
+                    orderStatusUpdate = Constants.Status.Refunded; 
+                    a = true;
+                }
+                else
+                {
+                    throw new ApplicationException();
+                }
+            }
+
+            if(orderStatusString.Equals(Constants.Status.Completed, StringComparison.OrdinalIgnoreCase))
+            {
+                if(exist.Status == Constants.Status.Delivered)
+                {
+                    orderStatusUpdate = Constants.Status.Completed;
+                    a = true;
                 }
                 else
                 {

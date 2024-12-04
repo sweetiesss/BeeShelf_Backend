@@ -132,6 +132,10 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.RequestIdNotFound);
             }
+            if(exist.Status != Constants.Status.Draft)
+            {
+                throw new ApplicationException(ResponseMessage.RequestStatusError);
+            }
             _unitOfWork.RequestRepo.SoftDelete(exist);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
@@ -268,6 +272,15 @@ namespace BeeStore_Repository.Services
                 throw new BadHttpRequestException(ResponseMessage.BadRequest);
             }
 
+            if (requestStatus.Equals(Constants.Status.Processing))
+            {
+                if (!exist.Status.Equals(Constants.Status.Pending))
+                {
+                    throw new ApplicationException(ResponseMessage.BadRequest);
+                }
+                exist.ApporveDate = DateTime.Now;
+            }
+
             if (requestStatus == Constants.Status.Completed)
             {
                 if(exist.Status != Constants.Status.Delivered)
@@ -295,16 +308,18 @@ namespace BeeStore_Repository.Services
                 lot.ImportDate = DateTime.Now;
                 lot.InventoryId = exist.SendToInventoryId;
                 lot.ExpirationDate = DateTime.Now.AddDays(lot.Product.ProductCategory!.ExpireIn!.Value);
-
+                
                 inventory.Weight = totalWeight;
 
             }
             if (requestStatus.Equals(Constants.Status.Failed))
             {
-                if(!exist.Status.Equals(Constants.Status.Processing))
+                if(!exist.Status.Equals(Constants.Status.Processing) || 
+                    !exist.Status.Equals(Constants.Status.Delivered))
                 {
                     throw new ApplicationException(ResponseMessage.RequestHasNotBeenProcessed);
                 }
+                exist.CancelDate = DateTime.Now;
             }
 
             if (requestStatus.Equals(Constants.Status.Delivered))
@@ -313,6 +328,7 @@ namespace BeeStore_Repository.Services
                 {
                     throw new ApplicationException(ResponseMessage.RequestHasNotBeenProcessed);
                 }
+                exist.DeliverDate = DateTime.Now;
             }
 
             exist.Status = requestStatus;

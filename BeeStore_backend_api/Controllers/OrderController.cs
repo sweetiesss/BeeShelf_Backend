@@ -22,6 +22,7 @@ namespace BeeStore_Api.Controllers
         [Authorize(Roles = "Admin,Manager,Staff")]
         [HttpGet]
         public async Task<IActionResult> GetOrderList([FromQuery] OrderFilterBy? orderFilterBy,
+                                                      [FromQuery]bool? hasBatch,
                                                       [FromQuery] string? filterQuery,
                                                       [FromQuery] OrderStatus? filterByStatus,
                                                       [FromQuery] OrderSortBy? sortBy,
@@ -29,7 +30,7 @@ namespace BeeStore_Api.Controllers
                                                       [FromQuery][DefaultValue(0)] int pageIndex,
                                                       [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _orderService.GetOrderList(orderFilterBy, filterQuery, filterByStatus, sortBy, descending, pageIndex, pageSize);
+            var result = await _orderService.GetOrderList(hasBatch, orderFilterBy, filterQuery, filterByStatus, sortBy, descending, pageIndex, pageSize);
             return Ok(result);
         }
 
@@ -37,6 +38,7 @@ namespace BeeStore_Api.Controllers
         [Authorize(Roles = "Partner")]
         [HttpGet]
         public async Task<IActionResult> GetOrderList(int userId,
+                                                      [FromQuery] bool? hasBatch,
                                                       [FromQuery] OrderFilterBy? orderFilterBy,
                                                       [FromQuery] string? filterQuery,
                                                       [FromQuery] OrderStatus? filterByStatus,
@@ -45,7 +47,7 @@ namespace BeeStore_Api.Controllers
                                                       [FromQuery][DefaultValue(0)] int pageIndex,
                                                       [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _orderService.GetOrderList(orderFilterBy, filterQuery, userId, filterByStatus, sortBy, descending, pageIndex, pageSize);
+            var result = await _orderService.GetOrderList(hasBatch, orderFilterBy, filterQuery, userId, filterByStatus, sortBy, descending, pageIndex, pageSize);
             return Ok(result);
         }
 
@@ -53,6 +55,7 @@ namespace BeeStore_Api.Controllers
         [Authorize(Roles = "Admin,Manager,Shipper")]
         [HttpGet]
         public async Task<IActionResult> GetShipperOrderList(int userId,
+                                                            [FromQuery] bool? hasBatch,
                                                             [FromQuery] OrderFilterBy? orderFilterBy,
                                                             [FromQuery] string? filterQuery,
                                                             [FromQuery] OrderStatus? filterByStatus,
@@ -61,7 +64,7 @@ namespace BeeStore_Api.Controllers
                                                             [FromQuery][DefaultValue(0)] int pageIndex,
                                                             [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _orderService.GetDeliverOrderList(orderFilterBy, filterQuery, userId, filterByStatus, sortBy, descending, pageIndex, pageSize);
+            var result = await _orderService.GetDeliverOrderList(hasBatch, orderFilterBy, filterQuery, userId, filterByStatus, sortBy, descending, pageIndex, pageSize);
             return Ok(result);
         }
 
@@ -69,6 +72,7 @@ namespace BeeStore_Api.Controllers
         [Authorize(Roles = "Admin,Manager,Staff,Shipper")]
         [HttpGet]
         public async Task<IActionResult> GetWarehouseSentOrder(int warehouseId,
+                                                            [FromQuery] bool? hasBatch,
                                                             [FromQuery] OrderFilterBy? orderFilterBy,
                                                             [FromQuery] string? filterQuery,
                                                             [FromQuery] OrderStatus? filterByStatus,
@@ -77,7 +81,7 @@ namespace BeeStore_Api.Controllers
                                                             [FromQuery][DefaultValue(0)] int pageIndex,
                                                             [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _orderService.GetWarehouseSentOrderList(orderFilterBy, filterQuery, warehouseId, filterByStatus, sortBy, descending, pageIndex, pageSize);
+            var result = await _orderService.GetWarehouseSentOrderList(hasBatch, orderFilterBy, filterQuery, warehouseId, filterByStatus, sortBy, descending, pageIndex, pageSize);
             return Ok(result);
         }
 
