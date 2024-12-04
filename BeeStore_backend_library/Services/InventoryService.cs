@@ -141,7 +141,7 @@ namespace BeeStore_Repository.Services
 
             var list = await _unitOfWork.InventoryRepo.GetListAsync(
                 filter: filterExpression,
-                includes: null,
+                includes: u => u.Include(o => o.Lots),
                 sortBy: sortBy!,
                 descending: descending,
                 searchTerm: null,

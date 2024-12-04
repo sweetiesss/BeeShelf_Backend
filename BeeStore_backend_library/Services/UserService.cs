@@ -79,8 +79,16 @@ namespace BeeStore_Repository.Services
 
                 if (user == null)
                 {
+                    var employee = await _unitOfWork.EmployeeRepo.FirstOrDefaultAsync(u => u.Id.Equals(tokenData.UserId) && u.Email.Equals(tokenData.Email));
+                    if(employee != null)
+                    {
+                        employee.Password = BCrypt.Net.BCrypt.HashPassword(request.newPassword);
+                        await _unitOfWork.SaveAsync();
+                        return ResponseMessage.Success;
+                    }
                     throw new KeyNotFoundException(ResponseMessage.UserEmailNotFound);
                 }
+
 
                 // Update password
                 user.Password = BCrypt.Net.BCrypt.HashPassword(request.newPassword);

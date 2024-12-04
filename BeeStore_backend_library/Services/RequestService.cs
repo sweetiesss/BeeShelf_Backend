@@ -132,12 +132,16 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.RequestIdNotFound);
             }
+            if(exist.Status != Constants.Status.Draft)
+            {
+                throw new ApplicationException(ResponseMessage.RequestStatusError);
+            }
             _unitOfWork.RequestRepo.SoftDelete(exist);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
         }
 
-        private async Task<List<Request>> ApplyFilterToList(RequestStatus? requestStatus, bool descending,
+        private async Task<List<Request>> ApplyFilterToList(bool? import, RequestStatus? requestStatus, bool descending,
                                                           int? userId = null, int? warehouseId = null)
         {
             string? filterQuery = requestStatus switch
@@ -159,6 +163,9 @@ namespace BeeStore_Repository.Services
                 filter: u => (filterQuery == null || u.Status.Equals(filterQuery))
                              && (userId == null || u.OcopPartnerId.Equals(userId))
                              && (warehouseId == null || u.SendToInventory.WarehouseId.Equals(warehouseId))
+                             && (import == null ||
+        (import == true && u.RequestType.Equals("Import")) ||
+        (import == false && u.RequestType.Equals("Export")))
                              && u.IsDeleted.Equals(false),
                 includes: null,
                 sortBy: Constants.SortCriteria.CreateDate,
@@ -169,16 +176,16 @@ namespace BeeStore_Repository.Services
             return list;
         }
 
-        public async Task<Pagination<RequestListDTO>> GetRequestList(RequestStatus? status, bool descending, int warehouseId, int pageIndex, int pageSize)
+        public async Task<Pagination<RequestListDTO>> GetRequestList(bool? import, RequestStatus? status, bool descending, int warehouseId, int pageIndex, int pageSize)
         {
-            var list = await ApplyFilterToList(status, descending, null, warehouseId);
+            var list = await ApplyFilterToList(import, status, descending, null, warehouseId);
             var result = _mapper.Map<List<RequestListDTO>>(list);
             return await ListPagination<RequestListDTO>.PaginateList(result, pageIndex, pageSize);
         }
 
-        public async Task<Pagination<RequestListDTO>> GetRequestList(int userId, RequestStatus? status, bool descending, int pageIndex, int pageSize)
+        public async Task<Pagination<RequestListDTO>> GetRequestList(int userId, bool? import, RequestStatus? status, bool descending, int pageIndex, int pageSize)
         {
-            var list = await ApplyFilterToList(status, descending, userId);
+            var list = await ApplyFilterToList(import, status, descending, userId);
             var result = _mapper.Map<List<RequestListDTO>>(list);
             return await ListPagination<RequestListDTO>.PaginateList(result, pageIndex, pageSize);
         }
@@ -268,6 +275,15 @@ namespace BeeStore_Repository.Services
                 throw new BadHttpRequestException(ResponseMessage.BadRequest);
             }
 
+            if (requestStatus.Equals(Constants.Status.Processing))
+            {
+                if (!exist.Status.Equals(Constants.Status.Pending))
+                {
+                    throw new ApplicationException(ResponseMessage.BadRequest);
+                }
+                exist.ApporveDate = DateTime.Now;
+            }
+
             if (requestStatus == Constants.Status.Completed)
             {
                 if(exist.Status != Constants.Status.Delivered)
@@ -295,16 +311,18 @@ namespace BeeStore_Repository.Services
                 lot.ImportDate = DateTime.Now;
                 lot.InventoryId = exist.SendToInventoryId;
                 lot.ExpirationDate = DateTime.Now.AddDays(lot.Product.ProductCategory!.ExpireIn!.Value);
-
+                
                 inventory.Weight = totalWeight;
 
             }
             if (requestStatus.Equals(Constants.Status.Failed))
             {
-                if(!exist.Status.Equals(Constants.Status.Processing))
+                if(!exist.Status.Equals(Constants.Status.Processing) || 
+                    !exist.Status.Equals(Constants.Status.Delivered))
                 {
                     throw new ApplicationException(ResponseMessage.RequestHasNotBeenProcessed);
                 }
+                exist.CancelDate = DateTime.Now;
             }
 
             if (requestStatus.Equals(Constants.Status.Delivered))
@@ -313,6 +331,7 @@ namespace BeeStore_Repository.Services
                 {
                     throw new ApplicationException(ResponseMessage.RequestHasNotBeenProcessed);
                 }
+                exist.DeliverDate = DateTime.Now;
             }
 
             exist.Status = requestStatus;
