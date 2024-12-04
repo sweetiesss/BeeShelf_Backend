@@ -116,7 +116,7 @@ namespace BeeStore_Repository.Services
             return result;
         }
 
-        public async Task<Pagination<VehicleListDTO>> GetVehicles(VehicleStatus? status, VehicleType? type, VehicleSortBy? sortCriteria, bool descending, int pageIndex, int pageSize)
+        public async Task<Pagination<VehicleListDTO>> GetVehicles(VehicleStatus? status, VehicleType? type, VehicleSortBy? sortCriteria, bool descending, int pageIndex, int pageSize, int? warehouseId)
         {
 
 
@@ -146,7 +146,8 @@ namespace BeeStore_Repository.Services
 
             var list = await _unitOfWork.VehicleRepo.GetListAsync(
                 filter: u => (vestatus == null || u.Status.Equals(vestatus))
-                             && (vetype == null || u.Type.Equals(vetype)),
+                             && (vetype == null || u.Type.Equals(vetype))
+                             && (warehouseId == null || u.WarehouseId.Equals(warehouseId)),
                 includes: null,
                 sortBy: sortBy!,
                 descending: descending,
