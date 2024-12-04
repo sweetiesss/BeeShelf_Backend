@@ -112,6 +112,17 @@ namespace BeeStore_Repository.Services
             return ResponseMessage.Success;
         }
 
+        public async Task<VehicleListDTO> GetShipperVehicle(int shipperId)
+        {
+            var vehicle = await _unitOfWork.VehicleRepo.SingleOrDefaultAsync(u => u.AssignedDriverId.Equals(shipperId));
+            if (vehicle == null)
+            {
+                throw new KeyNotFoundException(ResponseMessage.VehicleIdNotFound);
+            }
+            var result = _mapper.Map<VehicleListDTO>(vehicle);
+            return result;
+        }
+
         public async Task<VehicleListDTO> GetVehicle(int id)
         {
             var vehicle = await _unitOfWork.VehicleRepo.SingleOrDefaultAsync(u => u.Id.Equals(id));

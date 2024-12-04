@@ -41,6 +41,15 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
+        [Route("get-shipper-vehicle/{shipperId}")]
+        [HttpGet]
+        [Authorize(Roles = "Admin,Manager,Staff")]
+        public async Task<IActionResult> GetShipperVehicle(int shipperId)
+        {
+            var result = await _vehicleService.GetShipperVehicle(shipperId);
+            return Ok(result);
+        }
+
         [Route("create-vehicle")]
         [HttpPost]
         [Authorize(Roles = "Admin,Manager")]
