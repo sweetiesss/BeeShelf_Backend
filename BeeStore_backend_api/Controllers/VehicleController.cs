@@ -20,14 +20,15 @@ namespace BeeStore_Api.Controllers
         [Route("get-vehicles")]
         [HttpGet]
         [Authorize(Roles = "Admin,Manager,Staff")]
-        public async Task<IActionResult> GetVehicles([FromQuery] VehicleStatus? status,
+        public async Task<IActionResult> GetVehicles([FromQuery] int? warehouseId,
+                                                     [FromQuery] VehicleStatus? status,
                                                      [FromQuery] VehicleType? type,
                                                      [FromQuery] VehicleSortBy? sortBy,
                                                      [FromQuery][DefaultValue(false)] bool descending,
                                                      [FromQuery][DefaultValue(0)] int pageIndex,
                                                      [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _vehicleService.GetVehicles(status, type, sortBy, descending, pageIndex, pageSize);
+            var result = await _vehicleService.GetVehicles(status, type, sortBy, descending, pageIndex, pageSize, warehouseId);
             return Ok(result);
         }
 
