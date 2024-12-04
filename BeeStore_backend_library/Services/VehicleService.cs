@@ -9,6 +9,7 @@ using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 
 namespace BeeStore_Repository.Services
 {
@@ -26,7 +27,8 @@ namespace BeeStore_Repository.Services
 
         public async Task<string> AssignVehicle(int id, int driver_id)
         {
-            var employee = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id.Equals(driver_id));
+            var employee = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id.Equals(driver_id),
+                                                                              query => query.Include(o => o.Vehicles));
             if (employee == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
@@ -34,6 +36,11 @@ namespace BeeStore_Repository.Services
             if (employee.RoleId != 4)
             {
                 throw new ApplicationException(ResponseMessage.UserRoleNotShipperError);
+            }
+            var list = employee.Vehicles.ToList();
+            foreach(var x in list)
+            {
+                x.AssignedDriverId = null;
             }
             var vehicle = await _unitOfWork.VehicleRepo.SingleOrDefaultAsync(u => u.Id.Equals(id));
             if (vehicle == null)

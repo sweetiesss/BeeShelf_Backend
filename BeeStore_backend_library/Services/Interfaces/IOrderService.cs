@@ -8,14 +8,14 @@ namespace BeeStore_Repository.Services.Interfaces
 {
     public interface IOrderService
     {
-        Task<Pagination<OrderListDTO>> GetOrderList(OrderFilterBy? orderFilterBy, string? filterQuery, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
+        Task<Pagination<OrderListDTO>> GetOrderList(bool? hasBatch, OrderFilterBy? orderFilterBy, string? filterQuery, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
                                                           bool descending, int pageIndex, int pageSize);
 
-        Task<Pagination<OrderListDTO>> GetWarehouseSentOrderList(OrderFilterBy? orderFilterBy, string? filterQuery, int warehouseId, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
+        Task<Pagination<OrderListDTO>> GetWarehouseSentOrderList(bool? hasBatch, OrderFilterBy? orderFilterBy, string? filterQuery, int warehouseId, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
                                                           bool descending, int pageIndex, int pageSize);
-        Task<Pagination<OrderListDTO>> GetOrderList(OrderFilterBy? orderFilterBy, string? filterQuery, int partner, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
+        Task<Pagination<OrderListDTO>> GetOrderList(bool? hasBatch, OrderFilterBy? orderFilterBy, string? filterQuery, int partner, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
                                                           bool descending, int pageIndex, int pageSize);
-        Task<Pagination<OrderListDTO>> GetDeliverOrderList(OrderFilterBy? orderFilterBy, string? filterQuery, int employeeId, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
+        Task<Pagination<OrderListDTO>> GetDeliverOrderList(bool? hasBatch, OrderFilterBy? orderFilterBy, string? filterQuery, int employeeId, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
                                                           bool descending, int pageIndex, int pageSize);
 
         Task<string> CreateOrder(int warehouseId, OrderCreateDTO request);
