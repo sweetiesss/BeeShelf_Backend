@@ -97,9 +97,9 @@ namespace BeeStore_Api.Controllers
         [Route("update-order/{id}")]
         [Authorize(Roles = "Partner")]
         [HttpPut]
-        public async Task<IActionResult> UpdateOrder(int id, OrderUpdateDTO request)
+        public async Task<IActionResult> UpdateOrder(int id, int warehouseId, OrderUpdateDTO request)
         {
-            var result = await _orderService.UpdateOrder(id, request);
+            var result = await _orderService.UpdateOrder(id,warehouseId, request);
             return Ok(result);
         }
 

@@ -1,4 +1,5 @@
-﻿using AutoMapper;
+﻿using Amazon.S3.Model;
+using AutoMapper;
 using BeeStore_Repository.DTO;
 using BeeStore_Repository.DTO.OrderDTOs;
 using BeeStore_Repository.Enums;
@@ -10,6 +11,8 @@ using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using MySqlX.XDevAPI.Common;
 using System.Data;
 using System.Linq.Expressions;
 
@@ -265,6 +268,7 @@ namespace BeeStore_Repository.Services
             result.TotalPrice = totalPrice;
             result.TotalWeight = totalWeight;
             result.TotalPriceAfterFee = totalPrice - (totalStorageFee + deliveryFee);
+            result.OrderCode = GenerateOrderCode();
             await _unitOfWork.OrderRepo.AddAsync(result);
             await _unitOfWork.SaveAsync();
 
@@ -295,71 +299,158 @@ namespace BeeStore_Repository.Services
             {
                 throw new ApplicationException(ResponseMessage.OrderProccessedError);
             }
+            foreach(var x in exist.OrderDetails)
+            {
+                _unitOfWork.OrderDetailRepo.SoftDelete(x);
+            }
+            foreach(var x in exist.OrderFees)
+            {
+                _unitOfWork.OrderFeeRepo.SoftDelete(x);
+            }
             _unitOfWork.OrderRepo.SoftDelete(exist);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
         }
 
-        public async Task<string> UpdateOrder(int id, OrderUpdateDTO request)
+        public async Task<string> UpdateOrder(int id, int warehouseId, OrderUpdateDTO request)
         {
             var exist = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u => u.Id == id);
             if (exist == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.OrderIdNotFound);
             }
-            var firstODs = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(request.OrderDetails.First().LotId), query => query.Include(o => o.Inventory));
-            if (firstODs == null)
-            {
-                throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
-            }
 
             if (exist.Status != Constants.Status.Draft && exist.Status != Constants.Status.Shipping)
             {
-                if (request.OrderDetails != null)
-                {
-                    throw new ApplicationException(ResponseMessage.OrderProccessedError);
-                }
-            }
-            //If status = draft update orderdetails and such
-            if (exist.Status == Constants.Status.Draft)
-            {
-                decimal? totalPrice = 0;
-                foreach (var x in exist.OrderDetails)
-                {
-                    _unitOfWork.OrderDetailRepo.HardDelete(x);
-                }
+                int additionalFeeAfterUpdate = 5000;
 
-                foreach (var x in request.OrderDetails)
+                //if Draft update normally
+                if (exist.Status == Constants.Status.Draft)
                 {
-                    var a = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(x.LotId), query => query.Include(o => o.Product).Include(o => o.Inventory));
-                    if (a == null)
+                    //delete existing order details and fees
+                    foreach (var x in exist.OrderDetails)
                     {
-                        throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
+                        _unitOfWork.OrderDetailRepo.HardDelete(x);
+                    }
+                    foreach(var x in exist.OrderFees)
+                    {
+                        _unitOfWork.OrderFeeRepo.HardDelete(x);
                     }
 
-                    totalPrice += a.Product.Price * x.ProductAmount;
-                    x.ProductPrice = (int)(a.Product.Price);
-                    if (a.Inventory.WarehouseId != firstODs.Inventory.WarehouseId)
+                    //copy from create order
+                    int index = 0;
+                    decimal? totalPrice = 0;
+                    decimal? totalStorageFee = 0;
+                    decimal? deliveryFee = 0;
+                    decimal? totalWeight = 0;
+                    if (request.Distance > 10)
                     {
-                        throw new ApplicationException(ResponseMessage.OrderDetailsError);
+                        deliveryFee += (request.Distance - 10) * 1000;
                     }
+                    foreach (var product in request.Products)
+                    {
+
+                        var a = await _unitOfWork.ProductRepo.AnyAsync(u => u.Id.Equals(product.ProductId));
+                        if (a == false)
+                        {
+                            throw new KeyNotFoundException(ResponseMessage.ProductIdNotFound);
+                        }
+
+                        var b = await _unitOfWork.LotRepo.GetQueryable(query => query.Where(u => u.ProductId.Equals(product.ProductId)
+                                                                        && u.InventoryId.HasValue
+                                                                        && u.ImportDate.HasValue
+                                                                        && u.TotalProductAmount > 0
+                                                                        && u.Inventory.WarehouseId.Equals(warehouseId)
+                                                                        && u.IsDeleted.Equals(false))
+                                                                        .OrderBy(u => u.ImportDate)
+                                                                        .Include(o => o.Product)
+                                                                        .Include(o => o.Inventory).ThenInclude(o => o.Warehouse));
+                        if (b.Count() == 0)
+                        {
+                            throw new KeyNotFoundException(ResponseMessage.NoLotWithProductFound);
+                        }
+
+
+                        int productAmountNeeded = product.ProductAmount;
+
+                        while (productAmountNeeded > 0)
+                        {
+                            if (index >= b.Count())
+                            {
+                                throw new ApplicationException(ResponseMessage.ProductNotEnough);
+                            }
+
+                            var lot = b[index];
+
+                            int amountToTake = 0;
+
+                            if (lot.TotalProductAmount >= productAmountNeeded)
+                            {
+                                amountToTake = productAmountNeeded;
+                                productAmountNeeded = 0;  // Product amount is fulfilled.
+                            }
+                            else
+                            {
+                                amountToTake = lot.TotalProductAmount.Value;
+                                productAmountNeeded -= lot.TotalProductAmount.Value;
+                            }
+
+                            totalPrice += lot.Product.Price * amountToTake;
+                            totalStorageFee += CalculateStorageFee(lot.ImportDate.Value, DateTime.Now);
+                            totalWeight += lot.Product.Weight * product.ProductAmount;
+                            if (lot.Product.Weight * product.ProductAmount > 5)
+                            {
+                                decimal? extraWeight = lot.Product.Weight * product.ProductAmount - 5;
+                                decimal extraWeightUnits = Math.Ceiling((decimal)extraWeight / 0.5m); // Convert to 0.5kg units
+                                deliveryFee += extraWeightUnits * 5000;
+                            }
+
+                            exist.OrderDetails.Add(new OrderDetail
+                            {
+                                LotId = lot.Id,
+                                ProductAmount = amountToTake,
+                                ProductPrice = (int)(lot.Product.Price)
+                            });
+
+                            index++; // Move to the next lot
+                        }
+                        if (productAmountNeeded > 0)
+                        {
+                            throw new ApplicationException(ResponseMessage.ProductNotEnough);
+                        }
+                        index = 0;
+                    }
+                    exist.OrderFees.Add(new OrderFee
+                    {
+                        AdditionalFee = additionalFeeAfterUpdate,
+                        StorageFee = totalStorageFee,
+                        DeliveryFee = deliveryFee,
+                        IsDeleted = false
+                    });
+                    exist.Distance = request.Distance;
+                    exist.TotalPrice = totalPrice;
+                    exist.TotalWeight = totalWeight;
+                    exist.TotalPriceAfterFee = totalPrice - (totalStorageFee + deliveryFee + additionalFeeAfterUpdate);
                 }
-                exist.TotalPrice = totalPrice;
-                exist.OrderDetails = _mapper.Map<List<OrderDetail>>(request);
-            }
 
-
-            foreach (var fee in exist.OrderFees)
-            {
-                //if status = shipping ad additional fee
-                if (exist.Status == Constants.Status.Shipping)
+                //if shipping only allow update for receiver address and phone.
+                if(exist.Status == Constants.Status.Shipping)
                 {
-                    fee.AdditionalFee = 1;
+                    if (request.OrderDetails != null)
+                    {
+                        throw new ApplicationException(ResponseMessage.OrderProccessedError);
+                    }
+
+                    //if status = shipping ad additional fee
+                    if (exist.Status == Constants.Status.Shipping)
+                    {
+                        exist.OrderFees.First(u => u.OrderId.Equals(exist.Id)).AdditionalFee = additionalFeeAfterUpdate;
+                    }
+                    exist.TotalPriceAfterFee -= additionalFeeAfterUpdate;
+
                 }
-                //update delivery fee and storage fee in both situation
-                fee.DeliveryFee = 1;
-                fee.StorageFee = 1;
             }
+            
 
             //update receiver address and phone in both draft and shipping
             exist.ReceiverAddress = request.ReceiverAddress;
@@ -571,6 +662,11 @@ namespace BeeStore_Repository.Services
 
         private decimal CalculateStorageFee(DateTime importDate, DateTime currentDate)
         {
+            if(importDate.Date == currentDate.Date)
+            {
+                return 0;
+            }
+
             const decimal RATE_FIRST_WEEK = 10;    
             const decimal RATE_AFTER_WEEK = 20;    
             const int DAYS_IN_WEEK = 7;
@@ -612,6 +708,13 @@ namespace BeeStore_Repository.Services
                 lot.Inventory.Weight -= amount * lot.Product.Weight;
             }
             await _unitOfWork.SaveAsync();
+        }
+
+        private string GenerateOrderCode()
+        {
+            string timestamp = DateTime.Now.ToString("yyyyMMddHHmmss");
+            string randomSuffix = new Random().Next(1000, 9999).ToString();
+            return $"ORD-{timestamp}-{randomSuffix}";
         }
     }
 }

@@ -78,7 +78,7 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
-        //these are probably unecessary now that we have filter
+        
         [Route("get-warehouse-shippers/{id}")]
         [HttpGet]
         [Authorize(Roles = "Admin,Manager,Staff")]
@@ -124,7 +124,7 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
-        //these are probably unecessary now that we have filter
+        
         [Route("get-warehouse-staffs/{id}")]
         [HttpGet]
         [Authorize(Roles = "Admin,Manager")]
