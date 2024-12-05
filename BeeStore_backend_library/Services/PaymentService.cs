@@ -10,6 +10,7 @@ using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using MySqlX.XDevAPI.Common;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System.Text;
@@ -273,6 +274,13 @@ namespace BeeStore_Repository.Services
             await _unitOfWork.MoneyTransferRepo.AddAsync(moneyTransfer);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
+        }
+
+        public async Task<List<TransactionListDTO>> GetTransactionList(int? partnerId)
+        {
+            var list = await _unitOfWork.TransactionRepo.GetFiltered(u => u.OcopPartnerId.Equals(partnerId));
+            var result = _mapper.Map<List<TransactionListDTO>>(list);
+            return result;
         }
     }
 }

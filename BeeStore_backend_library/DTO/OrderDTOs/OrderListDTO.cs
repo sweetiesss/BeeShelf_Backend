@@ -4,6 +4,7 @@
     {
 
         public int Id { get; set; }
+        public string? OrderCode { get; set; }
         public string? partner_email { get; set; }
 
         public string? Status { get; set; }
