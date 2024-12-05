@@ -12,5 +12,6 @@ namespace BeeStore_Repository.Services.Interfaces
         Task<string> ConfirmMoneyTransferRequest(int staffId, int moneyTransferRequest);
         Task<List<MoneyTransferListDTO>> GetMoneyTransferList(int? warehouseId);
         Task<List<MoneyTransferListDTO>> GetPartnerMoneyTransferList(int? partnerId);
+        Task<List<TransactionListDTO>> GetTransactionList(int? partnerId);
     }
 }

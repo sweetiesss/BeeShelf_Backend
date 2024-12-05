@@ -63,6 +63,15 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
+        [Authorize(Roles = "Admin,Manager,Staff,Partner")]
+        [Route("get-partner-transactions/{partnerId}")]
+        [HttpGet]
+        public async Task<IActionResult> GetPartnerTransaction(int? partnerId)
+        {
+            var result = await _paymentService.GetTransactionList(partnerId);
+            return Ok(result);
+        }
+
         [Authorize(Roles = "Partner")]
         [Route("create-money-transfer-request/{partnerId}")]
         [HttpPost]

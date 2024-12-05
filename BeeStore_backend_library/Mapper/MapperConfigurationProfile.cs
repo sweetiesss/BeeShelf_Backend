@@ -61,7 +61,9 @@ namespace BeeStore_Repository.Mapper
             CreateMap<Wallet, WalletDTO>()
                 .ForMember(dest => dest.partner_email, opt => opt.MapFrom(src => src.OcopPartner.Email))
                 .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
-
+            CreateMap<Transaction, TransactionListDTO>()
+                .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.OcopPartner.Email))
+                .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
 
             CreateMap<OcopPartner, PartnerListDTO>()
                 .ForMember(dest => dest.RoleName, opt => opt.MapFrom(src => src.Role!.RoleName))
