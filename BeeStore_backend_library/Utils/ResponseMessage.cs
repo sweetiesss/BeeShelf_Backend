@@ -90,6 +90,7 @@ namespace BeeStore_Repository.Utils
         public const string ProductNotEnough = "Not enough products.";
         public const string ProductMustBeFromTheSameWarehouse = "All product in an order must be in the same warehouse.";
         public const string ProductAndWarehouseTypeNotMatch = "Product and warehouse type does not match";
+        public const string ProductAlreadyInInventory = "Can't edit products already in Inventory.";
 
         //Package response message
         public const string PackageIdNotFound = "Lot Id not found.";

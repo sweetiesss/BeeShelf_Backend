@@ -191,18 +191,12 @@ namespace BeeStore_Repository.Services
             }
 
             //check if the product is in a Lot in inventory or not
-            if (await _unitOfWork.LotRepo.AnyAsync(u => u.ProductId.Equals(id)
-                                                    && u.InventoryId.HasValue
-                                                    && u.IsDeleted == false) == false)
-            {
+            var lot = await _unitOfWork.LotRepo.AnyAsync(u => u.ProductId.Equals(exist.Id)
+                                                           && u.ImportDate.HasValue
+                                                           && u.IsDeleted.Equals(false));
 
-                //Check for duplicate name
-                //If a product with duplicate name exist that has the same email as the request
-                //Then check if that product has the same id with the request and its deleted status
-                //If deleted status is false and it doesn't have the same id then it's a duplicate name
-                //If deleted status is false and it has the same id then it's fine to update
-                //If deleted status is true then update the name of that duplicate product to null
-                //Then proceed to update
+            if (lot == false)
+            {
 
                 var duplicateName = await _unitOfWork.ProductRepo.SingleOrDefaultAsync(u => u.Name == request.Name && u.OcopPartnerId == request.OcopPartnerId);
 
@@ -221,17 +215,20 @@ namespace BeeStore_Repository.Services
                     }
                 }
 
-                var productCategory = await _unitOfWork.ProductCategoryRepo.SingleOrDefaultAsync(u => u.Id == request.ProductCategoryId);
-
                 exist.Name = request.Name;
                 exist.Origin = request.Origin;
                 exist.Weight = request.Weight;
+                exist.PictureLink = request.PictureLink;
+                exist.IsCold = request.IsCold;
+                exist.Unit = request.Unit;
                 exist.ProductCategoryId = request.ProductCategoryId;
                 exist.Barcode = request.Barcode;
+                exist.Price = request.Price;
             }
-            exist.Price = request.Price;
-            //exist.PictureLink = request.PictureLink;
-
+            else
+            {
+                throw new ApplicationException(ResponseMessage.ProductAlreadyInInventory);
+            }
 
             _unitOfWork.ProductRepo.Update(exist);
             await _unitOfWork.SaveAsync();
