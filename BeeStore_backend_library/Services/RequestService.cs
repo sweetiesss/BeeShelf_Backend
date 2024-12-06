@@ -156,9 +156,6 @@ namespace BeeStore_Repository.Services
                 _ => null
             };
 
-
-
-
             var list = await _unitOfWork.RequestRepo.GetListAsync(
                 filter: u => (filterQuery == null || u.Status.Equals(filterQuery))
                              && (userId == null || u.OcopPartnerId.Equals(userId))
