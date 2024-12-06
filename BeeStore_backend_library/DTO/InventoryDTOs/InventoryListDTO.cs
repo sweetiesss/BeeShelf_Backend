@@ -19,5 +19,6 @@
 
         public int? WarehouseId { get; set; }
         public string WarehouseName { get; set; }
+        public ulong? IsCold { get; set; }
     }
 }
