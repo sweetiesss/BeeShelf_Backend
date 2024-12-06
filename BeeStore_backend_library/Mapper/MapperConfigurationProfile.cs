@@ -95,6 +95,7 @@ namespace BeeStore_Repository.Mapper
 
             CreateMap<Inventory, InventoryListDTO>()
                 .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom(src => src.Warehouse!.Name))
+                .ForMember(dest => dest.IsCold, opt => opt.MapFrom(src => src.Warehouse!.IsCold))
                 .ForMember(dest => dest.totalProduct, opt => opt.MapFrom<CustomTotalProductInventoryResolver>())
             .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<InventoryCreateDTO, Inventory>();
