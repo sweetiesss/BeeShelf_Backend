@@ -86,10 +86,12 @@ namespace BeeStore_Repository.Services
 
                 result.DeliverBy = shipper.Id;
                 var vehicle = shipper.Vehicles.FirstOrDefault(u => u.AssignedDriverId.Equals(shipper.Id) && u.IsDeleted.Equals(false));
+                if (vehicle == null) {
+                    throw new KeyNotFoundException(ResponseMessage.VehicleIdNotFound);
+                }
                 //Check Order -> Create Batch Delivery
                 decimal? currentWeight = 0;
                 var cap = vehicle.Capacity;
-
                 result.Orders = orderList;
                 result.DeliveryStartDate = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
                 List<Order> tempOrder = new List<Order>();

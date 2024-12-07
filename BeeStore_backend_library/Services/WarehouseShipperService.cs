@@ -93,7 +93,7 @@ namespace BeeStore_Repository.Services
 
                 if (user == null)
                 {
-                    throw new KeyNotFoundException(ResponseMessage.ProductIdNotFound + $": {item.EmployeeId}");
+                    throw new KeyNotFoundException(ResponseMessage.UserIdNotFound + $": {item.EmployeeId}");
                 }
 
                 var role = await _unitOfWork.RoleRepo.SingleOrDefaultAsync(u => u.Id == user.RoleId);
