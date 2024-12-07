@@ -547,7 +547,9 @@ namespace BeeStore_Repository.Services
                 {
                     orderStatusUpdate = Constants.Status.Shipping;
                     a = true;
-                    
+                    DateTime now = DateTime.Now;
+                    exist.DeliverStartDate = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
+
                 }
                 else
                 {
@@ -608,14 +610,15 @@ namespace BeeStore_Repository.Services
                     exist.Payments.Add(new Payment
                     {
                         OcopPartnerId = exist.OcopPartnerId,
-                        CollectedBy = exist.Batch.DeliverBy,
+                        CollectedBy = exist.Batch!.DeliverBy,
                         OrderId = exist.Id,
                         TotalAmount = exist.TotalPriceAfterFee
                     //    TotalAmount = (int)(exist.TotalPrice - (orderfee.DeliveryFee + orderfee.StorageFee + orderfee.AdditionalFee))
                     });
                     exist.DeliverFinishDate = DateTime.Now;
                     //add money directly after order is delivered.
-                    exist.OcopPartner.Wallets.FirstOrDefault(u => u.Id.Equals(exist.OcopPartnerId)).TotalAmount += exist.TotalPriceAfterFee;
+
+                    exist.OcopPartner.Wallets.First().TotalAmount += exist.TotalPriceAfterFee;
                 }
                 else
                 {
@@ -642,6 +645,7 @@ namespace BeeStore_Repository.Services
                 {
                     orderStatusUpdate = Constants.Status.Completed;
                     a = true;
+                    exist.CompleteDate = DateTime.Now;
                 }
                 else
                 {

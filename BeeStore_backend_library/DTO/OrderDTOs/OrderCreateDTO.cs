@@ -11,6 +11,7 @@ namespace BeeStore_Repository.DTO.OrderDTOs
 
         public string? ReceiverAddress { get; set; }
         public decimal? Distance { get; set; }
+        public int? DeliveryZoneId { get; set; }
 
 
 
