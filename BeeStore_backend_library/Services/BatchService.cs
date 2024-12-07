@@ -125,6 +125,8 @@ namespace BeeStore_Repository.Services
                     for (int j = 0; j < tempOrder.Count; j++)
                     {
                         tempOrder[j].NumberOfTrips = 1;
+                        tempOrder[j].Status = Constants.Status.Shipping;
+                        tempOrder[j].DeliverStartDate = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
                         _unitOfWork.OrderRepo.Update(tempOrder[j]);
                     }
                 }
