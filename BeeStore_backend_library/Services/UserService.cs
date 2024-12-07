@@ -43,14 +43,21 @@ namespace BeeStore_Repository.Services
 
         public async Task<string> ForgotPassword(string email)
         {
-            var user = await _unitOfWork.OcopPartnerRepo.FirstOrDefaultAsync(u => u.Email == email);
+            string resetToken = string.Empty;
+            var user = await _unitOfWork.OcopPartnerRepo.SingleOrDefaultAsync(u => u.Email == email);
             if (user == null)
             {
-                return ResponseMessage.UserEmailNotFound;
+                var employee = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Email.Equals(email));
+                if (employee == null)
+                {
+                    return ResponseMessage.UserEmailNotFound;
+                }
+                resetToken = GenerateResetToken(employee.Id, employee.Email);
             }
-
-
-            var resetToken = GenerateResetToken(user.Id, user.Email);
+            if(user != null)
+            {
+                resetToken = GenerateResetToken(user.Id, user.Email);
+            }
 
             // Send email with reset link
             ResetPasswordEmailSender(email, resetToken);
@@ -75,11 +82,11 @@ namespace BeeStore_Repository.Services
                 }
 
 
-                var user = await _unitOfWork.OcopPartnerRepo.FirstOrDefaultAsync(u => u.Id.Equals(tokenData.UserId) && u.Email.Equals(tokenData.Email));
+                var user = await _unitOfWork.OcopPartnerRepo.SingleOrDefaultAsync(u => u.Id.Equals(tokenData.UserId) && u.Email.Equals(tokenData.Email));
 
                 if (user == null)
                 {
-                    var employee = await _unitOfWork.EmployeeRepo.FirstOrDefaultAsync(u => u.Id.Equals(tokenData.UserId) && u.Email.Equals(tokenData.Email));
+                    var employee = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id.Equals(tokenData.UserId) && u.Email.Equals(tokenData.Email));
                     if(employee != null)
                     {
                         employee.Password = BCrypt.Net.BCrypt.HashPassword(request.newPassword);
