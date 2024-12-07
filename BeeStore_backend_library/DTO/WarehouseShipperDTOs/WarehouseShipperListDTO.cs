@@ -1,4 +1,6 @@
-﻿namespace BeeStore_Repository.DTO.WarehouseShipperDTOs
+﻿using BeeStore_Repository.DTO.VehicleDTOs;
+
+namespace BeeStore_Repository.DTO.WarehouseShipperDTOs
 {
     public class WarehouseShipperListDTO
     {
@@ -11,6 +13,6 @@
         public string? DeliveryZoneName { get; set; }
         public int? WarehouseId { get; set; }
         public string? WarehouseName { get; set; }
-
+        public List<VehicleListDTO> Vehicles { get; set; }
     }
 }

@@ -135,6 +135,7 @@ namespace BeeStore_Repository.Mapper
                 .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom(src => src.Warehouse!.Name))
                 .ForMember(dest => dest.email, opt => opt.MapFrom(src => src.Employee!.Email))
                 .ForMember(dest => dest.DeliveryZoneName, opt => opt.MapFrom(src => src.DeliveryZone.Name))
+                .ForMember(dest => dest.Vehicles, opt => opt.MapFrom(src => src.Employee.Vehicles))
                 .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<WarehouseShipperCreateDTO, WarehouseShipper>();
 
