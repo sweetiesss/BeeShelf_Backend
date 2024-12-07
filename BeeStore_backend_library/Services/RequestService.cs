@@ -265,6 +265,7 @@ namespace BeeStore_Repository.Services
                 RequestStatus.Delivered => Constants.Status.Delivered,
                 RequestStatus.Completed => Constants.Status.Completed,
                 RequestStatus.Failed => Constants.Status.Failed,
+                RequestStatus.Returned => Constants.Status.Returned,
                 _ => string.Empty
             };
             if (requestStatus.Equals(string.Empty))
@@ -314,21 +315,32 @@ namespace BeeStore_Repository.Services
             }
             if (requestStatus.Equals(Constants.Status.Failed))
             {
-                if(!exist.Status.Equals(Constants.Status.Processing) || 
-                    !exist.Status.Equals(Constants.Status.Delivered))
+                if (exist.Status != Constants.Status.Processing)
                 {
-                    throw new ApplicationException(ResponseMessage.RequestHasNotBeenProcessed);
+                    if(exist.Status != Constants.Status.Delivered)
+                    {
+                        throw new ApplicationException(ResponseMessage.RequestHasNotBeenProcessed);
+                    }
                 }
                 exist.CancelDate = DateTime.Now;
             }
 
             if (requestStatus.Equals(Constants.Status.Delivered))
             {
-                if(!exist.Status.Equals(Constants.Status.Processing))
+                if(exist.Status != Constants.Status.Processing)
                 {
                     throw new ApplicationException(ResponseMessage.RequestHasNotBeenProcessed);
                 }
                 exist.DeliverDate = DateTime.Now;
+            }
+
+            if (requestStatus.Equals(Constants.Status.Returned))
+            {
+                if(exist.Status != Constants.Status.Delivered)
+                {
+                    throw new ApplicationException(ResponseMessage.RequestHasNotBeenProcessed);
+                }
+                exist.CancelDate = DateTime.Now;
             }
 
             exist.Status = requestStatus;

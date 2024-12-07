@@ -8,6 +8,7 @@
         Processing,
         Delivered,
         Failed,
+        Returned,
         Completed
     }
 }
