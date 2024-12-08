@@ -30,6 +30,10 @@ public partial class Request : BaseEntity
 
     //public ulong? IsDeleted { get; set; }
 
+    public int? ExportFromLotId { get; set; }
+
+    public virtual Lot? ExportFromLot { get; set; }
+
     public virtual Lot? Lot { get; set; }
 
     public virtual OcopPartner? OcopPartner { get; set; }

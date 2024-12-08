@@ -81,6 +81,40 @@ namespace BeeStore_Repository.Services
                 throw new KeyNotFoundException(ResponseMessage.InventoryPartnerNotMatch);
             }
 
+            int totalProductAmount = 0;
+            //gotta throw the export here because it will fuck up the other thing.
+            request.RequestType = type.ToString();
+            if (request.ExportFromLotId != 0)
+            {
+                if (request.RequestType == "Import")
+                {
+                    throw new ApplicationException(ResponseMessage.BadRequest);
+                }
+                var originalLot = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(request.ExportFromLotId), inc => inc.Include(o => o.Inventory));
+                if (originalLot != null)
+                {
+                    if (originalLot.Inventory.WarehouseId == inventory.WarehouseId)
+                    {
+                        throw new ApplicationException(ResponseMessage.InventoryFromTheSameWarehouse);
+                    }
+                    request.Lot.ProductId = (int)originalLot.ProductId;
+                    request.Lot.ProductPerLot = originalLot.ProductPerLot;
+                    //recalculate here because i'm a moron and I don't want to switch shit around too much
+                    totalProductAmount = (int)(request.Lot.ProductPerLot * request.Lot.LotAmount);
+
+                    if (originalLot.TotalProductAmount < totalProductAmount)
+                    {
+                        throw new ApplicationException(ResponseMessage.ProductNotEnough);
+                    }
+                    request.Lot.LotNumber = originalLot.LotNumber;
+                    request.Lot.Name = originalLot.Name;
+                }
+                else
+                {
+                    throw new ApplicationException(ResponseMessage.InventoryIdNotFound);
+                }
+            }
+
 
             var product = await _unitOfWork.ProductRepo.SingleOrDefaultAsync(u => u.Id == request.Lot.ProductId);
             if (product == null)
@@ -93,21 +127,26 @@ namespace BeeStore_Repository.Services
                 throw new ApplicationException(ResponseMessage.ProductAndWarehouseTypeNotMatch);
             }
 
+
             var userProduct = await _unitOfWork.ProductRepo.AnyAsync(u => u.Id.Equals(product.Id)
                                                                        && u.OcopPartnerId.Equals(user.Id));
             if (userProduct == false)
             {
                 throw new KeyNotFoundException(ResponseMessage.ProductPartnerNotMatch);
             }
-            int totalProductAmount = (int)(request.Lot.ProductPerLot * request.Lot.LotAmount);
-            decimal? totalWeight = inventory.Weight + product.Weight * totalProductAmount;
+            if(totalProductAmount == 0)
+            {
+                totalProductAmount = (int)(request.Lot.ProductPerLot * request.Lot.LotAmount);
+            }
+            
+            var totalWeight = inventory.Weight + product.Weight * totalProductAmount;
 
 
             if (totalWeight > inventory.MaxWeight)
             {
                 throw new ApplicationException(ResponseMessage.InventoryOverWeightError);
             }
-            request.RequestType = type.ToString();
+            
             if (Send == true)
             {
                 request.Status = Constants.Status.Pending;
@@ -118,7 +157,7 @@ namespace BeeStore_Repository.Services
             }
             var result = _mapper.Map<Request>(request);
             result.Lot.TotalProductAmount = totalProductAmount;
-            //result.Lot.InventoryId = request.SendToInventoryId;
+            
 
             await _unitOfWork.RequestRepo.AddAsync(result);
             await _unitOfWork.SaveAsync();
@@ -296,22 +335,58 @@ namespace BeeStore_Repository.Services
                 var inventory = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.SendToInventoryId));
                 if (inventory == null)
                 {
-                    throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
+                        throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
                 }
-                var totalWeight = inventory.Weight + (lot.Product.Weight * lot.TotalProductAmount);
-                if (totalWeight > inventory.MaxWeight)
+                if(exist.RequestType == "Import")
                 {
-                    exist.Status = Constants.Status.Failed;
-                    exist.CancellationReason = ResponseMessage.InventoryOverWeightError;
-                    await _unitOfWork.SaveAsync();
-                    throw new ApplicationException(ResponseMessage.InventoryOverWeightError);
-                }
-                lot.ImportDate = DateTime.Now;
-                lot.InventoryId = exist.SendToInventoryId;
-                lot.ExpirationDate = DateTime.Now.AddDays(lot.Product.ProductCategory!.ExpireIn!.Value);
+                    var totalWeight = inventory.Weight + (lot.Product.Weight * lot.TotalProductAmount);
+                    if (totalWeight > inventory.MaxWeight)
+                    {
+                        exist.Status = Constants.Status.Failed;
+                        exist.CancellationReason = ResponseMessage.InventoryOverWeightError;
+                        await _unitOfWork.SaveAsync();
+                        throw new ApplicationException(ResponseMessage.InventoryOverWeightError);
+                    }
+                    lot.ImportDate = DateTime.Now;
+                    lot.InventoryId = exist.SendToInventoryId;
+                    lot.ExpirationDate = DateTime.Now.AddDays(lot.Product.ProductCategory!.ExpireIn!.Value);
                 
-                inventory.Weight = totalWeight;
+                    inventory.Weight = totalWeight;
 
+                }
+                else
+                {
+                    var lotWeight = lot.Product.Weight * lot.TotalProductAmount;
+                    var totalWeight = inventory.Weight + lotWeight;
+                    if (totalWeight > inventory.MaxWeight)
+                    {
+                        exist.Status = Constants.Status.Failed;
+                        exist.CancellationReason = ResponseMessage.InventoryOverWeightError;
+                        await _unitOfWork.SaveAsync();
+                        throw new ApplicationException(ResponseMessage.InventoryOverWeightError);
+                    }
+                    var originalLot = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.ExportFromLotId));
+                    if (originalLot != null)
+                    {
+                        var totalProductAmount = exist.Lot.ProductPerLot * exist.Lot.LotAmount;
+                        if(totalProductAmount > originalLot.TotalProductAmount)
+                        {
+                            exist.Status = Constants.Status.Failed;
+                            exist.CancellationReason = ResponseMessage.ProductNotEnough;
+                            await _unitOfWork.SaveAsync();
+                            throw new ApplicationException(ResponseMessage.ProductNotEnough);
+                        }
+                        originalLot.TotalProductAmount -= totalProductAmount;
+                        originalLot.LotAmount -= exist.Lot.LotAmount;
+                        originalLot.ExportDate = DateTime.Now;
+                        lot.ImportDate = DateTime.Now;
+                        lot.InventoryId = exist.SendToInventoryId;
+                        lot.ExpirationDate = DateTime.Now.AddDays(lot.Product.ProductCategory!.ExpireIn!.Value);
+
+                        inventory.Weight = totalWeight;
+                        originalLot.Inventory.Weight -= lotWeight;
+                    }
+                }
             }
             if (requestStatus.Equals(Constants.Status.Failed))
             {

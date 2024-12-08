@@ -1,6 +1,7 @@
 ﻿using Amazon.S3;
 using Amazon.S3.Transfer;
 using Azure.Security.KeyVault.Secrets;
+using BeeStore_Repository.BackgroundServices;
 using BeeStore_Repository.Data;
 using BeeStore_Repository.Logger;
 using BeeStore_Repository.Logger.GlobalExceptionHandler;
@@ -47,6 +48,9 @@ namespace BeeStore_Repository
             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<ITransferUtility, TransferUtility>();
             services.AddScoped<GlobalExceptionMiddleware>();
+
+            //Background services
+            services.AddHostedService<InventoryExpirationService>();
 
             //Memory Cache
             services.AddMemoryCache();
