@@ -107,14 +107,14 @@ namespace BeeStore_Repository.Services
                 case LotFilter.ProductId:
                     filterExpression = u => u.ProductId.Equals(Int32.Parse(filterQuery!))
                                                                && u.Inventory.OcopPartnerId.Equals(partnerId)
-                                                               && u.Requests.Any(u => u.Status.Equals(Constants.Status.Completed)); break;
+                                                               && u.RequestLots.Any(u => u.Status.Equals(Constants.Status.Completed)); break;
                 case LotFilter.InventoryId:
                     filterExpression = u => u.InventoryId.Equals(Int32.Parse(filterQuery!))
                                                                && u.Inventory.OcopPartnerId.Equals(partnerId)
-                                                               && u.Requests.Any(u => u.Status.Equals(Constants.Status.Completed)); break;
+                                                               && u.RequestLots.Any(u => u.Status.Equals(Constants.Status.Completed)); break;
                 default:
                     filterExpression = u => u.Inventory.OcopPartnerId.Equals(partnerId)
-                                              && u.Requests.Any(u => u.Status.Equals(Constants.Status.Completed)); break;
+                                              && u.RequestLots.Any(u => u.Status.Equals(Constants.Status.Completed)); break;
             }
 
 

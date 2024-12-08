@@ -776,6 +776,8 @@ public partial class BeeStoreDbContext : DbContext
 
             entity.ToTable("Request");
 
+            entity.HasIndex(e => e.ExportFromLotId, "Request_ibfk_4");
+
             entity.HasIndex(e => e.LotId, "lot_id");
 
             entity.HasIndex(e => e.OcopPartnerId, "ocop_partner_id");
@@ -805,6 +807,7 @@ public partial class BeeStoreDbContext : DbContext
                 .HasColumnName("description")
                 .UseCollation("utf8mb3_general_ci")
                 .HasCharSet("utf8mb3");
+            entity.Property(e => e.ExportFromLotId).HasColumnName("export_from_lot_id");
             entity.Property(e => e.IsDeleted)
                 .HasDefaultValueSql("b'0'")
                 .HasColumnType("bit(1)")
@@ -824,7 +827,11 @@ public partial class BeeStoreDbContext : DbContext
                 .HasMaxLength(10)
                 .HasColumnName("status");
 
-            entity.HasOne(d => d.Lot).WithMany(p => p.Requests)
+            entity.HasOne(d => d.ExportFromLot).WithMany(p => p.RequestExportFromLots)
+                .HasForeignKey(d => d.ExportFromLotId)
+                .HasConstraintName("Request_ibfk_4");
+
+            entity.HasOne(d => d.Lot).WithMany(p => p.RequestLots)
                 .HasForeignKey(d => d.LotId)
                 .HasConstraintName("Request_ibfk_1");
 
@@ -1071,6 +1078,7 @@ public partial class BeeStoreDbContext : DbContext
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }
+
 
 
 

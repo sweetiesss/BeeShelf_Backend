@@ -34,5 +34,7 @@ public partial class Lot : BaseEntity
 
     public virtual Product? Product { get; set; }
 
-    public virtual ICollection<Request> Requests { get; set; } = new List<Request>();
+    public virtual ICollection<Request> RequestExportFromLots { get; set; } = new List<Request>();
+
+    public virtual ICollection<Request> RequestLots { get; set; } = new List<Request>();
 }
