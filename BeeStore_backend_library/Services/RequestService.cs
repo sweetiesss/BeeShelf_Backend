@@ -114,6 +114,10 @@ namespace BeeStore_Repository.Services
                     throw new ApplicationException(ResponseMessage.PackageIdNotFound);
                 }
             }
+            else
+            {
+                request.ExportFromLotId = null;
+            }
 
 
             var product = await _unitOfWork.ProductRepo.SingleOrDefaultAsync(u => u.Id == request.Lot.ProductId);
