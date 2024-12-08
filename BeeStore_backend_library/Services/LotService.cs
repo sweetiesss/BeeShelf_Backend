@@ -8,6 +8,7 @@ using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace BeeStore_Repository.Services
@@ -76,7 +77,8 @@ namespace BeeStore_Repository.Services
 
             var list = await _unitOfWork.LotRepo.GetListAsync(
                 filter: filterExpression!,
-                includes: null,
+                includes: u => u.Include(o => o.Product)
+                                .Include(o => o.Inventory).ThenInclude(o => o.Warehouse),
                 sortBy: sortCriteria!,
                 descending: descending,
                 searchTerm: search,
@@ -129,7 +131,8 @@ namespace BeeStore_Repository.Services
 
             var list = await _unitOfWork.LotRepo.GetListAsync(
                 filter: filterExpression!,
-                includes: null,
+                includes: u => u.Include(o => o.Product)
+                                .Include(o => o.Inventory).ThenInclude(o => o.Warehouse),
                 sortBy: sortCriteria!,
                 descending: descending,
                 searchTerm: search,
