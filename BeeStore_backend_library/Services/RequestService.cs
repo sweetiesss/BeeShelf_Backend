@@ -111,7 +111,7 @@ namespace BeeStore_Repository.Services
                 }
                 else
                 {
-                    throw new ApplicationException(ResponseMessage.InventoryIdNotFound);
+                    throw new ApplicationException(ResponseMessage.PackageIdNotFound);
                 }
             }
 
