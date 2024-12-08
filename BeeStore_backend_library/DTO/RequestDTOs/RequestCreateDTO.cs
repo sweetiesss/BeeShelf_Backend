@@ -14,6 +14,7 @@ namespace BeeStore_Repository.DTO.RequestDTOs
         [JsonIgnore]
         public string? RequestType { get; set; }
 
+        public int? ExportFromLotId { get; set; }
         public int? SendToInventoryId { get; set; }
 
         public LotCreateDTO? Lot { get; set; }
@@ -23,15 +24,6 @@ namespace BeeStore_Repository.DTO.RequestDTOs
 
         [JsonIgnore]
         public string? Status { get; set; }
-
-        [JsonIgnore]
-        public DateTime? ApporveDate { get; set; }
-
-        [JsonIgnore]
-        public DateTime? DeliverDate { get; set; }
-
-        [JsonIgnore]
-        public string? CancellationReason { get; set; }
 
     }
 }
