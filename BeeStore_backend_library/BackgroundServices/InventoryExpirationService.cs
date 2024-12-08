@@ -11,7 +11,7 @@ namespace BeeStore_Repository.BackgroundServices
             IUnitOfWork unitOfWork)
             : base(serviceProvider, logger)
         {
-            SetInterval(TimeSpan.FromSeconds(10));
+            SetInterval(TimeSpan.FromHours(24));
             _unitOfWork = unitOfWork;
         }
 
