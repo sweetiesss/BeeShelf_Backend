@@ -220,7 +220,7 @@ namespace BeeStore_Repository.Services
                 ProductName = l.Product.Name,
                 WarehouseId = l.Inventory.Warehouse.Id,
                 WarehouseName = l.Inventory.Warehouse.Name,
-                WarehouseLocation = l.Inventory.Warehouse.Location + ", " l.Inventory.Warehouse.Province.SubDivisionName
+                WarehouseLocation = l.Inventory.Warehouse.Location + ", " + l.Inventory.Warehouse.Province.SubDivisionName
             })
             .Select(group => new ProductDTO
             {
