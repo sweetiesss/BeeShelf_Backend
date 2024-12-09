@@ -14,5 +14,6 @@
         public int stock { get; set; }
         public int warehouseId { get; set; }
         public string warehouseName { get; set; }
+        public string warehouseLocation {  get; set; }
     }
 }
