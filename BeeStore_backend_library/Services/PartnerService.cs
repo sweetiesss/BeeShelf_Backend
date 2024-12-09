@@ -219,7 +219,8 @@ namespace BeeStore_Repository.Services
                 ProductId = l.ProductId,
                 ProductName = l.Product.Name,
                 WarehouseId = l.Inventory.Warehouse.Id,
-                WarehouseName = l.Inventory.Warehouse.Name
+                WarehouseName = l.Inventory.Warehouse.Name,
+                WarehouseLocation = l.Inventory.Warehouse.Location + ", " + l.Inventory.Warehouse.Province.SubDivisionName
             })
             .Select(group => new ProductDTO
             {
@@ -227,7 +228,8 @@ namespace BeeStore_Repository.Services
                 ProductName = group.Key.ProductName,
                 stock = group.Sum(l => (int)l.TotalProductAmount),
                 warehouseId = (int)group.Key.WarehouseId,
-                warehouseName = group.Key.WarehouseName
+                warehouseName = group.Key.WarehouseName,
+                warehouseLocation = group.Key.WarehouseLocation
             })
             .OrderByDescending(p => p.stock)
             .ToList();

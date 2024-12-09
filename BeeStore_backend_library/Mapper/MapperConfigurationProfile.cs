@@ -120,6 +120,8 @@ namespace BeeStore_Repository.Mapper
 
             CreateMap<Lot, LotListDTO>()
                 .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Product.Name))
+                .ForMember(dest => dest.ProductPictureLink, opt => opt.MapFrom(src => src.Product.PictureLink))
+                .ForMember(dest => dest.isCold, opt => opt.MapFrom(src => src.Product.IsCold))
                 .ForMember(dest => dest.WarehouseId, opt => opt.MapFrom(src => src.Inventory.WarehouseId))
                 .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom(src => src.Inventory.Warehouse.Name))
                 .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
