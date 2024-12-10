@@ -302,6 +302,7 @@ namespace BeeStore_Repository
                 if (productRepo == null)
                 {
                     productRepo = new GenericRepository<Product>(_context);
+                    _context.ChangeTracker.LazyLoadingEnabled = false;
                 }
                 return productRepo;
             }
