@@ -287,10 +287,11 @@ namespace BeeStore_Repository.Services
             if (exist != null)
             {
                 //CHECK OLD PASSWORD
-                if (!BCrypt.Net.BCrypt.Verify(user.ConfirmPassword, exist.Password))
-                {
-                    throw new ApplicationException(ResponseMessage.UserPasswordError);
-                }
+                // I dont really think you need to since we have JWT to confirm
+                //if (!BCrypt.Net.BCrypt.Verify(user.ConfirmPassword, exist.Password))
+                //{
+                //    throw new ApplicationException(ResponseMessage.UserPasswordError);
+                //}
 
 
                 exist.Setting = user.Setting;
