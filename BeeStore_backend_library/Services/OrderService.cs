@@ -630,11 +630,36 @@ namespace BeeStore_Repository.Services
                 }
             }
 
-            if(orderStatusString.Equals(Constants.Status.Refunded, StringComparison.OrdinalIgnoreCase))
+            if(orderStatusString.Equals(Constants.Status.Refunded, StringComparison.OrdinalIgnoreCase)) // To redunded
             {
                 if(exist.Status == Constants.Status.Returned)
                 {
-                    orderStatusUpdate = Constants.Status.Refunded; 
+                    orderStatusUpdate = Constants.Status.Refunded;
+
+                    //find batch of Order
+                    var batch = await _unitOfWork.BatchRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.BatchId));
+                    if (batch == null)
+                    {
+                        throw new KeyNotFoundException(ResponseMessage.BatchIdNotFound);
+                    }
+
+                    // find shipper of that batch
+                    var shipper = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id.Equals(batch.Id));
+                    if (shipper == null)
+                    {
+                        throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
+                    }
+
+                    // from shipper search for assigned vehicle
+                    var vehicle = await _unitOfWork.VehicleRepo.SingleOrDefaultAsync(u => u.AssignedDriverId.Equals(shipper.Id));
+                    if (vehicle == null)
+                    {
+                        throw new KeyNotFoundException(ResponseMessage.VehicleIdNotFound);
+                    }
+
+                    // change the found vehicle's status to Available
+                    vehicle.Status = Constants.VehicleStatus.Available;
+
                     a = true;
                 }
                 else
@@ -643,11 +668,35 @@ namespace BeeStore_Repository.Services
                 }
             }
 
-            if(orderStatusString.Equals(Constants.Status.Completed, StringComparison.OrdinalIgnoreCase))
+            if(orderStatusString.Equals(Constants.Status.Completed, StringComparison.OrdinalIgnoreCase)) // To Complete
             {
                 if(exist.Status == Constants.Status.Delivered)
                 {
                     orderStatusUpdate = Constants.Status.Completed;
+                    //find batch of Order
+                    var batch = await _unitOfWork.BatchRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.BatchId));
+                    if (batch == null)
+                    {
+                        throw new KeyNotFoundException(ResponseMessage.BatchIdNotFound);
+                    }
+
+                    // find shipper of that batch
+                    var shipper = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id.Equals(batch.Id));
+                    if (shipper == null)
+                    {
+                        throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
+                    }
+
+                    // from shipper search for assigned vehicle
+                    var vehicle = await _unitOfWork.VehicleRepo.SingleOrDefaultAsync(u => u.AssignedDriverId.Equals(shipper.Id));
+                    if (vehicle == null)
+                    {
+                        throw new KeyNotFoundException(ResponseMessage.VehicleIdNotFound);
+                    }
+
+                    // change the found vehicle's status to Available
+                    vehicle.Status = Constants.VehicleStatus.Available;
+
                     a = true;
                     exist.CompleteDate = DateTime.Now;
                 }
