@@ -9,6 +9,7 @@ using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 using System.Text;
 
@@ -148,7 +149,7 @@ namespace BeeStore_Repository.Services
 
             var list = await _unitOfWork.ProductRepo.GetListAsync(
                 filter: filterExpression,
-                includes: null,
+                includes: u => u.Include(o => o.Lots).ThenInclude(o => o.Inventory).Include(o => o.ProductCategory),
                 sortBy: sortBy!,
                 descending: descending,
                 searchTerm: search,

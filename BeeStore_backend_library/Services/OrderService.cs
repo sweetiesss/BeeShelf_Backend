@@ -86,7 +86,11 @@ namespace BeeStore_Repository.Services
 
             var list = await _unitOfWork.OrderRepo.GetListAsync(
                 filter: combinedFilter,
-                includes: u => u.Include(o => o.Batch),
+                includes: u => u.Include(o => o.Batch)
+                                .Include(o => o.OrderDetails).ThenInclude(o => o.Lot).ThenInclude(o => o.Inventory).ThenInclude(o => o.Warehouse)
+                                .Include(o => o.OrderFees)
+                                .Include(o => o.OcopPartner)
+                                .Include(o => o.DeliveryZone),
                 sortBy: sortBy!,
                 descending: descending,
                 searchTerm: null,
