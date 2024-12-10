@@ -207,7 +207,9 @@ namespace BeeStore_Repository.Services
         (import == true && u.RequestType.Equals("Import")) ||
         (import == false && u.RequestType.Equals("Export")))
                              && u.IsDeleted.Equals(false),
-                includes: null,
+                includes: u => u.Include(o => o.SendToInventory).ThenInclude(o => o.Warehouse)
+                                .Include(o => o.OcopPartner)
+                                .Include(o =>o.Lot).ThenInclude(o => o.Product),
                 sortBy: Constants.SortCriteria.CreateDate,
                 descending: descending,
                 searchTerm: null,
