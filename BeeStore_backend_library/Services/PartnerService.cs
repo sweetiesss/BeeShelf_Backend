@@ -70,10 +70,11 @@ namespace BeeStore_Repository.Services
             var exist = await _unitOfWork.OcopPartnerRepo.SingleOrDefaultAsync(u => u.Email == user.Email);
             if (exist != null)
             {
-                if (!BCrypt.Net.BCrypt.Verify(user.ConfirmPassword, exist.Password))
-                {
-                    throw new ApplicationException(ResponseMessage.UserPasswordError);
-                }
+                // Same thing here
+                //if (!BCrypt.Net.BCrypt.Verify(user.ConfirmPassword, exist.Password))
+                //{
+                //    throw new ApplicationException(ResponseMessage.UserPasswordError);
+                //}
                 if ((DateTime.Now - exist.UpdateDate.Value).TotalDays < 30)
                 {
                     throw new ApplicationException(ResponseMessage.UpdatePartnerError);
