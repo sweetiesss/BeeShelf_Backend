@@ -89,10 +89,18 @@ namespace BeeStore_Api.Controllers
         [Route("assign-driver/{id}/{driverId}")]
         [HttpPost]
         [Authorize(Roles = "Admin,Manager,Staff")]
-
         public async Task<IActionResult> AssignDriver(int id, int driverId)
         {
             var result = await _vehicleService.AssignVehicle(id, driverId);
+            return Ok(result);
+        }
+
+        [Route("unassign-vehicle/{id}")]
+        [HttpPost]
+        [Authorize(Roles = "Admin,Manager,Staff")]
+        public async Task<IActionResult> Unassign(int id)
+        {
+            var result = await _vehicleService.UnassignVehicle(id);
             return Ok(result);
         }
     }

@@ -17,5 +17,6 @@ namespace BeeStore_Repository.Services.Interfaces
         Task<string> DeleteVehicle(int id);
         Task<string> UpdateVehicleStatus(int id, VehicleStatus? status);
         Task<string> AssignVehicle(int id, int driver_id);
+        Task<string> UnassignVehicle(int id);
     }
 }

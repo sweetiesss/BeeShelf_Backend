@@ -89,6 +89,9 @@ namespace BeeStore_Repository.Services
                 if (vehicle == null) {
                     throw new KeyNotFoundException(ResponseMessage.VehicleIdNotFound);
                 }
+                if (vehicle.Status.Equals(Constants.VehicleStatus.InService)) {
+                    throw new KeyNotFoundException(ResponseMessage.VehicleCurrentlyInService);
+                }
                 //Check Order -> Create Batch Delivery
                 decimal? currentWeight = 0;
                 var cap = vehicle.Capacity;

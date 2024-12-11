@@ -499,6 +499,31 @@ namespace BeeStore_Repository.Services
                 exist.Status == Constants.Status.Shipping)
             {
                 exist.Status = Constants.Status.Canceled;
+
+                //find batch of Order
+                var batch = await _unitOfWork.BatchRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.BatchId));
+                if (batch == null)
+                {
+                    throw new KeyNotFoundException(ResponseMessage.BatchIdNotFound);
+                }
+
+                // find shipper of that batch
+                var shipper = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id.Equals(batch.DeliverBy));
+                if (shipper == null)
+                {
+                    throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
+                }
+
+                // from shipper search for assigned vehicle
+                var vehicle = await _unitOfWork.VehicleRepo.SingleOrDefaultAsync(u => u.AssignedDriverId.Equals(shipper.Id));
+                if (vehicle == null)
+                {
+                    throw new KeyNotFoundException(ResponseMessage.VehicleIdNotFound);
+                }
+
+                // change the found vehicle's status to Available
+                vehicle.Status = Constants.VehicleStatus.Available;
+
                 exist.CancelDate = DateTime.Now;
                 await _unitOfWork.SaveAsync();
             }
@@ -556,6 +581,31 @@ namespace BeeStore_Repository.Services
                 if (exist.Status == Constants.Status.Processing)
                 {
                     orderStatusUpdate = Constants.Status.Shipping;
+
+                    //find batch of Order
+                    var batch = await _unitOfWork.BatchRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.BatchId));
+                    if (batch == null)
+                    {
+                        throw new KeyNotFoundException(ResponseMessage.BatchIdNotFound);
+                    }
+
+                    // find shipper of that batch
+                    var shipper = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id.Equals(batch.DeliverBy));
+                    if (shipper == null)
+                    {
+                        throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
+                    }
+
+                    // from shipper search for assigned vehicle
+                    var vehicle = await _unitOfWork.VehicleRepo.SingleOrDefaultAsync(u => u.AssignedDriverId.Equals(shipper.Id));
+                    if (vehicle == null)
+                    {
+                        throw new KeyNotFoundException(ResponseMessage.VehicleIdNotFound);
+                    }
+
+                    // change the found vehicle's status to Available
+                    vehicle.Status = Constants.VehicleStatus.InService;
+
                     a = true;
                     DateTime now = DateTime.Now;
                     exist.DeliverStartDate = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
@@ -602,6 +652,32 @@ namespace BeeStore_Repository.Services
                     {
                         await UpdateLotProductAmount(od.LotId, od.ProductAmount, true);
                     }
+
+                    //find batch of Order
+                    var batch = await _unitOfWork.BatchRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.BatchId));
+                    if (batch == null)
+                    {
+                        throw new KeyNotFoundException(ResponseMessage.BatchIdNotFound);
+                    }
+
+                    // find shipper of that batch
+                    var shipper = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id.Equals(batch.DeliverBy));
+                    if (shipper == null)
+                    {
+                        throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
+                    }
+
+                    // from shipper search for assigned vehicle
+                    var vehicle = await _unitOfWork.VehicleRepo.SingleOrDefaultAsync(u => u.AssignedDriverId.Equals(shipper.Id));
+                    if (vehicle == null)
+                    {
+                        throw new KeyNotFoundException(ResponseMessage.VehicleIdNotFound);
+                    }
+
+                    // change the found vehicle's status to Available
+                    vehicle.Status = Constants.VehicleStatus.Available;
+
+
                 }
                 else
                 {
@@ -650,7 +726,7 @@ namespace BeeStore_Repository.Services
                     }
 
                     // find shipper of that batch
-                    var shipper = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id.Equals(batch.Id));
+                    var shipper = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id.Equals(batch.DeliverBy));
                     if (shipper == null)
                     {
                         throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
@@ -687,7 +763,7 @@ namespace BeeStore_Repository.Services
                     }
 
                     // find shipper of that batch
-                    var shipper = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id.Equals(batch.Id));
+                    var shipper = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id.Equals(batch.DeliverBy));
                     if (shipper == null)
                     {
                         throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
