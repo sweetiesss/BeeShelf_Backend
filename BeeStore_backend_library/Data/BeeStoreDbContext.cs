@@ -470,8 +470,6 @@ public partial class BeeStoreDbContext : DbContext
 
             entity.HasIndex(e => e.OcopPartnerId, "ocop_partner_id");
 
-            entity.HasIndex(e => e.PickStaffId, "pick_staff_id");
-
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.ApproveDate)
                 .HasColumnType("datetime")
@@ -510,10 +508,6 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.OrderCode)
                 .HasMaxLength(50)
                 .HasColumnName("order_code");
-            entity.Property(e => e.PickDate)
-                .HasColumnType("datetime")
-                .HasColumnName("pick_date");
-            entity.Property(e => e.PickStaffId).HasColumnName("pick_staff_id");
             entity.Property(e => e.PictureLink)
                 .HasColumnType("text")
                 .HasColumnName("picture_link");
@@ -551,9 +545,6 @@ public partial class BeeStoreDbContext : DbContext
                 .HasForeignKey(d => d.OcopPartnerId)
                 .HasConstraintName("Order_ibfk_2");
 
-            entity.HasOne(d => d.PickStaff).WithMany(p => p.Orders)
-                .HasForeignKey(d => d.PickStaffId)
-                .HasConstraintName("Order_ibfk_4");
         });
 
         modelBuilder.Entity<OrderDetail>(entity =>
@@ -561,7 +552,7 @@ public partial class BeeStoreDbContext : DbContext
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
             entity.ToTable("Order_Detail");
-
+                
             entity.HasIndex(e => e.LotId, "lot_id");
 
             entity.HasIndex(e => e.OrderId, "order_id");
