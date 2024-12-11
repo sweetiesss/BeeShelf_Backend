@@ -13,7 +13,7 @@ public partial class MoneyTransfer : BaseEntity
     public ulong? IsTransferred { get; set; }
 
     public decimal? Amount { get; set; }
-
+    public string? PictureLink { get; set; }
     public DateTime? CreateDate { get; set; }
 
     //public ulong? IsDeleted { get; set; }
