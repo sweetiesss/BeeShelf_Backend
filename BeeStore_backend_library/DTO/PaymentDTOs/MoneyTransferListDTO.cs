@@ -17,7 +17,7 @@ namespace BeeStore_Repository.DTO.PaymentDTOs
         public string? TransferByStaffEmail {  get; set; }
         public string? TransferByStaffName { get; set; }
         public ulong? IsTransferred { get; set; }
-
+        public string? PictureLink { get; set; }
         public string? CancellationReason { get; set; }
 
         public decimal? Amount { get; set; }
