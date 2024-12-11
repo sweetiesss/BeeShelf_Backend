@@ -48,7 +48,23 @@ namespace BeeStore_Repository.Services
                 throw new KeyNotFoundException(ResponseMessage.VehicleIdNotFound);
             }
             vehicle.AssignedDriverId = driver_id;
-            vehicle.Status = Constants.VehicleStatus.InService;
+            //vehicle.Status = Constants.VehicleStatus.InService;
+            await _unitOfWork.SaveAsync();
+            return ResponseMessage.Success;
+        }
+
+        public async Task<string> UnassignVehicle(int id)
+        {
+            
+            var vehicle = await _unitOfWork.VehicleRepo.SingleOrDefaultAsync(u => u.Id.Equals(id));
+            if (vehicle == null)
+            {
+                throw new KeyNotFoundException(ResponseMessage.VehicleIdNotFound);
+            }
+            if (vehicle.Status.Equals(Constants.VehicleStatus.InService)) {
+                throw new ApplicationException(ResponseMessage.VehicleCurrentlyInService);
+            }
+            vehicle.AssignedDriver = null;
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
         }
@@ -92,6 +108,7 @@ namespace BeeStore_Repository.Services
                 throw new BadHttpRequestException(ResponseMessage.BadRequest);
             }
             request.Type = VeType;
+            request.Status = Constants.VehicleStatus.Available;
             var result = _mapper.Map<Vehicle>(request);
             await _unitOfWork.VehicleRepo.AddAsync(result);
             await _unitOfWork.SaveAsync();
@@ -106,6 +123,9 @@ namespace BeeStore_Repository.Services
             if (vehicle == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.VehicleIdNotFound);
+            }
+            if (vehicle.Status.Equals(Constants.VehicleStatus.InService)){
+                throw new ApplicationException(ResponseMessage.VehicleCurrentlyInService);
             }
             _unitOfWork.VehicleRepo.SoftDelete(vehicle);
             await _unitOfWork.SaveAsync();
@@ -184,7 +204,10 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.VehicleIdNotFound);
             }
-
+            if (vehicle.Status.Equals(Constants.VehicleStatus.InService))
+            {
+                throw new ApplicationException(ResponseMessage.VehicleCurrentlyInService);
+            }
             var LPexist = await _unitOfWork.VehicleRepo.AnyAsync(u => u.LicensePlate == request.LicensePlate);
             if (LPexist != false)
             {
@@ -238,6 +261,17 @@ namespace BeeStore_Repository.Services
             if (veStat == null)
             {
                 throw new BadHttpRequestException(ResponseMessage.BadRequest);
+            }
+            if (veStat.Equals(Constants.VehicleStatus.Repair))
+            {
+                if (vehicle.AssignedDriver != null) 
+                {
+                    throw new BadHttpRequestException(ResponseMessage.VehicleAssigned);
+                }
+                if (vehicle.Status.Equals(Constants.VehicleStatus.InService))
+                {
+                    throw new ApplicationException(ResponseMessage.VehicleCurrentlyInService);
+                }
             }
             vehicle.Status = veStat;
             await _unitOfWork.SaveAsync();

@@ -28,6 +28,8 @@ namespace BeeStore_Repository.Utils
         public const string VehicleIdNotFound = "Vehicle not found.";
         public const string VehicleLicensePlateDuplicate = "License Plate already exist.";
         public const string VehicleTypeNotMatchWarehouse = "Vehicle type(cold/warm) not match";
+        public const string VehicleCurrentlyInService = "Vehicle is currently in Service";
+        public const string VehicleAssigned = "There is still shipper assigned to this vehicle";
 
         //Transaction response message
         public const string TransactionNotFound = "Transaction not found.";
