@@ -16,10 +16,10 @@ namespace BeeStore_Repository.Utils.Validator.Partner
                 .WithMessage(ValidationMessage.EmailMaxLength)
                 .When(x => !string.IsNullOrEmpty(x.Email));
 
-            RuleFor(x => x.ConfirmPassword)
-                .NotEmpty()
-                .WithMessage(ValidationMessage.ConfirmPasswordRequired)
-                .When(x => !string.IsNullOrEmpty(x.ConfirmPassword));
+            //RuleFor(x => x.ConfirmPassword)
+            //    .NotEmpty()
+            //    .WithMessage(ValidationMessage.ConfirmPasswordRequired)
+            //    .When(x => !string.IsNullOrEmpty(x.ConfirmPassword));
 
             RuleFor(x => x.FirstName)
                 .NotEmpty()

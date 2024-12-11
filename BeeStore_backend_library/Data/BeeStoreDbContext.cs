@@ -321,6 +321,9 @@ public partial class BeeStoreDbContext : DbContext
                 .HasColumnName("cancellation_reason")
                 .UseCollation("utf8mb3_general_ci")
                 .HasCharSet("utf8mb3");
+            entity.Property(e => e.PictureLink)
+                .HasColumnType("text")
+                .HasColumnName("picture_link");
             entity.Property(e => e.CreateDate)
                 .HasColumnType("datetime")
                 .HasColumnName("create_date");
