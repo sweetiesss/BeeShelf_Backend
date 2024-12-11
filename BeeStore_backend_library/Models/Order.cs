@@ -40,10 +40,6 @@ public partial class Order : BaseEntity
 
     public decimal? TotalWeight { get; set; }
 
-    public DateTime? PickDate { get; set; }
-
-    public int? PickStaffId { get; set; }
-
     public string? PictureLink { get; set; }
 
     //public ulong? IsDeleted { get; set; }
@@ -63,6 +59,4 @@ public partial class Order : BaseEntity
     public virtual ICollection<OrderFee> OrderFees { get; set; } = new List<OrderFee>();
 
     public virtual ICollection<Payment> Payments { get; set; } = new List<Payment>();
-
-    public virtual Employee? PickStaff { get; set; }
 }

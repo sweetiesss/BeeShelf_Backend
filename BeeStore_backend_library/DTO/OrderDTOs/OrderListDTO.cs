@@ -34,17 +34,10 @@
         public string? WarehouseLocation { get; set; }
         public int? DeliveryZoneId { get; set; }
         public string? DeliveryZoneName { get; set; }
-
         public decimal? TotalPrice { get; set; }
         public decimal? TotalPriceAfterFee { get; set; }
-
         public int? BatchId { get; set; }
         public int? NumberOfTrips { get; set; }
-
-
-        public DateTime? PickDate { get; set; }
-
-        public int? PickStaffId { get; set; }
 
         public string? PictureLink { get; set; }
         public List<OrderDetailDTO> OrderDetails { get; set; }
