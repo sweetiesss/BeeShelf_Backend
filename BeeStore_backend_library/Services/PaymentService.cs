@@ -202,8 +202,12 @@ namespace BeeStore_Repository.Services
             return result;
         }
 
-        public async Task<string> ConfirmMoneyTransferRequest(int staffId, int moneyTransferId)
+        public async Task<string> ConfirmMoneyTransferRequest(int staffId, int moneyTransferId, string picture_link)
         {
+            if (picture_link.Equals(string.Empty))
+            {
+                throw new ApplicationException(ResponseMessage.BadRequest);
+            }
             var moneyTransfer = await _unitOfWork.MoneyTransferRepo.SingleOrDefaultAsync(u => u.Id.Equals(moneyTransferId));
             if (moneyTransfer == null)
             {
@@ -228,7 +232,7 @@ namespace BeeStore_Repository.Services
             {
                 throw new ApplicationException(ResponseMessage.NotEnoughCredit);
             }
-
+            moneyTransfer.PictureLink = picture_link;
             moneyTransfer.IsTransferred = 1;
             moneyTransfer.TransferBy = staffId;
             partnerWallet.TotalAmount -= moneyTransfer.Amount;
