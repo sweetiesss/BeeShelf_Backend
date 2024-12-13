@@ -66,7 +66,7 @@ namespace BeeStore_Api.Controllers
         [Authorize(Roles = "Admin,Manager,Staff,Shipper")]
         [Route("get-shipper-batches/{shipperId}")]
         [HttpGet]
-        public async Task<IActionResult> GetAllBatches( int shipperId,
+        public async Task<IActionResult> GetAllBatches(int shipperId,
                                                        [FromQuery] BatchFilter? filterBy,
                                                        [FromQuery][DefaultValue(null)] string? filterQuery,
                                                        [FromQuery][DefaultValue(0)] int pageIndex,

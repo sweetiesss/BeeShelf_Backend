@@ -1,6 +1,4 @@
-﻿using BeeStore_Repository.Models;
-
-namespace BeeStore_Repository.DTO.ProductCategoryDTOs
+﻿namespace BeeStore_Repository.DTO.ProductCategoryDTOs
 {
     public class OcopCategoryListDTO
     {
@@ -10,6 +8,6 @@ namespace BeeStore_Repository.DTO.ProductCategoryDTOs
 
         public ulong? IsDeleted { get; set; }
 
-        public  List<CategoryListDTO> Categories { get; set; } = new List<CategoryListDTO>();
+        public List<CategoryListDTO> Categories { get; set; } = new List<CategoryListDTO>();
     }
 }

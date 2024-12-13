@@ -552,7 +552,7 @@ public partial class BeeStoreDbContext : DbContext
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
             entity.ToTable("Order_Detail");
-                
+
             entity.HasIndex(e => e.LotId, "lot_id");
 
             entity.HasIndex(e => e.OrderId, "order_id");

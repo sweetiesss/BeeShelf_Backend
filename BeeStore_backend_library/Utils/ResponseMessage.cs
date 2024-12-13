@@ -1,6 +1,4 @@
-﻿using Org.BouncyCastle.Tls;
-
-namespace BeeStore_Repository.Utils
+﻿namespace BeeStore_Repository.Utils
 {
     public static class ResponseMessage
     {

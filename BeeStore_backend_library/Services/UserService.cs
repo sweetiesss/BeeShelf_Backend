@@ -54,7 +54,7 @@ namespace BeeStore_Repository.Services
                 }
                 resetToken = GenerateResetToken(employee.Id, employee.Email);
             }
-            if(user != null)
+            if (user != null)
             {
                 resetToken = GenerateResetToken(user.Id, user.Email);
             }
@@ -87,7 +87,7 @@ namespace BeeStore_Repository.Services
                 if (user == null)
                 {
                     var employee = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id.Equals(tokenData.UserId) && u.Email.Equals(tokenData.Email));
-                    if(employee != null)
+                    if (employee != null)
                     {
                         employee.Password = BCrypt.Net.BCrypt.HashPassword(request.newPassword);
                         await _unitOfWork.SaveAsync();
@@ -247,17 +247,17 @@ namespace BeeStore_Repository.Services
                 throw new DuplicateException(ResponseMessage.UserEmailDuplicate);
             }
             var province = await _unitOfWork.ProvinceRepo.AnyAsync(u => u.Id.Equals(request.ProvinceId));
-            if(province == false)
+            if (province == false)
             {
                 throw new KeyNotFoundException(ResponseMessage.ProvinceIdNotFound);
             }
             var OcopCategory = await _unitOfWork.OcopCategoryRepo.SingleOrDefaultAsync(u => u.Id.Equals(request.OcopCategoryId),
                                                                                        query => query.Include(o => o.Categories));
-            if(OcopCategory == null)
+            if (OcopCategory == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.OcopCategoryIdNotFound);
             }
-            if(OcopCategory.Categories.FirstOrDefault(u => u.OcopCategoryId.Equals(request.OcopCategoryId)) == null)
+            if (OcopCategory.Categories.FirstOrDefault(u => u.OcopCategoryId.Equals(request.OcopCategoryId)) == null)
             {
                 throw new ApplicationException(ResponseMessage.CategoryIdNotMatch);
             }

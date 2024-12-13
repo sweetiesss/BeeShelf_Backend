@@ -75,11 +75,11 @@ namespace BeeStore_Api.Controllers
                                                                  [FromQuery][DefaultValue(0)] int pageIndex,
                                                                  [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _warehouseShipperService.GetWarehouseShipperList(search,hasVehicle, filterBy, filterQuery, pageIndex, pageSize);
+            var result = await _warehouseShipperService.GetWarehouseShipperList(search, hasVehicle, filterBy, filterQuery, pageIndex, pageSize);
             return Ok(result);
         }
 
-        
+
         [Route("get-warehouse-shippers/{id}")]
         [HttpGet]
         [Authorize(Roles = "Admin,Manager,Staff")]
@@ -91,7 +91,7 @@ namespace BeeStore_Api.Controllers
                                                                  [FromQuery][DefaultValue(0)] int pageIndex,
                                                                  [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _warehouseShipperService.GetWarehouseShipperList(id, search,hasVehicle, filterBy, filterQuery, pageIndex, pageSize);
+            var result = await _warehouseShipperService.GetWarehouseShipperList(id, search, hasVehicle, filterBy, filterQuery, pageIndex, pageSize);
             return Ok(result);
         }
 
@@ -126,7 +126,7 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
-        
+
         [Route("get-warehouse-staffs/{id}")]
         [HttpGet]
         [Authorize(Roles = "Admin,Manager")]

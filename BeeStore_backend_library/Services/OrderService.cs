@@ -1,5 +1,4 @@
-﻿using Amazon.S3.Model;
-using AutoMapper;
+﻿using AutoMapper;
 using BeeStore_Repository.DTO;
 using BeeStore_Repository.DTO.OrderDTOs;
 using BeeStore_Repository.Enums;
@@ -11,8 +10,6 @@ using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
-using MySqlX.XDevAPI.Common;
 using System.Data;
 using System.Linq.Expressions;
 
@@ -64,7 +61,7 @@ namespace BeeStore_Repository.Services
             //    case null: filterQuery = string.Empty; break;
             //}
 
-            
+
 
             string? sortBy = sortCriteria switch
             {
@@ -103,11 +100,11 @@ namespace BeeStore_Repository.Services
                 searchProperties: null
                 );
 
-           
+
             return list;
         }
 
-        public async Task<Pagination<OrderListDTO>> GetOrderList(bool? hasBatch,OrderFilterBy? orderFilterBy, string? filterQuery, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
+        public async Task<Pagination<OrderListDTO>> GetOrderList(bool? hasBatch, OrderFilterBy? orderFilterBy, string? filterQuery, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
                                                           bool descending, int pageIndex, int pageSize)
         {
             var list = await ApplyFilterToList(hasBatch, orderFilterBy, filterQuery, orderStatus, sortCriteria, descending);
@@ -154,7 +151,7 @@ namespace BeeStore_Repository.Services
             decimal? totalStorageFee = 0;
             decimal? deliveryFee = 0;
             decimal? totalWeight = 0;
-            if(request.Distance > 10)
+            if (request.Distance > 10)
             {
                 deliveryFee += (request.Distance - 10) * 1000;
             }
@@ -249,7 +246,7 @@ namespace BeeStore_Repository.Services
                     totalPrice += lot.Product.Price * amountToTake;
                     totalStorageFee += CalculateStorageFee(lot.ImportDate.Value, DateTime.Now);
                     totalWeight += lot.Product.Weight * product.ProductAmount;
-                    if(lot.Product.Weight * product.ProductAmount > 5)
+                    if (lot.Product.Weight * product.ProductAmount > 5)
                     {
                         decimal? extraWeight = lot.Product.Weight * product.ProductAmount - 5;
                         decimal extraWeightUnits = Math.Ceiling((decimal)extraWeight / 0.5m); // Convert to 0.5kg units
@@ -309,11 +306,11 @@ namespace BeeStore_Repository.Services
             {
                 throw new ApplicationException(ResponseMessage.OrderProccessedError);
             }
-            foreach(var x in exist.OrderDetails)
+            foreach (var x in exist.OrderDetails)
             {
                 _unitOfWork.OrderDetailRepo.SoftDelete(x);
             }
-            foreach(var x in exist.OrderFees)
+            foreach (var x in exist.OrderFees)
             {
                 _unitOfWork.OrderFeeRepo.SoftDelete(x);
             }
@@ -342,7 +339,7 @@ namespace BeeStore_Repository.Services
                     {
                         _unitOfWork.OrderDetailRepo.HardDelete(x);
                     }
-                    foreach(var x in exist.OrderFees)
+                    foreach (var x in exist.OrderFees)
                     {
                         _unitOfWork.OrderFeeRepo.HardDelete(x);
                     }
@@ -444,7 +441,7 @@ namespace BeeStore_Repository.Services
                 }
 
                 //if shipping only allow update for receiver address and phone.
-                if(exist.Status == Constants.Status.Shipping)
+                if (exist.Status == Constants.Status.Shipping)
                 {
                     if (request.OrderDetails != null)
                     {
@@ -460,7 +457,7 @@ namespace BeeStore_Repository.Services
 
                 }
             }
-            
+
 
             //update receiver address and phone in both draft and shipping
             exist.ReceiverAddress = request.ReceiverAddress;
@@ -540,7 +537,7 @@ namespace BeeStore_Repository.Services
         {
             var exist = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u => u.Id == id,
                                                                         query => query.Include(o => o.Batch));
-                                                                        
+
             if (exist == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.OrderIdNotFound);
@@ -637,7 +634,7 @@ namespace BeeStore_Repository.Services
                 }
             }
 
-            
+
             if (orderStatusString.Equals(Constants.Status.Canceled, StringComparison.OrdinalIgnoreCase)) //Canceled
             {
                 if (exist.Status == Constants.Status.Shipping ||
@@ -699,7 +696,7 @@ namespace BeeStore_Repository.Services
                         CollectedBy = exist.Batch!.DeliverBy,
                         OrderId = exist.Id,
                         TotalAmount = exist.TotalPriceAfterFee
-                    //    TotalAmount = (int)(exist.TotalPrice - (orderfee.DeliveryFee + orderfee.StorageFee + orderfee.AdditionalFee))
+                        //    TotalAmount = (int)(exist.TotalPrice - (orderfee.DeliveryFee + orderfee.StorageFee + orderfee.AdditionalFee))
                     });
                     exist.DeliverFinishDate = DateTime.Now;
                     //add money directly after order is delivered.
@@ -712,9 +709,9 @@ namespace BeeStore_Repository.Services
                 }
             }
 
-            if(orderStatusString.Equals(Constants.Status.Refunded, StringComparison.OrdinalIgnoreCase)) // To redunded
+            if (orderStatusString.Equals(Constants.Status.Refunded, StringComparison.OrdinalIgnoreCase)) // To redunded
             {
-                if(exist.Status == Constants.Status.Returned)
+                if (exist.Status == Constants.Status.Returned)
                 {
                     orderStatusUpdate = Constants.Status.Refunded;
 
@@ -750,9 +747,9 @@ namespace BeeStore_Repository.Services
                 }
             }
 
-            if(orderStatusString.Equals(Constants.Status.Completed, StringComparison.OrdinalIgnoreCase)) // To Complete
+            if (orderStatusString.Equals(Constants.Status.Completed, StringComparison.OrdinalIgnoreCase)) // To Complete
             {
-                if(exist.Status == Constants.Status.Delivered)
+                if (exist.Status == Constants.Status.Delivered)
                 {
                     orderStatusUpdate = Constants.Status.Completed;
                     //find batch of Order
@@ -801,13 +798,13 @@ namespace BeeStore_Repository.Services
 
         private decimal CalculateStorageFee(DateTime importDate, DateTime currentDate)
         {
-            if(importDate.Date == currentDate.Date)
+            if (importDate.Date == currentDate.Date)
             {
                 return 0;
             }
 
-            const decimal RATE_FIRST_WEEK = 10;    
-            const decimal RATE_AFTER_WEEK = 20;    
+            const decimal RATE_FIRST_WEEK = 10;
+            const decimal RATE_AFTER_WEEK = 20;
             const int DAYS_IN_WEEK = 7;
 
             TimeSpan storageDuration = currentDate - importDate;
