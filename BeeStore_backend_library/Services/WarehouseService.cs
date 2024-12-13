@@ -41,7 +41,7 @@ namespace BeeStore_Repository.Services
             var warehouse = _mapper.Map<Warehouse>(request);
             warehouse.CreateDate = DateTime.Now;
             await _unitOfWork.WarehouseRepo.AddAsync(warehouse);
-           
+
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
         }
@@ -68,7 +68,7 @@ namespace BeeStore_Repository.Services
                 throw new BadHttpRequestException(ResponseMessage.BadRequest);
             }
             Expression<Func<Warehouse, bool>> filterExpression = u =>
-            (filterBy == null || 
+            (filterBy == null ||
                 (filterBy == WarehouseFilter.WarehouseId && u.Id.Equals(Int32.Parse(filterQuery!)))
              || (filterBy == WarehouseFilter.ProvinceId && u.Id.Equals(Int32.Parse(filterQuery!))));
 
@@ -119,16 +119,16 @@ namespace BeeStore_Repository.Services
                                                        .Where(u => u.IsDeleted.Equals(false))
                                                        .Where(w => w.Inventories.Any(inventory => inventory.OcopPartnerId == userId))
             .Select(warehouse => new Warehouse
-             {
-                 Id = warehouse.Id,
-                 Location = warehouse.Location,
-                 Name = warehouse.Name,
-                 Capacity = warehouse.Capacity,
-                 IsCold = warehouse.IsCold,
-                 Province = warehouse.Province,
-                 CreateDate = warehouse.CreateDate,
-                 Inventories = warehouse.Inventories.Where(inventory => inventory.OcopPartnerId == userId).ToList()
-             }));
+            {
+                Id = warehouse.Id,
+                Location = warehouse.Location,
+                Name = warehouse.Name,
+                Capacity = warehouse.Capacity,
+                IsCold = warehouse.IsCold,
+                Province = warehouse.Province,
+                CreateDate = warehouse.CreateDate,
+                Inventories = warehouse.Inventories.Where(inventory => inventory.OcopPartnerId == userId).ToList()
+            }));
             var result = _mapper.Map<List<WarehouseListInventoryDTO>>(list);
 
             return result;
@@ -163,6 +163,6 @@ namespace BeeStore_Repository.Services
 
         }
 
-     
+
     }
 }

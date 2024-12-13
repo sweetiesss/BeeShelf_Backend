@@ -20,7 +20,7 @@ namespace BeeStore_Api.Controllers
         [HttpGet]
         [Authorize(Roles = "Admin,Manager,Staff")]
         public async Task<IActionResult> GetRequestList([FromQuery] RequestStatus? status,
-                                                    [FromQuery]bool? import,
+                                                    [FromQuery] bool? import,
                                                     [FromQuery][DefaultValue(false)] bool descending,
                                                     [FromQuery] int warehouseId,
                                                     [FromQuery][DefaultValue(0)] int pageIndex,

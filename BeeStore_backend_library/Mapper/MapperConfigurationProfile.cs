@@ -81,7 +81,7 @@ namespace BeeStore_Repository.Mapper
             CreateMap<DeliveryZoneCreateDTO, DeliveryZone>();
             CreateMap<Warehouse, WarehouseListInventoryDTO>()
                 .ForMember(dest => dest.ProvinceName, opt => opt.MapFrom(src => src.Province.SubDivisionName))
-                .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Location + ", "+ src.Province.SubDivisionName))
+                .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Location + ", " + src.Province.SubDivisionName))
                 .ForMember(dest => dest.TotalInventory, opt => opt.MapFrom(src => src.Inventories.Count()))
                 .ForMember(dest => dest.Inventories, opt => opt.MapFrom(src => src.Inventories))
             .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
@@ -171,8 +171,8 @@ namespace BeeStore_Repository.Mapper
             CreateMap<OrderDetail, OrderDetailDTO>()
                 .ForMember(dest => dest.ProductImage, opt => opt.MapFrom(src => src.Lot != null ? src.Lot.Product.PictureLink : null))
                 .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Lot.Product.Name))
-                .ForMember(dest => dest.Unit, opt=> opt.MapFrom(src => src.Lot.Product.Unit))
-                .ForMember(dest => dest.Weight, opt=> opt.MapFrom(src => src.Lot.Product.Weight));
+                .ForMember(dest => dest.Unit, opt => opt.MapFrom(src => src.Lot.Product.Unit))
+                .ForMember(dest => dest.Weight, opt => opt.MapFrom(src => src.Lot.Product.Weight));
             CreateMap<OrderFee, OrderFeeDTO>();
             CreateMap<OrderCreateDTO, Order>();
             CreateMap<OrderUpdateDTO, Order>()
@@ -199,7 +199,7 @@ namespace BeeStore_Repository.Mapper
                 .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<MoneyTransfer, MoneyTransferListDTO>()
                 .ForMember(dest => dest.TransferByStaffEmail, opt => opt.MapFrom(src => src.TransferByNavigation.Email))
-                .ForMember(dest => dest.TransferByStaffName, opt => opt.MapFrom(src => $"{src.TransferByNavigation.FirstName} {src.TransferByNavigation.LastName}" ))
+                .ForMember(dest => dest.TransferByStaffName, opt => opt.MapFrom(src => $"{src.TransferByNavigation.FirstName} {src.TransferByNavigation.LastName}"))
                 .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
 
         }

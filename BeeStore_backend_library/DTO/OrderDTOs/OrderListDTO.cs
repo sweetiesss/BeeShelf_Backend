@@ -63,7 +63,7 @@
         public string ProductName { get; set; }
 
         public decimal? ProductPrice { get; set; }
-        public string? Unit {  get; set; }
+        public string? Unit { get; set; }
         public string? Weight { get; set; }
 
         public int? ProductAmount { get; set; }

@@ -1,6 +1,5 @@
 ﻿using AutoMapper;
 using BeeStore_Repository.DTO;
-using BeeStore_Repository.DTO.PackageDTOs;
 using BeeStore_Repository.DTO.PartnerDTOs;
 using BeeStore_Repository.DTO.ProvinceDTOs;
 using BeeStore_Repository.Enums.SortBy;

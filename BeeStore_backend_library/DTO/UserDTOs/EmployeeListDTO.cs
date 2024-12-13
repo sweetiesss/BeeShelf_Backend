@@ -28,7 +28,7 @@
 
         public int? WorkAtWarehouseId { get; set; }
         public string? WorkAtWarehouseName { get; set; }
-        public string? WarehouseLocation {  get; set; }
+        public string? WarehouseLocation { get; set; }
 
 
     }

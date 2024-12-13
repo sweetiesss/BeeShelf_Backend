@@ -22,7 +22,7 @@ namespace BeeStore_Api.Controllers
         [Authorize(Roles = "Admin,Manager,Staff")]
         [HttpGet]
         public async Task<IActionResult> GetOrderList([FromQuery] OrderFilterBy? orderFilterBy,
-                                                      [FromQuery]bool? hasBatch,
+                                                      [FromQuery] bool? hasBatch,
                                                       [FromQuery] string? filterQuery,
                                                       [FromQuery] OrderStatus? filterByStatus,
                                                       [FromQuery] OrderSortBy? sortBy,
@@ -99,7 +99,7 @@ namespace BeeStore_Api.Controllers
         [HttpPut]
         public async Task<IActionResult> UpdateOrder(int id, int warehouseId, OrderUpdateDTO request)
         {
-            var result = await _orderService.UpdateOrder(id,warehouseId, request);
+            var result = await _orderService.UpdateOrder(id, warehouseId, request);
             return Ok(result);
         }
 

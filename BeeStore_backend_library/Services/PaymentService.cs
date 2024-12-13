@@ -10,7 +10,6 @@ using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using MySqlX.XDevAPI.Common;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Serialization;
 using System.Text;
@@ -42,7 +41,7 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.TransactionNotFound);
             }
-            if(transaction.Status != Constants.PaymentStatus.Pending)
+            if (transaction.Status != Constants.PaymentStatus.Pending)
             {
                 throw new ApplicationException(ResponseMessage.TransactionAlreadyProcessed);
             }
@@ -213,11 +212,11 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.PaymentNotFound);
             }
-            if(moneyTransfer.IsTransferred == 1)
+            if (moneyTransfer.IsTransferred == 1)
             {
                 throw new ApplicationException(ResponseMessage.MoneyTransferAlreadyMade);
             }
-            var employee = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id.Equals(staffId), 
+            var employee = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id.Equals(staffId),
                                                                                query => query.Include(o => o.Role));
             if (employee == null)
             {
@@ -236,7 +235,7 @@ namespace BeeStore_Repository.Services
             moneyTransfer.IsTransferred = 1;
             moneyTransfer.TransferBy = staffId;
             partnerWallet.TotalAmount -= moneyTransfer.Amount;
-            
+
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
         }
@@ -260,7 +259,7 @@ namespace BeeStore_Repository.Services
         public async Task<string> CreateMoneyTransferRequest(int ocopPartnerId, decimal amount)
         {
             var partnerWallet = await _unitOfWork.WalletRepo.SingleOrDefaultAsync(u => u.OcopPartnerId.Equals(ocopPartnerId));
-            if(partnerWallet == null)
+            if (partnerWallet == null)
             {
                 throw new ApplicationException(ResponseMessage.WalletIdNotFound);
             }
@@ -268,7 +267,8 @@ namespace BeeStore_Repository.Services
             {
                 throw new ApplicationException(ResponseMessage.NotEnoughCredit);
             }
-            var moneyTransfer = new MoneyTransfer{
+            var moneyTransfer = new MoneyTransfer
+            {
                 Amount = amount,
                 OcopPartnerId = ocopPartnerId,
                 IsDeleted = false,
