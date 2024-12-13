@@ -1,5 +1,4 @@
-﻿using Amazon.S3.Model;
-using AutoMapper;
+﻿using AutoMapper;
 using BeeStore_Repository.DTO;
 using BeeStore_Repository.DTO.Batch;
 using BeeStore_Repository.Enums.FilterBy;
@@ -9,7 +8,6 @@ using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
-using MySqlX.XDevAPI.Common;
 using System.Linq.Expressions;
 
 namespace BeeStore_Repository.Services
@@ -38,7 +36,7 @@ namespace BeeStore_Repository.Services
 
             //Sort Order by hand (fix this if you know how)
             var orderList = new List<Order>();
-            foreach(var o in request.Orders)
+            foreach (var o in request.Orders)
             {
                 var order = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(a => a.Id.Equals(o.Id));
                 if (order == null)
@@ -50,7 +48,7 @@ namespace BeeStore_Repository.Services
                 if (order.BatchId != null)
                     throw new ApplicationException(ResponseMessage.OrderBatchError);
 
-                if(!order.DeliveryZoneId.Equals(request.DeliveryZoneId))
+                if (!order.DeliveryZoneId.Equals(request.DeliveryZoneId))
                     throw new ApplicationException(ResponseMessage.DeliveryZoneOrderNotMatch);
 
                 orderList.Add(order);
@@ -86,10 +84,12 @@ namespace BeeStore_Repository.Services
 
                 result.DeliverBy = shipper.Id;
                 var vehicle = shipper.Vehicles.FirstOrDefault(u => u.AssignedDriverId.Equals(shipper.Id) && u.IsDeleted.Equals(false));
-                if (vehicle == null) {
+                if (vehicle == null)
+                {
                     throw new KeyNotFoundException(ResponseMessage.VehicleIdNotFound);
                 }
-                if (vehicle.Status.Equals(Constants.VehicleStatus.InService)) {
+                if (vehicle.Status.Equals(Constants.VehicleStatus.InService))
+                {
                     throw new KeyNotFoundException(ResponseMessage.VehicleCurrentlyInService);
                 }
                 //Check Order -> Create Batch Delivery
@@ -150,10 +150,10 @@ namespace BeeStore_Repository.Services
             }
 
 
-            if(request.ShipperId != null)
+            if (request.ShipperId != null)
                 batch.DeliverBy = request.ShipperId;
-            
-            if(request.Name != null)
+
+            if (request.Name != null)
                 batch.Name = request.Name;
 
 
@@ -198,7 +198,7 @@ namespace BeeStore_Repository.Services
             {
                 o.BatchId = null;
             }
-            
+
             _unitOfWork.BatchRepo.SoftDelete(batch);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;

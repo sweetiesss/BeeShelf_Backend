@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BeeStore_Repository.DTO.PaymentDTOs
+﻿namespace BeeStore_Repository.DTO.PaymentDTOs
 {
     public class MoneyTransferListDTO
     {
@@ -14,7 +8,7 @@ namespace BeeStore_Repository.DTO.PaymentDTOs
 
         public int? TransferBy { get; set; }
 
-        public string? TransferByStaffEmail {  get; set; }
+        public string? TransferByStaffEmail { get; set; }
         public string? TransferByStaffName { get; set; }
         public ulong? IsTransferred { get; set; }
         public string? PictureLink { get; set; }

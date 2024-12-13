@@ -16,7 +16,7 @@ namespace BeeStore_Repository.DTO.WarehouseDTOs
 
         [JsonIgnore]
         public DateTime? CreateDate { get; set; }
-        
+
 
     }
 

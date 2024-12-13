@@ -68,7 +68,7 @@ namespace BeeStore_Repository.Utils.Validator.User
                 .NotEmpty();
             RuleFor(x => x.OcopCategoryId)
                 .NotEmpty();
-                
+
         }
     }
 

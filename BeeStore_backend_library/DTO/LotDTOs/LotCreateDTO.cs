@@ -16,7 +16,7 @@ namespace BeeStore_Repository.DTO.PackageDTOs
         public int ProductId { get; set; }
 
         public int? ProductPerLot { get; set; }
-        
+
 
         [JsonIgnore]
         public int? InventoryId { get; set; }
