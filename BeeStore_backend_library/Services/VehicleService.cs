@@ -38,7 +38,7 @@ namespace BeeStore_Repository.Services
                 throw new ApplicationException(ResponseMessage.UserRoleNotShipperError);
             }
             var list = employee.Vehicles.ToList();
-            foreach(var x in list)
+            foreach (var x in list)
             {
                 x.AssignedDriverId = null;
             }
@@ -55,17 +55,17 @@ namespace BeeStore_Repository.Services
 
         public async Task<string> UnassignVehicle(int id)
         {
-            
             var vehicle = await _unitOfWork.VehicleRepo.SingleOrDefaultAsync(u => u.Id.Equals(id));
             if (vehicle == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.VehicleIdNotFound);
             }
-            if (vehicle.Status.Equals(Constants.VehicleStatus.InService)) {
+            if (vehicle.Status.Equals(Constants.VehicleStatus.InService))
+            {
                 throw new ApplicationException(ResponseMessage.VehicleCurrentlyInService);
             }
-            vehicle.AssignedDriver = null;
-            await _unitOfWork.SaveAsync();
+            vehicle.AssignedDriverId = null;
+            _unitOfWork.VehicleRepo.Update(vehicle);
             return ResponseMessage.Success;
         }
 
@@ -73,7 +73,8 @@ namespace BeeStore_Repository.Services
         {
             var vehicle = await _unitOfWork.VehicleRepo.AnyAsync(u => u.LicensePlate == request.LicensePlate);
             var warehouse = await _unitOfWork.WarehouseRepo.SingleOrDefaultAsync(o => o.Id.Equals(request.WarehouseId));
-            if (warehouse == null) {
+            if (warehouse == null)
+            {
                 throw new KeyNotFoundException(ResponseMessage.WarehouseIdNotFound);
             }
             if (request.IsCold.Value != warehouse.IsCold)
@@ -124,7 +125,8 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.VehicleIdNotFound);
             }
-            if (vehicle.Status.Equals(Constants.VehicleStatus.InService)){
+            if (vehicle.Status.Equals(Constants.VehicleStatus.InService))
+            {
                 throw new ApplicationException(ResponseMessage.VehicleCurrentlyInService);
             }
             _unitOfWork.VehicleRepo.SoftDelete(vehicle);
@@ -264,7 +266,7 @@ namespace BeeStore_Repository.Services
             }
             if (veStat.Equals(Constants.VehicleStatus.Repair))
             {
-                if (vehicle.AssignedDriver != null) 
+                if (vehicle.AssignedDriver != null)
                 {
                     throw new BadHttpRequestException(ResponseMessage.VehicleAssigned);
                 }

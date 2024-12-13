@@ -170,7 +170,7 @@ namespace BeeStore_Api_Test.Services
                     batchDelivery
                 }
 
-        };
+            };
 
             var newOrder = new Order { Id = 2, BatchDeliveryId = null, IsDeleted = false };
 

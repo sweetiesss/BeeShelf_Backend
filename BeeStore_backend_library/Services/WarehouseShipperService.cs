@@ -23,7 +23,7 @@ namespace BeeStore_Repository.Services
             _mapper = mapper;
         }
 
-        private async Task<List<WarehouseShipper>> ApplyFilterToList(string? search,bool? hasVehicle, WarehouseFilter? filterBy, string? filterQuery, int? warehouseId = null)
+        private async Task<List<WarehouseShipper>> ApplyFilterToList(string? search, bool? hasVehicle, WarehouseFilter? filterBy, string? filterQuery, int? warehouseId = null)
         {
             if ((!string.IsNullOrEmpty(filterQuery) && filterBy == null)
                 || (string.IsNullOrEmpty(filterQuery) && filterBy != null))
@@ -54,7 +54,7 @@ namespace BeeStore_Repository.Services
 
         public async Task<Pagination<WarehouseShipperListDTO>> GetWarehouseShipperList(string? search, bool? hasVehicle, WarehouseFilter? filterBy, string? filterQuery, int pageIndex, int pageSize)
         {
-            var list = await ApplyFilterToList(search,hasVehicle, filterBy, filterQuery);
+            var list = await ApplyFilterToList(search, hasVehicle, filterBy, filterQuery);
             var result = _mapper.Map<List<WarehouseShipperListDTO>>(list);
             return (await ListPagination<WarehouseShipperListDTO>.PaginateList(result, pageIndex, pageSize));
         }
@@ -141,11 +141,11 @@ namespace BeeStore_Repository.Services
                                                                               query => query
                                                                               .Include(o => o.WarehouseShippers)
                                                                               .ThenInclude(o => o.Warehouse));
-            if(shipper == null)
+            if (shipper == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
             }
-            if(shipper.Role.RoleName != Constants.RoleName.Shipper)
+            if (shipper.Role.RoleName != Constants.RoleName.Shipper)
             {
                 throw new ApplicationException(ResponseMessage.UserRoleNotShipperError);
             }
@@ -154,8 +154,8 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.DeliveryZoneIdNotFound);
             }
-            if(deliveryZone.ProvinceId != 
-                shipper.WarehouseShippers.FirstOrDefault(u => u.EmployeeId.Equals(shipperId) 
+            if (deliveryZone.ProvinceId !=
+                shipper.WarehouseShippers.FirstOrDefault(u => u.EmployeeId.Equals(shipperId)
                                                         && u.IsDeleted.Equals(false))
                                                         .Warehouse
                                                         .ProvinceId)
@@ -167,7 +167,7 @@ namespace BeeStore_Repository.Services
             result.DeliveryZoneId = deliveryZoneId;
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
-            
+
         }
     }
 }

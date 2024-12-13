@@ -4,50 +4,50 @@ using Microsoft.Extensions.Hosting;
 
 namespace BeeStore_Repository.BackgroundServices
 {
-        public abstract class BaseBackgroundService : BackgroundService
+    public abstract class BaseBackgroundService : BackgroundService
+    {
+        protected readonly IServiceProvider _serviceProvider;
+        protected readonly ILoggerManager _logger;
+
+
+        protected TimeSpan DefaultInterval { get; set; } = TimeSpan.FromSeconds(10);
+
+        protected BaseBackgroundService(
+            IServiceProvider serviceProvider,
+            ILoggerManager logger)
         {
-            protected readonly IServiceProvider _serviceProvider;
-            protected readonly ILoggerManager _logger;
+            _serviceProvider = serviceProvider;
+            _logger = logger;
+        }
 
-            
-            protected TimeSpan DefaultInterval { get; set; } = TimeSpan.FromSeconds(10);
 
-            protected BaseBackgroundService(
-                IServiceProvider serviceProvider,
-                ILoggerManager logger)
+        protected abstract Task PerformPeriodicTaskAsync(CancellationToken stoppingToken);
+
+
+        protected sealed override async Task ExecuteAsync(CancellationToken stoppingToken)
+        {
+            while (!stoppingToken.IsCancellationRequested)
             {
-                _serviceProvider = serviceProvider;
-                _logger = logger;
-            }
-
-            
-            protected abstract Task PerformPeriodicTaskAsync(CancellationToken stoppingToken);
-
-            
-            protected sealed override async Task ExecuteAsync(CancellationToken stoppingToken)
-            {
-                while (!stoppingToken.IsCancellationRequested)
+                try
                 {
-                    try
-                    {
-                        _logger.LogInfo($"Starting periodic task for {GetType().Name} at {DateTime.Now}");
+                    _logger.LogInfo($"Starting periodic task for {GetType().Name} at {DateTime.Now}");
 
-                        await PerformPeriodicTaskAsync(stoppingToken);
-                    }
-                    catch (Exception ex)
-                    {
-                        _logger.LogError($"EXCEPTION: {ex}, Error in background service {GetType().Name}");
-                    }
-
-                    // Wait for the next interval
-                    await Task.Delay(DefaultInterval, stoppingToken);
+                    await PerformPeriodicTaskAsync(stoppingToken);
                 }
-            }
+                catch (Exception ex)
+                {
+                    _logger.LogError($"EXCEPTION: {ex}, Error in background service {GetType().Name}");
+                }
 
-            
-            protected void SetInterval(TimeSpan interval)
-            {
-                DefaultInterval = interval;
+                // Wait for the next interval
+                await Task.Delay(DefaultInterval, stoppingToken);
             }
         }
+
+
+        protected void SetInterval(TimeSpan interval)
+        {
+            DefaultInterval = interval;
+        }
     }
+}

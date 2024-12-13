@@ -61,10 +61,10 @@ namespace BeeStore_Repository.Services
             }
             //Check inv capacity with total capacity of warehouse
             decimal? currWeight = request.MaxWeight;
-            foreach(var inv in exist.Inventories)
+            foreach (var inv in exist.Inventories)
             {
                 currWeight += inv.Weight;
-                if(currWeight > exist.Capacity)
+                if (currWeight > exist.Capacity)
                 {
                     throw new KeyNotFoundException(ResponseMessage.WarehouseAddInventoryCapacityLimitReach);
                 }
@@ -183,18 +183,18 @@ namespace BeeStore_Repository.Services
 
         public async Task<string> BuyInventory(int id, int userId, int month)
         {
-            if(month <= 0)
+            if (month <= 0)
             {
                 throw new ApplicationException(ResponseMessage.BadRequest);
             }
             var user = await _unitOfWork.OcopPartnerRepo.SingleOrDefaultAsync(u => u.Id == userId,
                                                                               query => query.Include(o => o.Wallets));
-            if(user == null)
+            if (user == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
             }
             var inv = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Id == id);
-            if(inv == null)
+            if (inv == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
             }
@@ -238,7 +238,7 @@ namespace BeeStore_Repository.Services
                 throw new ApplicationException(ResponseMessage.InventoryPartnerNotMatch);
             }
             var wallet = user.Wallets.FirstOrDefault(u => u.OcopPartnerId == userId);
-            if(wallet.TotalAmount < inv.Price * month)
+            if (wallet.TotalAmount < inv.Price * month)
             {
                 throw new ApplicationException(ResponseMessage.NotEnoughCredit);
             }

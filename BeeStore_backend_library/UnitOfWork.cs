@@ -2,9 +2,6 @@
 using BeeStore_Repository.Interfaces;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Repositories;
-using Microsoft.AspNetCore.Mvc;
-using Org.BouncyCastle.Asn1.IsisMtt.X509;
-using System.Runtime.InteropServices;
 
 namespace BeeStore_Repository
 {
@@ -12,7 +9,7 @@ namespace BeeStore_Repository
     {
         IGenericRepository<DeliveryZone> DeliveryZoneRepo { get; }
         IGenericRepository<MoneyTransfer> MoneyTransferRepo { get; }
-        IGenericRepository<Payment> PaymentRepo {  get; }
+        IGenericRepository<Payment> PaymentRepo { get; }
         IGenericRepository<Province> ProvinceRepo { get; }
         IGenericRepository<OcopCategory> OcopCategoryRepo { get; }
         IGenericRepository<Category> CategoryRepo { get; }

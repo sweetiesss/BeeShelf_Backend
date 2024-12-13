@@ -15,11 +15,11 @@
         public int ProductId { get; set; }
 
         public string? ProductName { get; set; }
-        public string? ProductPictureLink {  get; set; }
+        public string? ProductPictureLink { get; set; }
 
-        public int? WarehouseId {  get; set; }
+        public int? WarehouseId { get; set; }
         public string? WarehouseName { get; set; }
-        public bool? isCold {  get; set; }
+        public bool? isCold { get; set; }
 
         public int? ProductPerLot { get; set; }
 

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace BeeStore_Repository.DTO.PaymentDTOs
+﻿namespace BeeStore_Repository.DTO.PaymentDTOs
 {
     public class TransactionListDTO
     {
@@ -17,7 +11,7 @@ namespace BeeStore_Repository.DTO.PaymentDTOs
         public string? Description { get; set; }
 
         public int? OcopPartnerId { get; set; }
-        public string? Email {  get; set; }
+        public string? Email { get; set; }
 
         public DateTime? CreateDate { get; set; }
 
