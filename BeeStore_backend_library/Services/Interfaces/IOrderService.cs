@@ -18,7 +18,7 @@ namespace BeeStore_Repository.Services.Interfaces
         Task<Pagination<OrderListDTO>> GetDeliverOrderList(bool? hasBatch, OrderFilterBy? orderFilterBy, string? filterQuery, int employeeId, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
                                                           bool descending, int pageIndex, int pageSize);
 
-        Task<string> CreateOrder(int warehouseId, OrderCreateDTO request);
+        Task<string> CreateOrder(int warehouseId,bool send, OrderCreateDTO request);
         Task<string> SendOrder(int id);
         Task<string> CancelOrder(int id);
         Task<string> UpdateOrderStatus(int id, OrderStatus orderStatus, string? cancellationReason);
