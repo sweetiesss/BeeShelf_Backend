@@ -137,7 +137,7 @@ namespace BeeStore_Repository.Services
 
 
 
-        public async Task<string> CreateOrder(int warehouseId, OrderCreateDTO request)
+        public async Task<string> CreateOrder(int warehouseId,bool send, OrderCreateDTO request)
         {
             int number = 0;
             var user = await _unitOfWork.OcopPartnerRepo.AnyAsync(u => u.Id == request.OcopPartnerId);
@@ -276,6 +276,16 @@ namespace BeeStore_Repository.Services
             result.TotalWeight = totalWeight;
             result.TotalPriceAfterFee = totalPrice - (totalStorageFee + deliveryFee);
             result.OrderCode = GenerateOrderCode();
+
+            if (send == true)
+            {
+                result.Status = Constants.Status.Pending;
+            }
+            else
+            {
+                result.Status = Constants.Status.Draft;
+            }
+
             await _unitOfWork.OrderRepo.AddAsync(result);
             await _unitOfWork.SaveAsync();
 
