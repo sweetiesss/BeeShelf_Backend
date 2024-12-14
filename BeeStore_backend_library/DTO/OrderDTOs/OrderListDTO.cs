@@ -60,7 +60,9 @@
         public int Id { get; set; }
 
         public int? LotId { get; set; }
-        public string ProductName { get; set; }
+        public int? ProductId { get; set; }
+
+        public string? ProductName { get; set; }
 
         public decimal? ProductPrice { get; set; }
         public string? Unit { get; set; }

@@ -235,7 +235,7 @@ namespace BeeStore_Repository.Services
 
         public async Task<string> UpdateRequest(int id, RequestCreateDTO request)
         {
-            var exist = await _unitOfWork.RequestRepo.SingleOrDefaultAsync(u => u.Id == id);
+            var exist = await _unitOfWork.RequestRepo.SingleOrDefaultAsync(u => u.Id == id, include => include.Include(o => o.Lot));
             if (exist == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.RequestIdNotFound);
@@ -249,7 +249,7 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
             }
-            var inventory = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Id == request.SendToInventoryId);
+            var inventory = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Id == request.SendToInventoryId, include => include.Include(o => o.Warehouse));
             if (inventory == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
