@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Linq.Expressions;
+using System.Reflection.Metadata;
 
 namespace BeeStore_Repository.Services
 {
@@ -331,13 +332,14 @@ namespace BeeStore_Repository.Services
 
         public async Task<string> UpdateOrder(int id, int warehouseId, OrderUpdateDTO request)
         {
-            var exist = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u => u.Id == id);
+            var exist = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u => u.Id == id, 
+                                                                        includes => includes.Include(o => o.OrderFees).Include(o => o.OrderDetails));
             if (exist == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.OrderIdNotFound);
             }
 
-            if (exist.Status != Constants.Status.Draft && exist.Status != Constants.Status.Shipping)
+            if (exist.Status == Constants.Status.Draft || exist.Status == Constants.Status.Shipping)
             {
                 int additionalFeeAfterUpdate = 5000;
 
@@ -353,7 +355,6 @@ namespace BeeStore_Repository.Services
                     {
                         _unitOfWork.OrderFeeRepo.HardDelete(x);
                     }
-
                     //copy from create order
                     int index = 0;
                     decimal? totalPrice = 0;
@@ -467,13 +468,14 @@ namespace BeeStore_Repository.Services
 
                 }
             }
+          
 
 
             //update receiver address and phone in both draft and shipping
             exist.ReceiverAddress = request.ReceiverAddress;
             exist.ReceiverPhone = request.ReceiverPhone;
 
-            _unitOfWork.OrderRepo.Update(exist);
+            //_unitOfWork.OrderRepo.Update(exist);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
         }
@@ -546,7 +548,7 @@ namespace BeeStore_Repository.Services
         public async Task<string> UpdateOrderStatus(int id, OrderStatus orderStatus, string? cancellationReason)
         {
             var exist = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u => u.Id == id,
-                                                                        query => query.Include(o => o.Batch));
+                                                                        query => query.Include(o => o.Batch).ThenInclude(o => o.Orders));
 
             if (exist == null)
             {
@@ -695,6 +697,7 @@ namespace BeeStore_Repository.Services
             //From Shipping to delivered
             if (orderStatusString.Equals(Constants.Status.Delivered, StringComparison.OrdinalIgnoreCase))
             {
+                bool b = true;
                 if (exist.Status == Constants.Status.Shipping)
                 {
                     orderStatusUpdate = Constants.Status.Delivered;
@@ -712,6 +715,19 @@ namespace BeeStore_Repository.Services
                     //add money directly after order is delivered.
 
                     exist.OcopPartner.Wallets.First().TotalAmount += exist.TotalPriceAfterFee;
+                    foreach(var x in exist.Batch.Orders)
+                    {
+                        if(x.Status == Constants.Status.Shipping)
+                        {
+                            b = false;
+                            break;
+                        }
+                    }
+                    if(b == true)
+                    {
+                        exist.Batch.Status = Constants.Status.Completed;
+                    }
+                    
                 }
                 else
                 {
