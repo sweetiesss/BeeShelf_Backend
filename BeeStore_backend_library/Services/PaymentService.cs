@@ -234,6 +234,7 @@ namespace BeeStore_Repository.Services
             moneyTransfer.PictureLink = picture_link;
             moneyTransfer.IsTransferred = 1;
             moneyTransfer.TransferBy = staffId;
+            moneyTransfer.ConfirmDate = DateTime.Now;
             partnerWallet.TotalAmount -= moneyTransfer.Amount;
 
             await _unitOfWork.SaveAsync();
