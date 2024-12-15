@@ -169,6 +169,7 @@ namespace BeeStore_Repository.Mapper
                 .ForMember(dest => dest.DeliveryZoneName, opt => opt.MapFrom(src => src.DeliveryZone.Name))
             .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<OrderDetail, OrderDetailDTO>()
+                .ForMember(dest => dest.ProductId, opt => opt.MapFrom(src => src.Lot.ProductId))
                 .ForMember(dest => dest.ProductImage, opt => opt.MapFrom(src => src.Lot != null ? src.Lot.Product.PictureLink : null))
                 .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Lot.Product.Name))
                 .ForMember(dest => dest.Unit, opt => opt.MapFrom(src => src.Lot.Product.Unit))
@@ -198,6 +199,7 @@ namespace BeeStore_Repository.Mapper
                 .ForMember(dest => dest.Orders, opt => opt.Ignore())
                 .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<MoneyTransfer, MoneyTransferListDTO>()
+                .ForMember(dest => dest.partner_email, opt => opt.MapFrom(src => src.OcopPartner.Email))
                 .ForMember(dest => dest.TransferByStaffEmail, opt => opt.MapFrom(src => src.TransferByNavigation.Email))
                 .ForMember(dest => dest.TransferByStaffName, opt => opt.MapFrom(src => $"{src.TransferByNavigation.FirstName} {src.TransferByNavigation.LastName}"))
                 .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));

@@ -242,7 +242,9 @@ namespace BeeStore_Repository.Services
 
         public async Task<List<MoneyTransferListDTO>> GetMoneyTransferList(int? warehouseId)
         {
-            var list = await _unitOfWork.MoneyTransferRepo.GetQueryable(u => u.Where(u => u.OcopPartner.Inventories.Any(x => x.WarehouseId.Equals(warehouseId))));
+            var list = await _unitOfWork.MoneyTransferRepo.GetQueryable(u => u.Where(u => u.OcopPartner.Inventories.Any(x => x.WarehouseId.Equals(warehouseId)))
+                                                                            .Include(o => o.OcopPartner)
+                                                                            .Include(o => o.TransferByNavigation));
             list = list.ToList();
             var result = _mapper.Map<List<MoneyTransferListDTO>>(list);
             return result;
@@ -250,7 +252,9 @@ namespace BeeStore_Repository.Services
 
         public async Task<List<MoneyTransferListDTO>> GetPartnerMoneyTransferList(int? partnerId)
         {
-            var list = await _unitOfWork.MoneyTransferRepo.GetQueryable(u => u.Where(u => u.OcopPartnerId.Equals(partnerId)));
+            var list = await _unitOfWork.MoneyTransferRepo.GetQueryable(u => u.Where(u => u.OcopPartnerId.Equals(partnerId))
+                                                                            .Include(o => o.OcopPartner)
+                                                                            .Include(o => o.TransferByNavigation));
             list = list.ToList();
             var result = _mapper.Map<List<MoneyTransferListDTO>>(list);
             return result;

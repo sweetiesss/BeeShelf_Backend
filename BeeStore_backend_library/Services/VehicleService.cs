@@ -66,6 +66,7 @@ namespace BeeStore_Repository.Services
             }
             vehicle.AssignedDriverId = null;
             _unitOfWork.VehicleRepo.Update(vehicle);
+            await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
         }
 

@@ -15,6 +15,7 @@ namespace BeeStore_Repository.DTO.OrderDTOs
 
 
 
+
         [JsonIgnore]
         public List<OrderDetailCreateDTO>? OrderDetails { get; set; } = new List<OrderDetailCreateDTO>();
         public List<ProductDetailDTO> Products { get; set; }

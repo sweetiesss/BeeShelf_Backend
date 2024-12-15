@@ -35,6 +35,7 @@
         public const string OcopPartnerIdRequired = "OcopPartnerId is required.";
         public const string ReceiverPhoneMaxLength = "ReceiverPhone cannot exceed 11 characters.";
         public const string ReceiverAddressMaxLength = "ReceiverAddress cannot exceed 50 characters.";
+        public const string DeliveryZoneRequired = "Delivery Zone is required.";
         //public const string OrderDetailsNotEmpty = "OrderDetails list must contain at least one item.";
         public const string ProductDetailsNotEmpty = "Products list must contain at least one item.";
         //public const string LotIdRequired = "LotId is required.";

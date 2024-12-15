@@ -862,5 +862,27 @@ namespace BeeStore_Repository.Services
             string randomSuffix = new Random().Next(1000, 9999).ToString();
             return $"ORD-{timestamp}-{randomSuffix}";
         }
+
+        public async Task<OrderListDTO> GetOrder(int id)
+        {
+            var order = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u => u.Id.Equals(id), 
+                                u => u.Include(o => o.Batch)
+                                .Include(o => o.OrderDetails)
+                                    .ThenInclude(o => o.Lot)
+                                    .ThenInclude(o => o.Product)
+                                .Include(o => o.OrderDetails)
+                                    .ThenInclude(o => o.Lot)
+                                    .ThenInclude(o => o.Inventory)
+                                    .ThenInclude(o => o.Warehouse)
+                                .Include(o => o.OrderFees)
+                                .Include(o => o.OcopPartner)
+                                .Include(o => o.DeliveryZone));
+            if(order == null)
+            {
+                throw new KeyNotFoundException(ResponseMessage.OrderIdNotFound);
+            }
+            var result = _mapper.Map<OrderListDTO>(order);
+            return result;
+        }
     }
 }
