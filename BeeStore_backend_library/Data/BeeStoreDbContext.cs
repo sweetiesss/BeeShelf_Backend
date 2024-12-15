@@ -327,6 +327,9 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.CreateDate)
                 .HasColumnType("datetime")
                 .HasColumnName("create_date");
+            entity.Property(e => e.ConfirmDate)
+                .HasColumnType("datetime")
+                .HasColumnName("confirm_date");
             entity.Property(e => e.IsDeleted)
                 .HasDefaultValueSql("b'0'")
                 .HasColumnType("bit(1)")

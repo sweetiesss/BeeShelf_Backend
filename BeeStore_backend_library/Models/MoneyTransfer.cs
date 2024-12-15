@@ -15,6 +15,7 @@ public partial class MoneyTransfer : BaseEntity
     public decimal? Amount { get; set; }
     public string? PictureLink { get; set; }
     public DateTime? CreateDate { get; set; }
+    public DateTime? ConfirmDate { get; set; }
 
     //public ulong? IsDeleted { get; set; }
 
