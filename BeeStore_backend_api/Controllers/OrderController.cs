@@ -18,6 +18,15 @@ namespace BeeStore_Api.Controllers
             _orderService = orderService;
         }
 
+        [Route("get-order/{id}")]
+        [Authorize(Roles = "Admin,Manager,Staff,Partner")]
+        [HttpGet]
+        public async Task<IActionResult> GetOrder(int id)
+        {
+            var result = await _orderService.GetOrder(id);
+            return Ok(result);
+        }
+
         [Route("get-orders")]
         [Authorize(Roles = "Admin,Manager,Staff")]
         [HttpGet]

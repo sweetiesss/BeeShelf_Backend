@@ -26,6 +26,11 @@ namespace BeeStore_Repository.Utils.Validator.Order
                 .MaximumLength(100)
                 .WithMessage(ValidationMessage.ReceiverAddressMaxLength);
 
+            RuleFor(x => x.DeliveryZoneId)
+                .NotEmpty()
+                .NotEqual(0)
+                .WithMessage(ValidationMessage.DeliveryZoneRequired);
+
             //// Rule for OrderDetails: required and must contain at least one item
             //RuleFor(x => x.OrderDetails)
             //    .NotEmpty()

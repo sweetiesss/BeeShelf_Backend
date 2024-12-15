@@ -5,6 +5,8 @@
         public int Id { get; set; }
 
         public int? OcopPartnerId { get; set; }
+        public string? partner_email { get; set; }
+
 
         public int? TransferBy { get; set; }
 
