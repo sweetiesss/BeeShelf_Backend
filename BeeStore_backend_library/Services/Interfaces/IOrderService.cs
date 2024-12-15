@@ -8,6 +8,7 @@ namespace BeeStore_Repository.Services.Interfaces
 {
     public interface IOrderService
     {
+        Task<OrderListDTO> GetOrder(int id);
         Task<Pagination<OrderListDTO>> GetOrderList(bool? hasBatch, OrderFilterBy? orderFilterBy, string? filterQuery, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
                                                           bool descending, int pageIndex, int pageSize);
 

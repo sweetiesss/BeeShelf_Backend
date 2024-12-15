@@ -7,6 +7,12 @@ namespace BeeStore_Repository.Utils.Validator.ProductCategory
     {
         public ProductCategoryCreateDTOValidator()
         {
+            RuleFor(x => x.CategoryId)
+                .NotEmpty()
+                .NotNull()
+                .NotEqual(0)
+                .WithMessage(ValidationMessage.CategoryIdRequired);
+
             RuleFor(x => x.TypeName)
                 .NotEmpty()
                 .WithMessage(ValidationMessage.TypeNameRequired)
@@ -21,6 +27,8 @@ namespace BeeStore_Repository.Utils.Validator.ProductCategory
 
             RuleFor(x => x.ExpireIn)
                 .NotNull()
+                .NotEmpty()
+                .NotEqual(0)
                 .WithMessage(ValidationMessage.ExpireInRequired);
         }
     }
