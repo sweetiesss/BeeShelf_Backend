@@ -148,15 +148,15 @@ namespace BeeStore_Repository.Services
                 throw new DuplicateException(ResponseMessage.WarehouseNameDuplicate);
             }
 
-            if (!String.IsNullOrEmpty(request.Location) && !request.Location.Equals(Constants.DefaultString.String))
+            var province = await _unitOfWork.ProvinceRepo.AnyAsync(u => u.Id.Equals(request.ProvinceId));
+            if (province == false)
             {
-                exist.Location = request.Location;
+                throw new KeyNotFoundException(ResponseMessage.ProvinceIdNotFound);
             }
-            if (request.Capacity != null && request.Capacity != 0)
-            {
-                exist.Capacity = request.Capacity;
-            }
-
+            exist.Location = request.Location;
+            exist.Capacity = request.Capacity;
+            exist.IsCold = request.IsCold;
+            exist.ProvinceId = request.ProvinceId;
             _unitOfWork.WarehouseRepo.Update(exist);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
