@@ -6,9 +6,11 @@ namespace BeeStore_Repository.DTO.InventoryDTOs
     {
 
         //public ulong? IsDeleted { get; set; }
-        public string Name { get; set; }
+        [JsonIgnore]
+        public string? Name { get; set; }
         public decimal? MaxWeight { get; set; }
         public decimal? Price { get; set; }
+        public int? InventoryAmount { get; set; }
 
         [JsonIgnore]
         public DateTime? BoughtDate { get; set; }

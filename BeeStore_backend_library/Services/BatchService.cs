@@ -185,7 +185,7 @@ namespace BeeStore_Repository.Services
 
         public async Task<string> DeleteBatch(int id)
         {
-            var batch = await _unitOfWork.BatchRepo.SingleOrDefaultAsync(u => u.Id.Equals(id));
+            var batch = await _unitOfWork.BatchRepo.SingleOrDefaultAsync(u => u.Id.Equals(id), includes => includes.Include(o => o.Orders));
             if (batch == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.BatchIdNotFound);
@@ -193,6 +193,10 @@ namespace BeeStore_Repository.Services
             if (batch.Status != Constants.Status.Pending)
             {
                 throw new ApplicationException(ResponseMessage.BatchStatusNotPending);
+            }
+            if(batch.Orders.Any(u => u.Status != Constants.Status.Processing))
+            {
+                throw new ApplicationException(ResponseMessage.BatchOrderAlreadyShipped);
             }
             foreach (var o in batch.Orders)
             {
