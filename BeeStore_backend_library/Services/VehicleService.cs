@@ -211,7 +211,7 @@ namespace BeeStore_Repository.Services
             {
                 throw new ApplicationException(ResponseMessage.VehicleCurrentlyInService);
             }
-            var LPexist = await _unitOfWork.VehicleRepo.AnyAsync(u => u.LicensePlate == request.LicensePlate);
+            var LPexist = await _unitOfWork.VehicleRepo.AnyAsync(u => u.LicensePlate == request.LicensePlate && u.Id != vehicle.Id);
             if (LPexist != false)
             {
                 throw new DuplicateException(ResponseMessage.VehicleLicensePlateDuplicate);

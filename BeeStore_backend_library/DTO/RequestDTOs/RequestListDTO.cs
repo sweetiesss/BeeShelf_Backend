@@ -8,6 +8,9 @@
         public string? Name { get; set; }
         public string? Description { get; set; }
         public int? LotId { get; set; }
+        public int? LotAmount {  get; set; }
+        public int? ProductPerLotAmount {  get; set; }
+        public int? TotalProductAmount {  get; set; }
         public string? ProductName { get; set; }
         public string? ProductImage { get; set; }
         public string? RequestType { get; set; }
