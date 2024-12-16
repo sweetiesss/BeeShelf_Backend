@@ -8,11 +8,11 @@ namespace BeeStore_Repository.Utils.Validator.Inventory
         public InventoryCreateDTOValidator()
         {
             // Rule for Name: required and max length 25
-            RuleFor(x => x.Name)
-                .NotEmpty()
-                .WithMessage(ValidationMessage.NameRequired)
-                .MaximumLength(25)
-                .WithMessage(ValidationMessage.NameMaxLength);
+            //RuleFor(x => x.Name)
+            //    .NotEmpty()
+            //    .WithMessage(ValidationMessage.NameRequired)
+            //    .MaximumLength(25)
+            //    .WithMessage(ValidationMessage.NameMaxLength);
 
             // Rule for MaxWeight: optional but must be non-negative if provided
             RuleFor(x => x.MaxWeight)

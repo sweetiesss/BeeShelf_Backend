@@ -208,9 +208,12 @@ namespace BeeStore_Repository.Services
         public async Task<PartnerProductDTO> GetPartnerTotalProduct(int id, int? warehouseId)
         {
             var lotsQuery = await _unitOfWork.LotRepo.GetQueryable(query => query.Where(u => u.Product.OcopPartnerId.Equals(id)
+                                                                                          && u.ImportDate.HasValue
                                                                                           && u.InventoryId.HasValue
                                                                                           && u.IsDeleted.Equals(false)
-                                                                                          && (warehouseId == null || u.Inventory.WarehouseId.Equals(warehouseId))));
+                                                                                          && (warehouseId == null || u.Inventory.WarehouseId.Equals(warehouseId)))
+                                                                                 .Include(o => o.Inventory).ThenInclude(o => o.Warehouse)
+                                                                                 .Include(o => o.Product));
             lotsQuery = lotsQuery.ToList();
 
             var groupedProducts = lotsQuery

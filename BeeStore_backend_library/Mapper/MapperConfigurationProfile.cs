@@ -153,6 +153,9 @@ namespace BeeStore_Repository.Mapper
             CreateMap<WarehouseStaffCreateDTO, WarehouseStaff>();
 
             CreateMap<Request, RequestListDTO>()
+                .ForMember(dest => dest.LotAmount, opt => opt.MapFrom(src => src.Lot.LotAmount))
+                .ForMember(dest => dest.ProductPerLotAmount, opt => opt.MapFrom(src => src.Lot.ProductPerLot))
+                .ForMember(dest => dest.TotalProductAmount, opt => opt.MapFrom(src => src.Lot.TotalProductAmount))
                 .ForMember(dest => dest.partner_email, opt => opt.MapFrom(src => src.OcopPartner!.Email))
                 .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Lot!.Product!.Name))
                 .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom(src => src.SendToInventory!.Warehouse!.Name))
@@ -170,6 +173,9 @@ namespace BeeStore_Repository.Mapper
                 .ForMember(dest => dest.DeliveryZoneName, opt => opt.MapFrom(src => src.DeliveryZone.Name))
             .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<OrderDetail, OrderDetailDTO>()
+                .ForMember(dest => dest.LotName, opt => opt.MapFrom(src => src.Lot.Name))
+                .ForMember(dest => dest.InventoryId, opt => opt.MapFrom(src => src.Lot.InventoryId))
+                .ForMember(dest => dest.InventoryName, opt => opt.MapFrom(src => src.Lot.Inventory.Name))
                 .ForMember(dest => dest.ProductId, opt => opt.MapFrom(src => src.Lot.ProductId))
                 .ForMember(dest => dest.ProductImage, opt => opt.MapFrom(src => src.Lot != null ? src.Lot.Product.PictureLink : null))
                 .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Lot.Product.Name))

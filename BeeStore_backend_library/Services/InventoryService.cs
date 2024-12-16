@@ -19,6 +19,7 @@ namespace BeeStore_Repository.Services
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILoggerManager _logger;
+        private readonly HashSet<string> _existingInventoryNames = new HashSet<string>();
         public InventoryService(IUnitOfWork unitOfWork, IMapper mapper, ILoggerManager logger)
         {
             _unitOfWork = unitOfWork;
@@ -59,23 +60,55 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.WarehouseIdNotFound);
             }
-            //Check inv capacity with total capacity of warehouse
-            decimal? currWeight = request.MaxWeight;
-            foreach (var inv in exist.Inventories)
+            decimal? totalWeight = 0;
+            if(request.InventoryAmount > 0)
             {
-                currWeight += inv.Weight;
-                if (currWeight > exist.Capacity)
-                {
-                    throw new KeyNotFoundException(ResponseMessage.WarehouseAddInventoryCapacityLimitReach);
-                }
+                totalWeight = request.InventoryAmount * request.MaxWeight;
             }
-            var result = _mapper.Map<Inventory>(request);
-            result.Weight = 0;
-            // BoughtDate and ExpirationDate shouldn't be initialize here -> initialize when Partner buy Inventory
-            //result.BoughtDate = DateTime.Now;
-            //result.ExpirationDate = DateTime.Now;
-            result.Price = request.Price;
-            await _unitOfWork.InventoryRepo.AddAsync(result);
+            else
+            {
+                throw new ApplicationException(ResponseMessage.BadRequest);
+            }
+
+            //Check inv capacity with total capacity of warehouse
+            if ((totalWeight += exist.Inventories.Sum(o => o.MaxWeight).Value) > exist.Capacity)
+            {
+                throw new ApplicationException(ResponseMessage.WarehouseAddInventoryCapacityLimitReach);
+            }
+            for (int i = 0; i < request.InventoryAmount; i++)
+            {
+                string inventoryName;
+                int attempts = 0;
+                const int maxAttempts = 100; 
+
+                do
+                {
+                    inventoryName = GenerateUniqueInventoryName();
+                    attempts++;
+
+                    if (attempts >= maxAttempts)
+                    {
+                        throw new ApplicationException();
+                    }
+                }
+                while (_existingInventoryNames.Contains(inventoryName) ||
+                       exist.Inventories.Any(inv => inv.Name == inventoryName && inv.WarehouseId.Equals(request.WarehouseId)));
+
+                
+                _existingInventoryNames.Add(inventoryName);
+
+                exist.Inventories.Add(new Inventory
+                {
+                    Name = inventoryName,
+                    MaxWeight = request.MaxWeight,
+                    Weight = 0,
+                    Price = request.Price,
+                    WarehouseId = request.WarehouseId,
+                });
+            }
+
+
+            //_unitOfWork.WarehouseRepo.Update(exist);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
         }
@@ -246,6 +279,12 @@ namespace BeeStore_Repository.Services
             wallet.TotalAmount -= inv.Price * month;
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
+        }
+
+        private string GenerateUniqueInventoryName()
+        {
+            // Generate a random 5-digit number
+            return $"INV-{Random.Shared.Next(10000, 99999):D5}";
         }
     }
 }

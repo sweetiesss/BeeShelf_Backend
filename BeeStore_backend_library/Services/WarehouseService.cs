@@ -86,7 +86,7 @@ namespace BeeStore_Repository.Services
 
             var list = await _unitOfWork.WarehouseRepo.GetListAsync(
                 filter: filterExpression,
-                includes: null,
+                includes: u => u.Include(o => o.Province).Include(o => o.Inventories),
                 sortBy: sortBy!,
                 descending: descending,
                 searchTerm: search,
@@ -118,6 +118,7 @@ namespace BeeStore_Repository.Services
             var list = await _unitOfWork.WarehouseRepo.GetQueryable(wh => wh
                                                        .Where(u => u.IsDeleted.Equals(false))
                                                        .Where(w => w.Inventories.Any(inventory => inventory.OcopPartnerId == userId))
+            .Include(o => o.Province).Include(o => o.Inventories)
             .Select(warehouse => new Warehouse
             {
                 Id = warehouse.Id,
@@ -153,6 +154,7 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.ProvinceIdNotFound);
             }
+            exist.Name = request.Name;
             exist.Location = request.Location;
             exist.Capacity = request.Capacity;
             exist.IsCold = request.IsCold;
