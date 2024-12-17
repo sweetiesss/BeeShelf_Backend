@@ -138,39 +138,52 @@ namespace BeeStore_Repository.Services
             return ResponseMessage.Success;
         }
 
-        public async Task<List<PartnerRevenueDTO>> GetPartnerRevenue(int id, int? day, int? month, int? year)
+        public async Task<List<PartnerRevenueDTO>> GetPartnerRevenue(int id, int? year)
         {
-            List<PartnerRevenueDTO> list = new List<PartnerRevenueDTO>();
-            list.Add(new PartnerRevenueDTO
+            var result = Enumerable.Range(1, 12)
+        .Select(month => new PartnerRevenueDTO
+        {
+            Month = month,
+            data = new List<RevenueDTO>
             {
-                orderStatus = Constants.Status.Canceled,
-                orderAmount = 0,
-                amount = 0,
-            });
-            list.Add(new PartnerRevenueDTO
-            {
-                orderStatus = Constants.Status.Completed,
-                orderAmount = 0,
-                amount = 0,
-            });
-            list.Add(new PartnerRevenueDTO
-            {
-                orderStatus = Constants.Status.Failed,
-                orderAmount = 0,
-                amount = 0,
-            });
-            list.Add(new PartnerRevenueDTO
-            {
-                orderStatus = Constants.Status.Shipping,
-                orderAmount = 0,
-                amount = 0,
-            });
-            list.Add(new PartnerRevenueDTO
-            {
-                orderStatus = Constants.Status.Pending,
-                orderAmount = 0,
-                amount = 0,
-            });
+                new RevenueDTO { orderStatus = Constants.Status.Canceled.ToString(), orderAmount = 0, amount = 0 },
+                new RevenueDTO { orderStatus = Constants.Status.Completed.ToString(), orderAmount = 0, amount = 0 },
+                new RevenueDTO { orderStatus = Constants.Status.Failed.ToString(), orderAmount = 0, amount = 0 },
+                new RevenueDTO { orderStatus = Constants.Status.Shipping.ToString(), orderAmount = 0, amount = 0 },
+                new RevenueDTO { orderStatus = Constants.Status.Pending.ToString(), orderAmount = 0, amount = 0 }
+            }
+        })
+        .ToList();
+            //list.Add(new PartnerRevenueDTO
+            //{
+            //    orderStatus = Constants.Status.Canceled,
+            //    orderAmount = 0,
+            //    amount = 0,
+            //});
+            //list.Add(new PartnerRevenueDTO
+            //{
+            //    orderStatus = Constants.Status.Completed,
+            //    orderAmount = 0,
+            //    amount = 0,
+            //});
+            //list.Add(new PartnerRevenueDTO
+            //{
+            //    orderStatus = Constants.Status.Failed,
+            //    orderAmount = 0,
+            //    amount = 0,
+            //});
+            //list.Add(new PartnerRevenueDTO
+            //{
+            //    orderStatus = Constants.Status.Shipping,
+            //    orderAmount = 0,
+            //    amount = 0,
+            //});
+            //list.Add(new PartnerRevenueDTO
+            //{
+            //    orderStatus = Constants.Status.Pending,
+            //    orderAmount = 0,
+            //    amount = 0,
+            //});
             var partner = await _unitOfWork.OcopPartnerRepo.AnyAsync(u => u.Id == id);
             if (partner == false)
             {
@@ -187,36 +200,66 @@ namespace BeeStore_Repository.Services
             if (year.HasValue)
             {
                 ordersQuery = ordersQuery.Where(o => o.CreateDate.Value.Year == year.Value).ToList();
-                if (month.HasValue)
+                //if (month.HasValue)
+                //{
+                //    ordersQuery = ordersQuery.Where(o => o.CreateDate.Value.Month == month.Value).ToList();
+                //    if (day.HasValue)
+                //    {
+                //        ordersQuery = ordersQuery.Where(o => o.CreateDate.Value.Day == day.Value).ToList();
+                //    }
+                //}
+            }
+
+            var groupedOrders = ordersQuery
+        .GroupBy(o => new {
+            Month = o.CreateDate.Value.Month,
+            Status = o.Status.ToString()
+        })
+        .Select(g => new
+        {
+            Month = g.Key.Month,
+            Status = g.Key.Status,
+            OrderAmount = g.Count(),
+            TotalAmount = g.Sum(o => o.TotalPrice ?? 0)
+        })
+        .ToList();
+
+            //var groupedOrders = ordersQuery
+            //.GroupBy(o => o.Status)
+            //.Select(g => new
+            //{
+            //    Status = g.Key,
+            //    OrderAmount = g.Count(),
+            //    TotalAmount = g.Sum(o => o.TotalPrice ?? 0)
+            //});
+
+            //foreach (var group in groupedOrders)
+            //{
+            //    var dto = list.FirstOrDefault(d => d.orderStatus == group.Status);
+            //    if (dto != null)
+            //    {
+            //        dto.orderAmount = group.OrderAmount;
+            //        dto.amount = (int)group.TotalAmount;
+            //    }
+            //}
+            foreach (var monthGroup in result)
+            {
+                var monthOrders = groupedOrders.Where(g => g.Month == monthGroup.Month);
+
+                foreach (var orderGroup in monthOrders)
                 {
-                    ordersQuery = ordersQuery.Where(o => o.CreateDate.Value.Month == month.Value).ToList();
-                    if (day.HasValue)
+                    var statusEntry = monthGroup.data.FirstOrDefault(d =>
+                        d.orderStatus == orderGroup.Status);
+
+                    if (statusEntry != null)
                     {
-                        ordersQuery = ordersQuery.Where(o => o.CreateDate.Value.Day == day.Value).ToList();
+                        statusEntry.orderAmount = orderGroup.OrderAmount;
+                        statusEntry.amount = (int)orderGroup.TotalAmount;
                     }
                 }
             }
 
-            var groupedOrders = ordersQuery
-            .GroupBy(o => o.Status)
-            .Select(g => new
-            {
-                Status = g.Key,
-                OrderAmount = g.Count(),
-                TotalAmount = g.Sum(o => o.TotalPrice ?? 0)
-            });
-
-            foreach (var group in groupedOrders)
-            {
-                var dto = list.FirstOrDefault(d => d.orderStatus == group.Status);
-                if (dto != null)
-                {
-                    dto.orderAmount = group.OrderAmount;
-                    dto.amount = (int)group.TotalAmount;
-                }
-            }
-
-            return list;
+            return result;
         }
 
         public async Task<PartnerProductDTO> GetPartnerTotalProduct(int id, int? warehouseId)

@@ -189,7 +189,7 @@ namespace BeeStore_Repository.Services
                 filter: u => (vestatus == null || u.Status.Equals(vestatus))
                              && (vetype == null || u.Type.Equals(vetype))
                              && (warehouseId == null || u.WarehouseId.Equals(warehouseId)),
-                includes: null,
+                includes: u => u.Include(o => o.AssignedDriver),
                 sortBy: sortBy!,
                 descending: descending,
                 searchTerm: null,
@@ -243,6 +243,7 @@ namespace BeeStore_Repository.Services
             }
             vehicle.Name = request.Name;
             vehicle.LicensePlate = request.LicensePlate;
+            vehicle.WarehouseId = request.WarehouseId;
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
         }

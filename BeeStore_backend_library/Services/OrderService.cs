@@ -251,7 +251,7 @@ namespace BeeStore_Repository.Services
                     {
                         decimal? extraWeight = lot.Product.Weight * product.ProductAmount - 5;
                         decimal extraWeightUnits = Math.Ceiling((decimal)extraWeight / 0.5m); // Convert to 0.5kg units
-                        deliveryFee += extraWeightUnits * 5000;
+                        deliveryFee += extraWeightUnits * 2500;
                     }
                     request.OrderDetails.Add(new OrderDetailCreateDTO
                     {
@@ -420,7 +420,7 @@ namespace BeeStore_Repository.Services
                             {
                                 decimal? extraWeight = lot.Product.Weight * product.ProductAmount - 5;
                                 decimal extraWeightUnits = Math.Ceiling((decimal)extraWeight / 0.5m); // Convert to 0.5kg units
-                                deliveryFee += extraWeightUnits * 5000;
+                                deliveryFee += extraWeightUnits * 2500;
                             }
 
                             exist.OrderDetails.Add(new OrderDetail
@@ -469,8 +469,6 @@ namespace BeeStore_Repository.Services
                 }
             }
           
-
-
             //update receiver address and phone in both draft and shipping
             exist.ReceiverAddress = request.ReceiverAddress;
             exist.ReceiverPhone = request.ReceiverPhone;
@@ -595,32 +593,32 @@ namespace BeeStore_Repository.Services
                     orderStatusUpdate = Constants.Status.Shipping;
 
                     //find batch of Order
-                    var batch = await _unitOfWork.BatchRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.BatchId));
-                    if (batch == null)
-                    {
-                        throw new KeyNotFoundException(ResponseMessage.BatchIdNotFound);
-                    }
+                    //var batch = await _unitOfWork.BatchRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.BatchId));
+                    //if (batch == null)
+                    //{
+                    //    throw new KeyNotFoundException(ResponseMessage.BatchIdNotFound);
+                    //}
 
-                    // find shipper of that batch
-                    var shipper = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id.Equals(batch.DeliverBy));
-                    if (shipper == null)
-                    {
-                        throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
-                    }
+                    //// find shipper of that batch
+                    //var shipper = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id.Equals(batch.DeliverBy));
+                    //if (shipper == null)
+                    //{
+                    //    throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
+                    //}
 
-                    // from shipper search for assigned vehicle
-                    var vehicle = await _unitOfWork.VehicleRepo.SingleOrDefaultAsync(u => u.AssignedDriverId.Equals(shipper.Id));
-                    if (vehicle == null)
-                    {
-                        throw new KeyNotFoundException(ResponseMessage.VehicleIdNotFound);
-                    }
+                    //// from shipper search for assigned vehicle
+                    //var vehicle = await _unitOfWork.VehicleRepo.SingleOrDefaultAsync(u => u.AssignedDriverId.Equals(shipper.Id));
+                    //if (vehicle == null)
+                    //{
+                    //    throw new KeyNotFoundException(ResponseMessage.VehicleIdNotFound);
+                    //}
 
                     // change the found vehicle's status to Available
-                    vehicle.Status = Constants.VehicleStatus.InService;
+                    exist.Batch.DeliverByNavigation.Vehicles.First().Status = Constants.VehicleStatus.InService;
 
                     a = true;
                     DateTime now = DateTime.Now;
-                    exist.DeliverStartDate = now.AddHours(1).AddMinutes(-now.Minute).AddSeconds(-now.Second).AddMilliseconds(-now.Millisecond);
+                    exist.DeliverStartDate = now;
 
                 }
                 else
@@ -713,7 +711,7 @@ namespace BeeStore_Repository.Services
                     exist.DeliverFinishDate = DateTime.Now;
                     //add money directly after order is delivered.
 
-                    exist.OcopPartner.Wallets.First().TotalAmount += exist.TotalPriceAfterFee;
+                    //exist.OcopPartner.Wallets.First().TotalAmount += exist.TotalPriceAfterFee;
                 }
                 else
                 {
@@ -733,6 +731,10 @@ namespace BeeStore_Repository.Services
                         await UpdateLotProductAmount(od.LotId, od.ProductAmount, true);
                     }
 
+                    if(exist.TotalPriceAfterFee < 0)
+                    {
+                        exist.TotalPriceAfterFee *= -1;
+                    }
                     exist.OcopPartner.Wallets.First().TotalAmount -= exist.TotalPriceAfterFee;
                     exist.Payments.First().IsDeleted = true;
 
@@ -752,7 +754,6 @@ namespace BeeStore_Repository.Services
 
                     // change the found vehicle's status to Available
                     exist.Batch.DeliverByNavigation.Vehicles.First().Status = Constants.VehicleStatus.Available;
-
 
                     a = true;
                 }
@@ -775,14 +776,19 @@ namespace BeeStore_Repository.Services
                         if (x.Status == Constants.Status.Shipping || x.Status == Constants.Status.Delivered 
                             || x.Status == Constants.Status.Returned || x.Status == Constants.Status.Processing)
                         {
-                            b = false;
-                            break;
+                            if(x.Id != exist.Id)
+                            {
+                                b = false;
+                                break;
+                            }
                         }
                     }
                     if (b == true)
                     {
                         exist.Batch.Status = Constants.Status.Completed;
                     }
+
+                    exist.OcopPartner.Wallets.First().TotalAmount += exist.TotalPriceAfterFee;
 
                     // change the found vehicle's status to Available
                     exist.Batch.DeliverByNavigation.Vehicles.First().Status = Constants.VehicleStatus.Available;
