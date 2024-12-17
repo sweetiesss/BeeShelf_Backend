@@ -29,6 +29,15 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
+        [Route("get-warehouses-total-revenue")]
+        [HttpGet]
+        [Authorize(Roles = "Admin,Manager")]
+        public async Task<IActionResult> GetWarehousesTotalRevenue(int? year)
+        {
+            var result = await _userService.GetManagerTotalRevenue(year);
+            return Ok(result);
+        }
+
 
         [Route("get-employees")]
         [HttpGet]

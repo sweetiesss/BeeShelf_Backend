@@ -74,6 +74,8 @@ namespace BeeStore_Repository.Mapper
 
 
             CreateMap<Warehouse, WarehouseListDTO>()
+                .ForMember(dest => dest.UnboughtInventory, opt => opt.MapFrom(src => src.Inventories.Count(u => !u.OcopPartnerId.HasValue)))
+                .ForMember(dest => dest.TotalInventory, opt => opt.MapFrom(src => src.Inventories.Count()))
                 .ForMember(dest => dest.AvailableCapacity, opt => opt.MapFrom(src => src.Inventories == null ? 0 : src.Inventories.Where(u => string.IsNullOrEmpty(u.OcopPartnerId.ToString()) || u.OcopPartnerId == null).Sum(u => u.MaxWeight)))
                 .ForMember(dest => dest.Location, opt => opt.MapFrom(src => src.Location + ", " + src.Province.SubDivisionName))
                 .ForMember(dest => dest.ProvinceName, opt => opt.MapFrom(src => src.Province.SubDivisionName));
@@ -207,6 +209,8 @@ namespace BeeStore_Repository.Mapper
                 .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<MoneyTransfer, MoneyTransferListDTO>()
                 .ForMember(dest => dest.partner_email, opt => opt.MapFrom(src => src.OcopPartner.Email))
+                .ForMember(dest => dest.partner_bank_name, opt => opt.MapFrom(src => src.OcopPartner.BankName))
+                .ForMember(dest => dest.partner_bank_account, opt => opt.MapFrom(src => src.OcopPartner.BankAccountNumber))
                 .ForMember(dest => dest.TransferByStaffEmail, opt => opt.MapFrom(src => src.TransferByNavigation.Email))
                 .ForMember(dest => dest.TransferByStaffName, opt => opt.MapFrom(src => $"{src.TransferByNavigation.FirstName} {src.TransferByNavigation.LastName}"))
                 .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
