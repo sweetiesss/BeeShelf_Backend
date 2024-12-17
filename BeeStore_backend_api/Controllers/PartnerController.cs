@@ -79,9 +79,9 @@ namespace BeeStore_Api.Controllers
         [Route("get-partner-revenue/{id}")]
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> GetPartnerRevenue(int id, int? day, int? month, int? year)
+        public async Task<IActionResult> GetPartnerRevenue(int id, int? year)
         {
-            var result = await _partnerService.GetPartnerRevenue(id, day, month, year);
+            var result = await _partnerService.GetPartnerRevenue(id, year);
             return Ok(result);
         }
 

@@ -527,6 +527,43 @@ namespace BeeStore_Repository.Services
             }
         }
 
+        public async Task<List<ManagerTotalRevenueDTO>> GetManagerTotalRevenue(int? year)
+        {
+            var warehouses = await _unitOfWork.WarehouseRepo.GetQueryable(u => u.Include(o => o.Inventories)
+                                                                                .Include(o => o.Province)
+                                                                                .Include(o => o.Vehicles)
+                                                                                .Include(o => o.WarehouseShippers)
+                                                                                .Include(o => o.WarehouseStaffs));
+            warehouses = warehouses.ToList();
+
+            var result = new List<ManagerTotalRevenueDTO>();
+
+            foreach (var warehouse in warehouses)
+            {
+                var warehouseRevenue = new ManagerTotalRevenueDTO
+                {
+                    WarehouseId = warehouse.Id,
+                    WarehouseName = warehouse.Name,
+                    data = new List<MonthRevenueDTO>()
+                };
+
+
+                for (int month = 1; month <= 12; month++)
+                {
+
+                    var monthRevenue = await CalculateWarehouseRevenue(warehouse.Id, null, month, year);
+
+                    warehouseRevenue.data.Add(new MonthRevenueDTO
+                    {
+                        Month = month,
+                        TotalRevenue = monthRevenue,
+                    });
+                }
+                result.Add(warehouseRevenue);
+            }
+                return result;
+        }
+
         public async Task<ManagerDashboardDTO> GetManagerDashboard(int? day, int? month, int? year)
         {
             var warehouses = await _unitOfWork.WarehouseRepo.GetQueryable(u => u.Include(o => o.Inventories)
@@ -578,8 +615,8 @@ namespace BeeStore_Repository.Services
                 }
             }
             decimal? result = ordersQuery.Sum(o => o.TotalPrice - o.TotalPriceAfterFee);
-           return result;
-            
+            return result;
+
         }
     }
 }
