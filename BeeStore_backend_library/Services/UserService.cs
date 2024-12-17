@@ -527,5 +527,59 @@ namespace BeeStore_Repository.Services
             }
         }
 
+        public async Task<ManagerDashboardDTO> GetManagerDashboard(int? day, int? month, int? year)
+        {
+            var warehouses = await _unitOfWork.WarehouseRepo.GetQueryable(u => u.Include(o => o.Inventories)
+                                                                                .Include(o => o.Province)
+                                                                                .Include(o => o.Vehicles)
+                                                                                .Include(o => o.WarehouseShippers)
+                                                                                .Include(o => o.WarehouseStaffs));
+            warehouses = warehouses.ToList();
+            var dashboard = new ManagerDashboardDTO
+            {
+                totalWarehouse = warehouses.Count,
+                totalInventory = warehouses.Sum(w => w.Inventories.Count),
+                totalVehicle = warehouses.Sum(w => w.Vehicles.Count),
+                totalEmployee = warehouses.Sum(w => w.WarehouseStaffs.Count + w.WarehouseShippers.Count),
+                totalStaff = warehouses.Sum(w => w.WarehouseStaffs.Count),
+                totalShipper = warehouses.Sum(w => w.WarehouseShippers.Count),
+
+                data = warehouses.Select(w => new WarehouseRevenueDTO
+                {
+                    WarehouseId = w.Id,
+                    name = w.Name,
+                    location = w.Location + ", " + w.Province.SubDivisionName,
+                    isCold = w.IsCold,
+                    totalRevenue = CalculateWarehouseRevenue(w.Id, day, month, year).Result,
+                    totalBoughtInventory = w.Inventories.Count(i => i.OcopPartnerId.HasValue),
+                    totalUnboughtInventory = w.Inventories.Count(i => !i.OcopPartnerId.HasValue)
+                }).ToList()
+            };
+            return dashboard;
+        }
+
+        private async Task<decimal?> CalculateWarehouseRevenue(int warehouseId, int? day, int? month, int? year)
+        {
+            var ordersQuery = await _unitOfWork.OrderRepo.GetQueryable(query => query.Where(u => u.DeliveryZone.Province.Warehouses.Any(u => u.Id.Equals(warehouseId)))
+                                                                                     .Where(u => u.Status == Constants.Status.Completed)
+                                                                                     .OrderBy(u => u.CreateDate)
+                                                                                     .Include(o => o.DeliveryZone).ThenInclude(o => o.Province));
+            ordersQuery = ordersQuery.ToList();
+            if (year.HasValue)
+            {
+                ordersQuery = ordersQuery.Where(o => o.CreateDate.Value.Year == year.Value).ToList();
+                if (month.HasValue)
+                {
+                    ordersQuery = ordersQuery.Where(o => o.CreateDate.Value.Month == month.Value).ToList();
+                    if (day.HasValue)
+                    {
+                        ordersQuery = ordersQuery.Where(o => o.CreateDate.Value.Day == day.Value).ToList();
+                    }
+                }
+            }
+            decimal? result = ordersQuery.Sum(o => o.TotalPrice - o.TotalPriceAfterFee);
+           return result;
+            
+        }
     }
 }
