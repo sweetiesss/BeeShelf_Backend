@@ -155,7 +155,19 @@ namespace BeeStore_Repository.Services
             });
             list.Add(new PartnerRevenueDTO
             {
+                orderStatus = Constants.Status.Failed,
+                orderAmount = 0,
+                amount = 0,
+            });
+            list.Add(new PartnerRevenueDTO
+            {
                 orderStatus = Constants.Status.Shipping,
+                orderAmount = 0,
+                amount = 0,
+            });
+            list.Add(new PartnerRevenueDTO
+            {
+                orderStatus = Constants.Status.Pending,
                 orderAmount = 0,
                 amount = 0,
             });
@@ -167,7 +179,9 @@ namespace BeeStore_Repository.Services
             var ordersQuery = await _unitOfWork.OrderRepo.GetQueryable(query => query.Where(u => u.OcopPartnerId.Equals(id)
                                                                                          && (u.Status == Constants.Status.Canceled
                                                                                          || u.Status == Constants.Status.Completed
-                                                                                         || u.Status == Constants.Status.Shipping)
+                                                                                         || u.Status == Constants.Status.Shipping
+                                                                                         || u.Status == Constants.Status.Failed
+                                                                                         || u.Status == Constants.Status.Pending)
                                                                                          && u.IsDeleted == false)
                                                                                      .OrderBy(u => u.CreateDate));
             if (year.HasValue)

@@ -18,5 +18,6 @@ namespace BeeStore_Repository.Services.Interfaces
 
         Task<string> ForgotPassword(string email);
         Task<string> ResetPassword(UserForgotPasswordRequest request);
+        Task<ManagerDashboardDTO> GetManagerDashboard(int? day, int? month, int? year);
     }
 }
