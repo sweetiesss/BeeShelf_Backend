@@ -20,6 +20,14 @@ namespace BeeStore_Api.Controllers
             _jwtService = jwtService;
         }
 
+        [Route("get-manager-dashboard")]
+        [HttpGet]
+        [Authorize(Roles = "Admin,Manager")]
+        public async Task<IActionResult> GetManagerDashboard(int? day, int? month, int? year)
+        {
+            var result = await _userService.GetManagerDashboard(day, month, year);
+            return Ok(result);
+        }
 
 
         [Route("get-employees")]
