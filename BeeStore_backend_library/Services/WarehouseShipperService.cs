@@ -165,6 +165,7 @@ namespace BeeStore_Repository.Services
             var result = shipper.WarehouseShippers.FirstOrDefault(u => u.EmployeeId.Equals(shipperId)
                                                                  && u.IsDeleted.Equals(false));
             result.DeliveryZoneId = deliveryZoneId;
+            result.Status = "Active";
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
 

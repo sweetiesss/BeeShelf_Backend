@@ -6,6 +6,8 @@
 
         public int? OcopPartnerId { get; set; }
         public string? partner_email { get; set; }
+        public string? partner_bank_name {  get; set; }
+        public string? partner_bank_account {  get; set; }
         public int? TransferBy { get; set; }
 
         public string? TransferByStaffEmail { get; set; }
