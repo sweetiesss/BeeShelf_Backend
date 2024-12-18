@@ -211,6 +211,7 @@ namespace BeeStore_Repository.Services
         (import == false && u.RequestType.Equals("Export")))
                              && u.IsDeleted.Equals(false),
                 includes: u => u.Include(o => o.SendToInventory).ThenInclude(o => o.Warehouse)
+                                .Include(o => o.ExportFromLot).ThenInclude(o => o.Inventory).ThenInclude(o => o.Warehouse)
                                 .Include(o => o.OcopPartner)
                                 .Include(o => o.Lot).ThenInclude(o => o.Product),
                 sortBy: Constants.SortCriteria.CreateDate,
