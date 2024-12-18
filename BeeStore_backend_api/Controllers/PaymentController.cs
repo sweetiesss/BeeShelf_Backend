@@ -36,12 +36,12 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
-        [Authorize(Roles = "Admin,Staff")]
-        [Route("get-payments/{warehouseId}")]
+        [Authorize(Roles = "Admin,Manager,Partner")]
+        [Route("get-payments/{partnerId}")]
         [HttpGet]
-        public async Task<IActionResult> GetPayment(int warehouseId)
+        public async Task<IActionResult> GetPayment(int partnerId)
         {
-            var result = await _paymentService.GetPaymentList(warehouseId);
+            var result = await _paymentService.GetPaymentList(partnerId);
             return Ok(result);
         }
 

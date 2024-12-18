@@ -195,6 +195,7 @@ namespace BeeStore_Repository.Mapper
             CreateMap<OrderDetailCreateDTO, OrderDetail>();
             CreateMap<Payment, PaymentListDTO>()
                 .ForMember(dest => dest.ShipperEmail, opt => opt.MapFrom(src => src.CollectedByNavigation.Email))
+                .ForMember(dest => dest.OrderCode, opt => opt.MapFrom(src =>src.Order.OrderCode))
                 .ForMember(dest => dest.ShipperName, opt => opt.MapFrom(src => src.CollectedByNavigation.FirstName + src.CollectedByNavigation.LastName));
             CreateMap<OrderUpdateDTO, List<OrderDetail>>()
            .ConvertUsing((src, dest) => src.OrderDetails.Select(od => new OrderDetail
