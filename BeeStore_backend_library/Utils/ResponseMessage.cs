@@ -116,6 +116,7 @@
         public const string RequestDraftCancelError = "Can't cancel draft request.";
         public const string RequestHasNotBeenProcessed = "Request has not been processed or have already been finished.";
         public const string InventoryFromTheSameWarehouse = "You can't export a Lot to the same warehouse.";
+        public const string StaffCantProcessedExportOrderFromAnotherWarehouse = "This staff can't processed order export to another warehouse.";
 
         //Warehouse category response message
         public const string WarehouseCategoryAddListFailed = "Failed to add. Warehouse with these category already exist: ";
