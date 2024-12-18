@@ -507,30 +507,6 @@ namespace BeeStore_Repository.Services
             {
                 exist.Status = Constants.Status.Canceled;
 
-                //find batch of Order
-                var batch = await _unitOfWork.BatchRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.BatchId));
-                if (batch == null)
-                {
-                    throw new KeyNotFoundException(ResponseMessage.BatchIdNotFound);
-                }
-
-                // find shipper of that batch
-                var shipper = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id.Equals(batch.DeliverBy));
-                if (shipper == null)
-                {
-                    throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
-                }
-
-                // from shipper search for assigned vehicle
-                var vehicle = await _unitOfWork.VehicleRepo.SingleOrDefaultAsync(u => u.AssignedDriverId.Equals(shipper.Id));
-                if (vehicle == null)
-                {
-                    throw new KeyNotFoundException(ResponseMessage.VehicleIdNotFound);
-                }
-
-                // change the found vehicle's status to Available
-                vehicle.Status = Constants.VehicleStatus.Available;
-
                 exist.CancelDate = DateTime.Now;
                 await _unitOfWork.SaveAsync();
             }
