@@ -27,11 +27,24 @@ namespace BeeStore_Repository.Services
         //Must assgin only 1 shipper when Create Batch - Assigned Shipper cannot be changed
         public async Task<string> CreateBatch(BatchCreateDTO request)
         {
-            var batchlist = await _unitOfWork.BatchRepo.GetListAsync();
-            if(batchlist != null) 
-                foreach (var batch in batchlist) 
-                    if (batch.Name.Equals(request.Name, StringComparison.OrdinalIgnoreCase)) throw new ApplicationException(ResponseMessage.BatchDuplicateName);
-                
+            var shipper = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id.Equals(request.ShipperId),
+                                                                                 query => query.Include(o => o.Role)
+                                                                                               .Include(o => o.Vehicles).Include(o => o.WarehouseShippers));
+            if (shipper == null)
+            {
+                throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
+            }
+            if (shipper.Role.RoleName != Constants.RoleName.Shipper)
+            {
+                throw new ApplicationException(ResponseMessage.UserRoleNotShipperError);
+            }
+
+
+            var exist = await _unitOfWork.BatchRepo.AnyAsync(u => u.Name.Equals(request.Name) && u.DeliveryZone.WarehouseShippers.Any(u => u.WarehouseId.Equals(shipper.WarehouseShippers.First().WarehouseId)));
+            if (exist == true)
+            {
+                throw new ApplicationException(ResponseMessage.BatchDuplicateName);
+            }
 
             var result = _mapper.Map<Batch>(request);
             result.Status = Constants.Status.Pending;
@@ -64,17 +77,7 @@ namespace BeeStore_Repository.Services
             //check shipper
             if (request.ShipperId != 0)
             {
-                var shipper = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id.Equals(request.ShipperId),
-                                                                                 query => query.Include(o => o.Role)
-                                                                                               .Include(o => o.Vehicles));
-                if (shipper == null)
-                {
-                    throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
-                }
-                if (shipper.Role.RoleName != Constants.RoleName.Shipper)
-                {
-                    throw new ApplicationException(ResponseMessage.UserRoleNotShipperError);
-                }
+                
 
                 var warehouseShipper = await _unitOfWork.WarehouseShipperRepo.SingleOrDefaultAsync(u => u.EmployeeId.Equals(shipper.Id));
 
