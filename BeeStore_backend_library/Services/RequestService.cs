@@ -438,7 +438,8 @@ namespace BeeStore_Repository.Services
                     originalLot.ExportDate = DateTime.Now;
                     lot.ImportDate = DateTime.Now;
                     lot.InventoryId = exist.SendToInventoryId;
-                    lot.ExpirationDate = DateTime.Now.AddDays(lot.Product.ProductCategory!.ExpireIn!.Value);
+                    var productcategory = await _unitOfWork.ProductCategoryRepo.SingleOrDefaultAsync(u => u.Id.Equals(lot.Product.ProductCategoryId));
+                    lot.ExpirationDate = DateTime.Now.AddDays(productcategory!.ExpireIn!.Value);
                 }
 
             }
