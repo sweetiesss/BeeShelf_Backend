@@ -143,7 +143,8 @@ namespace BeeStore_Repository.Services
             var shipper = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id.Equals(shipperId),
                                                                               query => query
                                                                               .Include(o => o.WarehouseShippers)
-                                                                              .ThenInclude(o => o.Warehouse));
+                                                                              .ThenInclude(o => o.Warehouse)
+                                                                              .Include(o => o.Role));
             if (shipper == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
