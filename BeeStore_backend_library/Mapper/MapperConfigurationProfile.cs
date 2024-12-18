@@ -163,6 +163,9 @@ namespace BeeStore_Repository.Mapper
                 .ForMember(dest => dest.ProductName, opt => opt.MapFrom(src => src.Lot!.Product!.Name))
                 .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom(src => src.SendToInventory!.Warehouse!.Name))
                 .ForMember(dest => dest.ProductImage, opt => opt.MapFrom(src => src.Lot!.Product!.PictureLink))
+                .ForMember(dest => dest.ExportFromInventoryName, opt => opt.MapFrom(src => src.ExportFromLot.Inventory.Name))
+                .ForMember(dest => dest.SendToInventoryName, opt => opt.MapFrom(src => src.SendToInventory.Name))
+                .ForMember(dest => dest.ExportFromWarehouseName, opt => opt.MapFrom(src => src.ExportFromLot.Inventory.Warehouse.Name))
             .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<RequestCreateDTO, Request>();
 
