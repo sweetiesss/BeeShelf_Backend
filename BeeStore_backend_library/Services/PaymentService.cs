@@ -193,9 +193,9 @@ namespace BeeStore_Repository.Services
             }
         }
 
-        public async Task<List<PaymentListDTO>> GetPaymentList(int warehouseId)
+        public async Task<List<PaymentListDTO>> GetPaymentList(int partnerId)
         {
-            var list = await _unitOfWork.PaymentRepo.GetQueryable(query => query.Where(u => u.Order.OrderDetails.Any(od => od.Lot.Inventory.WarehouseId.Equals(warehouseId))));
+            var list = await _unitOfWork.PaymentRepo.GetQueryable(query => query.Where(u => u.OcopPartnerId.Equals(partnerId)).Include(o => o.CollectedByNavigation).Include(o => o.Order));
             var a = list.ToList();
             var result = _mapper.Map<List<PaymentListDTO>>(a);
             return result;
