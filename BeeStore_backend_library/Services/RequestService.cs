@@ -421,7 +421,8 @@ namespace BeeStore_Repository.Services
                     }
                     lot.ImportDate = DateTime.Now;
                     lot.InventoryId = exist.SendToInventoryId;
-                    lot.ExpirationDate = DateTime.Now.AddDays(product.ProductCategory!.ExpireIn!.Value);
+                    var productcategory = await _unitOfWork.ProductCategoryRepo.SingleOrDefaultAsync(u => u.Id.Equals(product.ProductCategoryId));
+                    lot.ExpirationDate = DateTime.Now.AddDays(productcategory!.ExpireIn!.Value);
 
                     inventory.Weight = totalWeight;
 
