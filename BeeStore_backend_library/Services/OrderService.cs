@@ -647,6 +647,7 @@ namespace BeeStore_Repository.Services
 
             if (orderStatusString.Equals(Constants.Status.Canceled, StringComparison.OrdinalIgnoreCase)) //Canceled
             {
+                bool b = true;
                 if (exist.Status == Constants.Status.Shipping ||
                     exist.Status == Constants.Status.Processing)
                 {
@@ -660,6 +661,19 @@ namespace BeeStore_Repository.Services
                         await UpdateLotProductAmount(od.LotId, od.ProductAmount, true);
                     }
 
+                    foreach (var x in exist.Batch.Orders)
+                    {
+                        if (x.Status == Constants.Status.Shipping || x.Status == Constants.Status.Delivered
+                            || x.Status == Constants.Status.Returned || x.Status == Constants.Status.Processing)
+                        {
+                            b = false;
+                            break;
+                        }
+                    }
+                    if (b == true)
+                    {
+                        exist.Batch.Status = Constants.Status.Completed;
+                    }
                     ////find batch of Order
                     //var batch = await _unitOfWork.BatchRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.BatchId));
                     //if (batch == null)

@@ -85,9 +85,9 @@ namespace BeeStore_Api.Controllers
         [Route("update-request-status/{id}")]
         [HttpPut]
         [Authorize(Roles = "Admin,Manager,Staff")]
-        public async Task<IActionResult> UpdateRequestStatus(int id, RequestStatus status)
+        public async Task<IActionResult> UpdateRequestStatus(int id, RequestStatus status, int? staffId)
         {
-            var result = await _requestService.UpdateRequestStatus(id, status);
+            var result = await _requestService.UpdateRequestStatus(id, status, staffId);
             return Ok(result);
         }
 

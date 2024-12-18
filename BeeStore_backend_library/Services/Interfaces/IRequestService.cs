@@ -9,7 +9,7 @@ namespace BeeStore_Repository.Services.Interfaces
         Task<Pagination<RequestListDTO>> GetRequestList(bool? import, RequestStatus? status, bool descending, int warehouseId, int pageIndex, int pageSize);
         Task<Pagination<RequestListDTO>> GetRequestList(int userId, bool? import, RequestStatus? status, bool descending, int pageIndex, int pageSize);
 
-        Task<string> UpdateRequestStatus(int id, RequestStatus status);
+        Task<string> UpdateRequestStatus(int id, RequestStatus status, int? staffId);
         Task<string> CancelRequest(int id, string cancellationReason);
         Task<string> SendRequest(int id);
         Task<string> CreateRequest(RequestType type, bool send, RequestCreateDTO request);

@@ -38,7 +38,7 @@ namespace BeeStore_Repository.Services
             {
                 throw new ApplicationException(ResponseMessage.RequestStatusError);
             }
-            if(cancellationReason != null)
+            if (cancellationReason != null)
             {
                 request.CancellationReason = cancellationReason;
             }
@@ -205,7 +205,7 @@ namespace BeeStore_Repository.Services
             var list = await _unitOfWork.RequestRepo.GetListAsync(
                 filter: u => (filterQuery == null || u.Status.Equals(filterQuery))
                              && (userId == null || u.OcopPartnerId.Equals(userId))
-                             && (warehouseId == null || u.SendToInventory.WarehouseId.Equals(warehouseId))
+                             && (warehouseId == null || u.SendToInventory.WarehouseId.Equals(warehouseId) || u.ExportFromLot.Inventory.WarehouseId.Equals(warehouseId))
                              && (import == null ||
         (import == true && u.RequestType.Equals("Import")) ||
         (import == false && u.RequestType.Equals("Export")))
@@ -289,10 +289,10 @@ namespace BeeStore_Repository.Services
         }
 
 
-        public async Task<string> UpdateRequestStatus(int id, RequestStatus status)
+        public async Task<string> UpdateRequestStatus(int id, RequestStatus status, int? staffId)
         {
 
-            var exist = await _unitOfWork.RequestRepo.SingleOrDefaultAsync(u => u.Id == id);
+            var exist = await _unitOfWork.RequestRepo.SingleOrDefaultAsync(u => u.Id == id, includes => includes.Include(o => o.Lot));
             if (exist == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.RequestIdNotFound);
@@ -323,11 +323,70 @@ namespace BeeStore_Repository.Services
 
             if (requestStatus.Equals(Constants.Status.Processing))
             {
+                if (staffId != null)
+                {
+                    var staff = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id == staffId, query => query.Include(o => o.WarehouseStaffs));
+                    if (staff == null)
+                    {
+                        throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
+                    }
+                }
+                if (exist.RequestType == "Export")
+                {
+                    if (exist.Lot.Inventory.WarehouseId != staffId)
+                    {
+                        throw new ApplicationException(ResponseMessage.StaffCantProcessedExportOrderFromAnotherWarehouse);
+                    }
+                }
                 if (!exist.Status.Equals(Constants.Status.Pending))
                 {
                     throw new ApplicationException(ResponseMessage.BadRequest);
                 }
-                exist.ApporveDate = DateTime.Now;
+                var lot = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.LotId), query => query.Include(o => o.Product));
+                if (lot == null)
+                {
+                    throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
+                }
+                var inventory = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.SendToInventoryId));
+                if (inventory == null)
+                {
+                    throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
+                }
+
+                if (exist.RequestType == "Import")
+                {
+
+                }
+                else
+                {
+                    var lotWeight = lot.Product.Weight * lot.TotalProductAmount;
+                    var totalWeight = inventory.Weight + lotWeight;
+                    if (totalWeight > inventory.MaxWeight)
+                    {
+                        exist.Status = Constants.Status.Failed;
+                        exist.CancellationReason = ResponseMessage.InventoryOverWeightError;
+                        await _unitOfWork.SaveAsync();
+                        throw new ApplicationException(ResponseMessage.InventoryOverWeightError);
+                    }
+                    var originalLot = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.ExportFromLotId), includes => includes.Include(o => o.Inventory));
+                    if (originalLot != null)
+                    {
+                        var totalProductAmount = exist.Lot.ProductPerLot * exist.Lot.LotAmount;
+                        if (totalProductAmount > originalLot.TotalProductAmount)
+                        {
+                            exist.Status = Constants.Status.Failed;
+                            exist.CancellationReason = ResponseMessage.ProductNotEnough;
+                            await _unitOfWork.SaveAsync();
+                            throw new ApplicationException(ResponseMessage.ProductNotEnough);
+                        }
+                        originalLot.TotalProductAmount -= totalProductAmount;
+                        originalLot.LotAmount -= exist.Lot.LotAmount;
+
+
+                        inventory.Weight = totalWeight;
+                        originalLot.Inventory.Weight -= lotWeight;
+                    }
+                }
             }
 
             if (requestStatus == Constants.Status.Completed)
@@ -365,37 +424,13 @@ namespace BeeStore_Repository.Services
                 }
                 else
                 {
-                    var lotWeight = lot.Product.Weight * lot.TotalProductAmount;
-                    var totalWeight = inventory.Weight + lotWeight;
-                    if (totalWeight > inventory.MaxWeight)
-                    {
-                        exist.Status = Constants.Status.Failed;
-                        exist.CancellationReason = ResponseMessage.InventoryOverWeightError;
-                        await _unitOfWork.SaveAsync();
-                        throw new ApplicationException(ResponseMessage.InventoryOverWeightError);
-                    }
-                    var originalLot = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.ExportFromLotId));
-                    if (originalLot != null)
-                    {
-                        var totalProductAmount = exist.Lot.ProductPerLot * exist.Lot.LotAmount;
-                        if (totalProductAmount > originalLot.TotalProductAmount)
-                        {
-                            exist.Status = Constants.Status.Failed;
-                            exist.CancellationReason = ResponseMessage.ProductNotEnough;
-                            await _unitOfWork.SaveAsync();
-                            throw new ApplicationException(ResponseMessage.ProductNotEnough);
-                        }
-                        originalLot.TotalProductAmount -= totalProductAmount;
-                        originalLot.LotAmount -= exist.Lot.LotAmount;
-                        originalLot.ExportDate = DateTime.Now;
-                        lot.ImportDate = DateTime.Now;
-                        lot.InventoryId = exist.SendToInventoryId;
-                        lot.ExpirationDate = DateTime.Now.AddDays(lot.Product.ProductCategory!.ExpireIn!.Value);
-
-                        inventory.Weight = totalWeight;
-                        originalLot.Inventory.Weight -= lotWeight;
-                    }
+                    var originalLot = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.ExportFromLotId), includes => includes.Include(o => o.Inventory));
+                    originalLot.ExportDate = DateTime.Now;
+                    lot.ImportDate = DateTime.Now;
+                    lot.InventoryId = exist.SendToInventoryId;
+                    lot.ExpirationDate = DateTime.Now.AddDays(lot.Product.ProductCategory!.ExpireIn!.Value);
                 }
+
             }
             if (requestStatus.Equals(Constants.Status.Failed))
             {
@@ -405,32 +440,72 @@ namespace BeeStore_Repository.Services
                     {
                         throw new ApplicationException(ResponseMessage.RequestHasNotBeenProcessed);
                     }
+                    if (exist.RequestType == "Export")
+                    {
+                        if (exist.Lot.Inventory.WarehouseId != staffId)
+                        {
+                            throw new ApplicationException(ResponseMessage.StaffCantProcessedExportOrderFromAnotherWarehouse);
+                        }
+                    }
+                    var lot = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.LotId), query => query.Include(o => o.Product));
+                    if (lot == null)
+                    {
+                        throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
+                    }
+                    var inventory = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.SendToInventoryId));
+                    if (inventory == null)
+                    {
+                        throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
+                    }
+                    var lotWeight = lot.Product.Weight * lot.TotalProductAmount;
+                    var originalLot = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.ExportFromLotId), includes => includes.Include(o => o.Inventory));
+                    if (originalLot != null)
+                    {
+                        var totalProductAmount = exist.Lot.ProductPerLot * exist.Lot.LotAmount;
+
+                        originalLot.TotalProductAmount += totalProductAmount;
+                        originalLot.LotAmount += exist.Lot.LotAmount;
+
+
+                        inventory.Weight -= lotWeight;
+                        originalLot.Inventory.Weight += lotWeight;
+                        lot.IsDeleted = true;
+                    }
+
+                    exist.CancelDate = DateTime.Now;
                 }
-                exist.CancelDate = DateTime.Now;
             }
 
-            if (requestStatus.Equals(Constants.Status.Delivered))
-            {
-                if (exist.Status != Constants.Status.Processing)
+                if (requestStatus.Equals(Constants.Status.Delivered))
                 {
-                    throw new ApplicationException(ResponseMessage.RequestHasNotBeenProcessed);
+                    if (exist.Status != Constants.Status.Processing)
+                    {
+                        throw new ApplicationException(ResponseMessage.RequestHasNotBeenProcessed);
+                    }
+                    if (exist.RequestType == "Export")
+                    {
+                        if (exist.ExportFromLot.Inventory.WarehouseId != staffId)
+                        {
+                            throw new ApplicationException(ResponseMessage.StaffCantProcessedExportOrderFromAnotherWarehouse);
+                        }
+                    }
+                    exist.DeliverDate = DateTime.Now;
                 }
-                exist.DeliverDate = DateTime.Now;
-            }
 
-            if (requestStatus.Equals(Constants.Status.Returned))
-            {
-                if (exist.Status != Constants.Status.Delivered)
+                if (requestStatus.Equals(Constants.Status.Returned))
                 {
-                    throw new ApplicationException(ResponseMessage.RequestHasNotBeenProcessed);
-                }
-                exist.CancelDate = DateTime.Now;
-            }
+                    if (exist.Status != Constants.Status.Delivered)
+                    {
+                        throw new ApplicationException(ResponseMessage.RequestHasNotBeenProcessed);
+                    }
 
-            exist.Status = requestStatus;
-            await _unitOfWork.SaveAsync();
-            var result = _mapper.Map<RequestListDTO>(exist);
-            return ResponseMessage.Success;
+                    exist.CancelDate = DateTime.Now;
+                }
+
+                exist.Status = requestStatus;
+                await _unitOfWork.SaveAsync();
+                var result = _mapper.Map<RequestListDTO>(exist);
+                return ResponseMessage.Success;
+            }
         }
     }
-}
