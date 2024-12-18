@@ -23,7 +23,7 @@ namespace BeeStore_Repository.Services
             _mapper = mapper;
         }
 
-        private async Task<List<WarehouseShipper>> ApplyFilterToList(string? search, bool? hasVehicle, WarehouseFilter? filterBy, string? filterQuery, int? warehouseId = null)
+        private async Task<List<WarehouseShipper>> ApplyFilterToList(string? search,bool? hasDeliveryZone, bool? hasVehicle, WarehouseFilter? filterBy, string? filterQuery, int? warehouseId = null)
         {
             if ((!string.IsNullOrEmpty(filterQuery) && filterBy == null)
                 || (string.IsNullOrEmpty(filterQuery) && filterBy != null))
@@ -37,7 +37,10 @@ namespace BeeStore_Repository.Services
                 (filterBy == WarehouseFilter.DeliveryZoneId && u.DeliveryZoneId.Equals(Int32.Parse(filterQuery!))))
                 && (hasVehicle == null ||
         (hasVehicle == true && u.Employee.Vehicles.Count() > 0) ||
-        (hasVehicle == false && u.Employee.Vehicles.Count() == 0)); ;
+        (hasVehicle == false && u.Employee.Vehicles.Count() == 0))
+                && (hasDeliveryZone == null ||
+        (hasDeliveryZone == true && u.Employee.WarehouseShippers.First().DeliveryZoneId.HasValue) ||
+        (hasDeliveryZone == false && !u.Employee.WarehouseShippers.First().DeliveryZoneId.HasValue));
 
 
             var list = await _unitOfWork.WarehouseShipperRepo.GetListAsync(
@@ -52,16 +55,16 @@ namespace BeeStore_Repository.Services
             return list;
         }
 
-        public async Task<Pagination<WarehouseShipperListDTO>> GetWarehouseShipperList(string? search, bool? hasVehicle, WarehouseFilter? filterBy, string? filterQuery, int pageIndex, int pageSize)
+        public async Task<Pagination<WarehouseShipperListDTO>> GetWarehouseShipperList(string? search, bool? hasDeliveryZone, bool? hasVehicle, WarehouseFilter? filterBy, string? filterQuery, int pageIndex, int pageSize)
         {
-            var list = await ApplyFilterToList(search, hasVehicle, filterBy, filterQuery);
+            var list = await ApplyFilterToList(search,hasDeliveryZone, hasVehicle, filterBy, filterQuery);
             var result = _mapper.Map<List<WarehouseShipperListDTO>>(list);
             return (await ListPagination<WarehouseShipperListDTO>.PaginateList(result, pageIndex, pageSize));
         }
 
-        public async Task<Pagination<WarehouseShipperListDTO>> GetWarehouseShipperList(int id, string? search, bool? hasVehicle, WarehouseFilter? filterBy, string? filterQuery, int pageIndex, int pageSize)
+        public async Task<Pagination<WarehouseShipperListDTO>> GetWarehouseShipperList(int id, string? search, bool? hasDeliveryZone, bool? hasVehicle, WarehouseFilter? filterBy, string? filterQuery, int pageIndex, int pageSize)
         {
-            var list = await ApplyFilterToList(search, hasVehicle, filterBy, filterQuery, id);
+            var list = await ApplyFilterToList(search,hasDeliveryZone, hasVehicle, filterBy, filterQuery, id);
             var result = _mapper.Map<List<WarehouseShipperListDTO>>(list);
             return (await ListPagination<WarehouseShipperListDTO>.PaginateList(result, pageIndex, pageSize));
         }
