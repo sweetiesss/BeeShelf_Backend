@@ -69,13 +69,14 @@ namespace BeeStore_Api.Controllers
         [HttpGet]
         [Authorize(Roles = "Admin,Manager,Staff")]
         public async Task<IActionResult> GetWarehouseShipperList([FromQuery][DefaultValue(null)] string? search,
+                                                                 [FromQuery] bool? hasDeliveryZone,
                                                                  [FromQuery] bool? hasVehicle,
                                                                  [FromQuery] WarehouseFilter? filterBy,
                                                                  [FromQuery][DefaultValue(null)] string? filterQuery,
                                                                  [FromQuery][DefaultValue(0)] int pageIndex,
                                                                  [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _warehouseShipperService.GetWarehouseShipperList(search, hasVehicle, filterBy, filterQuery, pageIndex, pageSize);
+            var result = await _warehouseShipperService.GetWarehouseShipperList(search,hasDeliveryZone, hasVehicle, filterBy, filterQuery, pageIndex, pageSize);
             return Ok(result);
         }
 
@@ -84,14 +85,15 @@ namespace BeeStore_Api.Controllers
         [HttpGet]
         [Authorize(Roles = "Admin,Manager,Staff")]
         public async Task<IActionResult> GetWarehouseShipperList(int id,
-                                                                 [FromQuery][DefaultValue(null)] string? search,
+                                                                 [FromQuery][DefaultValue(null)] string? search, 
+                                                                 [FromQuery] bool? hasDeliveryZone,
                                                                  [FromQuery] bool? hasVehicle,
                                                                  [FromQuery] WarehouseFilter? filterBy,
                                                                  [FromQuery][DefaultValue(null)] string? filterQuery,
                                                                  [FromQuery][DefaultValue(0)] int pageIndex,
                                                                  [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _warehouseShipperService.GetWarehouseShipperList(id, search, hasVehicle, filterBy, filterQuery, pageIndex, pageSize);
+            var result = await _warehouseShipperService.GetWarehouseShipperList(id, search,hasDeliveryZone, hasVehicle, filterBy, filterQuery, pageIndex, pageSize);
             return Ok(result);
         }
 
@@ -106,7 +108,7 @@ namespace BeeStore_Api.Controllers
 
         [Route("assign-shipper-to-delivery-zone/{shipperId}/{deliveryzoneId}")]
         [HttpPost]
-        [Authorize(Roles = "Admin, Manager")]
+        [Authorize(Roles = "Admin, Manager, Staff")]
         public async Task<IActionResult> AssingnShipperToDeliveryZone(int shipperId, int deliveryzoneId)
         {
             var result = await _warehouseShipperService.AssignShipperToDeliveryZone(shipperId, deliveryzoneId);

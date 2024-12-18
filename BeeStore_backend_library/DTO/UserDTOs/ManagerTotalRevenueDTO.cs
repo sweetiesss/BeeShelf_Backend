@@ -11,5 +11,6 @@
     {
         public int? Month { get; set; }
         public decimal? TotalRevenue { get; set; }
+        public int? TotalInventoryRevenue { get; set; }
     }
 }

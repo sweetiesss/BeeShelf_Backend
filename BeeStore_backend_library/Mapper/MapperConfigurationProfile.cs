@@ -63,6 +63,7 @@ namespace BeeStore_Repository.Mapper
                 .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<Transaction, TransactionListDTO>()
                 .ForMember(dest => dest.Email, opt => opt.MapFrom(src => src.OcopPartner.Email))
+                .ForMember(dest => dest.InventoryName, opt => opt.MapFrom(src => src.Inventory.Name))
                 .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
 
             CreateMap<OcopPartner, PartnerListDTO>()

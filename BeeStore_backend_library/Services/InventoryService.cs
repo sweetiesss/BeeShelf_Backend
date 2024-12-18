@@ -231,7 +231,6 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
             }
-            //m them cai || (DateTime.Now > inv.BoughtDate && DateTime.Now < inv.ExpirationDate) nay do no bi loi nen t xoa di r.
             if (inv.OcopPartnerId != null && inv.OcopPartnerId != userId)
             {
                 throw new ApplicationException(ResponseMessage.InventoryOccupied);
@@ -241,6 +240,18 @@ namespace BeeStore_Repository.Services
             {
                 throw new ApplicationException(ResponseMessage.NotEnoughCredit);
             }
+            inv.Transactions.Add(new Transaction
+            {
+                Code = GenerateRandomLetters(),
+                CreateDate = DateTime.Now,
+                Description = $"{user.LastName} bought x{month} of {inv.Name}",
+                Amount = (int)(inv.Price * month),
+                InventoryId = inv.Id,
+                month_amount = month,
+                OcopPartnerId = userId,
+                IsDeleted = false,
+                Status = Constants.PaymentStatus.Paid
+            });
             wallet.TotalAmount -= inv.Price * month;
             inv.OcopPartnerId = userId;
             inv.BoughtDate = DateTime.Now;
@@ -285,6 +296,21 @@ namespace BeeStore_Repository.Services
         {
             // Generate a random 5-digit number
             return $"INV-{Random.Shared.Next(10000, 99999):D5}";
+        }
+
+        private string GenerateRandomLetters(int length = 4)
+        {
+            Random random = new Random();
+            string letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+
+            char[] randomLetters = new char[length];
+
+            for (int i = 0; i < length; i++)
+            {
+                randomLetters[i] = letters[random.Next(letters.Length)];
+            }
+
+            return new string(randomLetters);
         }
     }
 }
