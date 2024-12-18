@@ -830,6 +830,10 @@ namespace BeeStore_Repository.Services
 
         private decimal CalculateStorageFee(DateTime importDate, DateTime currentDate)
         {
+            currentDate = DateTime.UtcNow;
+            TimeZoneInfo timeZone = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
+            DateTime utcPlus7 = TimeZoneInfo.ConvertTimeFromUtc(currentDate, timeZone);
+
             if (importDate.Date == currentDate.Date)
             {
                 return 0;
@@ -839,7 +843,7 @@ namespace BeeStore_Repository.Services
             const decimal RATE_AFTER_WEEK = 20;
             const int DAYS_IN_WEEK = 7;
 
-            TimeSpan storageDuration = currentDate - importDate;
+            TimeSpan storageDuration = utcPlus7 - importDate;
 
             double totalHours = storageDuration.TotalHours;
 
