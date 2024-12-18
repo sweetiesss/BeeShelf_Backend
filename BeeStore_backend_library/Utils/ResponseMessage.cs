@@ -83,6 +83,7 @@
         public const string DeliveryZoneOrderNotMatch = "Delivery Zone of Order is not Match with the Delivery Zone of the Batch";
         public const string ShipperDeliverColdProduct = "Shipper's assigned vehicle may not match with the type of product.";
         public const string BatchOrderAlreadyShipped = "Can't edit batch that has already processed orders";
+        public const string BatchDuplicateName = "There's already a batch with this name";
 
         //Product response message
         public const string ProductIdNotFound = "Product Id not found.";

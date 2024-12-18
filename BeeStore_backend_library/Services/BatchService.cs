@@ -27,6 +27,12 @@ namespace BeeStore_Repository.Services
         //Must assgin only 1 shipper when Create Batch - Assigned Shipper cannot be changed
         public async Task<string> CreateBatch(BatchCreateDTO request)
         {
+            var batchlist = await _unitOfWork.BatchRepo.GetAllAsync();
+            if(batchlist != null) 
+                foreach (var batch in batchlist) 
+                    if (batch.Name.Equals(request.Name)) throw new ApplicationException(ResponseMessage.BatchDuplicateName);
+                
+
             var result = _mapper.Map<Batch>(request);
             result.Status = Constants.Status.Pending;
             await _unitOfWork.BatchRepo.AddAsync(result);
