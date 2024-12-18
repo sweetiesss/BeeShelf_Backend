@@ -408,9 +408,10 @@ namespace BeeStore_Repository.Services
                 {
                     throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
                 }
+                var product = await _unitOfWork.ProductRepo.SingleOrDefaultAsync(u => u.Id.Equals(lot.ProductId));
                 if (exist.RequestType == "Import")
                 {
-                    var totalWeight = inventory.Weight + (lot.Product.Weight * lot.TotalProductAmount);
+                    var totalWeight = inventory.Weight + (product.Weight * lot.TotalProductAmount);
                     if (totalWeight > inventory.MaxWeight)
                     {
                         exist.Status = Constants.Status.Failed;
@@ -420,7 +421,7 @@ namespace BeeStore_Repository.Services
                     }
                     lot.ImportDate = DateTime.Now;
                     lot.InventoryId = exist.SendToInventoryId;
-                    lot.ExpirationDate = DateTime.Now.AddDays(lot.Product.ProductCategory!.ExpireIn!.Value);
+                    lot.ExpirationDate = DateTime.Now.AddDays(product.ProductCategory!.ExpireIn!.Value);
 
                     inventory.Weight = totalWeight;
 
