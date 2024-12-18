@@ -23,6 +23,7 @@ namespace BeeStore_Repository.DTO.UserDTOs
         public string? location { get; set; }
         public ulong? isCold {  get; set; }
         public decimal? totalRevenue { get; set; }
+        public int? totalInventoryRevenue { get; set; }
         public int? totalBoughtInventory {  get; set; }
         public int? totalUnboughtInventory { get; set; }
     }

@@ -23,7 +23,7 @@ namespace BeeStore_Repository.Services
             _logger = logger;
         }
 
-        public async Task<string> CancelRequest(int id, string cancellationReason)
+        public async Task<string> CancelRequest(int id, string? cancellationReason)
         {
             var request = await _unitOfWork.RequestRepo.SingleOrDefaultAsync(u => u.Id == id);
             if (request == null)
@@ -38,7 +38,10 @@ namespace BeeStore_Repository.Services
             {
                 throw new ApplicationException(ResponseMessage.RequestStatusError);
             }
-            request.CancellationReason = cancellationReason;
+            if(cancellationReason != null)
+            {
+                request.CancellationReason = cancellationReason;
+            }
             request.CancelDate = DateTime.Now;
             request.Status = Constants.Status.Canceled;
             await _unitOfWork.SaveAsync();

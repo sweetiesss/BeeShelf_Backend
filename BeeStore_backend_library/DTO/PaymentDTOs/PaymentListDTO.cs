@@ -14,7 +14,7 @@
 
         public int? TotalAmount { get; set; }
 
-        public ulong? IsTransferred { get; set; }
+        public ulong? IsConfirmed { get; set; }
 
         public ulong? IsDeleted { get; set; }
 

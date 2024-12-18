@@ -29,4 +29,6 @@ public partial class Inventory : BaseEntity
     public virtual ICollection<Request> Requests { get; set; } = new List<Request>();
 
     public virtual Warehouse? Warehouse { get; set; }
+
+    public virtual ICollection<Transaction> Transactions { get; set; } = new List<Transaction>();
 }

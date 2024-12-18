@@ -67,7 +67,7 @@ namespace BeeStore_Api.Controllers
         [Route("cancel-request")]
         [HttpPost]
         [Authorize(Roles = "Partner")]
-        public async Task<IActionResult> CancelRequest(int id, [FromBody] string? cancellationReason)
+        public async Task<IActionResult> CancelRequest(int id, string? cancellationReason)
         {
             var result = await _requestService.CancelRequest(id, cancellationReason);
             return Ok(result);

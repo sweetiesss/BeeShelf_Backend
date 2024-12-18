@@ -292,7 +292,7 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.ProductId).HasColumnName("product_id");
             entity.Property(e => e.ProductPerLot).HasColumnName("product_per_lot");
             entity.Property(e => e.TotalProductAmount).HasColumnName("total_product_amount");
-
+            
             entity.HasOne(d => d.Inventory).WithMany(p => p.Lots)
                 .HasForeignKey(d => d.InventoryId)
                 .HasConstraintName("Lot_ibfk_1");
@@ -887,6 +887,8 @@ public partial class BeeStoreDbContext : DbContext
                 .HasDefaultValueSql("b'0'")
                 .HasColumnType("bit(1)")
                 .HasColumnName("is_deleted");
+            entity.Property(e => e.InventoryId).HasColumnName("inventory_id");
+            
             entity.Property(e => e.OcopPartnerId).HasColumnName("ocop_partner_id");
             entity.Property(e => e.Status)
                 .HasMaxLength(10)
@@ -895,6 +897,10 @@ public partial class BeeStoreDbContext : DbContext
             entity.HasOne(d => d.OcopPartner).WithMany(p => p.Transactions)
                 .HasForeignKey(d => d.OcopPartnerId)
                 .HasConstraintName("Transaction_ibfk_1");
+
+            entity.HasOne(d => d.Inventory).WithMany(p => p.Transactions)
+                .HasForeignKey(d => d.InventoryId)
+                .HasConstraintName("Transaction_ibfk_2");
         });
 
         modelBuilder.Entity<Vehicle>(entity =>
