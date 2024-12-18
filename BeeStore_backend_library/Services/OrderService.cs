@@ -787,7 +787,7 @@ namespace BeeStore_Repository.Services
                     {
                         exist.Batch.Status = Constants.Status.Completed;
                     }
-
+                    exist.Payments.First().IsConfirmed = 1;
                     exist.OcopPartner.Wallets.First().TotalAmount += exist.TotalPriceAfterFee;
 
                     // change the found vehicle's status to Available

@@ -527,20 +527,15 @@ namespace BeeStore_Repository.Services
             }
         }
 
-        public async Task<List<ManagerTotalRevenueDTO>> GetManagerTotalRevenue(int? year)
+        public async Task<ManagerTotalRevenueDTO> GetManagerTotalRevenue(int warehouseId, int? year)
         {
-            var warehouses = await _unitOfWork.WarehouseRepo.GetQueryable(u => u.Include(o => o.Inventories)
+            var warehouse = await _unitOfWork.WarehouseRepo.SingleOrDefaultAsync(u => u.Id.Equals(warehouseId)
+                                                           ,includes => includes.Include(o => o.Inventories)
                                                                                 .Include(o => o.Province)
                                                                                 .Include(o => o.Vehicles)
                                                                                 .Include(o => o.WarehouseShippers)
                                                                                 .Include(o => o.WarehouseStaffs));
-            warehouses = warehouses.ToList();
-
-            var result = new List<ManagerTotalRevenueDTO>();
-
-            foreach (var warehouse in warehouses)
-            {
-                var warehouseRevenue = new ManagerTotalRevenueDTO
+                var result = new ManagerTotalRevenueDTO
                 {
                     WarehouseId = warehouse.Id,
                     WarehouseName = warehouse.Name,
@@ -550,17 +545,19 @@ namespace BeeStore_Repository.Services
 
                 for (int month = 1; month <= 12; month++)
                 {
-
                     var monthRevenue = await CalculateWarehouseRevenue(warehouse.Id, null, month, year);
 
-                    warehouseRevenue.data.Add(new MonthRevenueDTO
+                    var monthInvRevenue = await CalculateInventoryRevenue(warehouse.Id, null, month, year);
+
+
+                    result.data.Add(new MonthRevenueDTO
                     {
                         Month = month,
                         TotalRevenue = monthRevenue,
+                        TotalInventoryRevenue = monthInvRevenue
                     });
                 }
-                result.Add(warehouseRevenue);
-            }
+
                 return result;
         }
 
@@ -588,6 +585,7 @@ namespace BeeStore_Repository.Services
                     location = w.Location + ", " + w.Province.SubDivisionName,
                     isCold = w.IsCold,
                     totalRevenue = CalculateWarehouseRevenue(w.Id, day, month, year).Result,
+                    totalInventoryRevenue = CalculateInventoryRevenue(w.Id, day, month, year).Result,
                     totalBoughtInventory = w.Inventories.Count(i => i.OcopPartnerId.HasValue),
                     totalUnboughtInventory = w.Inventories.Count(i => !i.OcopPartnerId.HasValue)
                 }).ToList()
@@ -597,11 +595,15 @@ namespace BeeStore_Repository.Services
 
         private async Task<decimal?> CalculateWarehouseRevenue(int warehouseId, int? day, int? month, int? year)
         {
-            var ordersQuery = await _unitOfWork.OrderRepo.GetQueryable(query => query.Where(u => u.DeliveryZone.Province.Warehouses.Any(u => u.Id.Equals(warehouseId)))
+            var ordersQuery = await _unitOfWork.OrderRepo.GetQueryable(query => query.Where(u => u.OrderDetails.Any(u => u.Lot.Inventory.WarehouseId.Equals(warehouseId)))
                                                                                      .Where(u => u.Status == Constants.Status.Completed)
                                                                                      .OrderBy(u => u.CreateDate)
-                                                                                     .Include(o => o.DeliveryZone).ThenInclude(o => o.Province));
+                                                                                     .Include(o => o.OrderDetails).ThenInclude(o => o.Lot).ThenInclude(o => o.Inventory));
             ordersQuery = ordersQuery.ToList();
+            if(ordersQuery.Count == 0)
+            {
+                return 0;
+            }
             if (year.HasValue)
             {
                 ordersQuery = ordersQuery.Where(o => o.CreateDate.Value.Year == year.Value).ToList();
@@ -618,5 +620,30 @@ namespace BeeStore_Repository.Services
             return result;
 
         }
+
+        private async Task<int?> CalculateInventoryRevenue(int warehouseId, int? day, int? month, int? year)
+        {
+            var invQuery = await _unitOfWork.InventoryRepo.GetQueryable(query => query
+                                                                            .Where(u => u.WarehouseId.Equals(warehouseId) && u.Transactions.Count>0)
+                                                                            .Include(u => u.Transactions));
+
+                var filteredQuery = invQuery.Select(inventory => new
+                {
+                    Inventory = inventory,
+                    FilteredTransactions = inventory.Transactions.Where(t =>
+                        (!year.HasValue || t.CreateDate.Value.Year == year.Value) &&
+                        (!month.HasValue || t.CreateDate.Value.Month == month.Value) &&
+                        (!day.HasValue || t.CreateDate.Value.Day == day.Value)
+                    )
+                });
+
+                
+                var revenue = filteredQuery.Sum(x =>
+                    x.FilteredTransactions.Sum(t => t.Amount)
+                );
+
+                return revenue;
+            }
+
     }
 }
