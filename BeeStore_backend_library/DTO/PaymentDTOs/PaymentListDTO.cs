@@ -7,6 +7,8 @@
         public int? OcopPartnerId { get; set; }
 
         public int? OrderId { get; set; }
+        public int? OrderCode { get; set; }
+
 
         public int? CollectedBy { get; set; }
         public string? ShipperEmail { get; set; }
