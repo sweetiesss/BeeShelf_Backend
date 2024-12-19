@@ -9,7 +9,6 @@ namespace BeeStore_Repository.DTO.VehicleDTOs
         public string? LicensePlate { get; set; }
         public ulong? IsCold { get; set; }
 
-        [JsonIgnore]
         public decimal? Capacity { get; set; }
 
         [JsonIgnore]

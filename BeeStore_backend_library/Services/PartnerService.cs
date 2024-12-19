@@ -220,7 +220,7 @@ namespace BeeStore_Repository.Services
             Month = g.Key.Month,
             Status = g.Key.Status,
             OrderAmount = g.Count(),
-            TotalAmount = g.Sum(o => o.TotalPrice ?? 0)
+            TotalAmount = g.Sum(o => o.TotalPriceAfterFee ?? 0)
         })
         .ToList();
 
