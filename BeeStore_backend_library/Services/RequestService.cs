@@ -390,6 +390,7 @@ namespace BeeStore_Repository.Services
                         originalLot.Inventory.Weight -= lotWeight;
                     }
                 }
+                exist.ApporveDate = DateTime.Now;
             }
 
             if (requestStatus == Constants.Status.Completed)
