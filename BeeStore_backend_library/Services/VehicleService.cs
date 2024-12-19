@@ -91,15 +91,12 @@ namespace BeeStore_Repository.Services
             {
                 case VehicleType.Van:
                     VeType = Constants.VehicleType.Van;
-                    request.Capacity = 1000;
                     break;
                 case VehicleType.Truck:
                     VeType = Constants.VehicleType.Truck;
-                    request.Capacity = 10000;
                     break;
                 case VehicleType.Motorcycle:
                     VeType = Constants.VehicleType.Motorcycle;
-                    request.Capacity = 100;
                     break;
                 default:
                     break;
@@ -112,6 +109,7 @@ namespace BeeStore_Repository.Services
             request.Type = VeType;
             request.Status = Constants.VehicleStatus.Available;
             var result = _mapper.Map<Vehicle>(request);
+            result.Capacity = request.Capacity;
             await _unitOfWork.VehicleRepo.AddAsync(result);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
@@ -223,15 +221,12 @@ namespace BeeStore_Repository.Services
             {
                 case VehicleType.Van:
                     VeType = Constants.VehicleType.Van;
-                    vehicle.Capacity = 1000;
                     break;
                 case VehicleType.Truck:
                     VeType = Constants.VehicleType.Truck;
-                    vehicle.Capacity = 10000;
                     break;
                 case VehicleType.Motorcycle:
                     VeType = Constants.VehicleType.Motorcycle;
-                    vehicle.Capacity = 100;
                     break;
                 default:
                     break;
@@ -244,6 +239,7 @@ namespace BeeStore_Repository.Services
             vehicle.Name = request.Name;
             vehicle.LicensePlate = request.LicensePlate;
             vehicle.WarehouseId = request.WarehouseId;
+            vehicle.Capacity = request.Capacity;
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
         }
