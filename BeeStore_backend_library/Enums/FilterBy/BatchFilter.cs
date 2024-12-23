@@ -2,7 +2,7 @@
 {
     public enum BatchFilter
     {
-        WarehouseId,
+        StoreId,
         DeliveryZoneId,
         Status
     }

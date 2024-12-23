@@ -16,5 +16,5 @@ public partial class DeliveryZone : BaseEntity
 
     public virtual Province? Province { get; set; }
 
-    public virtual ICollection<WarehouseShipper> WarehouseShippers { get; set; } = new List<WarehouseShipper>();
+    public virtual ICollection<StoreShipper> StoreShippers { get; set; } = new List<StoreShipper>();
 }

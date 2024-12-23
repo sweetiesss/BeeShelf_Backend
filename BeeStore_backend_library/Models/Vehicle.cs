@@ -18,11 +18,11 @@ public partial class Vehicle : BaseEntity
 
     public int? AssignedDriverId { get; set; }
 
-    public int? WarehouseId { get; set; }
+    public int? StoreId { get; set; }
 
     //public ulong? IsDeleted { get; set; }
 
     public virtual Employee? AssignedDriver { get; set; }
 
-    public virtual Warehouse? Warehouse { get; set; }
+    public virtual Store? Store { get; set; }
 }

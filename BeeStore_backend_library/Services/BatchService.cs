@@ -29,7 +29,7 @@ namespace BeeStore_Repository.Services
         {
             var shipper = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id.Equals(request.ShipperId),
                                                                                  query => query.Include(o => o.Role)
-                                                                                               .Include(o => o.Vehicles).Include(o => o.WarehouseShippers));
+                                                                                               .Include(o => o.Vehicles).Include(o => o.StoreShippers));
             if (shipper == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
@@ -40,7 +40,7 @@ namespace BeeStore_Repository.Services
             }
 
 
-            var exist = await _unitOfWork.BatchRepo.AnyAsync(u => u.Name.Equals(request.Name) && u.DeliveryZone.WarehouseShippers.Any(u => u.WarehouseId.Equals(shipper.WarehouseShippers.First().WarehouseId)));
+            var exist = await _unitOfWork.BatchRepo.AnyAsync(u => u.Name.Equals(request.Name) && u.DeliveryZone.StoreShippers.Any(u => u.StoreId.Equals(shipper.StoreShippers.First().StoreId)));
             if (exist == true)
             {
                 throw new ApplicationException(ResponseMessage.BatchDuplicateName);
@@ -79,7 +79,7 @@ namespace BeeStore_Repository.Services
             {
                 
 
-                var warehouseShipper = await _unitOfWork.WarehouseShipperRepo.SingleOrDefaultAsync(u => u.EmployeeId.Equals(shipper.Id));
+                var warehouseShipper = await _unitOfWork.StoreShipperRepo.SingleOrDefaultAsync(u => u.EmployeeId.Equals(shipper.Id));
 
                 if (!warehouseShipper.DeliveryZoneId.Equals(request.DeliveryZoneId))
                 {
@@ -260,7 +260,7 @@ namespace BeeStore_Repository.Services
             Expression<Func<Batch, bool>> filterExpression = null;
             switch (filterBy)
             {
-                case BatchFilter.WarehouseId: filterExpression = u => u.DeliveryZone.WarehouseShippers.Any(u => u.WarehouseId.Equals(Int32.Parse(filterQuery!))); break;
+                case BatchFilter.StoreId: filterExpression = u => u.DeliveryZone.StoreShippers.Any(u => u.StoreId.Equals(Int32.Parse(filterQuery!))); break;
                 case BatchFilter.DeliveryZoneId: filterExpression = u => u.DeliveryZoneId.Equals(Int32.Parse(filterQuery!)); break;
                 case BatchFilter.Status: filterExpression = u => u.Status.Equals(filterQuery!, StringComparison.OrdinalIgnoreCase); break;
                 default: filterExpression = null; break;

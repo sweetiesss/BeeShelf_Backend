@@ -14,5 +14,5 @@ public partial class Province : BaseEntity
 
     public virtual ICollection<OcopPartner> OcopPartners { get; set; } = new List<OcopPartner>();
 
-    public virtual ICollection<Warehouse> Warehouses { get; set; } = new List<Warehouse>();
+    public virtual ICollection<Store> Stores { get; set; } = new List<Store>();
 }

@@ -88,9 +88,9 @@ namespace BeeStore_Api.Controllers
         [Route("get-partner-total-products/{id}")]
         [HttpGet]
         [AllowAnonymous]
-        public async Task<IActionResult> GetPartnerTotalProduct(int id, int? warehouseId)
+        public async Task<IActionResult> GetPartnerTotalProduct(int id, int? storeId)
         {
-            var result = await _partnerService.GetPartnerTotalProduct(id, warehouseId);
+            var result = await _partnerService.GetPartnerTotalProduct(id, storeId);
             return Ok(result);
         }
     }

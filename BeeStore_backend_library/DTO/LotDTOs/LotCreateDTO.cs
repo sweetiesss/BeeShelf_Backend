@@ -19,6 +19,6 @@ namespace BeeStore_Repository.DTO.PackageDTOs
 
 
         [JsonIgnore]
-        public int? InventoryId { get; set; }
+        public int? RoomId { get; set; }
     }
 }

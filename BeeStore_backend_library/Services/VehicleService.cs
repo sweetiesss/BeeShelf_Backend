@@ -73,7 +73,7 @@ namespace BeeStore_Repository.Services
         public async Task<string> CreateVehicle(VehicleType? type, VehicleCreateDTO request)
         {
             var vehicle = await _unitOfWork.VehicleRepo.AnyAsync(u => u.LicensePlate == request.LicensePlate);
-            var warehouse = await _unitOfWork.WarehouseRepo.SingleOrDefaultAsync(o => o.Id.Equals(request.WarehouseId));
+            var warehouse = await _unitOfWork.StoreRepo.SingleOrDefaultAsync(o => o.Id.Equals(request.StoreId));
             if (warehouse == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.WarehouseIdNotFound);
@@ -186,7 +186,7 @@ namespace BeeStore_Repository.Services
             var list = await _unitOfWork.VehicleRepo.GetListAsync(
                 filter: u => (vestatus == null || u.Status.Equals(vestatus))
                              && (vetype == null || u.Type.Equals(vetype))
-                             && (warehouseId == null || u.WarehouseId.Equals(warehouseId)),
+                             && (warehouseId == null || u.StoreId.Equals(warehouseId)),
                 includes: u => u.Include(o => o.AssignedDriver),
                 sortBy: sortBy!,
                 descending: descending,
@@ -238,7 +238,7 @@ namespace BeeStore_Repository.Services
             }
             vehicle.Name = request.Name;
             vehicle.LicensePlate = request.LicensePlate;
-            vehicle.WarehouseId = request.WarehouseId;
+            vehicle.StoreId = request.StoreId;
             vehicle.Capacity = request.Capacity;
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;

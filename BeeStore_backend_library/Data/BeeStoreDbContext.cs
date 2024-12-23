@@ -6,6 +6,7 @@ namespace BeeStore_Repository.Data;
 
 public partial class BeeStoreDbContext : DbContext
 {
+
     public BeeStoreDbContext(DbContextOptions<BeeStoreDbContext> options)
         : base(options)
     {
@@ -19,8 +20,6 @@ public partial class BeeStoreDbContext : DbContext
 
     public virtual DbSet<Employee> Employees { get; set; }
 
-    public virtual DbSet<Inventory> Inventories { get; set; }
-
     public virtual DbSet<Lot> Lots { get; set; }
 
     public virtual DbSet<MoneyTransfer> MoneyTransfers { get; set; }
@@ -28,6 +27,8 @@ public partial class BeeStoreDbContext : DbContext
     public virtual DbSet<OcopCategory> OcopCategories { get; set; }
 
     public virtual DbSet<OcopPartner> OcopPartners { get; set; }
+
+    public virtual DbSet<OcopPartnerVerificationPaper> OcopPartnerVerificationPapers { get; set; }
 
     public virtual DbSet<Order> Orders { get; set; }
 
@@ -47,17 +48,21 @@ public partial class BeeStoreDbContext : DbContext
 
     public virtual DbSet<Role> Roles { get; set; }
 
+    public virtual DbSet<Room> Rooms { get; set; }
+
+    public virtual DbSet<Store> Stores { get; set; }
+
+    public virtual DbSet<StoreShipper> StoreShippers { get; set; }
+
+    public virtual DbSet<StoreStaff> StoreStaffs { get; set; }
+
     public virtual DbSet<Transaction> Transactions { get; set; }
+
+    public virtual DbSet<Unit> Units { get; set; }
 
     public virtual DbSet<Vehicle> Vehicles { get; set; }
 
     public virtual DbSet<Wallet> Wallets { get; set; }
-
-    public virtual DbSet<Warehouse> Warehouses { get; set; }
-
-    public virtual DbSet<WarehouseShipper> WarehouseShippers { get; set; }
-
-    public virtual DbSet<WarehouseStaff> WarehouseStaffs { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -207,60 +212,15 @@ public partial class BeeStoreDbContext : DbContext
                 .HasConstraintName("Employee_ibfk_1");
         });
 
-        modelBuilder.Entity<Inventory>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PRIMARY");
-
-            entity.ToTable("Inventory");
-
-            entity.HasIndex(e => e.OcopPartnerId, "ocop_partner_id");
-
-            entity.HasIndex(e => e.WarehouseId, "warehouse_id");
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.BoughtDate)
-                .HasColumnType("datetime")
-                .HasColumnName("bought_date");
-            entity.Property(e => e.ExpirationDate)
-                .HasColumnType("datetime")
-                .HasColumnName("expiration_date");
-            entity.Property(e => e.IsDeleted)
-                .HasDefaultValueSql("b'0'")
-                .HasColumnType("bit(1)")
-                .HasColumnName("is_deleted");
-            entity.Property(e => e.MaxWeight)
-                .HasPrecision(10, 2)
-                .HasColumnName("max_weight");
-            entity.Property(e => e.Name)
-                .HasMaxLength(25)
-                .HasColumnName("name");
-            entity.Property(e => e.OcopPartnerId).HasColumnName("ocop_partner_id");
-            entity.Property(e => e.Price)
-                .HasPrecision(10, 2)
-                .HasColumnName("price");
-            entity.Property(e => e.WarehouseId).HasColumnName("warehouse_id");
-            entity.Property(e => e.Weight)
-                .HasPrecision(10, 2)
-                .HasColumnName("weight");
-
-            entity.HasOne(d => d.OcopPartner).WithMany(p => p.Inventories)
-                .HasForeignKey(d => d.OcopPartnerId)
-                .HasConstraintName("Inventory_ibfk_2");
-
-            entity.HasOne(d => d.Warehouse).WithMany(p => p.Inventories)
-                .HasForeignKey(d => d.WarehouseId)
-                .HasConstraintName("Inventory_ibfk_1");
-        });
-
         modelBuilder.Entity<Lot>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
             entity.ToTable("Lot");
 
-            entity.HasIndex(e => e.InventoryId, "inventory_id");
-
             entity.HasIndex(e => e.ProductId, "product_id");
+
+            entity.HasIndex(e => e.RoomId, "room_id");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.CreateDate)
@@ -275,7 +235,6 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.ImportDate)
                 .HasColumnType("datetime")
                 .HasColumnName("import_date");
-            entity.Property(e => e.InventoryId).HasColumnName("inventory_id");
             entity.Property(e => e.IsDeleted)
                 .HasDefaultValueSql("b'0'")
                 .HasColumnType("bit(1)")
@@ -291,15 +250,16 @@ public partial class BeeStoreDbContext : DbContext
                 .HasCharSet("utf8mb3");
             entity.Property(e => e.ProductId).HasColumnName("product_id");
             entity.Property(e => e.ProductPerLot).HasColumnName("product_per_lot");
+            entity.Property(e => e.RoomId).HasColumnName("room_id");
             entity.Property(e => e.TotalProductAmount).HasColumnName("total_product_amount");
-            
-            entity.HasOne(d => d.Inventory).WithMany(p => p.Lots)
-                .HasForeignKey(d => d.InventoryId)
-                .HasConstraintName("Lot_ibfk_1");
 
             entity.HasOne(d => d.Product).WithMany(p => p.Lots)
                 .HasForeignKey(d => d.ProductId)
                 .HasConstraintName("Lot_ibfk_2");
+
+            entity.HasOne(d => d.Room).WithMany(p => p.Lots)
+                .HasForeignKey(d => d.RoomId)
+                .HasConstraintName("Lot_ibfk_1");
         });
 
         modelBuilder.Entity<MoneyTransfer>(entity =>
@@ -321,15 +281,12 @@ public partial class BeeStoreDbContext : DbContext
                 .HasColumnName("cancellation_reason")
                 .UseCollation("utf8mb3_general_ci")
                 .HasCharSet("utf8mb3");
-            entity.Property(e => e.PictureLink)
-                .HasColumnType("text")
-                .HasColumnName("picture_link");
-            entity.Property(e => e.CreateDate)
-                .HasColumnType("datetime")
-                .HasColumnName("create_date");
             entity.Property(e => e.ConfirmDate)
                 .HasColumnType("datetime")
                 .HasColumnName("confirm_date");
+            entity.Property(e => e.CreateDate)
+                .HasColumnType("datetime")
+                .HasColumnName("create_date");
             entity.Property(e => e.IsDeleted)
                 .HasDefaultValueSql("b'0'")
                 .HasColumnType("bit(1)")
@@ -339,6 +296,9 @@ public partial class BeeStoreDbContext : DbContext
                 .HasColumnType("bit(1)")
                 .HasColumnName("is_transferred");
             entity.Property(e => e.OcopPartnerId).HasColumnName("ocop_partner_id");
+            entity.Property(e => e.PictureLink)
+                .HasColumnType("text")
+                .HasColumnName("picture_link");
             entity.Property(e => e.TransferBy).HasColumnName("transfer_by");
 
             entity.HasOne(d => d.OcopPartner).WithMany(p => p.MoneyTransfers)
@@ -412,7 +372,7 @@ public partial class BeeStoreDbContext : DbContext
                 .HasColumnType("bit(1)")
                 .HasColumnName("is_deleted");
             entity.Property(e => e.IsVerified)
-                .HasDefaultValueSql("b'1'")
+                .HasDefaultValueSql("b'0'")
                 .HasColumnType("bit(1)")
                 .HasColumnName("is_verified");
             entity.Property(e => e.LastName)
@@ -461,13 +421,57 @@ public partial class BeeStoreDbContext : DbContext
                 .HasConstraintName("OCOP_Partner_ibfk_3");
         });
 
+        modelBuilder.Entity<OcopPartnerVerificationPaper>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("OCOP_Partner_Verification_Paper");
+
+            entity.HasIndex(e => e.OcopPartnerId, "ocop_partner_id");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.BackPictureLink)
+                .HasColumnType("text")
+                .HasColumnName("back_picture_link");
+            entity.Property(e => e.CreateDate)
+                .HasColumnType("datetime")
+                .HasColumnName("create_date");
+            entity.Property(e => e.FrontPictureLink)
+                .HasColumnType("text")
+                .HasColumnName("front_picture_link");
+            entity.Property(e => e.IsRejected)
+                .HasDefaultValueSql("b'0'")
+                .HasColumnType("bit(1)")
+                .HasColumnName("is_rejected");
+            entity.Property(e => e.IsVerified)
+                .HasDefaultValueSql("b'0'")
+                .HasColumnType("bit(1)")
+                .HasColumnName("is_verified");
+            entity.Property(e => e.OcopPartnerId).HasColumnName("ocop_partner_id");
+            entity.Property(e => e.RejectDate)
+                .HasColumnType("datetime")
+                .HasColumnName("reject_date");
+            entity.Property(e => e.RejectReason)
+                .HasMaxLength(255)
+                .HasColumnName("reject_reason")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
+            entity.Property(e => e.VerifyDate)
+                .HasColumnType("datetime")
+                .HasColumnName("verify_date");
+
+            entity.HasOne(d => d.OcopPartner).WithMany(p => p.OcopPartnerVerificationPapers)
+                .HasForeignKey(d => d.OcopPartnerId)
+                .HasConstraintName("OCOP_Partner_Verification_Paper_ibfk_1");
+        });
+
         modelBuilder.Entity<Order>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
             entity.ToTable("Order");
 
-            entity.HasIndex(e => e.BatchId, "Order_ibfk_5");
+            entity.HasIndex(e => e.BatchId, "batch_id");
 
             entity.HasIndex(e => e.DeliveryZoneId, "delivery_zone_id");
 
@@ -517,6 +521,11 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.ReceiverAddress)
                 .HasMaxLength(100)
                 .HasColumnName("receiver_address");
+            entity.Property(e => e.ReceiverName)
+                .HasMaxLength(50)
+                .HasColumnName("receiver_name")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
             entity.Property(e => e.ReceiverPhone)
                 .HasMaxLength(11)
                 .HasColumnName("receiver_phone");
@@ -538,7 +547,7 @@ public partial class BeeStoreDbContext : DbContext
 
             entity.HasOne(d => d.Batch).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.BatchId)
-                .HasConstraintName("Order_ibfk_5");
+                .HasConstraintName("Order_ibfk_3");
 
             entity.HasOne(d => d.DeliveryZone).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.DeliveryZoneId)
@@ -547,7 +556,6 @@ public partial class BeeStoreDbContext : DbContext
             entity.HasOne(d => d.OcopPartner).WithMany(p => p.Orders)
                 .HasForeignKey(d => d.OcopPartnerId)
                 .HasConstraintName("Order_ibfk_2");
-
         });
 
         modelBuilder.Entity<OrderDetail>(entity =>
@@ -773,13 +781,13 @@ public partial class BeeStoreDbContext : DbContext
 
             entity.ToTable("Request");
 
-            entity.HasIndex(e => e.ExportFromLotId, "Request_ibfk_4");
+            entity.HasIndex(e => e.ExportFromLotId, "export_from_lot_id");
 
             entity.HasIndex(e => e.LotId, "lot_id");
 
             entity.HasIndex(e => e.OcopPartnerId, "ocop_partner_id");
 
-            entity.HasIndex(e => e.SendToInventoryId, "send_to_inventory_id");
+            entity.HasIndex(e => e.SendToRoomId, "send_to_room_id");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.ApporveDate)
@@ -819,14 +827,14 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.RequestType)
                 .HasMaxLength(10)
                 .HasColumnName("request_type");
-            entity.Property(e => e.SendToInventoryId).HasColumnName("send_to_inventory_id");
+            entity.Property(e => e.SendToRoomId).HasColumnName("send_to_room_id");
             entity.Property(e => e.Status)
                 .HasMaxLength(10)
                 .HasColumnName("status");
 
             entity.HasOne(d => d.ExportFromLot).WithMany(p => p.RequestExportFromLots)
                 .HasForeignKey(d => d.ExportFromLotId)
-                .HasConstraintName("Request_ibfk_4");
+                .HasConstraintName("Request_ibfk_2");
 
             entity.HasOne(d => d.Lot).WithMany(p => p.RequestLots)
                 .HasForeignKey(d => d.LotId)
@@ -834,11 +842,11 @@ public partial class BeeStoreDbContext : DbContext
 
             entity.HasOne(d => d.OcopPartner).WithMany(p => p.Requests)
                 .HasForeignKey(d => d.OcopPartnerId)
-                .HasConstraintName("Request_ibfk_3");
+                .HasConstraintName("Request_ibfk_4");
 
-            entity.HasOne(d => d.SendToInventory).WithMany(p => p.Requests)
-                .HasForeignKey(d => d.SendToInventoryId)
-                .HasConstraintName("Request_ibfk_2");
+            entity.HasOne(d => d.SendToRoom).WithMany(p => p.Requests)
+                .HasForeignKey(d => d.SendToRoomId)
+                .HasConstraintName("Request_ibfk_3");
         });
 
         modelBuilder.Entity<Role>(entity =>
@@ -859,124 +867,56 @@ public partial class BeeStoreDbContext : DbContext
                 .HasCharSet("utf8mb3");
         });
 
-        modelBuilder.Entity<Transaction>(entity =>
+        modelBuilder.Entity<Room>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("Transaction");
+            entity.ToTable("Room");
 
             entity.HasIndex(e => e.OcopPartnerId, "ocop_partner_id");
 
+            entity.HasIndex(e => e.StoreId, "store_id");
+
             entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.Amount).HasColumnName("amount");
-            entity.Property(e => e.CancellationReason)
-                .HasMaxLength(100)
-                .HasColumnName("cancellation_reason")
-                .UseCollation("utf8mb3_general_ci")
-                .HasCharSet("utf8mb3");
-            entity.Property(e => e.Code)
-                .HasMaxLength(10)
-                .HasColumnName("code");
-            entity.Property(e => e.CreateDate)
+            entity.Property(e => e.BoughtDate)
                 .HasColumnType("datetime")
-                .HasColumnName("create_date");
-            entity.Property(e => e.Description)
-                .HasMaxLength(100)
-                .HasColumnName("description");
+                .HasColumnName("bought_date");
+            entity.Property(e => e.ExpirationDate)
+                .HasColumnType("datetime")
+                .HasColumnName("expiration_date");
             entity.Property(e => e.IsDeleted)
                 .HasDefaultValueSql("b'0'")
                 .HasColumnType("bit(1)")
                 .HasColumnName("is_deleted");
-            entity.Property(e => e.InventoryId).HasColumnName("inventory_id");
-            
-            entity.Property(e => e.OcopPartnerId).HasColumnName("ocop_partner_id");
-            entity.Property(e => e.Status)
-                .HasMaxLength(10)
-                .HasColumnName("status");
-
-            entity.HasOne(d => d.OcopPartner).WithMany(p => p.Transactions)
-                .HasForeignKey(d => d.OcopPartnerId)
-                .HasConstraintName("Transaction_ibfk_1");
-
-            entity.HasOne(d => d.Inventory).WithMany(p => p.Transactions)
-                .HasForeignKey(d => d.InventoryId)
-                .HasConstraintName("Transaction_ibfk_2");
-        });
-
-        modelBuilder.Entity<Vehicle>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PRIMARY");
-
-            entity.ToTable("Vehicle");
-
-            entity.HasIndex(e => e.AssignedDriverId, "assigned_driver_id");
-
-            entity.HasIndex(e => e.WarehouseId, "warehouse_id");
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.AssignedDriverId).HasColumnName("assigned_driver_id");
-            entity.Property(e => e.Capacity)
+            entity.Property(e => e.MaxWeight)
                 .HasPrecision(10, 2)
-                .HasColumnName("capacity");
-            entity.Property(e => e.IsCold)
-                .HasDefaultValueSql("b'0'")
-                .HasColumnType("bit(1)")
-                .HasColumnName("is_cold");
-            entity.Property(e => e.IsDeleted)
-                .HasDefaultValueSql("b'0'")
-                .HasColumnType("bit(1)")
-                .HasColumnName("is_deleted");
-            entity.Property(e => e.LicensePlate)
-                .HasMaxLength(25)
-                .HasColumnName("license_plate");
-            entity.Property(e => e.Name)
-                .HasMaxLength(25)
-                .HasColumnName("name");
-            entity.Property(e => e.Status)
-                .HasMaxLength(10)
-                .HasColumnName("status");
-            entity.Property(e => e.Type)
-                .HasMaxLength(10)
-                .HasColumnName("type");
-            entity.Property(e => e.WarehouseId).HasColumnName("warehouse_id");
-
-            entity.HasOne(d => d.AssignedDriver).WithMany(p => p.Vehicles)
-                .HasForeignKey(d => d.AssignedDriverId)
-                .HasConstraintName("Vehicle_ibfk_1");
-
-            entity.HasOne(d => d.Warehouse).WithMany(p => p.Vehicles)
-                .HasForeignKey(d => d.WarehouseId)
-                .HasConstraintName("Vehicle_ibfk_2");
-        });
-
-        modelBuilder.Entity<Wallet>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PRIMARY");
-
-            entity.ToTable("Wallet");
-
-            entity.HasIndex(e => e.OcopPartnerId, "ocop_partner_id");
-
-            entity.Property(e => e.Id).HasColumnName("id");
-            entity.Property(e => e.IsDeleted)
-                .HasDefaultValueSql("b'0'")
-                .HasColumnType("bit(1)")
-                .HasColumnName("is_deleted");
+                .HasColumnName("max_weight");
             entity.Property(e => e.OcopPartnerId).HasColumnName("ocop_partner_id");
-            entity.Property(e => e.TotalAmount)
+            entity.Property(e => e.Price)
                 .HasPrecision(10, 2)
-                .HasColumnName("total_amount");
+                .HasColumnName("price");
+            entity.Property(e => e.RoomCode)
+                .HasMaxLength(25)
+                .HasColumnName("room_code");
+            entity.Property(e => e.StoreId).HasColumnName("store_id");
+            entity.Property(e => e.Weight)
+                .HasPrecision(10, 2)
+                .HasColumnName("weight");
 
-            entity.HasOne(d => d.OcopPartner).WithMany(p => p.Wallets)
+            entity.HasOne(d => d.OcopPartner).WithMany(p => p.Rooms)
                 .HasForeignKey(d => d.OcopPartnerId)
-                .HasConstraintName("Wallet_ibfk_1");
+                .HasConstraintName("Room_ibfk_2");
+
+            entity.HasOne(d => d.Store).WithMany(p => p.Rooms)
+                .HasForeignKey(d => d.StoreId)
+                .HasConstraintName("Room_ibfk_1");
         });
 
-        modelBuilder.Entity<Warehouse>(entity =>
+        modelBuilder.Entity<Store>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("Warehouse");
+            entity.ToTable("Store");
 
             entity.HasIndex(e => e.ProvinceId, "province_id");
 
@@ -1007,22 +947,22 @@ public partial class BeeStoreDbContext : DbContext
                 .HasCharSet("utf8mb3");
             entity.Property(e => e.ProvinceId).HasColumnName("province_id");
 
-            entity.HasOne(d => d.Province).WithMany(p => p.Warehouses)
+            entity.HasOne(d => d.Province).WithMany(p => p.Stores)
                 .HasForeignKey(d => d.ProvinceId)
-                .HasConstraintName("Warehouse_ibfk_1");
+                .HasConstraintName("Store_ibfk_1");
         });
 
-        modelBuilder.Entity<WarehouseShipper>(entity =>
+        modelBuilder.Entity<StoreShipper>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("Warehouse_Shipper");
+            entity.ToTable("Store_Shipper");
 
             entity.HasIndex(e => e.DeliveryZoneId, "delivery_zone_id");
 
             entity.HasIndex(e => e.EmployeeId, "employee_id");
 
-            entity.HasIndex(e => e.WarehouseId, "warehouse_id");
+            entity.HasIndex(e => e.StoreId, "store_id");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.DeliveryZoneId).HasColumnName("delivery_zone_id");
@@ -1034,30 +974,30 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.Status)
                 .HasMaxLength(10)
                 .HasColumnName("status");
-            entity.Property(e => e.WarehouseId).HasColumnName("warehouse_id");
+            entity.Property(e => e.StoreId).HasColumnName("store_id");
 
-            entity.HasOne(d => d.DeliveryZone).WithMany(p => p.WarehouseShippers)
+            entity.HasOne(d => d.DeliveryZone).WithMany(p => p.StoreShippers)
                 .HasForeignKey(d => d.DeliveryZoneId)
-                .HasConstraintName("Warehouse_Shipper_ibfk_2");
+                .HasConstraintName("Store_Shipper_ibfk_2");
 
-            entity.HasOne(d => d.Employee).WithMany(p => p.WarehouseShippers)
+            entity.HasOne(d => d.Employee).WithMany(p => p.StoreShippers)
                 .HasForeignKey(d => d.EmployeeId)
-                .HasConstraintName("Warehouse_Shipper_ibfk_1");
+                .HasConstraintName("Store_Shipper_ibfk_1");
 
-            entity.HasOne(d => d.Warehouse).WithMany(p => p.WarehouseShippers)
-                .HasForeignKey(d => d.WarehouseId)
-                .HasConstraintName("Warehouse_Shipper_ibfk_3");
+            entity.HasOne(d => d.Store).WithMany(p => p.StoreShippers)
+                .HasForeignKey(d => d.StoreId)
+                .HasConstraintName("Store_Shipper_ibfk_3");
         });
 
-        modelBuilder.Entity<WarehouseStaff>(entity =>
+        modelBuilder.Entity<StoreStaff>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
 
-            entity.ToTable("Warehouse_Staff");
+            entity.ToTable("Store_Staff");
 
             entity.HasIndex(e => e.EmployeeId, "employee_id");
 
-            entity.HasIndex(e => e.WarehouseId, "warehouse_id");
+            entity.HasIndex(e => e.StoreId, "store_id");
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.EmployeeId).HasColumnName("employee_id");
@@ -1065,15 +1005,142 @@ public partial class BeeStoreDbContext : DbContext
                 .HasDefaultValueSql("b'0'")
                 .HasColumnType("bit(1)")
                 .HasColumnName("is_deleted");
-            entity.Property(e => e.WarehouseId).HasColumnName("warehouse_id");
+            entity.Property(e => e.StoreId).HasColumnName("store_id");
 
-            entity.HasOne(d => d.Employee).WithMany(p => p.WarehouseStaffs)
+            entity.HasOne(d => d.Employee).WithMany(p => p.StoreStaffs)
                 .HasForeignKey(d => d.EmployeeId)
-                .HasConstraintName("Warehouse_Staff_ibfk_2");
+                .HasConstraintName("Store_Staff_ibfk_2");
 
-            entity.HasOne(d => d.Warehouse).WithMany(p => p.WarehouseStaffs)
-                .HasForeignKey(d => d.WarehouseId)
-                .HasConstraintName("Warehouse_Staff_ibfk_1");
+            entity.HasOne(d => d.Store).WithMany(p => p.StoreStaffs)
+                .HasForeignKey(d => d.StoreId)
+                .HasConstraintName("Store_Staff_ibfk_1");
+        });
+
+        modelBuilder.Entity<Transaction>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("Transaction");
+
+            entity.HasIndex(e => e.OcopPartnerId, "ocop_partner_id");
+
+            entity.HasIndex(e => e.RoomId, "room_id");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Amount).HasColumnName("amount");
+            entity.Property(e => e.CancellationReason)
+                .HasMaxLength(100)
+                .HasColumnName("cancellation_reason")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
+            entity.Property(e => e.Code)
+                .HasMaxLength(10)
+                .HasColumnName("code");
+            entity.Property(e => e.CreateDate)
+                .HasColumnType("datetime")
+                .HasColumnName("create_date");
+            entity.Property(e => e.Description)
+                .HasMaxLength(100)
+                .HasColumnName("description");
+            entity.Property(e => e.IsDeleted)
+                .HasDefaultValueSql("b'0'")
+                .HasColumnType("bit(1)")
+                .HasColumnName("is_deleted");
+            entity.Property(e => e.MonthAmount).HasColumnName("month_amount");
+            entity.Property(e => e.OcopPartnerId).HasColumnName("ocop_partner_id");
+            entity.Property(e => e.RoomId).HasColumnName("room_id");
+            entity.Property(e => e.Status)
+                .HasMaxLength(10)
+                .HasColumnName("status");
+
+            entity.HasOne(d => d.OcopPartner).WithMany(p => p.Transactions)
+                .HasForeignKey(d => d.OcopPartnerId)
+                .HasConstraintName("Transaction_ibfk_1");
+
+            entity.HasOne(d => d.Room).WithMany(p => p.Transactions)
+                .HasForeignKey(d => d.RoomId)
+                .HasConstraintName("Transaction_ibfk_2");
+        });
+
+        modelBuilder.Entity<Unit>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("Unit");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.Name)
+                .HasMaxLength(25)
+                .HasColumnName("name");
+        });
+
+        modelBuilder.Entity<Vehicle>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("Vehicle");
+
+            entity.HasIndex(e => e.AssignedDriverId, "assigned_driver_id");
+
+            entity.HasIndex(e => e.StoreId, "store_id");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.AssignedDriverId).HasColumnName("assigned_driver_id");
+            entity.Property(e => e.Capacity)
+                .HasPrecision(10, 2)
+                .HasColumnName("capacity");
+            entity.Property(e => e.IsCold)
+                .HasDefaultValueSql("b'0'")
+                .HasColumnType("bit(1)")
+                .HasColumnName("is_cold");
+            entity.Property(e => e.IsDeleted)
+                .HasDefaultValueSql("b'0'")
+                .HasColumnType("bit(1)")
+                .HasColumnName("is_deleted");
+            entity.Property(e => e.LicensePlate)
+                .HasMaxLength(25)
+                .HasColumnName("license_plate");
+            entity.Property(e => e.Name)
+                .HasMaxLength(25)
+                .HasColumnName("name");
+            entity.Property(e => e.Status)
+                .HasMaxLength(10)
+                .HasColumnName("status");
+            entity.Property(e => e.StoreId).HasColumnName("store_id");
+            entity.Property(e => e.Type)
+                .HasMaxLength(10)
+                .HasColumnName("type");
+
+            entity.HasOne(d => d.AssignedDriver).WithMany(p => p.Vehicles)
+                .HasForeignKey(d => d.AssignedDriverId)
+                .HasConstraintName("Vehicle_ibfk_1");
+
+            entity.HasOne(d => d.Store).WithMany(p => p.Vehicles)
+                .HasForeignKey(d => d.StoreId)
+                .HasConstraintName("Vehicle_ibfk_2");
+        });
+
+        modelBuilder.Entity<Wallet>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("Wallet");
+
+            entity.HasIndex(e => e.OcopPartnerId, "ocop_partner_id");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.IsDeleted)
+                .HasDefaultValueSql("b'0'")
+                .HasColumnType("bit(1)")
+                .HasColumnName("is_deleted");
+            entity.Property(e => e.OcopPartnerId).HasColumnName("ocop_partner_id");
+            entity.Property(e => e.TotalAmount)
+                .HasPrecision(10, 2)
+                .HasColumnName("total_amount");
+
+            entity.HasOne(d => d.OcopPartner).WithMany(p => p.Wallets)
+                .HasForeignKey(d => d.OcopPartnerId)
+                .HasConstraintName("Wallet_ibfk_1");
         });
 
         OnModelCreatingPartial(modelBuilder);

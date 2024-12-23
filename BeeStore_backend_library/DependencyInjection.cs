@@ -30,8 +30,8 @@ namespace BeeStore_Repository
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IRoleService, RoleService>();
             services.AddScoped<IPartnerService, PartnerService>();
-            services.AddScoped<IWarehouseService, WarehouseService>();
-            services.AddScoped<IInventoryService, InventoryService>();
+            services.AddScoped<IStoreService, StoreService>();
+            services.AddScoped<IRoomService, RoomService>();
             services.AddScoped<IProductService, ProductService>();
             services.AddScoped<IProductCategoryService, ProductCategoryService>();
             services.AddScoped<ILotService, LotService>();
@@ -39,8 +39,8 @@ namespace BeeStore_Repository
             services.AddScoped<IBatchService, BatchService>();
             services.AddScoped<IPaymentService, PaymentService>();
             services.AddScoped<IVehicleService, VehicleService>();
-            services.AddScoped<IWarehouseShipperService, WarehouseShipperService>();
-            services.AddScoped<IWarehouseStaffService, WarehouseStaffService>();
+            services.AddScoped<IStoreShipperService, StoreShipperService>();
+            services.AddScoped<IStoreStaffService, StoreStaffService>();
             services.AddScoped<IRequestService, RequestService>();
             services.AddScoped<IOrderService, OrderService>();
             services.AddScoped<ILoggerManager, LoggerManager>();
