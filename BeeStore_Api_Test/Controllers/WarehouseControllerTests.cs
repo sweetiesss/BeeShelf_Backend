@@ -14,16 +14,16 @@ namespace BeeStore_Api_Test.Controllers
     public class WarehouseControllerTests
     {
         private readonly Mock<IWarehouseService> _mockWarehouseService;
-        private readonly Mock<IWarehouseShipperService> _mockWarehouseShipperService;
-        private readonly Mock<IWarehouseStaffService> _mockWarehouseStaffService;
+        private readonly Mock<IStoreShipperService> _mockWarehouseShipperService;
+        private readonly Mock<IStoreStaffService> _mockWarehouseStaffService;
         private readonly Mock<IMemoryCache> _mockMemoryCache;
-        private readonly WarehouseController _warehouseController;
+        private readonly StoreController _warehouseController;
 
         public WarehouseControllerTests()
         {
             _mockWarehouseService = new Mock<IWarehouseService>();
-            _mockWarehouseShipperService = new Mock<IWarehouseShipperService>();
-            _mockWarehouseStaffService = new Mock<IWarehouseStaffService>();
+            _mockWarehouseShipperService = new Mock<IStoreShipperService>();
+            _mockWarehouseStaffService = new Mock<IStoreStaffService>();
             _mockMemoryCache = new Mock<IMemoryCache>();
             _warehouseController = new WarehouseController(_mockWarehouseService.Object,
                                                            _mockWarehouseShipperService.Object,
@@ -34,7 +34,7 @@ namespace BeeStore_Api_Test.Controllers
         [Fact]
         public async Task GetWarehouseList_ShouldReturnWarehouseList()
         {
-            var warehouses = new Pagination<WarehouseListDTO>();
+            var warehouses = new Pagination<StoreListDTO>();
             _mockWarehouseService
                 .Setup(s => s.GetWarehouseList(null, null, null, null, false, 0, 10))
                 .ReturnsAsync(warehouses);
@@ -49,7 +49,7 @@ namespace BeeStore_Api_Test.Controllers
         [Fact]
         public async Task GetWarehouse_ShouldReturnWarehouseById()
         {
-            var warehouse = new WarehouseDeliveryZoneDTO();
+            var warehouse = new StoreDeliveryZoneDTO();
             var warehouseId = 1;
             _mockWarehouseService.Setup(s => s.GetWarehouseById(warehouseId)).ReturnsAsync(warehouse);
 
@@ -64,7 +64,7 @@ namespace BeeStore_Api_Test.Controllers
         public async Task GetWarehouseByUserId_ShouldReturnWarehouseListForUser()
         {
             var userId = 1;
-            var warehouses = new List<WarehouseListInventoryDTO>();
+            var warehouses = new List<StoreListInventoryDTO>();
             _mockWarehouseService.Setup(s => s.GetWarehouseByUserId(userId)).ReturnsAsync(warehouses);
 
             var response = await _warehouseController.GetWarehouseByUserId(userId) as OkObjectResult;
@@ -77,7 +77,7 @@ namespace BeeStore_Api_Test.Controllers
         [Fact]
         public async Task GetWarehouseShipperList_ShouldReturnWarehouseShippers()
         {
-            var shippers = new Pagination<WarehouseShipperListDTO>();
+            var shippers = new Pagination<StoreShipperListDTO>();
             _mockWarehouseShipperService
                 .Setup(s => s.GetWarehouseShipperList(null, null, null, 0, 10))
                 .ReturnsAsync(shippers);
@@ -92,7 +92,7 @@ namespace BeeStore_Api_Test.Controllers
         [Fact]
         public async Task AddWarehouseShipper_ShouldReturnAddedShippers()
         {
-            var newShippers = new List<WarehouseShipperCreateDTO>();
+            var newShippers = new List<StoreShipperCreateDTO>();
             _mockWarehouseShipperService
                 .Setup(s => s.AddShipperToWarehouse(newShippers))
                 .ReturnsAsync(ResponseMessage.Success);
@@ -107,7 +107,7 @@ namespace BeeStore_Api_Test.Controllers
         [Fact]
         public async Task GetWarehouseStaffList_ShouldReturnWarehouseStaffs()
         {
-            var staff = new Pagination<WarehouseStaffListDTO>();
+            var staff = new Pagination<StoreStaffListDTO>();
             _mockWarehouseStaffService
                 .Setup(s => s.GetWarehouseStaffList(null, null, null, 0, 10))
                 .ReturnsAsync(staff);
@@ -122,7 +122,7 @@ namespace BeeStore_Api_Test.Controllers
         [Fact]
         public async Task AddWarehouseStaff_ShouldReturnAddedStaff()
         {
-            var newStaff = new List<WarehouseStaffCreateDTO>();
+            var newStaff = new List<StoreStaffCreateDTO>();
             _mockWarehouseStaffService
                 .Setup(s => s.AddStaffToWarehouse(newStaff))
                 .ReturnsAsync(ResponseMessage.Success);
@@ -137,7 +137,7 @@ namespace BeeStore_Api_Test.Controllers
         [Fact]
         public async Task CreateWarehouse_ShouldReturnCreatedWarehouse()
         {
-            var newWarehouse = new WarehouseCreateDTO();
+            var newWarehouse = new StoreCreateDTO();
             _mockWarehouseService
                 .Setup(s => s.CreateWarehouse(newWarehouse))
                 .ReturnsAsync(ResponseMessage.Success);
@@ -153,7 +153,7 @@ namespace BeeStore_Api_Test.Controllers
         public async Task UpdateWarehouse_ShouldReturnUpdatedWarehouse()
         {
             var warehouseId = 1;
-            var updatedWarehouse = new WarehouseCreateDTO();
+            var updatedWarehouse = new StoreCreateDTO();
             _mockWarehouseService
                 .Setup(s => s.UpdateWarehouse(warehouseId, updatedWarehouse))
                 .ReturnsAsync(ResponseMessage.Success);

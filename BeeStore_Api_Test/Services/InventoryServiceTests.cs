@@ -15,7 +15,7 @@ namespace BeeStore_Api_Test.Services
 {
     public class InventoryServiceTests
     {
-        private readonly InventoryService _inventoryService;
+        private readonly RoomService _inventoryService;
         private readonly Mock<IUnitOfWork> _mockUnitOfWork;
         private readonly Mock<IMapper> _mockMapper;
         private readonly Mock<ILoggerManager> _mockLogger;
@@ -25,7 +25,7 @@ namespace BeeStore_Api_Test.Services
             _mockUnitOfWork = new Mock<IUnitOfWork>();
             _mockMapper = new Mock<IMapper>();
             _mockLogger = new Mock<ILoggerManager>();
-            _inventoryService = new InventoryService(_mockUnitOfWork.Object, _mockMapper.Object, _mockLogger.Object);
+            _inventoryService = new RoomService(_mockUnitOfWork.Object, _mockMapper.Object, _mockLogger.Object);
         }
 
         [Fact]
@@ -132,7 +132,7 @@ namespace BeeStore_Api_Test.Services
         public async Task CreateInventory_ShouldReturnSuccess_WhenValidRequest()
         {
             // Arrange
-            var request = new InventoryCreateDTO
+            var request = new RoomCreateDTO
             {
                 Name = "New Inventory",
                 MaxWeight = 100,
@@ -175,7 +175,7 @@ namespace BeeStore_Api_Test.Services
         public async Task CreateInventory_ShouldThrowKeyNotFoundException_WhenWarehouseDoesNotExist()
         {
             // Arrange
-            var request = new InventoryCreateDTO
+            var request = new RoomCreateDTO
             {
                 Name = "New Inventory",
                 MaxWeight = 100,
@@ -191,7 +191,7 @@ namespace BeeStore_Api_Test.Services
 
             Assert.Equal(ResponseMessage.WarehouseIdNotFound, exception.Message);
             _mockUnitOfWork.Verify(u => u.WarehouseRepo.GetByIdAsync(request.WarehouseId), Times.Once);
-            _mockMapper.Verify(m => m.Map<Inventory>(It.IsAny<InventoryCreateDTO>()), Times.Never);
+            _mockMapper.Verify(m => m.Map<Inventory>(It.IsAny<RoomCreateDTO>()), Times.Never);
             _mockUnitOfWork.Verify(u => u.InventoryRepo.AddAsync(It.IsAny<Inventory>()), Times.Never);
             _mockUnitOfWork.Verify(u => u.SaveAsync(), Times.Never);
         }
@@ -243,7 +243,7 @@ namespace BeeStore_Api_Test.Services
         public async Task UpdateInventory_ShouldReturnSuccess_WhenInventoryExistsAndValidRequest()
         {
             // Arrange
-            var updateRequest = new InventoryUpdateDTO
+            var updateRequest = new RoomUpdateDTO
             {
                 Id = 1,
                 Name = "Updated Inventory",
@@ -280,7 +280,7 @@ namespace BeeStore_Api_Test.Services
         public async Task UpdateInventory_ShouldThrowKeyNotFoundException_WhenInventoryDoesNotExist()
         {
             // Arrange
-            var updateRequest = new InventoryUpdateDTO
+            var updateRequest = new RoomUpdateDTO
             {
                 Id = 1,
                 Name = "Non-existent Inventory",
@@ -303,9 +303,9 @@ namespace BeeStore_Api_Test.Services
         public async Task GetInventoryList_ShouldReturnPaginatedResult_WhenFilterAndSortAreValid()
         {
             // Arrange
-            var filterBy = InventoryFilter.WarehouseId;
+            var filterBy = RoomFilter.WarehouseId;
             var filterQuery = "1";
-            var sortCriteria = InventorySortBy.Name;
+            var sortCriteria = RoomSortBy.Name;
             var descending = false;
             var pageIndex = 0;
             var pageSize = 2;
@@ -316,7 +316,7 @@ namespace BeeStore_Api_Test.Services
         new Inventory { Id = 2, Name = "Inventory2", WarehouseId = 1 }
     };
 
-            var mappedList = inventoryList.Select(i => new InventoryListDTO
+            var mappedList = inventoryList.Select(i => new RoomListDTO
             {
                 Id = i.Id,
                 Name = i.Name,
@@ -332,7 +332,7 @@ namespace BeeStore_Api_Test.Services
                 null))
                 .ReturnsAsync(inventoryList);
 
-            _mockMapper.Setup(m => m.Map<List<InventoryListDTO>>(inventoryList))
+            _mockMapper.Setup(m => m.Map<List<RoomListDTO>>(inventoryList))
                 .Returns(mappedList);
 
             // Act
@@ -347,7 +347,7 @@ namespace BeeStore_Api_Test.Services
 
             _mockUnitOfWork.Verify(u => u.InventoryRepo.GetListAsync(It.IsAny<Expression<Func<Inventory, bool>>>(),
                 null, It.IsAny<string>(), descending, null, null), Times.Once);
-            _mockMapper.Verify(m => m.Map<List<InventoryListDTO>>(inventoryList), Times.Once);
+            _mockMapper.Verify(m => m.Map<List<RoomListDTO>>(inventoryList), Times.Once);
         }
 
         [Fact]
@@ -355,9 +355,9 @@ namespace BeeStore_Api_Test.Services
         {
             // Arrange
             var userId = 1;
-            var filterBy = InventoryFilter.WarehouseId;
+            var filterBy = RoomFilter.WarehouseId;
             var filterQuery = "1";
-            var sortCriteria = InventorySortBy.Name;
+            var sortCriteria = RoomSortBy.Name;
             var descending = false;
             var pageIndex = 0;
             var pageSize = 2;
@@ -368,7 +368,7 @@ namespace BeeStore_Api_Test.Services
         new Inventory { Id = 2, Name = "Inventory2", WarehouseId = 1, OcopPartnerId = userId }
     };
 
-            var mappedList = inventoryList.Select(i => new InventoryListDTO
+            var mappedList = inventoryList.Select(i => new RoomListDTO
             {
                 Id = i.Id,
                 Name = i.Name,
@@ -384,7 +384,7 @@ namespace BeeStore_Api_Test.Services
                 null))
                 .ReturnsAsync(inventoryList);
 
-            _mockMapper.Setup(m => m.Map<List<InventoryListDTO>>(inventoryList))
+            _mockMapper.Setup(m => m.Map<List<RoomListDTO>>(inventoryList))
                 .Returns(mappedList);
 
             // Act
@@ -399,7 +399,7 @@ namespace BeeStore_Api_Test.Services
 
             _mockUnitOfWork.Verify(u => u.InventoryRepo.GetListAsync(It.IsAny<Expression<Func<Inventory, bool>>>(),
                 null, It.IsAny<string>(), descending, null, null), Times.Once);
-            _mockMapper.Verify(m => m.Map<List<InventoryListDTO>>(inventoryList), Times.Once);
+            _mockMapper.Verify(m => m.Map<List<RoomListDTO>>(inventoryList), Times.Once);
         }
         [Fact]
         public async Task BuyInventory_ShouldReturnSuccess_WhenConditionsAreMet()

@@ -8,14 +8,17 @@ public partial class MoneyTransfer : BaseEntity
 
     public int? TransferBy { get; set; }
 
+    public DateTime? ConfirmDate { get; set; }
+
     public string? CancellationReason { get; set; }
 
     public ulong? IsTransferred { get; set; }
 
     public decimal? Amount { get; set; }
+
     public string? PictureLink { get; set; }
+
     public DateTime? CreateDate { get; set; }
-    public DateTime? ConfirmDate { get; set; }
 
     //public ulong? IsDeleted { get; set; }
 

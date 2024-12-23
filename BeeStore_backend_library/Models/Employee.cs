@@ -34,9 +34,9 @@ public partial class Employee : BaseEntity
 
     public virtual Role? Role { get; set; }
 
+    public virtual ICollection<StoreShipper> StoreShippers { get; set; } = new List<StoreShipper>();
+
+    public virtual ICollection<StoreStaff> StoreStaffs { get; set; } = new List<StoreStaff>();
+
     public virtual ICollection<Vehicle> Vehicles { get; set; } = new List<Vehicle>();
-
-    public virtual ICollection<WarehouseShipper> WarehouseShippers { get; set; } = new List<WarehouseShipper>();
-
-    public virtual ICollection<WarehouseStaff> WarehouseStaffs { get; set; } = new List<WarehouseStaff>();
 }

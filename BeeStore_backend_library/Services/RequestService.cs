@@ -72,12 +72,12 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
             }
-            var inventory = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Id == request.SendToInventoryId, query => query.Include(o => o.Warehouse));
+            var inventory = await _unitOfWork.RoomRepo.SingleOrDefaultAsync(u => u.Id == request.SendToRoomId, query => query.Include(o => o.Store));
             if (inventory == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
             }
-            var userInventory = await _unitOfWork.InventoryRepo.AnyAsync(u => u.Id.Equals(inventory.Id)
+            var userInventory = await _unitOfWork.RoomRepo.AnyAsync(u => u.Id.Equals(inventory.Id)
                                                                            && u.OcopPartner.Id.Equals(user.Id));
             if (userInventory == false)
             {
@@ -93,10 +93,10 @@ namespace BeeStore_Repository.Services
                 {
                     throw new ApplicationException(ResponseMessage.BadRequest);
                 }
-                var originalLot = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(request.ExportFromLotId), inc => inc.Include(o => o.Inventory));
+                var originalLot = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(request.ExportFromLotId), inc => inc.Include(o => o.Room));
                 if (originalLot != null)
                 {
-                    if (originalLot.Inventory.WarehouseId == inventory.WarehouseId)
+                    if (originalLot.Room.StoreId == inventory.StoreId)
                     {
                         throw new ApplicationException(ResponseMessage.InventoryFromTheSameWarehouse);
                     }
@@ -129,7 +129,7 @@ namespace BeeStore_Repository.Services
                 throw new KeyNotFoundException(ResponseMessage.ProductIdNotFound);
             }
             //check for cold shit
-            if (product.IsCold.Value != inventory.Warehouse.IsCold.Value)
+            if (product.IsCold.Value != inventory.Store.IsCold.Value)
             {
                 throw new ApplicationException(ResponseMessage.ProductAndWarehouseTypeNotMatch);
             }
@@ -188,7 +188,7 @@ namespace BeeStore_Repository.Services
         }
 
         private async Task<List<Request>> ApplyFilterToList(bool? import, RequestStatus? requestStatus, bool descending,
-                                                          int? userId = null, int? warehouseId = null)
+                                                          int? userId = null, int? storeId = null)
         {
             string? filterQuery = requestStatus switch
             {
@@ -205,13 +205,13 @@ namespace BeeStore_Repository.Services
             var list = await _unitOfWork.RequestRepo.GetListAsync(
                 filter: u => (filterQuery == null || u.Status.Equals(filterQuery))
                              && (userId == null || u.OcopPartnerId.Equals(userId))
-                             && (warehouseId == null || u.SendToInventory.WarehouseId.Equals(warehouseId) || u.ExportFromLot.Inventory.WarehouseId.Equals(warehouseId))
+                             && (storeId == null || u.SendToRoom.StoreId.Equals(storeId) || u.ExportFromLot.Room.StoreId.Equals(storeId))
                              && (import == null ||
         (import == true && u.RequestType.Equals("Import")) ||
         (import == false && u.RequestType.Equals("Export")))
                              && u.IsDeleted.Equals(false),
-                includes: u => u.Include(o => o.SendToInventory).ThenInclude(o => o.Warehouse)
-                                .Include(o => o.ExportFromLot).ThenInclude(o => o.Inventory).ThenInclude(o => o.Warehouse)
+                includes: u => u.Include(o => o.SendToRoom).ThenInclude(o => o.Store)
+                                .Include(o => o.ExportFromLot).ThenInclude(o => o.Room).ThenInclude(o => o.Store)
                                 .Include(o => o.OcopPartner)
                                 .Include(o => o.Lot).ThenInclude(o => o.Product),
                 sortBy: Constants.SortCriteria.CreateDate,
@@ -222,9 +222,9 @@ namespace BeeStore_Repository.Services
             return list;
         }
 
-        public async Task<Pagination<RequestListDTO>> GetRequestList(bool? import, RequestStatus? status, bool descending, int warehouseId, int pageIndex, int pageSize)
+        public async Task<Pagination<RequestListDTO>> GetRequestList(bool? import, RequestStatus? status, bool descending, int storeId, int pageIndex, int pageSize)
         {
-            var list = await ApplyFilterToList(import, status, descending, null, warehouseId);
+            var list = await ApplyFilterToList(import, status, descending, null, storeId);
             var result = _mapper.Map<List<RequestListDTO>>(list);
             return await ListPagination<RequestListDTO>.PaginateList(result, pageIndex, pageSize);
         }
@@ -253,7 +253,7 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
             }
-            var inventory = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Id == request.SendToInventoryId, include => include.Include(o => o.Warehouse));
+            var inventory = await _unitOfWork.RoomRepo.SingleOrDefaultAsync(u => u.Id == request.SendToRoomId, include => include.Include(o => o.Store));
             if (inventory == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
@@ -266,14 +266,14 @@ namespace BeeStore_Repository.Services
             }
 
             //check for cold shit
-            if (product.IsCold.Value != inventory.Warehouse.IsCold.Value)
+            if (product.IsCold.Value != inventory.Store.IsCold.Value)
             {
                 throw new ApplicationException(ResponseMessage.ProductAndWarehouseTypeNotMatch);
             }
 
-            if (exist.Lot.InventoryId != request.SendToInventoryId)
+            if (exist.Lot.RoomId != request.SendToRoomId)
             {
-                exist.Lot.InventoryId = request.SendToInventoryId;
+                exist.Lot.RoomId = request.SendToRoomId;
             }
             exist.Lot.ProductId = request.Lot.ProductId;
             exist.Lot.LotAmount = request.Lot.LotAmount;
@@ -282,7 +282,7 @@ namespace BeeStore_Repository.Services
             exist.Lot.ProductPerLot = request.Lot.ProductPerLot;
             exist.Lot.TotalProductAmount = request.Lot.ProductPerLot * request.Lot.LotAmount;
 
-            exist.SendToInventoryId = request.SendToInventoryId;
+            exist.SendToRoomId = request.SendToRoomId;
             exist.Description = request.Description;
             _unitOfWork.RequestRepo.Update(exist);
             await _unitOfWork.SaveAsync();
@@ -293,11 +293,11 @@ namespace BeeStore_Repository.Services
         public async Task<string> UpdateRequestStatus(int id, RequestStatus status, int? staffId)
         {
 
-            var exist = await _unitOfWork.RequestRepo.SingleOrDefaultAsync(u => u.Id == id, includes => includes.Include(o => o.Lot).ThenInclude(o => o.Inventory)
-                                                                                                                .Include(o => o.ExportFromLot).ThenInclude(o => o.Inventory)
-                                                                                                                .Include(o => o.SendToInventory));
+            var exist = await _unitOfWork.RequestRepo.SingleOrDefaultAsync(u => u.Id == id, includes => includes.Include(o => o.Lot).ThenInclude(o => o.Room)
+                                                                                                                .Include(o => o.ExportFromLot).ThenInclude(o => o.Room)
+                                                                                                                .Include(o => o.SendToRoomId));
 
-                var staff = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id == staffId, query => query.Include(o => o.WarehouseStaffs));
+                var staff = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id == staffId, query => query.Include(o => o.StoreStaffs));
                 if (staff == null)
                 {
                     throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
@@ -336,7 +336,7 @@ namespace BeeStore_Repository.Services
                 
                 if (exist.RequestType == "Export")
                 {
-                    if (exist.ExportFromLot.Inventory.WarehouseId != staff.WarehouseStaffs.First().WarehouseId)
+                    if (exist.ExportFromLot.Room.StoreId != staff.StoreStaffs.First().StoreId)
                     {
                         throw new ApplicationException(ResponseMessage.StaffCantProcessedExportOrderFromAnotherWarehouse);
                     }
@@ -350,7 +350,7 @@ namespace BeeStore_Repository.Services
                 {
                     throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
                 }
-                var inventory = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.SendToInventoryId));
+                var inventory = await _unitOfWork.RoomRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.SendToRoomId));
                 if (inventory == null)
                 {
                     throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
@@ -371,7 +371,7 @@ namespace BeeStore_Repository.Services
                         await _unitOfWork.SaveAsync();
                         throw new ApplicationException(ResponseMessage.InventoryOverWeightError);
                     }
-                    var originalLot = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.ExportFromLotId), includes => includes.Include(o => o.Inventory));
+                    var originalLot = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.ExportFromLotId), includes => includes.Include(o => o.Room));
                     if (originalLot != null)
                     {
                         var totalProductAmount = exist.Lot.ProductPerLot * exist.Lot.LotAmount;
@@ -387,7 +387,7 @@ namespace BeeStore_Repository.Services
 
 
                         inventory.Weight = totalWeight;
-                        originalLot.Inventory.Weight -= lotWeight;
+                        originalLot.Room.Weight -= lotWeight;
                     }
                 }
                 exist.ApporveDate = DateTime.Now;
@@ -404,7 +404,7 @@ namespace BeeStore_Repository.Services
                 {
                     throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
                 }
-                var inventory = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.SendToInventoryId));
+                var inventory = await _unitOfWork.RoomRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.SendToRoomId));
                 if (inventory == null)
                 {
                     throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
@@ -421,7 +421,7 @@ namespace BeeStore_Repository.Services
                         throw new ApplicationException(ResponseMessage.InventoryOverWeightError);
                     }
                     lot.ImportDate = DateTime.Now;
-                    lot.InventoryId = exist.SendToInventoryId;
+                    lot.RoomId = exist.SendToRoomId;
                     var productcategory = await _unitOfWork.ProductCategoryRepo.SingleOrDefaultAsync(u => u.Id.Equals(product.ProductCategoryId));
                     lot.ExpirationDate = DateTime.Now.AddDays(productcategory!.ExpireIn!.Value);
 
@@ -431,14 +431,14 @@ namespace BeeStore_Repository.Services
                 else
                 {
 
-                        if (exist.SendToInventory.WarehouseId != staff.WarehouseStaffs.First().WarehouseId)
+                        if (exist.SendToRoom.StoreId != staff.StoreStaffs.First().StoreId)
                         {
                             throw new ApplicationException(ResponseMessage.StaffCantProcessedExportOrderFromAnotherWarehouse);
                         }
-                    var originalLot = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.ExportFromLotId), includes => includes.Include(o => o.Inventory));
+                    var originalLot = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.ExportFromLotId), includes => includes.Include(o => o.Room));
                     originalLot.ExportDate = DateTime.Now;
                     lot.ImportDate = DateTime.Now;
-                    lot.InventoryId = exist.SendToInventoryId;
+                    lot.RoomId = exist.SendToRoomId;
                     var productcategory = await _unitOfWork.ProductCategoryRepo.SingleOrDefaultAsync(u => u.Id.Equals(lot.Product.ProductCategoryId));
                     lot.ExpirationDate = DateTime.Now.AddDays(productcategory!.ExpireIn!.Value);
                 }
@@ -454,7 +454,7 @@ namespace BeeStore_Repository.Services
                     }
                     if (exist.RequestType == "Export")
                     {
-                        if (exist.SendToInventory.WarehouseId != staff.WarehouseStaffs.First().WarehouseId)
+                        if (exist.SendToRoom.StoreId != staff.StoreStaffs.First().StoreId)
                         {
                             throw new ApplicationException(ResponseMessage.StaffCantProcessedExportOrderFromAnotherWarehouse);
                         }
@@ -464,13 +464,13 @@ namespace BeeStore_Repository.Services
                     {
                         throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
                     }
-                    var inventory = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.SendToInventoryId));
+                    var inventory = await _unitOfWork.RoomRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.SendToRoomId));
                     if (inventory == null)
                     {
                         throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
                     }
                     var lotWeight = lot.Product.Weight * lot.TotalProductAmount;
-                    var originalLot = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.ExportFromLotId), includes => includes.Include(o => o.Inventory));
+                    var originalLot = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.ExportFromLotId), includes => includes.Include(o => o.Room));
                     if (originalLot != null)
                     {
                         var totalProductAmount = exist.Lot.ProductPerLot * exist.Lot.LotAmount;
@@ -480,7 +480,7 @@ namespace BeeStore_Repository.Services
 
 
                         inventory.Weight -= lotWeight;
-                        originalLot.Inventory.Weight += lotWeight;
+                        originalLot.Room.Weight += lotWeight;
                         lot.IsDeleted = true;
                     }
 
@@ -496,7 +496,7 @@ namespace BeeStore_Repository.Services
                     }
                     if (exist.RequestType == "Export")
                     {
-                        if (exist.SendToInventory.WarehouseId != staff.WarehouseStaffs.First().WarehouseId)
+                        if (exist.SendToRoom.StoreId != staff.StoreShippers.First().StoreId)
                         {
                             throw new ApplicationException(ResponseMessage.StaffCantProcessedExportOrderFromAnotherWarehouse);
                         }

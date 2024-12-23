@@ -17,8 +17,8 @@
         public string? ProductName { get; set; }
         public string? ProductPictureLink { get; set; }
 
-        public int? WarehouseId { get; set; }
-        public string? WarehouseName { get; set; }
+        public int? StoreId { get; set; }
+        public string? StoreName { get; set; }
         public bool? isCold { get; set; }
 
         public int? ProductPerLot { get; set; }
@@ -31,6 +31,8 @@
 
         public DateTime? ExpirationDate { get; set; }
 
-        public int? InventoryId { get; set; }
+        public int? RoomId { get; set; }
+        public int? RoomCode { get; set; }
+
     }
 }

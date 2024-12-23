@@ -18,6 +18,8 @@ public partial class Order : BaseEntity
 
     public DateTime? DeliverFinishDate { get; set; }
 
+    public int? NumberOfTrips { get; set; }
+
     public DateTime? CompleteDate { get; set; }
 
     public DateTime? ReturnDate { get; set; }
@@ -25,6 +27,8 @@ public partial class Order : BaseEntity
     public DateTime? CancelDate { get; set; }
 
     public string? CancellationReason { get; set; }
+
+    public string? ReceiverName { get; set; }
 
     public string? ReceiverPhone { get; set; }
 
@@ -40,13 +44,11 @@ public partial class Order : BaseEntity
 
     public decimal? TotalWeight { get; set; }
 
+    public int? BatchId { get; set; }
+
     public string? PictureLink { get; set; }
 
     //public ulong? IsDeleted { get; set; }
-
-    public int? BatchId { get; set; }
-
-    public int? NumberOfTrips { get; set; }
 
     public virtual Batch? Batch { get; set; }
 

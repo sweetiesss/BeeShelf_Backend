@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace BeeStore_Repository.Utils.Validator.WarehouseStaff
 {
-    public class WarehouseStaffCreateDTOValidator : AbstractValidator<WarehouseStaffCreateDTO>
+    public class WarehouseStaffCreateDTOValidator : AbstractValidator<StoreStaffCreateDTO>
     {
         public WarehouseStaffCreateDTOValidator()
         {

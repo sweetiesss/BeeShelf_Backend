@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace BeeStore_Repository.Utils.Validator.WarehouseShipper
 {
-    public class WarehouseShipperCreateDTOValidator : AbstractValidator<WarehouseShipperCreateDTO>
+    public class WarehouseShipperCreateDTOValidator : AbstractValidator<StoreShipperCreateDTO>
     {
         public WarehouseShipperCreateDTOValidator()
         {

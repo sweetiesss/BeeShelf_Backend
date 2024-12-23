@@ -23,12 +23,12 @@ namespace BeeStore_Repository
         IGenericRepository<OrderFee> OrderFeeRepo { get; }
         IGenericRepository<Vehicle> VehicleRepo { get; }
         IGenericRepository<Role> RoleRepo { get; }
-        IGenericRepository<Warehouse> WarehouseRepo { get; }
-        IGenericRepository<Inventory> InventoryRepo { get; }
+        IGenericRepository<Store> StoreRepo { get; }
+        IGenericRepository<Room> RoomRepo { get; }
         IGenericRepository<Product> ProductRepo { get; }
         IGenericRepository<ProductCategory> ProductCategoryRepo { get; }
-        IGenericRepository<WarehouseShipper> WarehouseShipperRepo { get; }
-        IGenericRepository<WarehouseStaff> WarehouseStaffRepo { get; }
+        IGenericRepository<StoreShipper> StoreShipperRepo { get; }
+        IGenericRepository<StoreStaff> StoreStaffRepo { get; }
         IGenericRepository<Request> RequestRepo { get; }
         IGenericRepository<Order> OrderRepo { get; }
 
@@ -55,12 +55,12 @@ namespace BeeStore_Repository
         private IGenericRepository<Vehicle> vehicleRepo;
 
         private IGenericRepository<Role> roleRepo;
-        private IGenericRepository<Warehouse> warehouseRepo;
-        private IGenericRepository<Inventory> inventoryRepo;
+        private IGenericRepository<Store> storeRepo;
+        private IGenericRepository<Room> roomRepo;
         private IGenericRepository<Product> productRepo;
         private IGenericRepository<ProductCategory> productCategoryRepo;
-        private IGenericRepository<WarehouseShipper> warehouseShipperRepo;
-        private IGenericRepository<WarehouseStaff> warehouseStaffRepo;
+        private IGenericRepository<StoreShipper> storeShipperRepo;
+        private IGenericRepository<StoreStaff> storeStaffRepo;
         private IGenericRepository<Request> requestRepo;
         private IGenericRepository<Order> orderRepo;
 
@@ -268,27 +268,27 @@ namespace BeeStore_Repository
         }
 
 
-        public IGenericRepository<Warehouse> WarehouseRepo
+        public IGenericRepository<Store> StoreRepo
         {
             get
             {
-                if (warehouseRepo == null)
+                if (storeRepo == null)
                 {
-                    warehouseRepo = new GenericRepository<Warehouse>(_context);
+                    storeRepo = new GenericRepository<Store>(_context);
                 }
-                return warehouseRepo;
+                return storeRepo;
             }
         }
 
-        public IGenericRepository<Inventory> InventoryRepo
+        public IGenericRepository<Room> RoomRepo
         {
             get
             {
-                if (inventoryRepo == null)
+                if (roomRepo == null)
                 {
-                    inventoryRepo = new GenericRepository<Inventory>(_context);
+                    roomRepo = new GenericRepository<Room>(_context);
                 }
-                return inventoryRepo;
+                return roomRepo;
             }
         }
 
@@ -319,27 +319,27 @@ namespace BeeStore_Repository
 
 
 
-        public IGenericRepository<WarehouseShipper> WarehouseShipperRepo
+        public IGenericRepository<StoreShipper> StoreShipperRepo
         {
             get
             {
-                if (warehouseShipperRepo == null)
+                if (storeShipperRepo == null)
                 {
-                    warehouseShipperRepo = new GenericRepository<WarehouseShipper>(_context);
+                    storeShipperRepo = new GenericRepository<StoreShipper>(_context);
                 }
-                return warehouseShipperRepo;
+                return storeShipperRepo;
             }
         }
 
-        public IGenericRepository<WarehouseStaff> WarehouseStaffRepo
+        public IGenericRepository<StoreStaff> StoreStaffRepo
         {
             get
             {
-                if (warehouseStaffRepo == null)
+                if (storeStaffRepo == null)
                 {
-                    warehouseStaffRepo = new GenericRepository<WarehouseStaff>(_context);
+                    storeStaffRepo = new GenericRepository<StoreStaff>(_context);
                 }
-                return warehouseStaffRepo;
+                return storeStaffRepo;
             }
         }
 

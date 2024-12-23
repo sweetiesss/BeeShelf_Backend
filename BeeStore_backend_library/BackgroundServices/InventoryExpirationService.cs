@@ -26,7 +26,7 @@ namespace BeeStore_Repository.BackgroundServices
         protected override async Task PerformPeriodicTaskAsync(CancellationToken stoppingToken)
         {
 
-            var inventory = await _unitOfWork.InventoryRepo.GetQueryable(x => x.Include(o => o.Lots).Include(o => o.OcopPartner)
+            var inventory = await _unitOfWork.RoomRepo.GetQueryable(x => x.Include(o => o.Lots).Include(o => o.OcopPartner)
                                                                                 .Where(u => u.ExpirationDate.HasValue
                                                                                     && u.OcopPartnerId.HasValue));
 
@@ -63,7 +63,7 @@ namespace BeeStore_Repository.BackgroundServices
             try
             {
                 var target = new MailAddress(targetMail);
-                var inventory = await _unitOfWork.InventoryRepo.SingleOrDefaultAsync(u => u.Id == inventoryId, query => query.Include(o => o.Warehouse));
+                var inventory = await _unitOfWork.RoomRepo.SingleOrDefaultAsync(u => u.Id == inventoryId, query => query.Include(o => o.Store));
                 
                 var config = new ConfigurationBuilder()
                     .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
@@ -90,11 +90,11 @@ namespace BeeStore_Repository.BackgroundServices
                                         <div style='max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9; border-radius: 10px;'>
                                           <h2 style='color: #4CAF50;'>Welcome to BeeShelf!</h2>
                                           <p>Dear User,</p>
-                                          <p>Your inventory has expired: Inventory {inventory.Name}</p>
+                                          <p>Your inventory has expired: Inventory {inventory.RoomCode}</p>
                                           <p style='font-weight: bold; font-size: 12px; color: #333;'>Lots inside inventory: </p>
                                             <span> {FormatLotsForEmail(LotName)} </span>
                                           
-                                          <p>Please retrieve these as soon as possible at warehouse {inventory.Warehouse.Name}.</p>
+                                          <p>Please retrieve these as soon as possible at warehouse {inventory.Store.Name}.</p>
                                           <p>You have three business day to retrieve it, if you don't we will have the authority to dismantle the products.</p>
                                           <p>Thank you for using our service!</p>
                                           <p style='margin-top: 30px; font-size: 12px; color: #888;'>This is an automated email, please do not reply.</p>
@@ -111,7 +111,7 @@ namespace BeeStore_Repository.BackgroundServices
                                         <div style='max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9; border-radius: 10px;'>
                                           <h2 style='color: #4CAF50;'>Welcome to BeeShelf!</h2>
                                           <p>Dear User,</p>
-                                          <p>Your inventory is about to be expired in {inventory.ExpirationDate.Value.Day - inventory.BoughtDate.Value.Day} days: Inventory {inventory.Name}</p>
+                                          <p>Your inventory is about to be expired in {inventory.ExpirationDate.Value.Day} days: Inventory {inventory.RoomCode}</p>
     
                                           <p>Please extend your inventory if you wish to use it for longer.</p>
                                           <p>You have three business day to retrieve it, if you don't we will have the authority to dismantle the products.</p>

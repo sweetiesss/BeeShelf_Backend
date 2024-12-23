@@ -6,9 +6,8 @@ namespace BeeStore_Repository.DTO.OrderDTOs
     {
 
         public int? OcopPartnerId { get; set; }
-
+        public string? ReceiverName {  get; set; }
         public string? ReceiverPhone { get; set; }
-
         public string? ReceiverAddress { get; set; }
         public decimal? Distance { get; set; }
         public int? DeliveryZoneId { get; set; }

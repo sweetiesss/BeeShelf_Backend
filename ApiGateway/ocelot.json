@@ -81,10 +81,10 @@
       ],
       "SwaggerKey": "role"
     },
-    { // Inventory Path
-      "UpstreamPathTemplate": "/gateway/inventory/{everything}",
+    { // Room Path
+      "UpstreamPathTemplate": "/gateway/room/{everything}",
       "UpstreamHttpMethod": [],
-      "DownstreamPathTemplate": "/api/inventory/{everything}",
+      "DownstreamPathTemplate": "/api/room/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         //{
@@ -96,7 +96,7 @@
           "Port": 443
         }
       ],
-      "SwaggerKey": "inventory"
+      "SwaggerKey": "room"
     },
     { // Partner Path
       "UpstreamPathTemplate": "/gateway/partner/{everything}",
@@ -150,10 +150,10 @@
       "SwaggerKey": "product"
     },
 
-    { // Warehouse Path
-      "UpstreamPathTemplate": "/gateway/warehouse/{everything}",
+    { // Store Path
+      "UpstreamPathTemplate": "/gateway/store/{everything}",
       "UpstreamHttpMethod": [],
-      "DownstreamPathTemplate": "/api/warehouse/{everything}",
+      "DownstreamPathTemplate": "/api/store/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         //{
@@ -165,7 +165,7 @@
           "Port": 443
         }
       ],
-      "SwaggerKey": "warehouse"
+      "SwaggerKey": "store"
     },
     { // productCategory Path
       "UpstreamPathTemplate": "/gateway/product-category/{everything}",
@@ -311,10 +311,10 @@
       ]
     },
     {
-      "Key": "inventory",
+      "Key": "room",
       "Config": [
         {
-          "Name": "inventory gateway API",
+          "Name": "room gateway API",
           "version": "v1",
           //"Url": "https://localhost:7092/swagger/v1/swagger.json"
           "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
@@ -443,10 +443,10 @@
       ]
     },
     {
-      "Key": "warehouse",
+      "Key": "store",
       "Config": [
         {
-          "Name": "warehouse gateway API",
+          "Name": "store gateway API",
           "version": "v1",
           //"Url": "https://localhost:7092/swagger/v1/swagger.json"
           "Url": "https://beeshelfapi.azurewebsites.net/swagger/v1/swagger.json"
