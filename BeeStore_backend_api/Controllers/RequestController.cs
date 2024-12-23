@@ -22,11 +22,11 @@ namespace BeeStore_Api.Controllers
         public async Task<IActionResult> GetRequestList([FromQuery] RequestStatus? status,
                                                     [FromQuery] bool? import,
                                                     [FromQuery][DefaultValue(false)] bool descending,
-                                                    [FromQuery] int warehouseId,
+                                                    [FromQuery] int storeId,
                                                     [FromQuery][DefaultValue(0)] int pageIndex,
                                                     [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _requestService.GetRequestList(import, status, descending, warehouseId, pageIndex, pageSize);
+            var result = await _requestService.GetRequestList(import, status, descending, storeId, pageIndex, pageSize);
             return Ok(result);
         }
 

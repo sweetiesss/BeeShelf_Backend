@@ -149,7 +149,7 @@ namespace BeeStore_Repository.Services
 
             var list = await _unitOfWork.ProductRepo.GetListAsync(
                 filter: filterExpression,
-                includes: u => u.Include(o => o.Lots).ThenInclude(o => o.Inventory).Include(o => o.ProductCategory),
+                includes: u => u.Include(o => o.Lots).ThenInclude(o => o.Room).Include(o => o.ProductCategory),
                 sortBy: sortBy!,
                 descending: descending,
                 searchTerm: search,

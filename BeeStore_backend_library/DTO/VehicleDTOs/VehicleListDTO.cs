@@ -13,7 +13,7 @@
         public string? Type { get; set; }
         public ulong? IsCold { get; set; }
         public string? Status { get; set; }
-        public int? WarehouseId { get; set; }
+        public int? StoreId { get; set; }
 
         public int? AssignedDriverId { get; set; }
         public string? AssignedDriverEmail { get; set; }

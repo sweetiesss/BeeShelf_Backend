@@ -15,7 +15,7 @@ namespace BeeStore_Repository.DTO.RequestDTOs
         public string? RequestType { get; set; }
 
         public int? ExportFromLotId { get; set; }
-        public int? SendToInventoryId { get; set; }
+        public int? SendToRoomId { get; set; }
 
         public LotCreateDTO? Lot { get; set; }
 

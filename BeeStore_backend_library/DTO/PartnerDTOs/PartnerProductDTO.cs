@@ -12,8 +12,8 @@
         public int id { get; set; }
         public string ProductName { get; set; }
         public int stock { get; set; }
-        public int warehouseId { get; set; }
-        public string warehouseName { get; set; }
-        public string warehouseLocation { get; set; }
+        public int storeId { get; set; }
+        public string storeName { get; set; }
+        public string storeLocation { get; set; }
     }
 }

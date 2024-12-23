@@ -12,9 +12,9 @@ public partial class Transaction : BaseEntity
 
     public int? OcopPartnerId { get; set; }
 
-    public int? InventoryId { get; set; }
+    public int? RoomId { get; set; }
 
-    public int? month_amount { get; set; }
+    public int? MonthAmount { get; set; }
 
     public DateTime? CreateDate { get; set; }
 
@@ -25,7 +25,6 @@ public partial class Transaction : BaseEntity
     //public ulong? IsDeleted { get; set; }
 
     public virtual OcopPartner? OcopPartner { get; set; }
-    public virtual Inventory? Inventory { get; set; }
 
-
+    public virtual Room? Room { get; set; }
 }

@@ -77,10 +77,10 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
-        [Route("get-warehouse-orders")]
+        [Route("get-store-orders")]
         [Authorize(Roles = "Admin,Manager,Staff,Shipper")]
         [HttpGet]
-        public async Task<IActionResult> GetWarehouseSentOrder(int warehouseId,
+        public async Task<IActionResult> GetStoreSentOrder(int storeId,
                                                             [FromQuery] bool? hasBatch,
                                                             [FromQuery] OrderFilterBy? orderFilterBy,
                                                             [FromQuery] string? filterQuery,
@@ -90,7 +90,7 @@ namespace BeeStore_Api.Controllers
                                                             [FromQuery][DefaultValue(0)] int pageIndex,
                                                             [FromQuery][DefaultValue(10)] int pageSize)
         {
-            var result = await _orderService.GetWarehouseSentOrderList(hasBatch, orderFilterBy, filterQuery, warehouseId, filterByStatus, sortBy, descending, pageIndex, pageSize);
+            var result = await _orderService.GetStoreSentOrderList(hasBatch, orderFilterBy, filterQuery, storeId, filterByStatus, sortBy, descending, pageIndex, pageSize);
             return Ok(result);
         }
 

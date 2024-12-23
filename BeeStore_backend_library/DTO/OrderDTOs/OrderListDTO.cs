@@ -71,7 +71,7 @@
 
         public int? ProductAmount { get; set; }
         public string? ProductImage { get; set; }
-        public int? InventoryId {  get; set; }
-        public string? InventoryName { get; set;}
+        public int? RoomId {  get; set; }
+        public string? RoomCode { get; set;}
     }
 }

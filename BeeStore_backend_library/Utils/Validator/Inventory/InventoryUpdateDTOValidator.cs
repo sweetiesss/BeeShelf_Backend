@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace BeeStore_Repository.Utils.Validator.Inventory
 {
-    public class InventoryUpdateDTOValidator : AbstractValidator<InventoryUpdateDTO>
+    public class InventoryUpdateDTOValidator : AbstractValidator<RoomUpdateDTO>
     {
         public InventoryUpdateDTOValidator()
         {

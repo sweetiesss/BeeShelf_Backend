@@ -12,11 +12,11 @@ public partial class Batch : BaseEntity
 
     public int? DeliveryZoneId { get; set; }
 
+    public DateTime? DeliveryStartDate { get; set; }
+
     public int? DeliverBy { get; set; }
 
     //public ulong? IsDeleted { get; set; }
-
-    public DateTime? DeliveryStartDate { get; set; }
 
     public virtual Employee? DeliverByNavigation { get; set; }
 
