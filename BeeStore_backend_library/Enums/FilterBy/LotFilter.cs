@@ -3,6 +3,6 @@
     public enum LotFilter
     {
         ProductId,
-        InventoryId
+        RoomId
     }
 }

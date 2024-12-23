@@ -24,11 +24,9 @@ public partial class Lot : BaseEntity
 
     public DateTime? ExpirationDate { get; set; }
 
-    public int? InventoryId { get; set; }
+    public int? RoomId { get; set; }
 
     //public ulong? IsDeleted { get; set; }
-
-    public virtual Inventory? Inventory { get; set; }
 
     public virtual ICollection<OrderDetail> OrderDetails { get; set; } = new List<OrderDetail>();
 
@@ -37,4 +35,6 @@ public partial class Lot : BaseEntity
     public virtual ICollection<Request> RequestExportFromLots { get; set; } = new List<Request>();
 
     public virtual ICollection<Request> RequestLots { get; set; } = new List<Request>();
+
+    public virtual Room? Room { get; set; }
 }

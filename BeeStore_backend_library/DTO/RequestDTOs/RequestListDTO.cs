@@ -15,11 +15,11 @@
         public string? ProductImage { get; set; }
         public string? RequestType { get; set; }
         public int? ExportFromLotId { get; set; }
-        public string? ExportFromInventoryName { get; set; }
-        public int? SendToInventoryId { get; set; }
-        public string? SendToInventoryName { get; set; }
-        public string? WarehouseName { get; set; }
-        public string? ExportFromWarehouseName {  get; set; }
+        public string? ExportFromRoomName { get; set; }
+        public int? SendToRoomId { get; set; }
+        public string? SendToRoomName { get; set; }
+        public string? StoreName { get; set; }
+        public string? ExportFromStoreName {  get; set; }
         public DateTime? CreateDate { get; set; }
         public DateTime? ApporveDate { get; set; }
         public DateTime? DeliverDate { get; set; }

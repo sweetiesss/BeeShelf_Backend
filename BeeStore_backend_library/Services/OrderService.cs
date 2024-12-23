@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Linq.Expressions;
-using System.Reflection.Metadata;
 
 namespace BeeStore_Repository.Services
 {
@@ -29,7 +28,7 @@ namespace BeeStore_Repository.Services
         }
 
         private async Task<List<Order>> ApplyFilterToList(bool? hasBatch, OrderFilterBy? orderFilterBy, string? filterQuery, OrderStatus? orderStatus, OrderSortBy? sortCriteria,
-                                                          bool descending, int? shipperId = null, int? userId = null, int? warehouseId = null)
+                                                          bool descending, int? shipperId = null, int? userId = null, int? storeId = null)
         {
             string? filterQue = orderStatus switch
             {
@@ -45,25 +44,6 @@ namespace BeeStore_Repository.Services
                 _ => null
             };
 
-            //Expression<Func<Order, bool>> filterExpression = null;
-            //switch (orderFilterBy)
-            //{
-            //    case OrderFilterBy.DeliveryZoneId:
-            //        break;
-            //    case OrderFilterBy.BatchId: 
-            //        if (filterQuery.Equals("false", StringComparison.OrdinalIgnoreCase)){
-            //            filterExpression = u => u.BatchId == null;
-            //        }
-            //        else
-            //        {
-            //            filterExpression = u => u.BatchId != null;
-            //        }
-            //            break;
-            //    case null: filterQuery = string.Empty; break;
-            //}
-
-
-
             string? sortBy = sortCriteria switch
             {
                 OrderSortBy.CreateDate => Constants.SortCriteria.CreateDate,
@@ -74,7 +54,7 @@ namespace BeeStore_Repository.Services
 
             Expression<Func<Order, bool>> combinedFilter = u => (filterQue == null || u.Status.Equals(filterQue))
                              && (userId == null || u.OcopPartnerId.Equals(userId))
-                             && (warehouseId == null || u.OrderDetails.Any(od => od.Lot.Inventory.WarehouseId.Equals(warehouseId)))
+                             && (storeId == null || u.OrderDetails.Any(od => od.Lot.Room.StoreId.Equals(storeId)))
                              && (shipperId == null || u.Batch.DeliverBy.Equals(shipperId) && u.IsDeleted.Equals(false))
                              && (orderFilterBy == null || u.DeliveryZoneId.Equals(Int32.Parse(filterQuery)))
                              && (hasBatch == null ||
@@ -90,8 +70,8 @@ namespace BeeStore_Repository.Services
                                     .ThenInclude(o => o.Product)
                                 .Include(o => o.OrderDetails)
                                     .ThenInclude(o => o.Lot)
-                                    .ThenInclude(o => o.Inventory)
-                                    .ThenInclude(o => o.Warehouse)
+                                    .ThenInclude(o => o.Room)
+                                    .ThenInclude(o => o.Store)
                                 .Include(o => o.OrderFees)
                                 .Include(o => o.OcopPartner)
                                 .Include(o => o.DeliveryZone),
@@ -113,9 +93,9 @@ namespace BeeStore_Repository.Services
             return await ListPagination<OrderListDTO>.PaginateList(result, pageIndex, pageSize);
         }
 
-        public async Task<Pagination<OrderListDTO>> GetWarehouseSentOrderList(bool? hasBatch, OrderFilterBy? orderFilterBy, string? filterQuery, int warehouseId, OrderStatus? orderStatus, OrderSortBy? sortCriteria, bool descending, int pageIndex, int pageSize)
+        public async Task<Pagination<OrderListDTO>> GetStoreSentOrderList(bool? hasBatch, OrderFilterBy? orderFilterBy, string? filterQuery, int storeId, OrderStatus? orderStatus, OrderSortBy? sortCriteria, bool descending, int pageIndex, int pageSize)
         {
-            var list = await ApplyFilterToList(hasBatch, orderFilterBy, filterQuery, orderStatus, sortCriteria, descending, null, null, warehouseId);
+            var list = await ApplyFilterToList(hasBatch, orderFilterBy, filterQuery, orderStatus, sortCriteria, descending, null, null, storeId);
             var result = _mapper.Map<List<OrderListDTO>>(list);
             return await ListPagination<OrderListDTO>.PaginateList(result, pageIndex, pageSize);
         }
@@ -138,7 +118,7 @@ namespace BeeStore_Repository.Services
 
 
 
-        public async Task<string> CreateOrder(int warehouseId,bool send, OrderCreateDTO request)
+        public async Task<string> CreateOrder(int storeId, bool send, OrderCreateDTO request)
         {
             int number = 0;
             var user = await _unitOfWork.OcopPartnerRepo.AnyAsync(u => u.Id == request.OcopPartnerId);
@@ -166,14 +146,14 @@ namespace BeeStore_Repository.Services
                 }
                 //get a list of Lot with product Id
                 var b = await _unitOfWork.LotRepo.GetQueryable(query => query.Where(u => u.ProductId.Equals(product.ProductId)
-                                                                && u.InventoryId.HasValue
+                                                                && u.RoomId.HasValue
                                                                 && u.ImportDate.HasValue
                                                                 && u.TotalProductAmount > 0
-                                                                && u.Inventory.WarehouseId.Equals(warehouseId)
+                                                                && u.Room.StoreId.Equals(storeId)
                                                                 && u.IsDeleted.Equals(false))
                                                                 .OrderBy(u => u.ImportDate)
                                                                 .Include(o => o.Product)
-                                                                .Include(o => o.Inventory).ThenInclude(o => o.Warehouse));
+                                                                .Include(o => o.Room).ThenInclude(o => o.Store));
                 if (b.Count() == 0)
                 {
                     throw new KeyNotFoundException(ResponseMessage.NoLotWithProductFound);
@@ -330,9 +310,9 @@ namespace BeeStore_Repository.Services
             return ResponseMessage.Success;
         }
 
-        public async Task<string> UpdateOrder(int id, int warehouseId, OrderUpdateDTO request)
+        public async Task<string> UpdateOrder(int id, int storeId, OrderUpdateDTO request)
         {
-            var exist = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u => u.Id == id, 
+            var exist = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u => u.Id == id,
                                                                         includes => includes.Include(o => o.OrderFees).Include(o => o.OrderDetails));
             if (exist == null)
             {
@@ -375,14 +355,14 @@ namespace BeeStore_Repository.Services
                         }
 
                         var b = await _unitOfWork.LotRepo.GetQueryable(query => query.Where(u => u.ProductId.Equals(product.ProductId)
-                                                                        && u.InventoryId.HasValue
+                                                                        && u.RoomId.HasValue
                                                                         && u.ImportDate.HasValue
                                                                         && u.TotalProductAmount > 0
-                                                                        && u.Inventory.WarehouseId.Equals(warehouseId)
+                                                                        && u.Room.StoreId.Equals(storeId)
                                                                         && u.IsDeleted.Equals(false))
                                                                         .OrderBy(u => u.ImportDate)
                                                                         .Include(o => o.Product)
-                                                                        .Include(o => o.Inventory).ThenInclude(o => o.Warehouse));
+                                                                        .Include(o => o.Room).ThenInclude(o => o.Store));
                         if (b.Count() == 0)
                         {
                             throw new KeyNotFoundException(ResponseMessage.NoLotWithProductFound);
@@ -468,8 +448,9 @@ namespace BeeStore_Repository.Services
 
                 }
             }
-          
+
             //update receiver address and phone in both draft and shipping
+            exist.ReceiverName = request.ReceiverName;
             exist.ReceiverAddress = request.ReceiverAddress;
             exist.ReceiverPhone = request.ReceiverPhone;
 
@@ -612,7 +593,7 @@ namespace BeeStore_Repository.Services
                     a = true;
                     exist.CancellationReason = cancellationReason;
                     //take away the product's amount here
-                    
+
                 }
                 else
                 {
@@ -721,7 +702,7 @@ namespace BeeStore_Repository.Services
                         await UpdateLotProductAmount(od.LotId, od.ProductAmount, true);
                     }
 
-                    if(exist.TotalPriceAfterFee < 0)
+                    if (exist.TotalPriceAfterFee < 0)
                     {
                         exist.TotalPriceAfterFee *= -1;
                     }
@@ -760,13 +741,13 @@ namespace BeeStore_Repository.Services
                     bool b = true;
                     orderStatusUpdate = Constants.Status.Completed;
 
-                    
+
                     foreach (var x in exist.Batch.Orders)
                     {
-                        if (x.Status == Constants.Status.Shipping || x.Status == Constants.Status.Delivered 
+                        if (x.Status == Constants.Status.Shipping || x.Status == Constants.Status.Delivered
                             || x.Status == Constants.Status.Returned || x.Status == Constants.Status.Processing)
                         {
-                            if(x.Id != exist.Id)
+                            if (x.Id != exist.Id)
                             {
                                 b = false;
                                 break;
@@ -844,7 +825,7 @@ namespace BeeStore_Repository.Services
             if (cancel == true)
             {
                 lot.TotalProductAmount += amount;
-                lot.Inventory.Weight += amount * lot.Product.Weight;
+                lot.Room.Weight += amount * lot.Product.Weight;
             }
             else
             {
@@ -853,7 +834,7 @@ namespace BeeStore_Repository.Services
                     throw new ApplicationException(ResponseMessage.ProductNotEnough);
                 }
                 lot.TotalProductAmount -= amount;
-                lot.Inventory.Weight -= amount * lot.Product.Weight;
+                lot.Room.Weight -= amount * lot.Product.Weight;
             }
             await _unitOfWork.SaveAsync();
         }
@@ -867,19 +848,19 @@ namespace BeeStore_Repository.Services
 
         public async Task<OrderListDTO> GetOrder(int id)
         {
-            var order = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u => u.Id.Equals(id), 
+            var order = await _unitOfWork.OrderRepo.SingleOrDefaultAsync(u => u.Id.Equals(id),
                                 u => u.Include(o => o.Batch)
                                 .Include(o => o.OrderDetails)
                                     .ThenInclude(o => o.Lot)
                                     .ThenInclude(o => o.Product)
                                 .Include(o => o.OrderDetails)
                                     .ThenInclude(o => o.Lot)
-                                    .ThenInclude(o => o.Inventory)
-                                    .ThenInclude(o => o.Warehouse)
+                                    .ThenInclude(o => o.Room)
+                                    .ThenInclude(o => o.Store)
                                 .Include(o => o.OrderFees)
                                 .Include(o => o.OcopPartner)
                                 .Include(o => o.DeliveryZone));
-            if(order == null)
+            if (order == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.OrderIdNotFound);
             }

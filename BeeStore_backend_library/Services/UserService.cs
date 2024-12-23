@@ -171,10 +171,10 @@ namespace BeeStore_Repository.Services
             var list = await _unitOfWork.EmployeeRepo.GetListAsync(
                 filter: u => filterQuery == null || u.Role!.RoleName!.Equals(filterQuery),
                 includes: query => query.Include(o => o.Role)
-                                        .Include(o => o.WarehouseShippers)
-                                        .ThenInclude(o => o.Warehouse)
-                                        .Include(o => o.WarehouseStaffs)
-                                        .ThenInclude(o => o.Warehouse),
+                                        .Include(o => o.StoreShippers)
+                                        .ThenInclude(o => o.Store)
+                                        .Include(o => o.StoreStaffs)
+                                        .ThenInclude(o => o.Store),
                 sortBy: sortBy!,
                 descending: order,
                 searchTerm: search,
@@ -192,10 +192,10 @@ namespace BeeStore_Repository.Services
         {
             var user = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Email.Equals(email),
                                                                        query => query.Include(o => o.Role)
-                                                                                     .Include(o => o.WarehouseShippers)
-                                                                                     .ThenInclude(o => o.Warehouse)
-                                                                                     .Include(o => o.WarehouseStaffs)
-                                                                                     .ThenInclude(o => o.Warehouse))
+                                                                                     .Include(o => o.StoreShippers)
+                                                                                     .ThenInclude(o => o.Store)
+                                                                                     .Include(o => o.StoreStaffs)
+                                                                                     .ThenInclude(o => o.Store))
                                                                                      ;
             if (user == null)
             {
@@ -529,12 +529,12 @@ namespace BeeStore_Repository.Services
 
         public async Task<ManagerTotalRevenueDTO> GetManagerTotalRevenue(int warehouseId, int? year)
         {
-            var warehouse = await _unitOfWork.WarehouseRepo.SingleOrDefaultAsync(u => u.Id.Equals(warehouseId)
-                                                           ,includes => includes.Include(o => o.Inventories)
+            var warehouse = await _unitOfWork.StoreRepo.SingleOrDefaultAsync(u => u.Id.Equals(warehouseId)
+                                                           ,includes => includes.Include(o => o.Rooms)
                                                                                 .Include(o => o.Province)
                                                                                 .Include(o => o.Vehicles)
-                                                                                .Include(o => o.WarehouseShippers)
-                                                                                .Include(o => o.WarehouseStaffs));
+                                                                                .Include(o => o.StoreShippers)
+                                                                                .Include(o => o.StoreStaffs));
                 var result = new ManagerTotalRevenueDTO
                 {
                     WarehouseId = warehouse.Id,
@@ -563,20 +563,20 @@ namespace BeeStore_Repository.Services
 
         public async Task<ManagerDashboardDTO> GetManagerDashboard(int? day, int? month, int? year)
         {
-            var warehouses = await _unitOfWork.WarehouseRepo.GetQueryable(u => u.Include(o => o.Inventories)
+            var warehouses = await _unitOfWork.StoreRepo.GetQueryable(u => u.Include(o => o.Rooms)
                                                                                 .Include(o => o.Province)
                                                                                 .Include(o => o.Vehicles)
-                                                                                .Include(o => o.WarehouseShippers)
-                                                                                .Include(o => o.WarehouseStaffs));
+                                                                                .Include(o => o.StoreShippers)
+                                                                                .Include(o => o.StoreStaffs));
             warehouses = warehouses.ToList();
             var dashboard = new ManagerDashboardDTO
             {
                 totalWarehouse = warehouses.Count,
-                totalInventory = warehouses.Sum(w => w.Inventories.Count),
+                totalInventory = warehouses.Sum(w => w.Rooms.Count),
                 totalVehicle = warehouses.Sum(w => w.Vehicles.Count),
-                totalEmployee = warehouses.Sum(w => w.WarehouseStaffs.Count + w.WarehouseShippers.Count),
-                totalStaff = warehouses.Sum(w => w.WarehouseStaffs.Count),
-                totalShipper = warehouses.Sum(w => w.WarehouseShippers.Count),
+                totalEmployee = warehouses.Sum(w => w.StoreStaffs.Count + w.StoreShippers.Count),
+                totalStaff = warehouses.Sum(w => w.StoreStaffs.Count),
+                totalShipper = warehouses.Sum(w => w.StoreShippers.Count),
 
                 data = warehouses.Select(w => new WarehouseRevenueDTO
                 {
@@ -586,8 +586,8 @@ namespace BeeStore_Repository.Services
                     isCold = w.IsCold,
                     totalRevenue = CalculateWarehouseRevenue(w.Id, day, month, year).Result,
                     totalInventoryRevenue = CalculateInventoryRevenue(w.Id, day, month, year).Result,
-                    totalBoughtInventory = w.Inventories.Count(i => i.OcopPartnerId.HasValue),
-                    totalUnboughtInventory = w.Inventories.Count(i => !i.OcopPartnerId.HasValue)
+                    totalBoughtInventory = w.Rooms.Count(i => i.OcopPartnerId.HasValue),
+                    totalUnboughtInventory = w.Rooms.Count(i => !i.OcopPartnerId.HasValue)
                 }).ToList()
             };
             return dashboard;
@@ -595,10 +595,10 @@ namespace BeeStore_Repository.Services
 
         private async Task<decimal?> CalculateWarehouseRevenue(int warehouseId, int? day, int? month, int? year)
         {
-            var ordersQuery = await _unitOfWork.OrderRepo.GetQueryable(query => query.Where(u => u.OrderDetails.Any(u => u.Lot.Inventory.WarehouseId.Equals(warehouseId)))
+            var ordersQuery = await _unitOfWork.OrderRepo.GetQueryable(query => query.Where(u => u.OrderDetails.Any(u => u.Lot.Room.StoreId.Equals(warehouseId)))
                                                                                      .Where(u => u.Status == Constants.Status.Completed)
                                                                                      .OrderBy(u => u.CreateDate)
-                                                                                     .Include(o => o.OrderDetails).ThenInclude(o => o.Lot).ThenInclude(o => o.Inventory));
+                                                                                     .Include(o => o.OrderDetails).ThenInclude(o => o.Lot).ThenInclude(o => o.Room));
             ordersQuery = ordersQuery.ToList();
             if(ordersQuery.Count == 0)
             {
@@ -623,8 +623,8 @@ namespace BeeStore_Repository.Services
 
         private async Task<int?> CalculateInventoryRevenue(int warehouseId, int? day, int? month, int? year)
         {
-            var invQuery = await _unitOfWork.InventoryRepo.GetQueryable(query => query
-                                                                            .Where(u => u.WarehouseId.Equals(warehouseId) && u.Transactions.Count>0)
+            var invQuery = await _unitOfWork.RoomRepo.GetQueryable(query => query
+                                                                            .Where(u => u.StoreId.Equals(warehouseId) && u.Transactions.Count>0)
                                                                             .Include(u => u.Transactions));
 
                 var filteredQuery = invQuery.Select(inventory => new

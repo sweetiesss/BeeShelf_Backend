@@ -11,34 +11,34 @@ namespace BeeStore_Api_Test.Controllers
 {
     public class InventoryControllerTests
     {
-        private readonly Mock<IInventoryService> _mockInventoryService;
+        private readonly Mock<IRoomService> _mockInventoryService;
         private readonly Mock<IMemoryCache> _mockMemoryCache;
-        private readonly InventoryController _inventoryController;
+        private readonly RoomController _inventoryController;
 
         public InventoryControllerTests()
         {
-            _mockInventoryService = new Mock<IInventoryService>();
+            _mockInventoryService = new Mock<IRoomService>();
             _mockMemoryCache = new Mock<IMemoryCache>();
-            _inventoryController = new InventoryController(_mockInventoryService.Object, _mockMemoryCache.Object);
+            _inventoryController = new RoomController(_mockInventoryService.Object, _mockMemoryCache.Object);
         }
 
         [Fact]
         public async Task GetInventoryList_ShouldReturnInventoryList()
         {
             _mockInventoryService.Setup(s => s.GetInventoryList(null, null, null, false, 0, 10))
-                .ReturnsAsync(new Pagination<InventoryListDTO>());
+                .ReturnsAsync(new Pagination<RoomListDTO>());
 
             var response = await _inventoryController.GetInventoryList(null, null, null, false, 0, 10) as OkObjectResult;
 
             Assert.NotNull(response);
             Assert.Equal(200, response.StatusCode);
-            Assert.IsType<Pagination<InventoryListDTO>>(response.Value);
+            Assert.IsType<Pagination<RoomListDTO>>(response.Value);
         }
 
         [Fact]
         public async Task GetInventoryById_ShouldReturnInventory()
         {
-            var inventory = new InventoryLotListDTO { Id = 1 };
+            var inventory = new RoomLotListDTO { Id = 1 };
             _mockInventoryService.Setup(s => s.GetInventoryById(1)).ReturnsAsync(inventory);
 
             var response = await _inventoryController.GetInventoryById(1) as OkObjectResult;
@@ -64,7 +64,7 @@ namespace BeeStore_Api_Test.Controllers
         [Fact]
         public async Task CreateInventory_ShouldReturnCreatedInventory()
         {
-            var inventory = new InventoryCreateDTO { Name = "Test Inventory" };
+            var inventory = new RoomCreateDTO { Name = "Test Inventory" };
 
             _mockInventoryService.Setup(s => s.CreateInventory(inventory)).ReturnsAsync(ResponseMessage.Success);
 
@@ -78,7 +78,7 @@ namespace BeeStore_Api_Test.Controllers
         [Fact]
         public async Task UpdateInventory_ShouldReturnUpdatedInventory()
         {
-            var inventoryUpdate = new InventoryUpdateDTO { Id = 1, Name = "Updated Inventory" };
+            var inventoryUpdate = new RoomUpdateDTO { Id = 1, Name = "Updated Inventory" };
 
             _mockInventoryService.Setup(s => s.UpdateInventory(inventoryUpdate)).ReturnsAsync(ResponseMessage.Success);
 

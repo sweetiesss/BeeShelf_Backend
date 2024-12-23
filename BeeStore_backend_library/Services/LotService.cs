@@ -61,7 +61,7 @@ namespace BeeStore_Repository.Services
             switch (filterBy)
             {
                 case LotFilter.ProductId: filterExpression = u => u.ProductId.Equals(Int32.Parse(filterQuery!)); break;
-                case LotFilter.InventoryId: filterExpression = u => u.InventoryId.Equals(Int32.Parse(filterQuery!)); break;
+                case LotFilter.RoomId: filterExpression = u => u.RoomId.Equals(Int32.Parse(filterQuery!)); break;
                 default: filterExpression = null; break;
             }
 
@@ -78,7 +78,7 @@ namespace BeeStore_Repository.Services
             var list = await _unitOfWork.LotRepo.GetListAsync(
                 filter: filterExpression!,
                 includes: u => u.Include(o => o.Product)
-                                .Include(o => o.Inventory).ThenInclude(o => o.Warehouse),
+                                .Include(o => o.Room).ThenInclude(o => o.Store),
                 sortBy: sortCriteria!,
                 descending: descending,
                 searchTerm: search,
@@ -108,14 +108,14 @@ namespace BeeStore_Repository.Services
             {
                 case LotFilter.ProductId:
                     filterExpression = u => u.ProductId.Equals(Int32.Parse(filterQuery!))
-                                                               && u.Inventory.OcopPartnerId.Equals(partnerId)
+                                                               && u.Room.OcopPartnerId.Equals(partnerId)
                                                                && u.RequestLots.Any(u => u.Status.Equals(Constants.Status.Completed)); break;
-                case LotFilter.InventoryId:
-                    filterExpression = u => u.InventoryId.Equals(Int32.Parse(filterQuery!))
-                                                               && u.Inventory.OcopPartnerId.Equals(partnerId)
+                case LotFilter.RoomId:
+                    filterExpression = u => u.RoomId.Equals(Int32.Parse(filterQuery!))
+                                                               && u.Room.OcopPartnerId.Equals(partnerId)
                                                                && u.RequestLots.Any(u => u.Status.Equals(Constants.Status.Completed)); break;
                 default:
-                    filterExpression = u => u.Inventory.OcopPartnerId.Equals(partnerId)
+                    filterExpression = u => u.Room.OcopPartnerId.Equals(partnerId)
                                               && u.RequestLots.Any(u => u.Status.Equals(Constants.Status.Completed)); break;
             }
 
@@ -132,7 +132,7 @@ namespace BeeStore_Repository.Services
             var list = await _unitOfWork.LotRepo.GetListAsync(
                 filter: filterExpression!,
                 includes: u => u.Include(o => o.Product)
-                                .Include(o => o.Inventory).ThenInclude(o => o.Warehouse),
+                                .Include(o => o.Room).ThenInclude(o => o.Store),
                 sortBy: sortCriteria!,
                 descending: descending,
                 searchTerm: search,
@@ -143,34 +143,6 @@ namespace BeeStore_Repository.Services
             return (await ListPagination<LotListDTO>.PaginateList(result, pageIndex, pageSize));
         }
 
-        //public async Task<string> UpdateLot(int id, LotCreateDTO request)
-        //{
-        //    var exist = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id == id);
-        //    if (exist == null)
-        //    {
-        //        throw new KeyNotFoundException(ResponseMessage.PackageIdNotFound);
-        //    }
-        //    if (request.InventoryId != null)
-        //    {
-        //        var inventory = await _unitOfWork.InventoryRepo.AnyAsync(u => u.Id == request.InventoryId);
-        //        if (inventory == false)
-        //        {
-        //            throw new KeyNotFoundException(ResponseMessage.InventoryIdNotFound);
-        //        }
-        //    }
-        //    var product = await _unitOfWork.ProductRepo.SingleOrDefaultAsync(u => u.Id == request.ProductId);
-        //    if (product == null)
-        //    {
-        //        throw new KeyNotFoundException(ResponseMessage.ProductIdNotFound);
-        //    }
-        //    var productCategory = await _unitOfWork.ProductCategoryRepo.SingleOrDefaultAsync(u => u.Id == product.ProductCategoryId);
-        //    exist.ProductAmount = request.ProductAmount;
-        //    exist.ProductId = request.ProductId;
-        //    exist.InventoryId = request.InventoryId;
-        //    exist.ExpirationDate = DateTime.Now.AddDays(productCategory.ExpireIn!.Value);
-        //    _unitOfWork.LotRepo.Update(exist);
-        //    await _unitOfWork.SaveAsync();
-        //    return ResponseMessage.Success;
-        //}
+    
     }
 }

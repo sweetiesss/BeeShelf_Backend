@@ -154,36 +154,7 @@ namespace BeeStore_Repository.Services
             }
         })
         .ToList();
-            //list.Add(new PartnerRevenueDTO
-            //{
-            //    orderStatus = Constants.Status.Canceled,
-            //    orderAmount = 0,
-            //    amount = 0,
-            //});
-            //list.Add(new PartnerRevenueDTO
-            //{
-            //    orderStatus = Constants.Status.Completed,
-            //    orderAmount = 0,
-            //    amount = 0,
-            //});
-            //list.Add(new PartnerRevenueDTO
-            //{
-            //    orderStatus = Constants.Status.Failed,
-            //    orderAmount = 0,
-            //    amount = 0,
-            //});
-            //list.Add(new PartnerRevenueDTO
-            //{
-            //    orderStatus = Constants.Status.Shipping,
-            //    orderAmount = 0,
-            //    amount = 0,
-            //});
-            //list.Add(new PartnerRevenueDTO
-            //{
-            //    orderStatus = Constants.Status.Pending,
-            //    orderAmount = 0,
-            //    amount = 0,
-            //});
+            
             var partner = await _unitOfWork.OcopPartnerRepo.AnyAsync(u => u.Id == id);
             if (partner == false)
             {
@@ -200,14 +171,7 @@ namespace BeeStore_Repository.Services
             if (year.HasValue)
             {
                 ordersQuery = ordersQuery.Where(o => o.CreateDate.Value.Year == year.Value).ToList();
-                //if (month.HasValue)
-                //{
-                //    ordersQuery = ordersQuery.Where(o => o.CreateDate.Value.Month == month.Value).ToList();
-                //    if (day.HasValue)
-                //    {
-                //        ordersQuery = ordersQuery.Where(o => o.CreateDate.Value.Day == day.Value).ToList();
-                //    }
-                //}
+
             }
 
             var groupedOrders = ordersQuery
@@ -224,24 +188,6 @@ namespace BeeStore_Repository.Services
         })
         .ToList();
 
-            //var groupedOrders = ordersQuery
-            //.GroupBy(o => o.Status)
-            //.Select(g => new
-            //{
-            //    Status = g.Key,
-            //    OrderAmount = g.Count(),
-            //    TotalAmount = g.Sum(o => o.TotalPrice ?? 0)
-            //});
-
-            //foreach (var group in groupedOrders)
-            //{
-            //    var dto = list.FirstOrDefault(d => d.orderStatus == group.Status);
-            //    if (dto != null)
-            //    {
-            //        dto.orderAmount = group.OrderAmount;
-            //        dto.amount = (int)group.TotalAmount;
-            //    }
-            //}
             foreach (var monthGroup in result)
             {
                 var monthOrders = groupedOrders.Where(g => g.Month == monthGroup.Month);
@@ -262,14 +208,14 @@ namespace BeeStore_Repository.Services
             return result;
         }
 
-        public async Task<PartnerProductDTO> GetPartnerTotalProduct(int id, int? warehouseId)
+        public async Task<PartnerProductDTO> GetPartnerTotalProduct(int id, int? storeId)
         {
             var lotsQuery = await _unitOfWork.LotRepo.GetQueryable(query => query.Where(u => u.Product.OcopPartnerId.Equals(id)
                                                                                           && u.ImportDate.HasValue
-                                                                                          && u.InventoryId.HasValue
+                                                                                          && u.RoomId.HasValue
                                                                                           && u.IsDeleted.Equals(false)
-                                                                                          && (warehouseId == null || u.Inventory.WarehouseId.Equals(warehouseId)))
-                                                                                 .Include(o => o.Inventory).ThenInclude(o => o.Warehouse)
+                                                                                          && (storeId == null || u.Room.StoreId.Equals(storeId)))
+                                                                                 .Include(o => o.Room).ThenInclude(o => o.Store)
                                                                                  .Include(o => o.Product));
             lotsQuery = lotsQuery.ToList();
 
@@ -278,18 +224,18 @@ namespace BeeStore_Repository.Services
             {
                 ProductId = l.ProductId,
                 ProductName = l.Product.Name,
-                WarehouseId = l.Inventory.Warehouse.Id,
-                WarehouseName = l.Inventory.Warehouse.Name,
-                WarehouseLocation = l.Inventory.Warehouse.Location + ", " + l.Inventory.Warehouse.Province.SubDivisionName
+                StoreId = l.Room.Store.Id,
+                StoreName = l.Room.Store.Name,
+                StoreLocation = l.Room.Store.Location + ", " + l.Room.Store.Province.SubDivisionName
             })
             .Select(group => new ProductDTO
             {
                 id = (int)group.Key.ProductId,
                 ProductName = group.Key.ProductName,
                 stock = group.Sum(l => (int)l.TotalProductAmount),
-                warehouseId = (int)group.Key.WarehouseId,
-                warehouseName = group.Key.WarehouseName,
-                warehouseLocation = group.Key.WarehouseLocation
+                storeId = (int)group.Key.StoreId,
+                storeName = group.Key.StoreName,
+                storeLocation = group.Key.StoreLocation
             })
             .OrderByDescending(p => p.stock)
             .ToList();

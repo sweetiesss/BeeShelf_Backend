@@ -12,9 +12,9 @@
 
         public int? OcopPartnerId { get; set; }
         public string? Email { get; set; }
-        public int? InventoryId { get; set; }
-        public string? InventoryName { get; set; }
-        public int? month_amount { get; set; }
+        public int? RoomId { get; set; }
+        public string? RoomCode { get; set; }
+        public int? MonthAmount { get; set; }
         public DateTime? CreateDate { get; set; }
 
         public string? Status { get; set; }
