@@ -7,6 +7,7 @@ namespace BeeStore_Repository
 {
     public interface IUnitOfWork : IDisposable
     {
+        IGenericRepository<OcopPartnerVerificationPaper> OcopPartnerVerificationPaperRepository { get; }
         IGenericRepository<DeliveryZone> DeliveryZoneRepo { get; }
         IGenericRepository<MoneyTransfer> MoneyTransferRepo { get; }
         IGenericRepository<Payment> PaymentRepo { get; }
@@ -38,6 +39,7 @@ namespace BeeStore_Repository
     public class UnitOfWork : IUnitOfWork
     {
         private BeeStoreDbContext _context;
+        private IGenericRepository<OcopPartnerVerificationPaper> ocopPartnerVerificationPaperRepo;
         private IGenericRepository<DeliveryZone> deliveryZoneRepo;
         private IGenericRepository<MoneyTransfer> moneyTransferRepo;
         private IGenericRepository<Payment> paymentRepo;
@@ -67,6 +69,18 @@ namespace BeeStore_Repository
         public UnitOfWork(BeeStoreDbContext context)
         {
             _context = context;
+        }
+
+        public IGenericRepository<OcopPartnerVerificationPaper> OcopPartnerVerificationPaperRepository
+        {
+            get
+            {
+                if (ocopPartnerVerificationPaperRepo == null)
+                {
+                    ocopPartnerVerificationPaperRepo = new GenericRepository<OcopPartnerVerificationPaper>(_context);
+                }
+                return ocopPartnerVerificationPaperRepo;
+            }
         }
 
         public IGenericRepository<DeliveryZone> DeliveryZoneRepo
