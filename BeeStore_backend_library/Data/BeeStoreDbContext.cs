@@ -459,6 +459,10 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.VerifyDate)
                 .HasColumnType("datetime")
                 .HasColumnName("verify_date");
+            entity.Property(e => e.IsDeleted)
+                .HasDefaultValueSql("b'0'")
+                .HasColumnType("bit(1)")
+                .HasColumnName("is_deleted");
 
             entity.HasOne(d => d.OcopPartner).WithMany(p => p.OcopPartnerVerificationPapers)
                 .HasForeignKey(d => d.OcopPartnerId)

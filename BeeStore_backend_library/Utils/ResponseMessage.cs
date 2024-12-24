@@ -133,5 +133,9 @@
         public const string OcopCategoryIdNotFound = "OcopCategory Id not found.";
         //Category
         public const string CategoryIdNotMatch = "Category Id not match with OCOPCategory";
+        public const string NoReasonGiven = "No reason was given";
+
+        public const string OcopPartnerVerificationNotFound = "Verification papers not found.";
+        public const string RejectVerifiedError = "You can't reject a verified paper.";
     }
 }

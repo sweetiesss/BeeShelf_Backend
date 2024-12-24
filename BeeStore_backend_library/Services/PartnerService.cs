@@ -7,7 +7,9 @@ using BeeStore_Repository.Logger;
 using BeeStore_Repository.Models;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace BeeStore_Repository.Services
@@ -15,11 +17,13 @@ namespace BeeStore_Repository.Services
     public class PartnerService : IPartnerService
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IPictureService _pictureService;
         private readonly IMapper _mapper;
         private readonly ILoggerManager _logger;
-        public PartnerService(IUnitOfWork unitOfWork, IMapper mapper, ILoggerManager logger)
+        public PartnerService(IUnitOfWork unitOfWork,IPictureService pictureService, IMapper mapper, ILoggerManager logger)
         {
             _unitOfWork = unitOfWork;
+            _pictureService = pictureService;
             _mapper = mapper;
             _logger = logger;
         }
@@ -252,6 +256,180 @@ namespace BeeStore_Repository.Services
             var list = await _unitOfWork.ProvinceRepo.GetAllAsync();
             var result = _mapper.Map<List<ProvinceListDTO>>(list);
             return result;
+        }
+
+        public async Task<string> CreatePartnerVerificationPaper(int ocop_partner_id, List<IFormFile> file)
+        {
+            if(file.Count == 0)
+            {
+                throw new ArgumentNullException();
+            }
+
+            var partner = await _unitOfWork.OcopPartnerRepo.AnyAsync(u => u.Id == ocop_partner_id);
+            if(partner == false)
+            {
+                throw new KeyNotFoundException(ResponseMessage.PartnerIdNotFound);
+            }
+            var exist = await _unitOfWork.OcopPartnerVerificationPaperRepository.GetQueryable(u => u.Where(x => x.OcopPartnerId.Equals(ocop_partner_id)));
+            exist = exist.ToList();
+            if(exist.Count != 0)
+            {
+              if(exist.Any(x => x.IsVerified == 1))
+              {
+                   throw new ApplicationException("This account has already been verified.");
+              }
+              if(exist.Any(x => x.IsRejected == 0 && x.IsVerified == 0))
+              {
+                    throw new ApplicationException("You have to wait for your previous submission to be checked first.");
+              }
+            }
+            string picture_link_1 = string.Empty;
+            string picture_link_2 = string.Empty;
+
+            foreach (var item in file)
+            {
+                if(picture_link_1 != string.Empty && picture_link_2 != string.Empty)
+                {
+                    break;
+                }
+                var picture_link = await _pictureService.UploadImage(item);
+                if(picture_link_1 == string.Empty)
+                {
+                    picture_link_1 = picture_link;
+                    continue;
+                }
+                if(picture_link_2 == string.Empty)
+                {
+                    picture_link_2 = picture_link;
+                    continue;
+                }
+            }
+            var request = new PartnerVerificationPaperCreateDTO
+            {
+                OcopPartnerId = ocop_partner_id
+            };
+
+            var result = _mapper.Map<OcopPartnerVerificationPaper>(request);
+            result.FrontPictureLink = picture_link_1;
+            result.BackPictureLink = picture_link_2;
+            await _unitOfWork.OcopPartnerVerificationPaperRepository.AddAsync(result);
+            await _unitOfWork.SaveAsync();
+            return ResponseMessage.Success;
+        }
+
+        public async Task<PartnerVerificationPaperDTO> GetPartnerVerificationPaper(int partnerId)
+        {
+            var list = await _unitOfWork.OcopPartnerVerificationPaperRepository.GetQueryable(u => u.Where(x => x.OcopPartnerId == partnerId)
+                                                                                                   .OrderBy(u => u.CreateDate));
+            list = list.ToList();
+
+            var partner = await _unitOfWork.OcopPartnerRepo.SingleOrDefaultAsync(u => u.Id.Equals(partnerId));
+
+            var result = new PartnerVerificationPaperDTO
+            {
+                OCOPPartnerId = partnerId,
+                OCOPPartnerEmail = partner?.Email, 
+                IsVerified = partner?.IsVerified,
+                data = list.Select(paper => new VerificationPaperDTO
+                {
+                    Id = paper.Id,
+                    OcopPartnerId = paper.OcopPartnerId,
+                    CreateDate = paper.CreateDate,
+                    IsVerified = paper.IsVerified,
+                    VerifyDate = paper.VerifyDate,
+                    IsRejected = paper.IsRejected,
+                    RejectDate = paper.RejectDate,
+                    RejectReason = paper.RejectReason,
+                    FrontPictureLink = paper.FrontPictureLink,
+                    BackPictureLink = paper.BackPictureLink
+                }).ToList()
+            };
+            return result;
+        }
+
+        public async Task<Pagination<PartnerVerificationPaperDTO>> GetAllPartnerVerificationPaper(bool? verified, int pageIndex, int pageSize)
+        {
+            
+            var query = await _unitOfWork.OcopPartnerVerificationPaperRepository.GetQueryable(u => u.Include(o => o.OcopPartner));
+
+            
+            var groupedPapers = query
+                .GroupBy(x => x.OcopPartner)  
+                .Select(group => new
+                 {
+                    Partner = group.Key,  
+                    Papers = group.OrderBy(p => p.CreateDate).ToList()
+                });
+            
+            if (verified.HasValue)
+            {
+                groupedPapers = groupedPapers.Where(g =>
+                    verified.Value
+                        ? g.Papers.Any(p => p.IsVerified == 1)
+                        : !g.Papers.Any(p => p.IsVerified == 1));
+            }
+
+            var items = groupedPapers.Select(group => new PartnerVerificationPaperDTO
+            {
+                OCOPPartnerId = group.Partner.Id,
+                OCOPPartnerEmail = group.Partner.Email,
+                IsVerified = group.Partner.IsVerified,
+                data = group.Papers.Select(paper => new VerificationPaperDTO
+                {
+                    Id = paper.Id,
+                    OcopPartnerId = paper.OcopPartnerId,
+                    CreateDate = paper.CreateDate,
+                    IsVerified = paper.IsVerified,
+                    VerifyDate = paper.VerifyDate,
+                    IsRejected = paper.IsRejected,
+                    RejectDate = paper.RejectDate,
+                    RejectReason = paper.RejectReason,
+                    FrontPictureLink = paper.FrontPictureLink,
+                    BackPictureLink = paper.BackPictureLink
+                }).ToList()
+            }).ToList();
+
+            var result = _mapper.Map<List<PartnerVerificationPaperDTO>>(items);
+
+            return await ListPagination<PartnerVerificationPaperDTO>.PaginateList(result, pageIndex, pageSize);
+        }
+
+        public async Task<string> VerifyPartnerVerificationPaper(int partnerVerPaperid)
+        {
+            var exist = await _unitOfWork.OcopPartnerVerificationPaperRepository.SingleOrDefaultAsync(u => u.Id.Equals(partnerVerPaperid),
+                                                                                                     query => query.Include(o => o.OcopPartner));
+            if(exist == null)
+            {
+                throw new KeyNotFoundException(ResponseMessage.OcopPartnerVerificationNotFound);
+            }
+            exist.VerifyDate = DateTime.Now;
+            exist.IsVerified = 1;
+            exist.OcopPartner.IsVerified = 1;
+            await _unitOfWork.SaveAsync();
+            return ResponseMessage.Success;
+
+        }
+
+        public async Task<string> RejectPartnerVerificationPaper(int partnerVerPaperid, string reason)
+        {
+            if(reason == null || reason == string.Empty)
+            {
+                throw new ApplicationException(ResponseMessage.NoReasonGiven);
+            }
+            var exist = await _unitOfWork.OcopPartnerVerificationPaperRepository.SingleOrDefaultAsync(u => u.Id.Equals(partnerVerPaperid));
+            if (exist == null)
+            {
+                throw new KeyNotFoundException(ResponseMessage.OcopPartnerVerificationNotFound);
+            }
+            if(exist.IsVerified == 1)
+            {
+                throw new ApplicationException(ResponseMessage.RejectVerifiedError);
+            }
+            exist.RejectDate = DateTime.Now;
+            exist.IsRejected = 1;
+            exist.RejectReason = reason;
+            await _unitOfWork.SaveAsync();
+            return ResponseMessage.Success;
         }
     }
 }
