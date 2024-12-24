@@ -220,7 +220,7 @@ namespace BeeStore_Repository.Mapper
                 .ForMember(dest => dest.TransferByStaffEmail, opt => opt.MapFrom(src => src.TransferByNavigation.Email))
                 .ForMember(dest => dest.TransferByStaffName, opt => opt.MapFrom(src => $"{src.TransferByNavigation.FirstName} {src.TransferByNavigation.LastName}"))
                 .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
-
+            CreateMap<PartnerVerificationPaperCreateDTO, OcopPartnerVerificationPaper>();
         }
     }
 }

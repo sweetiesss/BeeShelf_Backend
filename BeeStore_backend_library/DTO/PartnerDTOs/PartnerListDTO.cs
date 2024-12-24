@@ -45,6 +45,7 @@
 
         public int? OcopCategoryId { get; set; }
         public string? OcopCategoryName { get; set; }
+        public ulong? IsVerified { get; set; }
 
 
     }
