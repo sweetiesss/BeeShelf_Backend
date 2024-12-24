@@ -93,5 +93,54 @@ namespace BeeStore_Api.Controllers
             var result = await _partnerService.GetPartnerTotalProduct(id, storeId);
             return Ok(result);
         }
+
+        [Route("get-verification-paper/{partnerId}")]
+        [HttpGet]
+        [Authorize(Roles = "Admin,Manager,Partner")]
+        public async Task<IActionResult> GetPartnerVerificationPaper(int partnerId)
+        {
+            var result = await _partnerService.GetPartnerVerificationPaper(partnerId);
+            return Ok(result);
+        }
+
+        [Route("get-verification-papers")]
+        [HttpGet]
+        [Authorize(Roles = "Admin,Manager")]
+        public async Task<IActionResult> GetPartnerVerificationPaper(bool? verified, 
+                                                                    [FromQuery][DefaultValue(0)] int pageIndex,
+                                                                    [FromQuery][DefaultValue(10)] int pageSize)
+        {
+            var result = await _partnerService.GetAllPartnerVerificationPaper(verified, pageIndex, pageSize);
+            return Ok(result);
+        }
+
+        [Route("create-verification-paper")]
+        [HttpPost]
+        [Authorize(Roles = "Admin, Partner")]
+        public async Task<IActionResult> CreatePartnerVerificationPapers(int ocop_partner_id,
+                                                                        List<IFormFile> file)
+        {
+            var result = await _partnerService.CreatePartnerVerificationPaper(ocop_partner_id, file);
+            return Ok(result);
+        }
+
+
+        [Route("verify-verification-paper")]
+        [HttpPut]
+        [Authorize(Roles = "Admin, Manager")]
+        public async Task<IActionResult> VerifyVerificationPaper(int verificationPaperId)
+        {
+            var result = await _partnerService.VerifyPartnerVerificationPaper(verificationPaperId);
+            return Ok(result);
+        }
+
+        [Route("reject-verification-paper")]
+        [HttpPut]
+        [Authorize(Roles = "Admin, Manager")]
+        public async Task<IActionResult> RejectVerificationPaper(int verificationPaperId, string reason)
+        {
+            var result = await _partnerService.RejectPartnerVerificationPaper(verificationPaperId, reason);
+            return Ok(result);
+        }
     }
 }

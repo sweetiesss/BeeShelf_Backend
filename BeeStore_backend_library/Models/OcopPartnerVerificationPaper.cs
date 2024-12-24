@@ -22,5 +22,7 @@ public partial class OcopPartnerVerificationPaper : BaseEntity
 
     public string? BackPictureLink { get; set; }
 
+    //public ulong? IsDeleted { get; set; }
+
     public virtual OcopPartner? OcopPartner { get; set; }
 }
