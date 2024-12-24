@@ -6,8 +6,8 @@ resources:
 
 variables:
   # Container registry service connection established during pipeline creation
-  dockerRegistryServiceConnection: '81f64ba0-95fc-4d01-8f0f-68732968cd25'
-
+  # dockerRegistryServiceConnection: '81f64ba0-95fc-4d01-8f0f-68732968cd25'
+  dockerRegistryServiceConnection: 'de596001-94fd-41d5-8114-b48a8f7224a6'
   # Agent VM image name
   vmImageName: 'ubuntu-latest'
 stages:
