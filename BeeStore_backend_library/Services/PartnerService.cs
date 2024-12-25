@@ -1,4 +1,6 @@
 ﻿using AutoMapper;
+using Azure.Identity;
+using Azure.Security.KeyVault.Secrets;
 using BeeStore_Repository.DTO;
 using BeeStore_Repository.DTO.PartnerDTOs;
 using BeeStore_Repository.DTO.ProvinceDTOs;
@@ -9,8 +11,12 @@ using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Linq.Expressions;
+using System.Net.Mail;
+using System.Net;
+using BeeStore_Repository.Data;
 
 namespace BeeStore_Repository.Services
 {
@@ -402,10 +408,16 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.OcopPartnerVerificationNotFound);
             }
+            var partner = await _unitOfWork.OcopPartnerRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.OcopPartnerId));
+
             exist.VerifyDate = DateTime.Now;
             exist.IsVerified = 1;
             exist.OcopPartner.IsVerified = 1;
             await _unitOfWork.SaveAsync();
+
+            //send email here
+            EmailSender(partner.Email, true);
+
             return ResponseMessage.Success;
 
         }
@@ -430,6 +442,74 @@ namespace BeeStore_Repository.Services
             exist.RejectReason = reason;
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
+        }
+
+        private async void EmailSender(string targetMail, bool verify)
+        {
+            try
+            {
+                string saythis = string.Empty;
+                if(verify == true)
+                {
+                    saythis = "Your account has been verified.";
+                }
+                else
+                {
+                    saythis = "Your submission has been rejected, please resubmit valid documents.";
+                }
+                var target = new MailAddress(targetMail);
+
+                var config = new ConfigurationBuilder()
+                    .SetBasePath(AppDomain.CurrentDomain.BaseDirectory)
+                    .AddJsonFile(Constants.DefaultString.systemJsonFile).Build();
+
+                var mailConfig = config.GetSection("Mail").Get<AppConfiguration>();
+
+                var keyVault = config.GetSection("KeyVault").Get<AppConfiguration>();
+
+                var _client = new SecretClient(new Uri(keyVault.KeyVaultURL), new EnvironmentCredential());
+
+                string smtpPassword = _client.GetSecret("BeeStore-Smtp-Password").Value.Value;
+
+                MailMessage mailMessage = new MailMessage();
+                mailMessage.From = new MailAddress(mailConfig.sourceMail);
+                mailMessage.Subject = Constants.Smtp.registerMailSubject;
+                mailMessage.To.Add(target);
+
+                    mailMessage.Body = $@"
+                                    <html>
+                                      <body style='font-family: Arial, sans-serif; color: #333; line-height: 1.6;'>
+                                        <div style='max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9; border-radius: 10px;'>
+                                          <h2 style='color: #4CAF50;'>Welcome to BeeShelf!</h2>
+                                          <p>Dear User,</p>
+                                          <p>{saythis}</p>
+                                          <p style='font-weight: bold; font-size: 12px; color: #333;'>Lots inside inventory: </p>
+                                            <span> </span>
+                                          
+                                          
+                                          <p>Thank you for using our service!</p>
+                                          <p style='margin-top: 30px; font-size: 12px; color: #888;'>This is an automated email, please do not reply.</p>
+                                        </div>
+                                      </body>
+                                    </html>";
+
+                
+               
+                mailMessage.IsBodyHtml = true;
+
+                var smtpClient = new SmtpClient(Constants.Smtp.smtp)
+                {
+                    Port = 587,
+                    Credentials = new NetworkCredential(mailConfig.sourceMail, smtpPassword),
+                    EnableSsl = true
+                };
+
+                smtpClient.Send(mailMessage);
+            }
+            catch (Exception)
+            {
+                throw;
+            }
         }
     }
 }
