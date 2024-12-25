@@ -319,11 +319,11 @@ namespace BeeStore_Repository.Services
                 RequestStatus.Draft => string.Empty,
                 RequestStatus.Pending => string.Empty,
                 RequestStatus.Canceled => string.Empty,
-                RequestStatus.Processing => Constants.Status.Processing,
-                RequestStatus.Delivered => Constants.Status.Delivered,
-                RequestStatus.Completed => Constants.Status.Completed,
-                RequestStatus.Failed => Constants.Status.Failed,
-                RequestStatus.Returned => Constants.Status.Returned,
+                RequestStatus.Processing => await UpdateProcessingStatusRequest(status.ToString(), staff, exist),
+                RequestStatus.Delivered => await UpdateDeliveredStatusRequest(status.ToString(), staff, exist),
+                RequestStatus.Completed => await UpdateCompletedStatusRequest(status.ToString(), staff, exist),
+                RequestStatus.Failed => await UpdateFailedStatusRequest(status.ToString(), staff, exist),
+                RequestStatus.Returned => await UpdateReturnedStatusRequest(status.ToString(), staff, exist),
                 _ => string.Empty
             };
             if (requestStatus.Equals(string.Empty))
@@ -331,9 +331,33 @@ namespace BeeStore_Repository.Services
                 throw new BadHttpRequestException(ResponseMessage.BadRequest);
             }
 
+            //Pending to processing (both import and export)
+            //await UpdateProcessingStatusRequest(requestStatus, staff, exist);
+
+            //Processing to Delivered
+            //await UpdateDeliveredStatusRequest(requestStatus, staff, exist);
+
+            //Delivered to Completed
+            //await UpdateCompletedStatusRequest(requestStatus, staff, exist);
+
+            //From processing/delivered to Failed
+            //await UpdateFailedStatusRequest(requestStatus, staff, exist);
+
+            //From Delivered to Returned    
+            //await UpdateReturnedStatusRequest(requestStatus, staff, exist);
+            return ResponseMessage.Success;
+
+        }
+        private async Task<string> UpdateProcessingStatusRequest(string requestStatus,Employee staff, Request exist)
+        {
+            //Pending to processing (both import and export)
             if (requestStatus.Equals(Constants.Status.Processing))
             {
-                
+                if (!exist.Status.Equals(Constants.Status.Pending))
+                {
+                    throw new ApplicationException(ResponseMessage.BadRequest);
+                }
+
                 if (exist.RequestType == "Export")
                 {
                     if (exist.ExportFromLot.Room.StoreId != staff.StoreStaffs.First().StoreId)
@@ -341,10 +365,7 @@ namespace BeeStore_Repository.Services
                         throw new ApplicationException(ResponseMessage.StaffCantProcessedExportOrderFromAnotherWarehouse);
                     }
                 }
-                if (!exist.Status.Equals(Constants.Status.Pending))
-                {
-                    throw new ApplicationException(ResponseMessage.BadRequest);
-                }
+
                 var lot = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.LotId), query => query.Include(o => o.Product));
                 if (lot == null)
                 {
@@ -358,9 +379,9 @@ namespace BeeStore_Repository.Services
 
                 if (exist.RequestType == "Import")
                 {
-
+                    //do nothing, just change the status and move on
                 }
-                else
+                else //if export do these things
                 {
                     var lotWeight = lot.Product.Weight * lot.TotalProductAmount;
                     var totalWeight = inventory.Weight + lotWeight;
@@ -392,7 +413,35 @@ namespace BeeStore_Repository.Services
                 }
                 exist.ApporveDate = DateTime.Now;
             }
-
+            exist.Status = requestStatus;
+            await _unitOfWork.SaveAsync();
+            return ResponseMessage.Success;
+        }
+        
+        private async Task<string> UpdateDeliveredStatusRequest(string requestStatus, Employee staff, Request exist)
+        {
+            if (requestStatus.Equals(Constants.Status.Delivered))
+            {
+                if (exist.Status != Constants.Status.Processing)
+                {
+                    throw new ApplicationException(ResponseMessage.RequestHasNotBeenProcessed);
+                }
+                if (exist.RequestType == "Export")
+                {
+                    if (exist.SendToRoom.StoreId != staff.StoreShippers.First().StoreId)
+                    {
+                        throw new ApplicationException(ResponseMessage.StaffCantProcessedExportOrderFromAnotherWarehouse);
+                    }
+                }
+                exist.DeliverDate = DateTime.Now;
+            }
+            exist.Status = requestStatus;
+            await _unitOfWork.SaveAsync();
+            return ResponseMessage.Success;
+        }
+    
+        private async Task<string> UpdateCompletedStatusRequest(string requestStatus, Employee staff, Request exist)
+        {
             if (requestStatus == Constants.Status.Completed)
             {
                 if (exist.Status != Constants.Status.Delivered)
@@ -426,15 +475,13 @@ namespace BeeStore_Repository.Services
                     lot.ExpirationDate = DateTime.Now.AddDays(productcategory!.ExpireIn!.Value);
 
                     inventory.Weight = totalWeight;
-
                 }
                 else
                 {
-
-                        if (exist.SendToRoom.StoreId != staff.StoreStaffs.First().StoreId)
-                        {
-                            throw new ApplicationException(ResponseMessage.StaffCantProcessedExportOrderFromAnotherWarehouse);
-                        }
+                    if (exist.SendToRoom.StoreId != staff.StoreStaffs.First().StoreId)
+                    {
+                        throw new ApplicationException(ResponseMessage.StaffCantProcessedExportOrderFromAnotherWarehouse);
+                    }
                     var originalLot = await _unitOfWork.LotRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.ExportFromLotId), includes => includes.Include(o => o.Room));
                     originalLot.ExportDate = DateTime.Now;
                     lot.ImportDate = DateTime.Now;
@@ -442,8 +489,14 @@ namespace BeeStore_Repository.Services
                     var productcategory = await _unitOfWork.ProductCategoryRepo.SingleOrDefaultAsync(u => u.Id.Equals(lot.Product.ProductCategoryId));
                     lot.ExpirationDate = DateTime.Now.AddDays(productcategory!.ExpireIn!.Value);
                 }
-
             }
+            exist.Status = requestStatus;
+            await _unitOfWork.SaveAsync();
+            return ResponseMessage.Success;
+        }
+
+        private async Task<string> UpdateFailedStatusRequest(string requestStatus, Employee staff, Request exist)
+        {
             if (requestStatus.Equals(Constants.Status.Failed))
             {
                 if (exist.Status != Constants.Status.Processing)
@@ -487,37 +540,27 @@ namespace BeeStore_Repository.Services
                     exist.CancelDate = DateTime.Now;
                 }
             }
-
-                if (requestStatus.Equals(Constants.Status.Delivered))
-                {
-                    if (exist.Status != Constants.Status.Processing)
-                    {
-                        throw new ApplicationException(ResponseMessage.RequestHasNotBeenProcessed);
-                    }
-                    if (exist.RequestType == "Export")
-                    {
-                        if (exist.SendToRoom.StoreId != staff.StoreShippers.First().StoreId)
-                        {
-                            throw new ApplicationException(ResponseMessage.StaffCantProcessedExportOrderFromAnotherWarehouse);
-                        }
-                    }
-                    exist.DeliverDate = DateTime.Now;
-                }
-
-                if (requestStatus.Equals(Constants.Status.Returned))
-                {
-                    if (exist.Status != Constants.Status.Delivered)
-                    {
-                        throw new ApplicationException(ResponseMessage.RequestHasNotBeenProcessed);
-                    }
-
-                    exist.CancelDate = DateTime.Now;
-                }
-
-                exist.Status = requestStatus;
-                await _unitOfWork.SaveAsync();
-                var result = _mapper.Map<RequestListDTO>(exist);
-                return ResponseMessage.Success;
-            }
+            exist.Status = requestStatus;
+            await _unitOfWork.SaveAsync();
+            return ResponseMessage.Success;
         }
+        
+        private async Task<string> UpdateReturnedStatusRequest(string requestStatus, Employee staff, Request exist)
+        {
+            if (requestStatus.Equals(Constants.Status.Returned))
+            {
+                if (exist.Status != Constants.Status.Delivered)
+                {
+                    throw new ApplicationException(ResponseMessage.RequestHasNotBeenProcessed);
+                }
+
+                exist.CancelDate = DateTime.Now;
+            }
+            exist.Status = requestStatus;
+            await _unitOfWork.SaveAsync();
+            return ResponseMessage.Success;
+        }
+
     }
+    
+}
