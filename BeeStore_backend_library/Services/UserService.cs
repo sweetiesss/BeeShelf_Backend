@@ -378,8 +378,6 @@ namespace BeeStore_Repository.Services
         }
 
 
-
-
         private void PasswordMailSender(string targetMail, string userGeneratedPassword)
         {
             try
