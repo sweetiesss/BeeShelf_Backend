@@ -1,8 +1,10 @@
 ﻿using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
+using BeeStore_Repository.DTO;
 using BeeStore_Repository.DTO.UserDTOs;
 using BeeStore_Repository.Services.Interfaces;
 using BeeStore_Repository.Utils;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
@@ -15,11 +17,13 @@ namespace BeeStore_Repository.Services
     {
         private readonly string _keyVaultURL;
         public SecretClient _client;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public JWTService(IConfiguration configuration)
+        public JWTService(IConfiguration configuration, IHttpContextAccessor httpContextAccessor)
         {
             _keyVaultURL = configuration["KeyVault:KeyVaultURL"] ?? throw new ArgumentNullException("Key Vault URL configuration values are missing.");
             _client = new SecretClient(new Uri(_keyVaultURL), new EnvironmentCredential());
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public string RefreshJWTToken(UserRefreshTokenRequestDTO jwt)
@@ -133,6 +137,51 @@ namespace BeeStore_Repository.Services
                     claims: claims,
                     expires: DateTime.Now.AddMinutes(24 * 60),
                     signingCredentials: creds);
+        }
+
+
+        public async Task<string> GetUserEmail()
+        {
+            var tokenContent = await ExtractTokenContent();
+            return tokenContent.Email;
+        }
+
+        public async Task<string> GetUserRole()
+        {
+            var tokenContent = await ExtractTokenContent();
+            return tokenContent.Role;
+        }
+
+        private async Task<string> GetBearerTokenFromHttpContext()
+        {
+            var authHeader = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString();
+            if (string.IsNullOrEmpty(authHeader))
+                return null;
+
+            const string bearerPrefix = "Bearer ";
+            if (authHeader.StartsWith(bearerPrefix, StringComparison.OrdinalIgnoreCase))
+            {
+                return authHeader[bearerPrefix.Length..].Trim();
+            }
+
+            return authHeader.Trim();
+        }
+
+        private async Task<TokenContent> ExtractTokenContent()
+        {
+            var token = await GetBearerTokenFromHttpContext();
+            if (string.IsNullOrEmpty(token))
+            {
+                throw new UnauthorizedAccessException("No token found in the request");
+            }
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var jwtToken = tokenHandler.ReadJwtToken(token);
+
+            return new TokenContent
+            {
+                Email = jwtToken.Claims.FirstOrDefault(c => c.Type == JwtRegisteredClaimNames.Email)?.Value,
+                Role = jwtToken.Claims.FirstOrDefault(c => c.Type == ClaimTypes.Role)?.Value,
+            };
         }
     }
 }

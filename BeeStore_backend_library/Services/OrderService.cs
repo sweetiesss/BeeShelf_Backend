@@ -12,6 +12,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using System.Data;
 using System.Linq.Expressions;
+using static BeeStore_Repository.Utils.Constants;
 
 namespace BeeStore_Repository.Services
 {
@@ -159,39 +160,6 @@ namespace BeeStore_Repository.Services
                     throw new KeyNotFoundException(ResponseMessage.NoLotWithProductFound);
                 }
 
-                //get first product warehouse Id
-                //if (firstProductWarehouseId == 0 && b.Any())
-                //{
-                //    firstProductWarehouseId = b[0].Inventory.WarehouseId.Value;
-                //}
-
-                ////if first product warehouse id already exist, check if this product is in the same warehouse or not
-                //if (firstProductWarehouseId != 0)
-                //{
-                //    if (b[0].Inventory.WarehouseId != firstProductWarehouseId)
-                //    {
-                //        for (int i = 1; i < b.Count(); i++)
-                //        {
-                //            if (b[i].Inventory.WarehouseId == firstProductWarehouseId)
-                //            {
-                //                index = i;
-                //                break;
-                //            }
-                //        }
-                //        if (index == 0)
-                //        {
-                //            throw new ApplicationException(ResponseMessage.ProductMustBeFromTheSameWarehouse);
-                //        }
-
-                //    }
-                //}
-
-                //check for product amount
-
-                //Get the next Lot if the first Lot doesnt have enough product
-                //check if the next Lot have the same warehouseId or not, if not then go to the next Lot
-                //if none of the next Lot have the same warehouseId return not enough product
-                //if there is no next Lot return not enough product
                 int productAmountNeeded = product.ProductAmount;
 
                 while (productAmountNeeded > 0)
@@ -203,13 +171,6 @@ namespace BeeStore_Repository.Services
 
                     var lot = b[index];
 
-                    // Check if the current lot's WarehouseId matches the first lot's WarehouseId
-                    //if (lot.Inventory.WarehouseId != firstProductWarehouseId)
-                    //{
-                    //    // If not, move to the next lot and continue the loop
-                    //    index++;
-                    //    continue;
-                    //}
 
                     int amountToTake = 0;
 
@@ -513,21 +474,62 @@ namespace BeeStore_Repository.Services
                 throw new KeyNotFoundException(ResponseMessage.OrderIdNotFound);
             }
 
-            var orderStatusString = orderStatus.ToString();
-            bool a = false;
-            string orderStatusUpdate = null;
-            if (orderStatusString.Equals(Constants.Status.Pending, StringComparison.OrdinalIgnoreCase))        //Pending
-            {
-                return ResponseMessage.Success;
-            }
 
+            string? status = orderStatus switch
+            {
+                OrderStatus.Draft => string.Empty,
+                OrderStatus.Pending => string.Empty,
+                OrderStatus.Processing => await UpdateStatusProcessingOrder(orderStatus.ToString(), exist),
+                OrderStatus.Shipping => await UpdateStatusShippingOrder(orderStatus.ToString(), exist),
+                OrderStatus.Delivered => await UpdateStatusDeliveredOrder(orderStatus.ToString(), exist),
+                OrderStatus.Completed => await UpdateStatusCompletedOrder(orderStatus.ToString(), exist),
+                OrderStatus.Canceled => await UpdateStatusCanceledOrder(orderStatus.ToString(), exist, cancellationReason),
+                OrderStatus.Returned => await UpdateStatusReturnedOrder(orderStatus.ToString(), exist, cancellationReason),
+                OrderStatus.Refunded => await UpdateStatusRefundedOrder(orderStatus.ToString(), exist),
+                _ => string.Empty
+            };
+
+            bool a = false;
+            //var orderStatusString = orderStatus.ToString();
+
+            //from pending to processing
+            //await UpdateStatusProcessingOrder(orderStatusString, exist);
+
+            //from processing to shipping
+            //await UpdateStatusShippingOrder(orderStatusString, exist);
+
+            //From Shipping to delivered
+            //await UpdateStatusDeliveredOrder(orderStatusString, exist);
+
+            //From Delivered to Completed
+            //await UpdateStatusCompletedOrder(orderStatusString, exist);
+
+            //from shipping/processing to canceled
+            //await UpdateStatusCanceledOrder(orderStatusString, exist, cancellationReason);
+
+            //from delivered to returned
+            //await UpdateStatusReturnedOrder(orderStatusString, exist, cancellationReason);
+
+            //From Returned to refunded
+            //await UpdateStatusRefundedOrder(orderStatusString, exist);
+
+
+            if (!a)
+            {
+                throw new BadHttpRequestException(ResponseMessage.BadRequest);
+            }
+            return ResponseMessage.Success;
+        }
+
+        private async Task<string> UpdateStatusProcessingOrder(string orderStatus, Order exist)
+        {
             //from Pending to Processing
-            if (orderStatusString.Equals(Constants.Status.Processing, StringComparison.OrdinalIgnoreCase))        //Processing
+            if (orderStatus.Equals(Constants.Status.Processing, StringComparison.OrdinalIgnoreCase))        //Processing
             {
                 if (exist.Status == Constants.Status.Pending)
                 {
-                    orderStatusUpdate = Constants.Status.Processing;
-                    a = true;
+                    orderStatus = Constants.Status.Processing;
+                    //a = true;
                     //take away the product's amount here
                     foreach (var od in exist.OrderDetails)
                     {
@@ -541,39 +543,25 @@ namespace BeeStore_Repository.Services
                 }
             }
 
+            exist.Status = orderStatus;
+            _unitOfWork.OrderRepo.Update(exist);
+            await _unitOfWork.SaveAsync();
+            return ResponseMessage.Success;
+        }
 
+        private async Task<string> UpdateStatusShippingOrder(string orderStatus, Order exist)
+        {
             //from processing to Shipping
-            if (orderStatusString.Equals(Constants.Status.Shipping, StringComparison.OrdinalIgnoreCase))    //Shipped
+            if (orderStatus.Equals(Constants.Status.Shipping, StringComparison.OrdinalIgnoreCase))    //Shipped
             {
                 if (exist.Status == Constants.Status.Processing)
                 {
-                    orderStatusUpdate = Constants.Status.Shipping;
-
-                    //find batch of Order
-                    //var batch = await _unitOfWork.BatchRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.BatchId));
-                    //if (batch == null)
-                    //{
-                    //    throw new KeyNotFoundException(ResponseMessage.BatchIdNotFound);
-                    //}
-
-                    //// find shipper of that batch
-                    //var shipper = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id.Equals(batch.DeliverBy));
-                    //if (shipper == null)
-                    //{
-                    //    throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
-                    //}
-
-                    //// from shipper search for assigned vehicle
-                    //var vehicle = await _unitOfWork.VehicleRepo.SingleOrDefaultAsync(u => u.AssignedDriverId.Equals(shipper.Id));
-                    //if (vehicle == null)
-                    //{
-                    //    throw new KeyNotFoundException(ResponseMessage.VehicleIdNotFound);
-                    //}
+                    orderStatus = Constants.Status.Shipping;
 
                     // change the found vehicle's status to Available
                     exist.Batch.DeliverByNavigation.Vehicles.First().Status = Constants.VehicleStatus.InService;
 
-                    a = true;
+                    //a = true;
                     DateTime now = DateTime.Now;
                     exist.DeliverStartDate = now;
 
@@ -583,33 +571,102 @@ namespace BeeStore_Repository.Services
                     throw new ApplicationException(ResponseMessage.OrderProccessedError);
                 }
             }
+            exist.Status = orderStatus;
+            _unitOfWork.OrderRepo.Update(exist);
+            await _unitOfWork.SaveAsync();
+            return ResponseMessage.Success;
+        }
 
-            if (orderStatusString.Equals(Constants.Status.Returned, StringComparison.OrdinalIgnoreCase))    //Returned
+        private async Task<string> UpdateStatusDeliveredOrder(string orderStatus, Order exist)
+        {
+            //From Shipping to delivered
+            if (orderStatus.Equals(Constants.Status.Delivered, StringComparison.OrdinalIgnoreCase))
             {
-                if (exist.Status == Constants.Status.Delivered)
+                if (exist.Status == Constants.Status.Shipping)
                 {
-                    orderStatusUpdate = Constants.Status.Returned;
-                    exist.ReturnDate = DateTime.Now;
-                    a = true;
-                    exist.CancellationReason = cancellationReason;
-                    //take away the product's amount here
-
+                    orderStatus = Constants.Status.Delivered;
+                    //a = true;
+                    //create payment after delivered (but don't transfer money yet)
+                    var orderfee = exist.OrderFees.FirstOrDefault(u => u.Id.Equals(exist.Id));
+                    exist.Payments.Add(new Payment
+                    {
+                        OcopPartnerId = exist.OcopPartnerId,
+                        CollectedBy = exist.Batch!.DeliverBy,
+                        OrderId = exist.Id,
+                        TotalAmount = exist.TotalPriceAfterFee
+                    });
+                    exist.DeliverFinishDate = DateTime.Now;
                 }
                 else
                 {
-                    throw new ApplicationException(ResponseMessage.OrderProccessedError);
+                    throw new ApplicationException();
                 }
             }
+            exist.Status = orderStatus;
+            _unitOfWork.OrderRepo.Update(exist);
+            await _unitOfWork.SaveAsync();
+            return ResponseMessage.Success;
+        }
+
+        private async Task<string> UpdateStatusCompletedOrder(string orderStatus, Order exist)
+        {
+            //From Delivered to Completed
+            if (orderStatus.Equals(Constants.Status.Completed, StringComparison.OrdinalIgnoreCase)) // To Complete
+            {
+                if (exist.Status == Constants.Status.Delivered)
+                {
+                    bool b = true;
+                    orderStatus = Constants.Status.Completed;
 
 
-            if (orderStatusString.Equals(Constants.Status.Canceled, StringComparison.OrdinalIgnoreCase)) //Canceled
+                    foreach (var x in exist.Batch.Orders)
+                    {
+                        if (x.Status == Constants.Status.Shipping || x.Status == Constants.Status.Delivered
+                            || x.Status == Constants.Status.Returned || x.Status == Constants.Status.Processing)
+                        {
+                            if (x.Id != exist.Id)
+                            {
+                                b = false;
+                                break;
+                            }
+                        }
+                    }
+                    if (b == true)
+                    {
+                        exist.Batch.Status = Constants.Status.Completed;
+                    }
+                    exist.Payments.First().IsConfirmed = 1;
+                    exist.OcopPartner.Wallets.First().TotalAmount += exist.TotalPriceAfterFee;
+
+                    // change the found vehicle's status to Available
+                    exist.Batch.DeliverByNavigation.Vehicles.First().Status = Constants.VehicleStatus.Available;
+
+
+                    //a = true;
+                    exist.CompleteDate = DateTime.Now;
+                }
+                else
+                {
+                    throw new ApplicationException();
+                }
+            }
+            exist.Status = orderStatus;
+            _unitOfWork.OrderRepo.Update(exist);
+            await _unitOfWork.SaveAsync();
+            return ResponseMessage.Success;
+        }
+
+        private async Task<string> UpdateStatusCanceledOrder(string orderStatus, Order exist, string? cancellationReason)
+        {
+            //from shipping/processing to canceled
+            if (orderStatus.Equals(Constants.Status.Canceled, StringComparison.OrdinalIgnoreCase)) //Canceled
             {
                 bool b = true;
                 if (exist.Status == Constants.Status.Shipping ||
                     exist.Status == Constants.Status.Processing)
                 {
-                    orderStatusUpdate = Constants.Status.Canceled;
-                    a = true;
+                    orderStatus = Constants.Status.Canceled;
+                    //a = true;
                     exist.CancelDate = DateTime.Now;
                     exist.CancellationReason = cancellationReason;
                     //return product's amount here
@@ -631,71 +688,53 @@ namespace BeeStore_Repository.Services
                     {
                         exist.Batch.Status = Constants.Status.Completed;
                     }
-                    ////find batch of Order
-                    //var batch = await _unitOfWork.BatchRepo.SingleOrDefaultAsync(u => u.Id.Equals(exist.BatchId));
-                    //if (batch == null)
-                    //{
-                    //    throw new KeyNotFoundException(ResponseMessage.BatchIdNotFound);
-                    //}
-
-                    //// find shipper of that batch
-                    //var shipper = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id.Equals(batch.DeliverBy));
-                    //if (shipper == null)
-                    //{
-                    //    throw new KeyNotFoundException(ResponseMessage.UserIdNotFound);
-                    //}
-
-                    //// from shipper search for assigned vehicle
-                    //var vehicle = await _unitOfWork.VehicleRepo.SingleOrDefaultAsync(u => u.AssignedDriverId.Equals(shipper.Id));
-                    //if (vehicle == null)
-                    //{
-                    //    throw new KeyNotFoundException(ResponseMessage.VehicleIdNotFound);
-                    //}
 
                     // change the found vehicle's status to Available
                     exist.Batch.DeliverByNavigation.Vehicles.First().Status = Constants.VehicleStatus.Available;
-
-
                 }
                 else
                 {
                     throw new ApplicationException(ResponseMessage.OrderCanceledError);
                 }
             }
-
-            //From Shipping to delivered
-            if (orderStatusString.Equals(Constants.Status.Delivered, StringComparison.OrdinalIgnoreCase))
+            exist.Status = orderStatus;
+            _unitOfWork.OrderRepo.Update(exist);
+            await _unitOfWork.SaveAsync();
+            return ResponseMessage.Success;
+        }
+        
+        private async Task<string> UpdateStatusReturnedOrder(string orderStatus, Order exist, string? cancellationReason)
+        {
+            //from delivered to returned
+            if (orderStatus.Equals(Constants.Status.Returned, StringComparison.OrdinalIgnoreCase))    //Returned
             {
-                if (exist.Status == Constants.Status.Shipping)
+                if (exist.Status == Constants.Status.Delivered)
                 {
-                    orderStatusUpdate = Constants.Status.Delivered;
-                    a = true;
-
-                    var orderfee = exist.OrderFees.FirstOrDefault(u => u.Id.Equals(exist.Id));
-                    exist.Payments.Add(new Payment
-                    {
-                        OcopPartnerId = exist.OcopPartnerId,
-                        CollectedBy = exist.Batch!.DeliverBy,
-                        OrderId = exist.Id,
-                        TotalAmount = exist.TotalPriceAfterFee
-                    });
-                    exist.DeliverFinishDate = DateTime.Now;
-                    //add money directly after order is delivered.
-
-                    //exist.OcopPartner.Wallets.First().TotalAmount += exist.TotalPriceAfterFee;
+                    orderStatus = Constants.Status.Returned;
+                    exist.ReturnDate = DateTime.Now;
+                    //a = true;
+                    exist.CancellationReason = cancellationReason;
                 }
                 else
                 {
-                    throw new ApplicationException();
+                    throw new ApplicationException(ResponseMessage.OrderProccessedError);
                 }
             }
-
-            if (orderStatusString.Equals(Constants.Status.Refunded, StringComparison.OrdinalIgnoreCase)) // To redunded
+            exist.Status = orderStatus;
+            _unitOfWork.OrderRepo.Update(exist);
+            await _unitOfWork.SaveAsync();
+            return ResponseMessage.Success;
+        }
+        
+        private async Task<string> UpdateStatusRefundedOrder(string orderStatus, Order exist)
+        {
+            //From Returned to refunded
+            if (orderStatus.Equals(Constants.Status.Refunded, StringComparison.OrdinalIgnoreCase)) // To refunded
             {
                 if (exist.Status == Constants.Status.Returned)
                 {
                     bool b = true;
-                    orderStatusUpdate = Constants.Status.Refunded;
+                    orderStatus = Constants.Status.Refunded;
 
                     foreach (var od in exist.OrderDetails)
                     {
@@ -726,65 +765,19 @@ namespace BeeStore_Repository.Services
                     // change the found vehicle's status to Available
                     exist.Batch.DeliverByNavigation.Vehicles.First().Status = Constants.VehicleStatus.Available;
 
-                    a = true;
+                    //a = true;
                 }
                 else
                 {
                     throw new ApplicationException();
                 }
             }
-
-            if (orderStatusString.Equals(Constants.Status.Completed, StringComparison.OrdinalIgnoreCase)) // To Complete
-            {
-                if (exist.Status == Constants.Status.Delivered)
-                {
-                    bool b = true;
-                    orderStatusUpdate = Constants.Status.Completed;
-
-
-                    foreach (var x in exist.Batch.Orders)
-                    {
-                        if (x.Status == Constants.Status.Shipping || x.Status == Constants.Status.Delivered
-                            || x.Status == Constants.Status.Returned || x.Status == Constants.Status.Processing)
-                        {
-                            if (x.Id != exist.Id)
-                            {
-                                b = false;
-                                break;
-                            }
-                        }
-                    }
-                    if (b == true)
-                    {
-                        exist.Batch.Status = Constants.Status.Completed;
-                    }
-                    exist.Payments.First().IsConfirmed = 1;
-                    exist.OcopPartner.Wallets.First().TotalAmount += exist.TotalPriceAfterFee;
-
-                    // change the found vehicle's status to Available
-                    exist.Batch.DeliverByNavigation.Vehicles.First().Status = Constants.VehicleStatus.Available;
-
-
-                    a = true;
-                    exist.CompleteDate = DateTime.Now;
-                }
-                else
-                {
-                    throw new ApplicationException();
-                }
-            }
-
-            if (!a)
-            {
-                throw new BadHttpRequestException(ResponseMessage.BadRequest);
-            }
-
-            exist.Status = orderStatusUpdate;
+            exist.Status = orderStatus;
             _unitOfWork.OrderRepo.Update(exist);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
         }
-
+        
         private decimal CalculateStorageFee(DateTime importDate, DateTime currentDate)
         {
             currentDate = DateTime.UtcNow;
