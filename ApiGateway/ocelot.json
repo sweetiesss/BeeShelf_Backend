@@ -168,9 +168,9 @@
       "SwaggerKey": "store"
     },
     { // productCategory Path
-      "UpstreamPathTemplate": "/gateway/product-category/{everything}",
+      "UpstreamPathTemplate": "/gateway/productCategory/{everything}",
       "UpstreamHttpMethod": [],
-      "DownstreamPathTemplate": "/api/product-category/{everything}",
+      "DownstreamPathTemplate": "/api/productCategory/{everything}",
       "DownstreamScheme": "https",
       "DownstreamHostAndPorts": [
         //{
