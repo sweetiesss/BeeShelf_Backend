@@ -32,6 +32,8 @@ public partial class Request : BaseEntity
 
     //public ulong? IsDeleted { get; set; }
 
+    public virtual ICollection<ExportFee> ExportFees { get; set; } = new List<ExportFee>();
+
     public virtual Lot? ExportFromLot { get; set; }
 
     public virtual Lot? Lot { get; set; }

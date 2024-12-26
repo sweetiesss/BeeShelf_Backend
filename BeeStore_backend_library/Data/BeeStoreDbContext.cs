@@ -20,6 +20,8 @@ public partial class BeeStoreDbContext : DbContext
 
     public virtual DbSet<Employee> Employees { get; set; }
 
+    public virtual DbSet<ExportFee> ExportFees { get; set; }
+
     public virtual DbSet<Lot> Lots { get; set; }
 
     public virtual DbSet<MoneyTransfer> MoneyTransfers { get; set; }
@@ -55,6 +57,8 @@ public partial class BeeStoreDbContext : DbContext
     public virtual DbSet<StoreShipper> StoreShippers { get; set; }
 
     public virtual DbSet<StoreStaff> StoreStaffs { get; set; }
+
+    public virtual DbSet<SystemConfiguration> SystemConfigurations { get; set; }
 
     public virtual DbSet<Transaction> Transactions { get; set; }
 
@@ -212,6 +216,32 @@ public partial class BeeStoreDbContext : DbContext
                 .HasConstraintName("Employee_ibfk_1");
         });
 
+        modelBuilder.Entity<ExportFee>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("Export_Fee");
+
+            entity.HasIndex(e => e.RequestId, "request_id");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.AdditionalFee)
+                .HasPrecision(10, 2)
+                .HasColumnName("additional_fee");
+            entity.Property(e => e.DeliveryFee)
+                .HasPrecision(10, 2)
+                .HasColumnName("delivery_fee");
+            entity.Property(e => e.IsDeleted)
+                .HasDefaultValueSql("b'0'")
+                .HasColumnType("bit(1)")
+                .HasColumnName("is_deleted");
+            entity.Property(e => e.RequestId).HasColumnName("request_id");
+
+            entity.HasOne(d => d.Request).WithMany(p => p.ExportFees)
+                .HasForeignKey(d => d.RequestId)
+                .HasConstraintName("Export_Fee_ibfk_1");
+        });
+
         modelBuilder.Entity<Lot>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
@@ -349,13 +379,25 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.BankName)
                 .HasMaxLength(25)
                 .HasColumnName("bank_name");
+            entity.Property(e => e.BusinessAddress)
+                .HasMaxLength(100)
+                .HasColumnName("business_address")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
             entity.Property(e => e.BusinessName)
-                .HasMaxLength(50)
-                .HasColumnName("business_name");
+                .HasMaxLength(100)
+                .HasColumnName("business_name")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
+            entity.Property(e => e.BusinessNameInternational)
+                .HasMaxLength(100)
+                .HasColumnName("business_name_international");
+            entity.Property(e => e.BusinessShortName)
+                .HasMaxLength(100)
+                .HasColumnName("business_short_name")
+                .UseCollation("utf8mb3_general_ci")
+                .HasCharSet("utf8mb3");
             entity.Property(e => e.CategoryId).HasColumnName("category_id");
-            entity.Property(e => e.CitizenIdentificationNumber)
-                .HasMaxLength(25)
-                .HasColumnName("citizen_identification_number");
             entity.Property(e => e.CreateDate)
                 .HasColumnType("datetime")
                 .HasColumnName("create_date");
@@ -439,6 +481,10 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.FrontPictureLink)
                 .HasColumnType("text")
                 .HasColumnName("front_picture_link");
+            entity.Property(e => e.IsDeleted)
+                .HasDefaultValueSql("b'0'")
+                .HasColumnType("bit(1)")
+                .HasColumnName("is_deleted");
             entity.Property(e => e.IsRejected)
                 .HasDefaultValueSql("b'0'")
                 .HasColumnType("bit(1)")
@@ -459,10 +505,6 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.VerifyDate)
                 .HasColumnType("datetime")
                 .HasColumnName("verify_date");
-            entity.Property(e => e.IsDeleted)
-                .HasDefaultValueSql("b'0'")
-                .HasColumnType("bit(1)")
-                .HasColumnName("is_deleted");
 
             entity.HasOne(d => d.OcopPartner).WithMany(p => p.OcopPartnerVerificationPapers)
                 .HasForeignKey(d => d.OcopPartnerId)
@@ -888,6 +930,10 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.ExpirationDate)
                 .HasColumnType("datetime")
                 .HasColumnName("expiration_date");
+            entity.Property(e => e.IsCold)
+                .HasDefaultValueSql("b'0'")
+                .HasColumnType("bit(1)")
+                .HasColumnName("is_cold");
             entity.Property(e => e.IsDeleted)
                 .HasDefaultValueSql("b'0'")
                 .HasColumnType("bit(1)")
@@ -931,10 +977,6 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.CreateDate)
                 .HasColumnType("datetime")
                 .HasColumnName("create_date");
-            entity.Property(e => e.IsCold)
-                .HasDefaultValueSql("b'0'")
-                .HasColumnType("bit(1)")
-                .HasColumnName("is_cold");
             entity.Property(e => e.IsDeleted)
                 .HasDefaultValueSql("b'0'")
                 .HasColumnType("bit(1)")
@@ -1020,6 +1062,86 @@ public partial class BeeStoreDbContext : DbContext
                 .HasConstraintName("Store_Staff_ibfk_1");
         });
 
+        modelBuilder.Entity<SystemConfiguration>(entity =>
+        {
+            entity.HasKey(e => e.Id).HasName("PRIMARY");
+
+            entity.ToTable("SystemConfiguration");
+
+            entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.AdditonalUpdateFeeRatePercentage)
+                .HasPrecision(10, 2)
+                .HasColumnName("additonal_update_fee_rate_percentage");
+            entity.Property(e => e.DeliveryDistanceFeeRate)
+                .HasPrecision(10, 2)
+                .HasColumnName("delivery_distance_fee_rate");
+            entity.Property(e => e.DeliveryDistanceTreshold)
+                .HasPrecision(10, 2)
+                .HasColumnName("delivery_distance_treshold");
+            entity.Property(e => e.DeliveryDistanceUnit)
+                .HasPrecision(10, 2)
+                .HasColumnName("delivery_distance_unit");
+            entity.Property(e => e.DeliveryWeightFeeRate)
+                .HasPrecision(10, 2)
+                .HasColumnName("delivery_weight_fee_rate");
+            entity.Property(e => e.DeliveryWeightUnit)
+                .HasPrecision(10, 2)
+                .HasColumnName("delivery_weight_unit");
+            entity.Property(e => e.DeliveryWeigtTreshold)
+                .HasPrecision(10, 2)
+                .HasColumnName("delivery_weigt_treshold");
+            entity.Property(e => e.ExportDeliveryDistanceFeeRate)
+                .HasPrecision(10, 2)
+                .HasColumnName("export_delivery_distance_fee_rate");
+            entity.Property(e => e.ExportDeliveryDistanceTreshold)
+                .HasPrecision(10, 2)
+                .HasColumnName("export_delivery_distance_treshold");
+            entity.Property(e => e.ExportDeliveryDistanceUnit)
+                .HasPrecision(10, 2)
+                .HasColumnName("export_delivery_distance_unit");
+            entity.Property(e => e.ExportDeliveryWeightFeeRate)
+                .HasPrecision(10, 2)
+                .HasColumnName("export_delivery_weight_fee_rate");
+            entity.Property(e => e.ExportDeliveryWeightTreshold)
+                .HasPrecision(10, 2)
+                .HasColumnName("export_delivery_weight_treshold");
+            entity.Property(e => e.ExportDeliveryWeightUnit)
+                .HasPrecision(10, 2)
+                .HasColumnName("export_delivery_weight_unit");
+            entity.Property(e => e.InventoryExpireEmailNotificationPeriod).HasColumnName("inventory_expire_email_notification_period");
+            entity.Property(e => e.IsDeleted)
+                .HasDefaultValueSql("b'0'")
+                .HasColumnType("bit(1)")
+                .HasColumnName("is_deleted");
+            entity.Property(e => e.OrderDistanceLimit)
+                .HasPrecision(10, 2)
+                .HasColumnName("order_distance_limit");
+            entity.Property(e => e.OrderWeightLimit)
+                .HasPrecision(10, 2)
+                .HasColumnName("order_weight_limit");
+            entity.Property(e => e.RequestDistanceLimit)
+                .HasPrecision(10, 2)
+                .HasColumnName("request_distance_limit");
+            entity.Property(e => e.RequestWeightLimit)
+                .HasPrecision(10, 2)
+                .HasColumnName("request_weight_limit");
+            entity.Property(e => e.StorageFeeFirstPeriodDuration)
+                .HasPrecision(10, 2)
+                .HasColumnName("storage_fee_first_period_duration");
+            entity.Property(e => e.StorageFeeFirstPeriodRate)
+                .HasPrecision(10, 2)
+                .HasColumnName("storage_fee_first_period_rate");
+            entity.Property(e => e.StorageFeePersonalFeePerLot)
+                .HasPrecision(10, 2)
+                .HasColumnName("storage_fee_personal_fee_per_lot");
+            entity.Property(e => e.StorageFeeSecondPeriodDuration)
+                .HasPrecision(10, 2)
+                .HasColumnName("storage_fee_second_period_duration");
+            entity.Property(e => e.StorageFeeSecondPeriodRate)
+                .HasPrecision(10, 2)
+                .HasColumnName("storage_fee_second_period_rate");
+        });
+
         modelBuilder.Entity<Transaction>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PRIMARY");
@@ -1073,6 +1195,10 @@ public partial class BeeStoreDbContext : DbContext
             entity.ToTable("Unit");
 
             entity.Property(e => e.Id).HasColumnName("id");
+            entity.Property(e => e.IsDeleted)
+                .HasDefaultValueSql("b'0'")
+                .HasColumnType("bit(1)")
+                .HasColumnName("is_deleted");
             entity.Property(e => e.Name)
                 .HasMaxLength(25)
                 .HasColumnName("name");
@@ -1152,6 +1278,7 @@ public partial class BeeStoreDbContext : DbContext
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
 }
+
 
 
 

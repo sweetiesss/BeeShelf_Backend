@@ -10,7 +10,6 @@ namespace BeeStore_Repository.DTO.PartnerDTOs
 
         public string? BankAccountNumber { get; set; }
 
-        public string? CitizenIdentificationNumber { get; set; }
 
         [JsonIgnore]
         public DateTime? CreateDate { get; set; }
