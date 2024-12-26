@@ -33,11 +33,6 @@ namespace BeeStore_Repository.Utils.Validator.User
                 .MaximumLength(11)
                 .WithMessage(ValidationMessage.PhoneMaxLength);
 
-            RuleFor(x => x.CitizenIdentificationNumber)
-                .NotEmpty()
-                .WithMessage(ValidationMessage.CitizenIdRequired)
-                .MaximumLength(25)
-                .WithMessage(ValidationMessage.CitizenIdMaxLength);
 
             RuleFor(x => x.TaxIdentificationNumber)
                 .NotEmpty()

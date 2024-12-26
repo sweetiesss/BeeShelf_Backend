@@ -129,9 +129,9 @@ namespace BeeStore_Repository.Services
                 throw new KeyNotFoundException(ResponseMessage.ProductIdNotFound);
             }
             //check for cold shit
-            if (product.IsCold.Value != inventory.Store.IsCold.Value)
+            if (product.IsCold.Value != inventory.IsCold.Value)
             {
-                throw new ApplicationException(ResponseMessage.ProductAndWarehouseTypeNotMatch);
+                throw new ApplicationException(ResponseMessage.ProductAndRoomTypeNotMatch);
             }
 
 
@@ -266,9 +266,9 @@ namespace BeeStore_Repository.Services
             }
 
             //check for cold shit
-            if (product.IsCold.Value != inventory.Store.IsCold.Value)
+            if (product.IsCold.Value != inventory.IsCold.Value)
             {
-                throw new ApplicationException(ResponseMessage.ProductAndWarehouseTypeNotMatch);
+                throw new ApplicationException(ResponseMessage.ProductAndRoomTypeNotMatch);
             }
 
             if (exist.Lot.RoomId != request.SendToRoomId)

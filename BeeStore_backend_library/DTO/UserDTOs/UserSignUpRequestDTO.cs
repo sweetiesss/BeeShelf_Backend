@@ -12,11 +12,15 @@ namespace BeeStore_Repository.DTO.UserDTOs
 
         public string? Phone { get; set; }
 
-        public string? CitizenIdentificationNumber { get; set; }
-
         public string? TaxIdentificationNumber { get; set; }
 
         public string? BusinessName { get; set; }
+
+        public string? BusinessNameInternational { get; set; }
+
+        public string? BusinessShortName { get; set; }
+
+        public string? BusinessAddress { get; set; }
 
         public string? BankName { get; set; }
 
