@@ -92,7 +92,7 @@
         public const string ProductPartnerNotMatch = "This product does not belongs to this user.";
         public const string ProductNotEnough = "Not enough products.";
         public const string ProductMustBeFromTheSameWarehouse = "All product in an order must be in the same warehouse.";
-        public const string ProductAndWarehouseTypeNotMatch = "Product and warehouse type does not match";
+        public const string ProductAndRoomTypeNotMatch = "Product and room type does not match";
         public const string ProductAlreadyInInventory = "Can't edit products already in Inventory.";
 
         //Package response message

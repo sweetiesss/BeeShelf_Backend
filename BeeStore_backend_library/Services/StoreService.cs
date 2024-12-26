@@ -125,7 +125,6 @@ namespace BeeStore_Repository.Services
                 Location = warehouse.Location,
                 Name = warehouse.Name,
                 Capacity = warehouse.Capacity,
-                IsCold = warehouse.IsCold,
                 Province = warehouse.Province,
                 CreateDate = warehouse.CreateDate,
                 Rooms = warehouse.Rooms.Where(inventory => inventory.OcopPartnerId == userId).ToList()
@@ -157,7 +156,6 @@ namespace BeeStore_Repository.Services
             exist.Name = request.Name;
             exist.Location = request.Location;
             exist.Capacity = request.Capacity;
-            exist.IsCold = request.IsCold;
             exist.ProvinceId = request.ProvinceId;
             _unitOfWork.StoreRepo.Update(exist);
             await _unitOfWork.SaveAsync();

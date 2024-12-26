@@ -20,6 +20,8 @@ public partial class Room : BaseEntity
 
     public int? StoreId { get; set; }
 
+    public ulong? IsCold { get; set; }
+
     //public ulong? IsDeleted { get; set; }
 
     public virtual ICollection<Lot> Lots { get; set; } = new List<Lot>();

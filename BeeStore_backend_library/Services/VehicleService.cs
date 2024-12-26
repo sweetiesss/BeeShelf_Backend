@@ -78,10 +78,7 @@ namespace BeeStore_Repository.Services
             {
                 throw new KeyNotFoundException(ResponseMessage.WarehouseIdNotFound);
             }
-            if (request.IsCold.Value != warehouse.IsCold)
-            {
-                throw new ApplicationException(ResponseMessage.VehicleTypeNotMatchWarehouse);
-            }
+
             if (vehicle != false)
             {
                 throw new DuplicateException(ResponseMessage.VehicleLicensePlateDuplicate);
