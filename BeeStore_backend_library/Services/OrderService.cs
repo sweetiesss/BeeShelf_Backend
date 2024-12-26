@@ -160,6 +160,10 @@ namespace BeeStore_Repository.Services
                     throw new KeyNotFoundException(ResponseMessage.NoLotWithProductFound);
                 }
 
+                //gotta check for all the product of the same type here (all cold or non cold) here
+
+                //
+
                 int productAmountNeeded = product.ProductAmount;
 
                 while (productAmountNeeded > 0)

@@ -581,7 +581,6 @@ namespace BeeStore_Repository.Services
                     WarehouseId = w.Id,
                     name = w.Name,
                     location = w.Location + ", " + w.Province.SubDivisionName,
-                    isCold = w.IsCold,
                     totalRevenue = CalculateWarehouseRevenue(w.Id, day, month, year).Result,
                     totalInventoryRevenue = CalculateInventoryRevenue(w.Id, day, month, year).Result,
                     totalBoughtInventory = w.Rooms.Count(i => i.OcopPartnerId.HasValue),

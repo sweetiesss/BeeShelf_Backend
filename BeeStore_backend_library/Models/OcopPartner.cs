@@ -14,11 +14,15 @@ public partial class OcopPartner : BaseEntity
 
     public string? Phone { get; set; }
 
-    public string? CitizenIdentificationNumber { get; set; }
-
     public string? TaxIdentificationNumber { get; set; }
 
     public string? BusinessName { get; set; }
+
+    public string? BusinessNameInternational { get; set; }
+
+    public string? BusinessShortName { get; set; }
+
+    public string? BusinessAddress { get; set; }
 
     public DateTime? CreateDate { get; set; }
 

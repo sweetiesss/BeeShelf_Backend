@@ -21,12 +21,6 @@ namespace BeeStore_Repository.Utils.Validator.Partner
                 .WithMessage(ValidationMessage.BankAccountNumberMaxLength)
                 .When(x => !string.IsNullOrEmpty(x.BankAccountNumber));
 
-            RuleFor(x => x.CitizenIdentificationNumber)
-                .NotEmpty()
-                .WithMessage(ValidationMessage.CitizenIdRequired)
-                .MaximumLength(25)
-                .WithMessage(ValidationMessage.CitizenIdMaxLength)
-                .When(x => !string.IsNullOrEmpty(x.CitizenIdentificationNumber));
 
             RuleFor(x => x.UserId)
                 .NotNull()

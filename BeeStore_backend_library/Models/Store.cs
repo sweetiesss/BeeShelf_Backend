@@ -12,8 +12,6 @@ public partial class Store : BaseEntity
 
     public int? ProvinceId { get; set; }
 
-    public ulong? IsCold { get; set; }
-
     public DateTime? CreateDate { get; set; }
 
     //public ulong? IsDeleted { get; set; }
