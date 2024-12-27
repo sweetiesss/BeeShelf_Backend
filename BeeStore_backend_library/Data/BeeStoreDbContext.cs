@@ -974,6 +974,12 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.Capacity)
                 .HasPrecision(10, 2)
                 .HasColumnName("capacity");
+            entity.Property(e => e.Longitude)
+                .HasPrecision(10, 2)
+                .HasColumnName("longitude");
+            entity.Property(e => e.Latitude)
+                .HasPrecision(10, 2)
+                .HasColumnName("latitude");
             entity.Property(e => e.CreateDate)
                 .HasColumnType("datetime")
                 .HasColumnName("create_date");
