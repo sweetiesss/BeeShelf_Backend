@@ -11,6 +11,8 @@ namespace BeeStore_Repository.DTO.WarehouseDTOs
 
         public string? Location { get; set; }
         public int? ProvinceId { get; set; }
+        public decimal? Longitude { get; set; }
+        public decimal? Latitude { get; set; }
 
         [JsonIgnore]
         public DateTime? CreateDate { get; set; }

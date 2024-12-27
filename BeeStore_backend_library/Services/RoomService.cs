@@ -78,6 +78,7 @@ namespace BeeStore_Repository.Services
                     Weight = 0,
                     Price = request.Price,
                     StoreId = request.WarehouseId,
+                    IsCold = request.IsCold,
                 });
             }
 
@@ -115,6 +116,7 @@ namespace BeeStore_Repository.Services
             {
                 exist.MaxWeight = request.MaxWeight;
             }
+            exist.IsCold = request.IsCold;
             exist.Price = request.Price;
             _unitOfWork.RoomRepo.Update(exist);
             await _unitOfWork.SaveAsync();

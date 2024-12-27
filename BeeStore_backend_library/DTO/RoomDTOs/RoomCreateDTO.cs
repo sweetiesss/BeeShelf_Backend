@@ -5,9 +5,9 @@ namespace BeeStore_Repository.DTO.InventoryDTOs
     public class RoomCreateDTO
     {
 
-        //public ulong? IsDeleted { get; set; }
+        public ulong? IsCold { get; set; }
         [JsonIgnore]
-        public string? Name { get; set; }
+        public string? RoomCode { get; set; }
         public decimal? MaxWeight { get; set; }
         public decimal? Price { get; set; }
         public int? InventoryAmount { get; set; }

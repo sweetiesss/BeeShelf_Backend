@@ -8,7 +8,7 @@ namespace BeeStore_Repository.DTO.InventoryDTOs
 
         public int? OcopPartnerId { get; set; }
 
-        public string? Name { get; set; }
+        public string? RoomCode { get; set; }
 
         public decimal? MaxWeight { get; set; }
 
@@ -18,7 +18,8 @@ namespace BeeStore_Repository.DTO.InventoryDTOs
 
         public DateTime? ExpirationDate { get; set; }
 
-        public string WarehouseName { get; set; }
+        public int? StoreId {  get; set; }
+        public string StoreName { get; set; }
 
         public List<LotListDTO> Lots { get; set; }
     }

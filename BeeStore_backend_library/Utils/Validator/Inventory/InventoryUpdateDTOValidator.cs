@@ -7,10 +7,10 @@ namespace BeeStore_Repository.Utils.Validator.Inventory
     {
         public InventoryUpdateDTOValidator()
         {
-            RuleFor(x => x.Name)
+            RuleFor(x => x.RoomCode)
                 .MaximumLength(25)
                 .WithMessage(ValidationMessage.NameMaxLength)
-                .When(x => !string.IsNullOrEmpty(x.Name));
+                .When(x => !string.IsNullOrEmpty(x.RoomCode));
 
             RuleFor(x => x.MaxWeight)
                 .GreaterThanOrEqualTo(0)
