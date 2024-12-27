@@ -9,7 +9,8 @@ public partial class Store : BaseEntity
     public decimal? Capacity { get; set; }
 
     public string? Location { get; set; }
-
+    public decimal? Longitude { get; set; }
+    public decimal? Latitude { get; set; }
     public int? ProvinceId { get; set; }
 
     public DateTime? CreateDate { get; set; }

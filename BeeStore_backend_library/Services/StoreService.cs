@@ -127,6 +127,8 @@ namespace BeeStore_Repository.Services
                 Capacity = warehouse.Capacity,
                 Province = warehouse.Province,
                 CreateDate = warehouse.CreateDate,
+                Longitude = warehouse.Longitude,
+                Latitude = warehouse.Latitude,
                 Rooms = warehouse.Rooms.Where(inventory => inventory.OcopPartnerId == userId).ToList()
             }));
             var result = _mapper.Map<List<StoreListInventoryDTO>>(list);
@@ -157,6 +159,8 @@ namespace BeeStore_Repository.Services
             exist.Location = request.Location;
             exist.Capacity = request.Capacity;
             exist.ProvinceId = request.ProvinceId;
+            exist.Longitude = request.Longitude;
+            exist.Latitude = request.Latitude;
             _unitOfWork.StoreRepo.Update(exist);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
