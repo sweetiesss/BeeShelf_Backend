@@ -97,13 +97,13 @@ namespace BeeStore_Repository.Mapper
                 .ForMember(dest => dest.ProvinceName, opt => opt.MapFrom(src => src.Province.SubDivisionName));
 
             CreateMap<Room, RoomListDTO>()
-                .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom(src => src.Store!.Name))
-                .ForMember(dest => dest.WarehouseLocation, opt => opt.MapFrom(src => src.Store.Location + ", " + src.Store.Province.SubDivisionName))
+                .ForMember(dest => dest.StoreName, opt => opt.MapFrom(src => src.Store!.Name))
+                .ForMember(dest => dest.StoreLocation, opt => opt.MapFrom(src => src.Store.Location + ", " + src.Store.Province.SubDivisionName))
                 .ForMember(dest => dest.totalProduct, opt => opt.MapFrom<CustomTotalProductInventoryResolver>())
             .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<RoomCreateDTO, Room>();
             CreateMap<Room, RoomLotListDTO>()
-                .ForMember(dest => dest.WarehouseName, opt => opt.MapFrom(src => src.Store!.Name))
+                .ForMember(dest => dest.StoreName, opt => opt.MapFrom(src => src.Store!.Name))
                 .ForMember(dest => dest.Lots, opt => opt.MapFrom(src => src.Lots))
                 .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
 

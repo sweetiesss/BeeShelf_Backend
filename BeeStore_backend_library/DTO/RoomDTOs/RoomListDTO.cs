@@ -6,7 +6,7 @@
 
         public int? OcopPartnerId { get; set; }
 
-        public string? Name { get; set; }
+        public string? RoomCode { get; set; }
 
         public decimal? MaxWeight { get; set; }
         public int totalProduct { get; set; }
@@ -17,9 +17,9 @@
 
         public DateTime? ExpirationDate { get; set; }
 
-        public int? WarehouseId { get; set; }
-        public string? WarehouseName { get; set; }
-        public string? WarehouseLocation { get; set; }
+        public int? StoreId { get; set; }
+        public string? StoreName { get; set; }
+        public string? StoreLocation { get; set; }
         public ulong? IsCold { get; set; }
     }
 }
