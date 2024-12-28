@@ -4,6 +4,6 @@
     {
         public int? EmployeeId { get; set; }
 
-        public int? WarehouseId { get; set; }
+        public int? StoreId { get; set; }
     }
 }

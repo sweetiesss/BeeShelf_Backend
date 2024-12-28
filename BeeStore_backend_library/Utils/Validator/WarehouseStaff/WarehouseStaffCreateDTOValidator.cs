@@ -11,7 +11,7 @@ namespace BeeStore_Repository.Utils.Validator.WarehouseStaff
                 .NotEmpty()
                 .WithMessage(ValidationMessage.EmployeeIdRequired);
 
-            RuleFor(x => x.WarehouseId)
+            RuleFor(x => x.StoreId)
                 .NotEmpty()
                 .WithMessage(ValidationMessage.WarehouseIdRequired);
         }
