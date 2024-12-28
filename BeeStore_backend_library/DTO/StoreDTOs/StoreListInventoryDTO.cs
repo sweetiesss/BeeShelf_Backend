@@ -15,6 +15,9 @@ namespace BeeStore_Repository.DTO.WarehouseDTOs
         public string? Location { get; set; }
         public decimal? Longitude { get; set; }
         public decimal? Latitude { get; set; }
+        public decimal? Width { get; set; }
+        public decimal? Length { get; set; }
+        public int? Cols { get; set; }
         public int TotalInventory { get; set; }
         public DateTime? CreateDate { get; set; }
         public List<RoomListDTO> Inventories { get; set; }

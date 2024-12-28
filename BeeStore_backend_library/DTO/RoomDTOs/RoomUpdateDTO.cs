@@ -7,6 +7,10 @@
         public string RoomCode { get; set; }
         public int? MaxWeight { get; set; }
         public int? Weight { get; set; }
+        public decimal? Width { get; set; }
+        public decimal? Length { get; set; }
+        public decimal? X { get; set; }
+        public decimal? Y { get; set; }
         public ulong? IsCold {  get; set; }
     }
 }

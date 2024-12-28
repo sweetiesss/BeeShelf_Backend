@@ -13,6 +13,10 @@ public partial class Room : BaseEntity
     public decimal? Weight { get; set; }
 
     public decimal? Price { get; set; }
+    public decimal? Width { get; set; }
+    public decimal? Length { get; set; }
+    public decimal? X { get; set; }
+    public decimal? Y { get; set; }
 
     public DateTime? BoughtDate { get; set; }
 

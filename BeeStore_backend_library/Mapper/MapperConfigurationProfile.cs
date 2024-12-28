@@ -46,14 +46,14 @@ namespace BeeStore_Repository.Mapper
                                                                      && u.IsDeleted == false)?.StoreId))
                     .ForMember(dest => dest.WorkAtWarehouseName, opt => opt.MapFrom((src, dest) =>
                                 src.StoreShippers.FirstOrDefault(u => u.EmployeeId.Equals(src.Id)
-                                                                       && u.IsDeleted == false)?.Store.Name ??
+                                                                       && u.IsDeleted == false)?.Store?.Name ??
                                 src.StoreStaffs.FirstOrDefault(u => u.EmployeeId.Equals(src.Id)
-                                                                     && u.IsDeleted == false)?.Store.Name))
+                                                                     && u.IsDeleted == false)?.Store?.Name))
                     .ForMember(dest => dest.WarehouseLocation, opt => opt.MapFrom((src, dest) =>
                                 src.StoreShippers.FirstOrDefault(u => u.EmployeeId.Equals(src.Id)
-                                                                       && u.IsDeleted == false)?.Store.Location ??
+                                                                       && u.IsDeleted == false)?.Store?.Location ??
                                 src.StoreStaffs.FirstOrDefault(u => u.EmployeeId.Equals(src.Id)
-                                                                     && u.IsDeleted == false)?.Store.Location))
+                                                                     && u.IsDeleted == false)?.Store?.Location))
                     .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
 
             CreateMap<Role, RoleListDTO>();
