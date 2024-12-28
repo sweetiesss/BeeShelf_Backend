@@ -945,6 +945,18 @@ public partial class BeeStoreDbContext : DbContext
             entity.Property(e => e.Price)
                 .HasPrecision(10, 2)
                 .HasColumnName("price");
+            entity.Property(e => e.Width)
+                .HasPrecision(10, 2)
+                .HasColumnName("width");
+            entity.Property(e => e.Length)
+                .HasPrecision(10, 2)
+                .HasColumnName("length");
+            entity.Property(e => e.X)
+                .HasPrecision(10, 2)
+                .HasColumnName("x");
+            entity.Property(e => e.Y)
+                .HasPrecision(10, 2)
+                .HasColumnName("y");
             entity.Property(e => e.RoomCode)
                 .HasMaxLength(25)
                 .HasColumnName("room_code");
@@ -975,11 +987,20 @@ public partial class BeeStoreDbContext : DbContext
                 .HasPrecision(10, 2)
                 .HasColumnName("capacity");
             entity.Property(e => e.Longitude)
-                .HasPrecision(10, 2)
+                .HasPrecision(11, 7)
                 .HasColumnName("longitude");
             entity.Property(e => e.Latitude)
-                .HasPrecision(10, 2)
+                .HasPrecision(10, 7)
                 .HasColumnName("latitude");
+            entity.Property(e => e.Width)
+                .HasPrecision(10, 2)
+                .HasColumnName("width");
+            entity.Property(e => e.Length)
+                .HasPrecision(10, 2)
+                .HasColumnName("length");
+            entity.Property(e => e.Cols)
+                .HasColumnName("cols")
+                .HasColumnType("int");
             entity.Property(e => e.CreateDate)
                 .HasColumnType("datetime")
                 .HasColumnName("create_date");

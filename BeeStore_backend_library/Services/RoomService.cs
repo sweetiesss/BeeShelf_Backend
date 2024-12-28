@@ -29,58 +29,75 @@ namespace BeeStore_Repository.Services
        
         public async Task<string> CreateRoom(RoomCreateDTO request)
         {
-            var exist = await _unitOfWork.StoreRepo.GetByIdAsync(request.WarehouseId);
+            var exist = await _unitOfWork.StoreRepo.GetByIdAsync(request.StoreId);
             if (exist == null)
             {
                 throw new KeyNotFoundException(ResponseMessage.WarehouseIdNotFound);
             }
             decimal? totalWeight = 0;
-            if(request.InventoryAmount > 0)
+            //if(request.InventoryAmount > 0)
+            //{
+            //    totalWeight = request.InventoryAmount * request.MaxWeight;
+            //}
+            //else
+            //{
+            //    throw new ApplicationException(ResponseMessage.BadRequest);
+            //}
+            foreach(var x in request.data)
             {
-                totalWeight = request.InventoryAmount * request.MaxWeight;
-            }
-            else
-            {
-                throw new ApplicationException(ResponseMessage.BadRequest);
+                totalWeight += x.MaxWeight;
+                if(exist.Rooms.Any(u => u.RoomCode.Equals(x.RoomCode)))
+                {
+                    throw new ApplicationException(ResponseMessage.InventoryNameDuplicate);
+                }
+                exist.Rooms.Add(new Room
+                {
+                    RoomCode = x.RoomCode,
+                    MaxWeight = x.MaxWeight,
+                    Weight = 0,
+                    Price = x.Price,
+                    StoreId = request.StoreId,
+                    Width = x.Width,
+                    Length = x.Length,
+                    X = x.X,
+                    Y = x.Y,
+                    IsCold = x.IsCold,
+                });
             }
 
-            //Check inv capacity with total capacity of warehouse
             if ((totalWeight += exist.Rooms.Sum(o => o.MaxWeight).Value) > exist.Capacity)
             {
                 throw new ApplicationException(ResponseMessage.WarehouseAddInventoryCapacityLimitReach);
             }
-            for (int i = 0; i < request.InventoryAmount; i++)
-            {
-                string inventoryName;
-                int attempts = 0;
-                const int maxAttempts = 100; 
 
-                do
-                {
-                    inventoryName = GenerateUniqueInventoryName();
-                    attempts++;
+            //Check inv capacity with total capacity of warehouse
 
-                    if (attempts >= maxAttempts)
-                    {
-                        throw new ApplicationException();
-                    }
-                }
-                while (_existingInventoryNames.Contains(inventoryName) ||
-                       exist.Rooms.Any(inv => inv.RoomCode == inventoryName && inv.StoreId.Equals(request.WarehouseId)));
 
-                
-                _existingInventoryNames.Add(inventoryName);
 
-                exist.Rooms.Add(new Room
-                {
-                    RoomCode = inventoryName,
-                    MaxWeight = request.MaxWeight,
-                    Weight = 0,
-                    Price = request.Price,
-                    StoreId = request.WarehouseId,
-                    IsCold = request.IsCold,
-                });
-            }
+            //for (int i = 0; i < request.InventoryAmount; i++)
+            //{
+            //    string inventoryName;
+            //    int attempts = 0;
+            //    const int maxAttempts = 100; 
+
+            //    do
+            //    {
+            //        inventoryName = GenerateUniqueInventoryName();
+            //        attempts++;
+
+            //        if (attempts >= maxAttempts)
+            //        {
+            //            throw new ApplicationException();
+            //        }
+            //    }
+            //    while (_existingInventoryNames.Contains(inventoryName) ||
+            //           exist.Rooms.Any(inv => inv.RoomCode == inventoryName && inv.StoreId.Equals(request.WarehouseId)));
+
+
+            //    _existingInventoryNames.Add(inventoryName);
+
+
+            //}
 
 
             //_unitOfWork.WarehouseRepo.Update(exist);
@@ -118,6 +135,10 @@ namespace BeeStore_Repository.Services
             }
             exist.IsCold = request.IsCold;
             exist.Price = request.Price;
+            exist.Width = request.Width;
+            exist.Length = request.Length;
+            exist.X = request.X;
+            exist.Y = request.Y;
             _unitOfWork.RoomRepo.Update(exist);
             await _unitOfWork.SaveAsync();
             return ResponseMessage.Success;
