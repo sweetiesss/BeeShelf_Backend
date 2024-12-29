@@ -295,7 +295,7 @@ namespace BeeStore_Repository.Services
 
             var exist = await _unitOfWork.RequestRepo.SingleOrDefaultAsync(u => u.Id == id, includes => includes.Include(o => o.Lot).ThenInclude(o => o.Room)
                                                                                                                 .Include(o => o.ExportFromLot).ThenInclude(o => o.Room)
-                                                                                                                .Include(o => o.SendToRoomId));
+                                                                                                                .Include(o => o.SendToRoom));
 
                 var staff = await _unitOfWork.EmployeeRepo.SingleOrDefaultAsync(u => u.Id == staffId, query => query.Include(o => o.StoreStaffs));
                 if (staff == null)
