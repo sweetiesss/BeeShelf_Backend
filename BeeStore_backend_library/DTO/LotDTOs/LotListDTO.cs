@@ -32,7 +32,7 @@
         public DateTime? ExpirationDate { get; set; }
 
         public int? RoomId { get; set; }
-        public int? RoomCode { get; set; }
+        public string? RoomCode { get; set; }
 
     }
 }
