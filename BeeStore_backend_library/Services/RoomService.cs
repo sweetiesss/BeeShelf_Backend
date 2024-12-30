@@ -35,6 +35,7 @@ namespace BeeStore_Repository.Services
                 throw new KeyNotFoundException(ResponseMessage.WarehouseIdNotFound);
             }
             decimal? totalWeight = 0;
+            decimal? storeWeight = exist.Rooms.Sum(o => o.MaxWeight).Value;
             //if(request.InventoryAmount > 0)
             //{
             //    totalWeight = request.InventoryAmount * request.MaxWeight;
@@ -65,7 +66,7 @@ namespace BeeStore_Repository.Services
                 });
             }
 
-            if ((totalWeight += exist.Rooms.Sum(o => o.MaxWeight).Value) > exist.Capacity)
+            if ((totalWeight + storeWeight) > exist.Capacity)
             {
                 throw new ApplicationException(ResponseMessage.WarehouseAddInventoryCapacityLimitReach);
             }
