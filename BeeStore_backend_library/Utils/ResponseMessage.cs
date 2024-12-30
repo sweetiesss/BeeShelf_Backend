@@ -71,7 +71,7 @@
         public const string WarehouseNameDuplicate = "Warehouse with this name already exist.";
         public const string WarehouseUserDuplicateList = "Please check provided list. The following user is duplicate: ";
         public const string WarehouseUserAddListFailed = "Failed to add. These user are already working at a warehouse ";
-        public const string WarehouseAddInventoryCapacityLimitReach = "Warehosue capacity limit reached";
+        public const string WarehouseAddInventoryCapacityLimitReach = "Warehouse capacity limit reached";
 
 
         //Batch response message
