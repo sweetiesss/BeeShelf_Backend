@@ -25,6 +25,8 @@
 
         public DateTime? CancelDate { get; set; }
 
+        public string? ReceiverName { get; set; }
+
         public string? ReceiverPhone { get; set; }
 
         public string? ReceiverAddress { get; set; }
