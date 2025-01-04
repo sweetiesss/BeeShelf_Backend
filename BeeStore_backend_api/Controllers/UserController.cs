@@ -88,5 +88,24 @@ namespace BeeStore_Api.Controllers
             var result = await _userService.DeleteEmployee(id);
             return Ok(result);
         }
+
+        [Route("get-provinces")]
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetProvinces([FromQuery][DefaultValue(0)] int pageIndex,
+                                                  [FromQuery][DefaultValue(10)] int pageSize)
+        {
+            var result = await _userService.GetProvinces(pageIndex, pageSize);
+            return Ok(result);
+        }
+
+        [Route("get-province/{id}")]
+        [HttpGet]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetProvince(int id)
+        {
+            var result = await _userService.GetProvince(id);
+            return Ok(result);
+        }
     }
 }
