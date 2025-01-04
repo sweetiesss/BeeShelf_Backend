@@ -25,9 +25,15 @@ namespace BeeStore_Repository.DTO.OrderDTOs
     {
         public int ProductId { get; set; }
         public int ProductAmount { get; set; }
-
-
+        public List<OrderStoreCreateDTO> ProductStore { get; set; } = new List<OrderStoreCreateDTO>();
     }
+
+    public class OrderStoreCreateDTO
+    {
+        public int? StoreId { get; set; }
+        public decimal? Distance { get; set; }
+    }
+
 
 
     public class OrderDetailCreateDTO

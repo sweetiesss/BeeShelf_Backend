@@ -117,7 +117,78 @@ namespace BeeStore_Repository.Services
             return await ListPagination<OrderListDTO>.PaginateList(result, pageIndex, pageSize);
         }
 
+        public async Task CreateOrderHandler(bool send, OrderCreateDTO request)
+        {
+            //for you who might dont understand wtf im doing(this could be me in the future)
+            //Here's a brief description of main point
 
+            //iterate through each product of the request
+            foreach(var singleProductDetail in request.Products){
+
+                var product = await _unitOfWork.ProductRepo.SingleOrDefaultAsync(u => u.Id.Equals(singleProductDetail.ProductId));
+                if(product == null) throw new KeyNotFoundException(ResponseMessage.ProductIdNotFound);
+
+                var TotalAmountOfProductInOrder = singleProductDetail.ProductAmount; // amount of product in the order
+
+                //iterate through all the store of the product that FE send
+                foreach(var ProductStore in singleProductDetail.ProductStore)
+                {
+                    var store = await _unitOfWork.StoreRepo.AnyAsync(u => u.Id.Equals(ProductStore.StoreId));
+                    //get a list of Lot with productId (i copied you so hopefully it works)
+                    var lotList = await _unitOfWork.LotRepo.GetQueryable(query => query.Where(u => u.ProductId.Equals(product.Id)
+                                                                    && u.RoomId.HasValue
+                                                                    && u.ImportDate.HasValue
+                                                                    && u.TotalProductAmount > 0
+                                                                    && u.Room.StoreId.Equals(ProductStore.StoreId)
+                                                                    && u.IsDeleted.Equals(false))
+                                                                    .OrderBy(u => u.ImportDate)
+                                                                    .Include(o => o.Product)
+                                                                    .Include(o => o.Room).ThenInclude(o => o.Store));
+                    // determine how much should i take
+                    int? totalNumberOfProduct = 0;
+                    foreach(var lot in lotList){
+                        totalNumberOfProduct += lot.TotalProductAmount;
+                    }
+
+                    // Create new Request to use the original CreateOrder - not gud
+                    var newRequest = RewriteOrderCreateDTO(product.Id,
+                                                           Math.Min(totalNumberOfProduct.Value, TotalAmountOfProductInOrder),
+                                                           request);
+                    
+                    CreateOrder(ProductStore.StoreId.Value, send, newRequest);
+
+                    // Recheck if we have all of the product in order or not
+                    TotalAmountOfProductInOrder -= totalNumberOfProduct.Value;
+                    if (TotalAmountOfProductInOrder <= 0) break;
+                }
+            }
+        }
+        
+        private OrderCreateDTO RewriteOrderCreateDTO(int productId, int productAmount, OrderCreateDTO request)
+        {
+            var productDetailDTO = new ProductDetailDTO();
+            productDetailDTO.ProductId = productId;
+            productDetailDTO.ProductAmount = productAmount;
+
+            var newList = new List<ProductDetailDTO>()
+            {
+                productDetailDTO
+            };
+
+            var newOrderCreateDTO = new OrderCreateDTO()
+            {
+                OcopPartnerId = request.OcopPartnerId,
+                DeliveryZoneId = request.DeliveryZoneId,
+                Distance = request.Distance,
+                ReceiverAddress = request.ReceiverAddress,
+                ReceiverName = request.ReceiverName,
+                ReceiverPhone = request.ReceiverPhone,
+                Products = newList
+            };
+
+
+            return newOrderCreateDTO;
+        }
 
         public async Task<string> CreateOrder(int storeId, bool send, OrderCreateDTO request)
         {
