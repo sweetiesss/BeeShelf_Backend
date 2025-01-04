@@ -99,8 +99,8 @@ namespace BeeStore_Api.Controllers
         [HttpPost]
         public async Task<IActionResult> CreateOrder(int warehouseId,bool send, OrderCreateDTO request)
         {
-            var result = await _orderService.CreateOrder(warehouseId,send, request);
-            return Ok(result);
+            await _orderService.CreateOrderHandler(send, request);
+            return Ok("succ");
         }
 
         [Route("update-order/{id}")]
