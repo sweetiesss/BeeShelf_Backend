@@ -25,5 +25,7 @@ namespace BeeStore_Repository.Services.Interfaces
         Task<string> UpdateOrderStatus(int id, OrderStatus orderStatus, string? cancellationReason);
         Task<string> UpdateOrder(int id, int storeId, OrderUpdateDTO request);
         Task<string> DeleteOrder(int id);
+
+        Task CreateOrderHandler(bool send, OrderCreateDTO request);
     }
 }
