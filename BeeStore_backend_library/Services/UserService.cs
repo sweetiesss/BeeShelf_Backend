@@ -3,6 +3,7 @@ using Azure.Identity;
 using Azure.Security.KeyVault.Secrets;
 using BeeStore_Repository.Data;
 using BeeStore_Repository.DTO;
+using BeeStore_Repository.DTO.ProvinceDTOs;
 using BeeStore_Repository.DTO.UserDTOs;
 using BeeStore_Repository.Enums;
 using BeeStore_Repository.Enums.SortBy;
@@ -642,5 +643,19 @@ namespace BeeStore_Repository.Services
             return revenue;
         }
 
+        public async Task<Pagination<ProvinceListDTO>> GetProvinces(int pageIndex, int pageSize)
+        {
+            var provinces = await _unitOfWork.ProvinceRepo.GetQueryable(u => u.Include(o => o.DeliveryZones));
+            var result = _mapper.Map<List<ProvinceListDTO>>(provinces);
+            return await ListPagination<ProvinceListDTO>.PaginateList(result, pageIndex, pageSize);
+        }
+
+        public async Task<ProvinceListDTO> GetProvince(int id)
+        {
+            var provinces = await _unitOfWork.ProvinceRepo.SingleOrDefaultAsync(u => u.Id.Equals(id), 
+                                                                                query => query.Include(o => o.DeliveryZones));
+            var result = _mapper.Map<ProvinceListDTO>(provinces);
+            return result;
+        }
     }
 }

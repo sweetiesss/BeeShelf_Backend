@@ -136,7 +136,8 @@ namespace BeeStore_Repository.Mapper
                 .ForMember(dest => dest.AssignedDriverEmail, opt => opt.MapFrom(src => src.AssignedDriver.Email))
                 .ForAllMembers(options => options.Condition((src, dest, srcMember) => srcMember != null));
             CreateMap<VehicleCreateDTO, Vehicle>();
-
+            CreateMap<Province, ProvinceListDTO>();
+            CreateMap<DeliveryZone, DZDTO>();
 
 
             CreateMap<StoreShipper, StoreShipperListDTO>()

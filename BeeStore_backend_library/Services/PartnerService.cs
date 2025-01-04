@@ -17,6 +17,7 @@ using System.Linq.Expressions;
 using System.Net.Mail;
 using System.Net;
 using BeeStore_Repository.Data;
+using BeeStore_Repository.DTO.ProductDTOs;
 
 namespace BeeStore_Repository.Services
 {
@@ -510,6 +511,35 @@ namespace BeeStore_Repository.Services
             {
                 throw;
             }
+        }
+
+        public async Task<ProductStoreListDTO> GetProductByProvinceId(int productId, int provinceId, int partnerId)
+        {
+            var stores = await _unitOfWork.StoreRepo.GetQueryable(u => u.Where(x => x.ProvinceId.Equals(provinceId)
+                                                                            && x.Rooms.Any(room => room.OcopPartnerId.Equals(partnerId)
+                                                                                && room.Lots.Any(lot => lot.ProductId.Equals(productId) && lot.ImportDate.HasValue)))
+                                                                        .Include(o => o.Rooms).ThenInclude(o => o.Lots).ThenInclude(o => o.Product)
+                                                                        .Include(o => o.Province));
+            stores = stores.ToList();
+            var list = stores.Select(s => new StoreDTO
+            {
+                Id = s.Id,
+                ProvinceId = s.ProvinceId,
+                Latitude = s.Latitude,
+                Longitude = s.Longitude,
+                Location = s.Location,
+                ProvinceName = s.Province.SubDivisionName,
+                ProductInStorage = s.Rooms
+                .SelectMany(r => r.Lots)
+                .Where(l => l.ProductId.Equals(productId))
+                .Sum(l => l.TotalProductAmount)
+            }).ToList();
+            var totalProducts = list.Sum(s => s.ProductInStorage ?? 0);
+            return new ProductStoreListDTO
+            {
+                totalProduct = totalProducts,
+                data = list
+            };
         }
     }
 }
