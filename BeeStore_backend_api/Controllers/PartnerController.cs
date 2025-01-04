@@ -94,6 +94,15 @@ namespace BeeStore_Api.Controllers
             return Ok(result);
         }
 
+        [Route("get-store-with-products/{productId}/{provinceId}/{partnerId}")]
+        [HttpGet]
+        [Authorize(Roles = "Admin,Partner")]
+        public async Task<IActionResult> GetStoreWithProducts(int productId, int provinceId, int partnerId)
+        {
+            var result = await _partnerService.GetProductByProvinceId(productId, provinceId, partnerId);
+            return Ok(result);
+        }
+
         [Route("get-verification-paper/{partnerId}")]
         [HttpGet]
         [Authorize(Roles = "Admin,Manager,Partner")]
