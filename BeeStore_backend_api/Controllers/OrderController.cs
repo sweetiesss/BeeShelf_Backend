@@ -95,7 +95,7 @@ namespace BeeStore_Api.Controllers
         }
 
         [Route("create-order")]
-        [Authorize(Roles = "Partner")]
+        [Authorize(Roles = "Admin,Partner")]
         [HttpPost]
         public async Task<IActionResult> CreateOrder(int warehouseId,bool send, OrderCreateDTO request)
         {

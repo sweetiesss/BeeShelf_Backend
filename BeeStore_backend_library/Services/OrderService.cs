@@ -155,7 +155,7 @@ namespace BeeStore_Repository.Services
                                                            Math.Min(totalNumberOfProduct.Value, TotalAmountOfProductInOrder),
                                                            request);
                     
-                    CreateOrder(ProductStore.StoreId.Value, send, newRequest);
+                    await CreateOrder(ProductStore.StoreId.Value, send, newRequest);
 
                     // Recheck if we have all of the product in order or not
                     TotalAmountOfProductInOrder -= totalNumberOfProduct.Value;
