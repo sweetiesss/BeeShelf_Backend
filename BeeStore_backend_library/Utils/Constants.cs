@@ -114,6 +114,9 @@
             public const string smtp = "smtp.gmail.com";
 
             public const string registerMailSubject = "BeeShelf Account Password";
+            public const string roomExpireMailSubject = "Room expiration.";
+            public const string lotExpireMailSubject = "Lot expiration.";
+            public const string partnerVerification = "BeeShelf Account Verification";
         }
     }
 }

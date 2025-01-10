@@ -55,6 +55,7 @@ namespace BeeStore_Repository.BackgroundServices
                     item.OcopPartnerId = null;
                 }
             }
+            await _unitOfWork.SaveAsync();
 
         }
 
@@ -79,7 +80,7 @@ namespace BeeStore_Repository.BackgroundServices
 
                 MailMessage mailMessage = new MailMessage();
                 mailMessage.From = new MailAddress(mailConfig.sourceMail);
-                mailMessage.Subject = Constants.Smtp.registerMailSubject;
+                mailMessage.Subject = Constants.Smtp.roomExpireMailSubject;
                 mailMessage.To.Add(target);
                 // Ignore this abomination below
                 if(LotName != null)
@@ -90,11 +91,11 @@ namespace BeeStore_Repository.BackgroundServices
                                         <div style='max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9; border-radius: 10px;'>
                                           <h2 style='color: #4CAF50;'>Welcome to BeeShelf!</h2>
                                           <p>Dear User,</p>
-                                          <p>Your inventory has expired: Inventory {inventory.RoomCode}</p>
-                                          <p style='font-weight: bold; font-size: 12px; color: #333;'>Lots inside inventory: </p>
+                                          <p>Your Room has expired: Room {inventory.RoomCode}</p>
+                                          <p style='font-weight: bold; font-size: 12px; color: #333;'>Lots inside room: </p>
                                             <span> {FormatLotsForEmail(LotName)} </span>
                                           
-                                          <p>Please retrieve these as soon as possible at warehouse {inventory.Store.Name}.</p>
+                                          <p>Please retrieve these as soon as possible at Store: {inventory.Store.Name}.</p>
                                           <p>You have three business day to retrieve it, if you don't we will have the authority to dismantle the products.</p>
                                           <p>Thank you for using our service!</p>
                                           <p style='margin-top: 30px; font-size: 12px; color: #888;'>This is an automated email, please do not reply.</p>
@@ -111,9 +112,9 @@ namespace BeeStore_Repository.BackgroundServices
                                         <div style='max-width: 600px; margin: 0 auto; padding: 20px; background-color: #f9f9f9; border-radius: 10px;'>
                                           <h2 style='color: #4CAF50;'>Welcome to BeeShelf!</h2>
                                           <p>Dear User,</p>
-                                          <p>Your inventory is about to be expired in {inventory.ExpirationDate.Value.Day} days: Inventory {inventory.RoomCode}</p>
+                                          <p>Your Room is about to be expired in {inventory.ExpirationDate.Value.Day} days: Room {inventory.RoomCode}</p>
     
-                                          <p>Please extend your inventory if you wish to use it for longer.</p>
+                                          <p>Please extend your Room if you wish to use it for longer.</p>
                                           <p>You have three business day to retrieve it, if you don't we will have the authority to dismantle the products.</p>
                                           <p>Thank you for using our service!</p>
                                           <p style='margin-top: 30px; font-size: 12px; color: #888;'>This is an automated email, please do not reply.</p>
