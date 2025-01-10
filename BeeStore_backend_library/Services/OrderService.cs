@@ -753,8 +753,11 @@ namespace BeeStore_Repository.Services
                         if (x.Status == Constants.Status.Shipping || x.Status == Constants.Status.Delivered
                             || x.Status == Constants.Status.Returned || x.Status == Constants.Status.Processing)
                         {
-                            b = false;
-                            break;
+                            if (x.Id != exist.Id)
+                            {
+                                b = false;
+                                break;
+                            }
                         }
                     }
                     if (b == true)
@@ -826,8 +829,11 @@ namespace BeeStore_Repository.Services
                         if (x.Status == Constants.Status.Shipping || x.Status == Constants.Status.Delivered
                             || x.Status == Constants.Status.Returned || x.Status == Constants.Status.Processing)
                         {
-                            b = false;
-                            break;
+                            if (x.Id != exist.Id)
+                            {
+                                b = false;
+                                break;
+                            }
                         }
                     }
                     if (b == true)
