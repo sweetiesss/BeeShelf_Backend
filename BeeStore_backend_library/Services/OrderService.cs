@@ -564,7 +564,7 @@ namespace BeeStore_Repository.Services
                 _ => string.Empty
             };
 
-            if(status != string.Empty)
+            if(status == string.Empty)
             {
                 throw new BadHttpRequestException(ResponseMessage.BadRequest);
             }
