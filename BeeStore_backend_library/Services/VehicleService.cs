@@ -88,12 +88,24 @@ namespace BeeStore_Repository.Services
             {
                 case VehicleType.Van:
                     VeType = Constants.VehicleType.Van;
+                    if(request.Capacity < 500 || request.Capacity > 3500)
+                    {
+                        throw new ApplicationException("Van's capacity should range from 500kg - 3500kg");
+                    }
                     break;
                 case VehicleType.Truck:
                     VeType = Constants.VehicleType.Truck;
+                    if(request.Capacity < 1000 || request.Capacity > 30000)
+                    {
+                        throw new ApplicationException("Truck's capacity should range from 1000kg - 30000kg");
+                    }
                     break;
                 case VehicleType.Motorcycle:
                     VeType = Constants.VehicleType.Motorcycle;
+                    if (request.Capacity < 50 || request.Capacity > 200)
+                    {
+                        throw new ApplicationException("Motorcycle's capacity should range from 50kg - 200kg");
+                    }
                     break;
                 default:
                     break;
