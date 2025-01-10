@@ -476,7 +476,7 @@ namespace BeeStore_Repository.Services
 
                 MailMessage mailMessage = new MailMessage();
                 mailMessage.From = new MailAddress(mailConfig.sourceMail);
-                mailMessage.Subject = Constants.Smtp.registerMailSubject;
+                mailMessage.Subject = Constants.Smtp.partnerVerification;
                 mailMessage.To.Add(target);
 
                     mailMessage.Body = $@"
@@ -486,9 +486,7 @@ namespace BeeStore_Repository.Services
                                           <h2 style='color: #4CAF50;'>Welcome to BeeShelf!</h2>
                                           <p>Dear User,</p>
                                           <p>{saythis}</p>
-                                          <p style='font-weight: bold; font-size: 12px; color: #333;'>Lots inside inventory: </p>
                                             <span> </span>
-                                          
                                           
                                           <p>Thank you for using our service!</p>
                                           <p style='margin-top: 30px; font-size: 12px; color: #888;'>This is an automated email, please do not reply.</p>

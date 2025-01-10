@@ -42,6 +42,7 @@ namespace BeeStore_Repository.BackgroundServices
                         item.CancellationReason = "Deliver window expired.";
                         item.CancelDate = DateTime.Now;
                         item.Lot.IsDeleted = true;
+                        _logger.LogInfo($"Change Request ID:{item.Id} to Expired.");
                     }
                 }
                 

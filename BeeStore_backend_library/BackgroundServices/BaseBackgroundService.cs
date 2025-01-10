@@ -6,6 +6,7 @@ namespace BeeStore_Repository.BackgroundServices
 {
     public abstract class BaseBackgroundService : BackgroundService
     {
+        private static SemaphoreSlim _semaphore = new SemaphoreSlim(1, 1);
         protected readonly IServiceProvider _serviceProvider;
         protected readonly ILoggerManager _logger;
 
@@ -30,9 +31,18 @@ namespace BeeStore_Repository.BackgroundServices
             {
                 try
                 {
-                    _logger.LogInfo($"Starting periodic task for {GetType().Name} at {DateTime.Now}");
+                    await _semaphore.WaitAsync(stoppingToken);
+                    try
+                    {
+                        _logger.LogInfo($"Starting periodic task for {GetType().Name} at {DateTime.Now}");
 
-                    await PerformPeriodicTaskAsync(stoppingToken);
+                        await PerformPeriodicTaskAsync(stoppingToken);
+                    }
+                    finally
+                    {
+                        // Release the semaphore so the next service can run
+                        _semaphore.Release();
+                    }
                 }
                 catch (Exception ex)
                 {
