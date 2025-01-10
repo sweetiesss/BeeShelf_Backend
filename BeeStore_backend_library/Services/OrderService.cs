@@ -747,26 +747,28 @@ namespace BeeStore_Repository.Services
                     {
                         await UpdateLotProductAmount(od.LotId, od.ProductAmount, true);
                     }
-
-                    foreach (var x in exist.Batch.Orders)
+                    if (exist.Batch != null)
                     {
-                        if (x.Status == Constants.Status.Shipping || x.Status == Constants.Status.Delivered
-                            || x.Status == Constants.Status.Returned || x.Status == Constants.Status.Processing)
+                        foreach (var x in exist.Batch.Orders)
                         {
-                            if (x.Id != exist.Id)
+                            if (x.Status == Constants.Status.Shipping || x.Status == Constants.Status.Delivered
+                                || x.Status == Constants.Status.Returned || x.Status == Constants.Status.Processing)
                             {
-                                b = false;
-                                break;
+                                if (x.Id != exist.Id)
+                                {
+                                    b = false;
+                                    break;
+                                }
                             }
                         }
-                    }
-                    if (b == true)
-                    {
-                        exist.Batch.Status = Constants.Status.Completed;
-                    }
+                        if (b == true)
+                        {
+                            exist.Batch.Status = Constants.Status.Completed;
+                        }
 
-                    // change the found vehicle's status to Available
-                    exist.Batch.DeliverByNavigation.Vehicles.First().Status = Constants.VehicleStatus.Available;
+                        // change the found vehicle's status to Available
+                        exist.Batch.DeliverByNavigation.Vehicles.First().Status = Constants.VehicleStatus.Available;
+                    }
                 }
                 else
                 {
