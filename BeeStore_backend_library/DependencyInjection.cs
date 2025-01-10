@@ -51,6 +51,9 @@ namespace BeeStore_Repository
 
             //Background services
             services.AddHostedService<InventoryExpirationService>();
+            services.AddHostedService<LotExpirationService>();
+            services.AddHostedService<RequestStatusChangeService>();
+
 
             //Memory Cache
             services.AddMemoryCache();
