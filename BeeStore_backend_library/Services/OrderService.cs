@@ -564,7 +564,10 @@ namespace BeeStore_Repository.Services
                 _ => string.Empty
             };
 
-            bool a = false;
+            if(status != string.Empty)
+            {
+                throw new BadHttpRequestException(ResponseMessage.BadRequest);
+            }
             //var orderStatusString = orderStatus.ToString();
 
             //from pending to processing
@@ -588,11 +591,6 @@ namespace BeeStore_Repository.Services
             //From Returned to refunded
             //await UpdateStatusRefundedOrder(orderStatusString, exist);
 
-
-            if (!a)
-            {
-                throw new BadHttpRequestException(ResponseMessage.BadRequest);
-            }
             return ResponseMessage.Success;
         }
 
