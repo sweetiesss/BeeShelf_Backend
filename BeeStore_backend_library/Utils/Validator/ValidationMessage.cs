@@ -21,7 +21,7 @@
         // Inventory specific messages
         public const string MaxWeightNonNegative = "MaxWeight must be a non-negative value.";
         public const string WeightNonNegative = "Weight must be a non-negative value.";
-        public const string WarehouseIdRequired = "WarehouseId is required.";
+        public const string WarehouseIdRequired = "StoreId is required.";
 
         // Lot specific messages
         public const string NameMaxLength50 = "Name cannot exceed 50 characters.";
@@ -90,7 +90,7 @@
         // Request specific messages
         public const string RequestNameRequired = "Name is required.";
         public const string RequestDescriptionRequired = "Description is required.";
-        public const string SendToInventoryIdRequired = "SendToInventoryId is required.";
+        public const string SendToInventoryIdRequired = "RoomId is required.";
         public const string LotRequired = "Lot is required.";
         public const string RequestTypeRequired = "RequestType is required.";
         public const string CancellationReasonRequired = "CancellationReason is required.";
