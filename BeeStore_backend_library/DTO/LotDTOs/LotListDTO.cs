@@ -14,6 +14,7 @@
 
         public int ProductId { get; set; }
         public string? ProductUnit {  get; set; }
+        public decimal? ProductWeight { get; set; }
         public string? ProductName { get; set; }
         public string? ProductPictureLink { get; set; }
 

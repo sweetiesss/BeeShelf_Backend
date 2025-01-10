@@ -235,6 +235,7 @@ namespace BeeStore_Repository.Services
             {
                 ProductId = l.ProductId,
                 ProductName = l.Product.Name,
+                ProductImage = l.Product.PictureLink,
                 StoreId = l.Room.Store.Id,
                 StoreName = l.Room.Store.Name,
                 StoreLocation = l.Room.Store.Location + ", " + l.Room.Store.Province.SubDivisionName
@@ -243,6 +244,7 @@ namespace BeeStore_Repository.Services
             {
                 id = (int)group.Key.ProductId,
                 ProductName = group.Key.ProductName,
+                ProductImage = group.Key.ProductImage,
                 stock = group.Sum(l => (int)l.TotalProductAmount),
                 storeId = (int)group.Key.StoreId,
                 storeName = group.Key.StoreName,

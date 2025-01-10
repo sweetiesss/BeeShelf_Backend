@@ -60,18 +60,18 @@
         public const string NotEnoughCredit = "Wallet doesn't have enough money.";
 
         //Inventory response message
-        public const string InventoryIdNotFound = "Inventory Id not found.";
-        public const string InventoryOccupied = "Inventory is already occupied.";
-        public const string InventoryOverWeightError = "Inventory will exceed the max weight if this item is added in.";
-        public const string InventoryNameDuplicate = "Inventory Name already exist.";
-        public const string InventoryPartnerNotMatch = "This Inventory does not belongs to this user.";
+        public const string InventoryIdNotFound = "Room Id not found.";
+        public const string InventoryOccupied = "Room is already occupied.";
+        public const string InventoryOverWeightError = "Room will exceed the max weight if this item is added in.";
+        public const string InventoryNameDuplicate = "Room Name already exist.";
+        public const string InventoryPartnerNotMatch = "This Room does not belongs to this user.";
 
         //Warehouse response message
-        public const string WarehouseIdNotFound = "Warehouse Id not found.";
-        public const string WarehouseNameDuplicate = "Warehouse with this name already exist.";
+        public const string WarehouseIdNotFound = "Store Id not found.";
+        public const string WarehouseNameDuplicate = "Store with this name already exist.";
         public const string WarehouseUserDuplicateList = "Please check provided list. The following user is duplicate: ";
-        public const string WarehouseUserAddListFailed = "Failed to add. These user are already working at a warehouse ";
-        public const string WarehouseAddInventoryCapacityLimitReach = "Warehouse capacity limit reached";
+        public const string WarehouseUserAddListFailed = "Failed to add. These user are already working at a Store ";
+        public const string WarehouseAddInventoryCapacityLimitReach = "Store capacity limit reached";
 
 
         //Batch response message
@@ -91,9 +91,9 @@
         public const string ProductListDuplicate = "Please check your provided list, these name are duplicate: ";
         public const string ProductPartnerNotMatch = "This product does not belongs to this user.";
         public const string ProductNotEnough = "Not enough products.";
-        public const string ProductMustBeFromTheSameWarehouse = "All product in an order must be in the same warehouse.";
-        public const string ProductAndRoomTypeNotMatch = "Product and room type does not match";
-        public const string ProductAlreadyInInventory = "Can't edit products already in Inventory.";
+        //public const string ProductMustBeFromTheSameWarehouse = "All product in an order must be in the same store.";
+        public const string ProductAndRoomTypeNotMatch = "Product and Room type does not match";
+        public const string ProductAlreadyInInventory = "Can't edit products already imported to a Room.";
 
         //Package response message
         public const string PackageIdNotFound = "Lot Id not found.";
@@ -104,7 +104,7 @@
         public const string OrderProccessedError = "You can't edit proccessed order.";
         public const string OrderCanceledError = "You can't canceled finished order.";
         public const string OrderSentError = "Order is already sent.";
-        public const string OrderDetailsError = "All items must be from the same warehouse.";
+        //public const string OrderDetailsError = "All items must be from the same Store.";
         public const string OrderBatchError = "There are orders that has already been assign to a batch.";
 
         //Product category response message
@@ -116,11 +116,11 @@
         public const string RequestStatusError = "Request has already been proccessed.";
         public const string RequestDraftCancelError = "Can't cancel draft request.";
         public const string RequestHasNotBeenProcessed = "Request has not been processed or have already been finished.";
-        public const string InventoryFromTheSameWarehouse = "You can't export a Lot to the same warehouse.";
-        public const string StaffCantProcessedExportOrderFromAnotherWarehouse = "This staff can't processed order export to another warehouse.";
+        public const string InventoryFromTheSameWarehouse = "You can't export a Lot to the same Store.";
+        public const string StaffCantProcessedExportOrderFromAnotherWarehouse = "This staff can't processed order export to another Store.";
 
         //Warehouse category response message
-        public const string WarehouseCategoryAddListFailed = "Failed to add. Warehouse with these category already exist: ";
+        public const string WarehouseCategoryAddListFailed = "Failed to add. Store with these category already exist: ";
         public const string WarehouseCategoryDuplicateList = "Please check provided list. The following category is duplicate: ";
 
         //Delivery Zone

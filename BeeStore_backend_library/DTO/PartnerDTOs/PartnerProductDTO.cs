@@ -11,6 +11,7 @@
     {
         public int id { get; set; }
         public string ProductName { get; set; }
+        public string ProductImage {  get; set; }
         public int stock { get; set; }
         public int storeId { get; set; }
         public string storeName { get; set; }
